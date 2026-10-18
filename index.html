@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50400">
+<meta name="kadraj-version" content="50401">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3000,7 +3000,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50400,APP_VER="5.4.0";
+const APP_V=50401,APP_VER="5.4.1";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -10857,7 +10857,14 @@ function krRing(c){krStop();KR.id=c.id;const p=P(c.peer);
 function krStop(){clearInterval(KR.t);KR.t=0;const id=KR.id;KR.id=null;if(!id||!navigator.serviceWorker)return;
  navigator.serviceWorker.ready.then(reg=>reg.getNotifications({tag:"call-"+id})).then(ns=>(ns||[]).forEach(n=>n.close())).catch(()=>{})}
 const startToneBase540=startTone;
-startTone=function(kind){if(kind==="ring"&&typeof CALL!=="undefined"&&CALL&&CALL.role==="callee"&&CALL.status==="incoming"&&krCan()){stopTone();return krRing(CALL)}return startToneBase540(kind)};
+startTone=function(kind){if(kind==="ring"&&typeof CALL!=="undefined"&&CALL&&CALL.role==="callee"&&CALL.status==="incoming"&&krCan()){stopTone();return krRing(CALL)}
+ if(kind==="back"){stopTone();return krBack()}return startToneBase540(kind)};
+/* 5.4.1 arayan taraftaki bekleme sesi: eski vızıltılı 440+480 Hz telefon tonu yerine yumuşak, alçak sesli üç notalı çan (do-mi-sol), 3,2 sn'de bir */
+function krBack(){let ctx;try{ctx=Music.ctx||(Music.ctx=new(window.AudioContext||window.webkitAudioContext)());ctx.resume()}catch{return}
+ const note=(f,t,v)=>{const o=ctx.createOscillator(),h=ctx.createOscillator(),g=ctx.createGain(),hg=ctx.createGain();o.type="sine";h.type="sine";o.frequency.value=f;h.frequency.value=f*2;hg.gain.value=.18;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.02);g.gain.exponentialRampToValueAtTime(.0008,t+1.1);o.connect(g);h.connect(hg);hg.connect(g);g.connect(ctx.destination);o.start(t);h.start(t);o.stop(t+1.15);h.stop(t+1.15)};
+ const chime=()=>{const t=ctx.currentTime+.03;note(523.25,t,.045);note(659.25,t+.18,.04);note(783.99,t+.36,.035)};
+ chime();toneT=setInterval(chime,3200)}
 const stopToneBase540=stopTone;
 stopTone=function(){krStop();return stopToneBase540()};
 /* beğen/kaydet zıplaması */
