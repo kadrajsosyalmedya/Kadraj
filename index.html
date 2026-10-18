@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50204">
+<meta name="kadraj-version" content="50300">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -2913,6 +2913,37 @@ html.reduce-motion .k51pt,html.reduce-motion .rzchip{transition:none!important}
 .swp-ic .i{width:16px;height:16px}
 .mrow:not(.me)>.swp-ic{left:-38px}.mrow.me>.swp-ic{right:-38px}
 /*}@css:520*/
+/*@css:530{*/
+/* 5.3.0 çoklu fotoğraf: akışta yana kaydırılan şerit, oluştur ekranında küçük resim şeridi */
+.phc{display:block}
+.phc-tr{display:flex;width:100%;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.phc-tr::-webkit-scrollbar{display:none}
+.media .phc-tr img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;scroll-snap-align:center;scroll-snap-stop:always;-webkit-user-drag:none}
+.phc-n{position:absolute;top:10px;right:10px;padding:5px 9px;border-radius:999px;background:rgba(0,0,0,.55);color:#fff;font:600 .72rem/1 var(--f-mono);pointer-events:none}
+.phc-d{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:5px;pointer-events:none}
+.phc-d i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);box-shadow:0 0 2px rgba(0,0,0,.45);transition:background .2s,transform .2s}
+.phc-d i.on{background:#fff;transform:scale(1.25)}
+.phc-b{position:absolute;top:50%;transform:translateY(-50%);width:2rem;height:2rem;padding:0;border-radius:50%;border:0;background:rgba(255,255,255,.88);color:#111;display:none;place-items:center;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.phc-b.pv{left:10px}.phc-b.nx{right:10px}
+.phc-b svg.i{width:1.1rem;height:1.1rem}
+:root[data-ui="vizor"] .phc-n{top:20px;right:22px;z-index:2;padding:5px 10px;font-size:.64rem;letter-spacing:.04em;background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+:root[data-ui="vizor"] .phc-d{bottom:19px;z-index:2}
+:root[data-ui="vizor"] .phc-b{z-index:2}
+@media (hover:hover) and (pointer:fine){.phc-b{display:grid}.phc-b[hidden]{display:none}}
+.phs{padding:8px 16px 0}
+.phs-r{position:relative;display:flex;gap:8px;overflow-x:auto;padding:8px 2px 4px;scrollbar-width:thin}
+.phs-t{position:relative;flex:0 0 auto}
+.phs-t>button[data-phi]{position:relative;display:block;width:58px;height:58px;padding:0;border:2px solid transparent;border-radius:12px;overflow:hidden;background:var(--surface-2);cursor:pointer}
+.phs-t[data-on="1"]>button[data-phi]{border-color:var(--accent)}
+.phs-t img{width:100%;height:100%;object-fit:cover;display:block}
+.phs-k{position:absolute;left:4px;bottom:4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:rgba(0,0,0,.6);color:#fff;font:600 .62rem/16px var(--f-mono);text-align:center}
+.phs-x{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;border:2px solid var(--bg);background:var(--fg);color:var(--bg);display:grid;place-items:center;padding:0;cursor:pointer}
+.phs-x svg.i{width:.75rem;height:.75rem}
+.phs-add{flex:0 0 auto;width:58px;height:58px;border-radius:12px;border:1.5px dashed var(--line);background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.phs-f{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.8rem;min-height:2.2rem}
+.phs-mv{display:flex;gap:2px}
+.phs-mv .ib:disabled{opacity:.35}
+/*}@css:530*/
 
 
 </style>
@@ -2953,7 +2984,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50204,APP_VER="5.2.4";
+const APP_V=50300,APP_VER="5.3.0";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3369,6 +3400,7 @@ function mediaHtml(p){
  if(p.kind==="note")return`<div class="note" style="background:${NOTE_BG[p.bg||0]}" data-dbl="${esc(p.id)}">${esc(p.text)}</div>`;
  if(p.kind==="poll")return pollHtml(p);
  if(p.kind==="reel"){const th=postThumb(p);return`<button class="media" style="--ar:4/5;display:block;width:100%" data-reel="${esc(p.id)}" aria-label="Klaketi izle">${th?`<img src="${esc(th)}" alt="" loading="lazy">`:""}<span class="badge-k">${I("reels")}Klaket${p.music&&p.music!=="none"?" · müzikli":""}</span><span class="playbig"><span>${I("play")}</span></span></button>`}
+ {const im=phList(p);if(im.length>1)return phCarousel(p,im)}
  return`<div class="media" style="--ar:${esc(p.ar||"1/1")}" data-dbl="${esc(p.id)}"><img src="${esc(R(p.src||p.img))}" alt="${esc((p.caption||"").slice(0,80))}" loading="lazy" ${p.css?`style="filter:${esc(p.css)}"`:""}></div>`}
 function pollHtml(p){const votes=votesOf(p);const tot=votes.reduce((a,b)=>a+b,0);const mv=myVote(p.id);const shown=mv!=null||p.uid===S.uid;
  return`<div class="poll"><div class="q">${esc(p.question)}</div>${p.options.map((o,i)=>{const pc=tot?Math.round(votes[i]/tot*100):0;return`<button class="popt ${mv===i?"mine":""}" data-vote="${esc(p.id)}" data-i="${i}">${shown?`<i class="bar" style="width:${pc}%"></i>`:""}<span>${esc(o)}</span>${shown?`<span class="pc">%${pc}</span>`:""}${mv===i?`<span>${I("check")}</span>`:""}</button>`}).join("")}<div class="tot">${fmt(tot)} oy${mv==null&&p.uid!==S.uid?" · oy verince sonuçları görürsün":""}</div></div>`}
@@ -3396,7 +3428,7 @@ function vExplore(){const q=(S.q||"").trim().toLocaleLowerCase("tr");
  const ps=allPosts().filter(canSee).sort((a,b)=>hash32(a.id,9).localeCompare(hash32(b.id,9)));
  return h+`<h3 class="sec-h"><span>Keşfedilecekler</span></h3>`+grid(ps)}
 function personRow(u){const p=P(u);return`<div class="row"><button data-prof="${esc(u)}">${avatar(u,48,{click:false})}</button><button class="t" data-prof="${esc(u)}"><div><b>${esc(p.name)}</b>${badge(u)}</div><div class="s">@${esc(p.username)}${S.online.has(u)?" · çevrimiçi":""}</div></button>${u!==S.uid&&!S.guest?`<button class="btn sm ${isFollowing(S.uid,u)?"sec":""}" data-follow="${esc(u)}">${isFollowing(S.uid,u)?"Takiptesin":"Takip et"}</button>`:""}</div>`}
-function tileInner(p){if(p.kind==="note")return`<span class="tx" style="background:${NOTE_BG[p.bg||0]}">${esc((p.text||"").slice(0,70))}</span>`;if(p.kind==="poll")return`<span class="tx" style="background:#0c7a63">${esc(p.question.slice(0,60))}</span><span class="k">${I("poll")}</span>`;const th=postThumb(p);return(th?`<img src="${esc(th)}" alt="" loading="lazy" ${p.css?`style="filter:${esc(p.css)}"`:""}>`:`<span class="tx" style="background:#111">${I("play")}</span>`)+(p.kind==="reel"?`<span class="k">${I("reels")}</span>`:"")}
+function tileInner(p){if(p.kind==="note")return`<span class="tx" style="background:${NOTE_BG[p.bg||0]}">${esc((p.text||"").slice(0,70))}</span>`;if(p.kind==="poll")return`<span class="tx" style="background:#0c7a63">${esc(p.question.slice(0,60))}</span><span class="k">${I("poll")}</span>`;const th=postThumb(p);return(th?`<img src="${esc(th)}" alt="" loading="lazy" ${p.css?`style="filter:${esc(p.css)}"`:""}>`:`<span class="tx" style="background:#111">${I("play")}</span>`)+(p.kind==="reel"?`<span class="k">${I("reels")}</span>`:p.kind==="photo"&&phList(p).length>1?`<span class="k" aria-label="Çoklu fotoğraf">${I("stack")}</span>`:"")}
 const pinsOf=uid=>((S.profiles[uid]||{}).pins||[]).filter(id=>{const p=postById(id);return p&&p.uid===uid}).slice(0,3);
 function withPins(list,uid){const pins=pinsOf(uid);if(!pins.length)return list;const top=pins.map(id=>list.find(p=>p.id===id)).filter(Boolean);return[...top,...list.filter(p=>!pins.includes(p.id))]}
 async function togglePin(id){if(!guard())return;const cur=pinsOf(S.uid);const on=cur.includes(id);if(!on&&cur.length>=3)return toast("En fazla 3 paylaşım sabitleyebilirsin. Önce birini kaldır.");
@@ -3721,7 +3753,8 @@ function openCreate(){if(!guard())return;
 async function openComposer(kind){if(!guard())return;
  S.cmp={kind,filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:kind==="reel"?"video":"slides"};
  if(kind==="draw"){const c=await openDraw();if(!c)return;S.cmp.kind="photo";S.cmp.img=c;return drawComposer()}
- if(kind==="photo"||kind==="story"){const r=await pickImage({title:kind==="story"?"Hikâyene ne ekleyelim?":"Fotoğraf ekle"});if(!r)return;S.cmp.img=r.img;S.cmp.src=r.src||null}
+ if(kind==="photo"){const a=await phPick(PH_MAX);if(!a)return;S.cmp.imgs=a;S.cmp.cur=0;S.cmp.img=a[0].img;S.cmp.src=a[0].src}
+ if(kind==="story"){const r=await pickImage({title:"Hikâyene ne ekleyelim?"});if(!r)return;S.cmp.img=r.img;S.cmp.src=r.src||null}
  drawComposer()}
 const arSize=ar=>ar==="4/5"?[1080,1350]:ar==="16/9"?[1080,608]:[1080,1080];
 function thumbOf(c){if(c._thumb&&c._thumbFor===c.img)return c._thumb;c._thumb=toCanvas(c.img,120,120).toDataURL("image/jpeg",.7);c._thumbFor=c.img;return c._thumb}
@@ -3731,11 +3764,11 @@ function drawComposer(){const c=S.cmp;const titles={photo:"Yeni fotoğraf",reel:
  $("#cmpT",l).textContent=titles[c.kind];const b=$("#cmpB",l);const go=$("#cmpGo",l);go.onclick=publishComposer;go.disabled=false;go.textContent="Paylaş";
  if(c._t){clearInterval(c._t);c._t=null}Music.stop();
  const capFields=`<div class="field"><label for="cCap">Açıklama</label><textarea class="in" id="cCap" maxlength="900" placeholder="Bir şeyler yaz… #etiket ekleyebilirsin">${esc(c.caption||"")}</textarea></div>${S.caps.sample&&c.kind==="photo"?`<button class="btn sec" id="cAI" type="button">${I("spark")}Rota açıklama yazsın</button>`:""}<div class="field"><label for="cLoc">Konum</label><input class="in" id="cLoc" maxlength="60" placeholder="Örn. Kadıköy, İstanbul" value="${esc(c.loc||"")}"></div>`;
- if(c.kind==="photo"){b.innerHTML=`<div class="pv"><canvas id="cCv"></canvas></div><div style="padding:6px 16px"><div class="seg">${[["1/1","Kare"],["4/5","Dikey"],["16/9","Yatay"]].map(([v,lb])=>`<button data-ar="${v}" aria-pressed="${c.ar===v}">${lb}</button>`).join("")}</div></div><div class="filters">${FILTERS.map((f,i)=>`<button data-flt="${i}" aria-pressed="${c.filter===i}"><img src="${thumbOf(c)}" style="filter:${f[1]||"none"}" alt="">${f[0]}</button>`).join("")}</div><div class="form">${capFields}<button class="btn ghost" id="cRe" type="button">Başka fotoğraf seç</button></div>`;
-  const redraw=()=>{const[w,h]=arSize(c.ar);const cv=$("#cCv",l);cv.width=w;cv.height=h;const x=cv.getContext("2d");x.filter=FILTERS[c.filter][1]||"none";coverDraw(x,c.img,w,h)};redraw();
+ if(c.kind==="photo"){phEnsure(c);b.innerHTML=`<div class="pv"><canvas id="cCv"></canvas></div>${phStripHtml(c)}<div style="padding:6px 16px"><div class="seg">${[["1/1","Kare"],["4/5","Dikey"],["16/9","Yatay"]].map(([v,lb])=>`<button data-ar="${v}" aria-pressed="${c.ar===v}">${lb}</button>`).join("")}</div></div><div class="filters">${FILTERS.map((f,i)=>`<button data-flt="${i}" aria-pressed="${c.filter===i}"><img src="${thumbOf(c)}" style="filter:${f[1]||"none"}" alt="">${f[0]}</button>`).join("")}</div><div class="form">${capFields}<button class="btn ghost" id="cRe" type="button">${c.imgs.length>1?"Bu fotoğrafı değiştir":"Başka fotoğraf seç"}</button></div>`;
+  const redraw=()=>{const[w,h]=arSize(c.ar);const cv=$("#cCv",l);cv.width=w;cv.height=h;const x=cv.getContext("2d");x.filter=FILTERS[c.filter][1]||"none";coverDraw(x,c.img,w,h)};redraw();phWire(c,l);
   $$("[data-ar]",l).forEach(el=>el.onclick=()=>{c.ar=el.dataset.ar;$$("[data-ar]",l).forEach(o=>o.setAttribute("aria-pressed",o===el));redraw()});
   $$("[data-flt]",l).forEach(el=>el.onclick=()=>{c.filter=+el.dataset.flt;$$("[data-flt]",l).forEach(o=>o.setAttribute("aria-pressed",o===el));redraw()});
-  $("#cRe",l).onclick=async()=>{const r=await pickImage();if(r){c.img=r.img;c.src=r.src||null;drawComposer()}};
+  $("#cRe",l).onclick=async()=>{const r=await pickImage();if(r){c.img=r.img;c.src=r.src||null;c.imgs[c.cur]={img:c.img,src:c.src};drawComposer()}};
   const ai=$("#cAI",l);if(ai)ai.onclick=()=>aiCaption(ai,$("#cCv",l))}
  else if(c.kind==="story"){b.innerHTML=`<div class="pv" style="background:transparent"><canvas id="cCv" style="max-height:52vh;border-radius:18px"></canvas></div><div class="form"><div class="field"><label for="cTxt">Üstüne yazı (isteğe bağlı)</label><input class="in" id="cTxt" maxlength="40" value="${esc(c.text||"")}" placeholder="Örn. Günaydın!"></div><button class="btn ghost" id="cRe" type="button">Başka fotoğraf seç</button><p class="muted" style="margin:0;font-size:.85rem">Hikâyen 24 saat boyunca akışın üstünde görünür. Yanıtlar sana mesaj olarak gelir.</p></div>`;
   const redraw=()=>{const cv=$("#cCv",l);cv.width=720;cv.height=1280;const x=cv.getContext("2d");coverDraw(x,c.img,720,1280);if(c.text){x.font="700 60px Unbounded, 'Avenir Next', sans-serif";x.textAlign="center";x.textBaseline="middle";const w=Math.min(660,x.measureText(c.text).width+70);x.fillStyle="rgba(0,0,0,.45)";x.beginPath();if(x.roundRect)x.roundRect(360-w/2,580,w,120,30);else x.rect(360-w/2,580,w,120);x.fill();x.fillStyle="#fff";x.fillText(c.text,360,642,620)}};redraw();
@@ -3781,7 +3814,8 @@ function drawComposer(){const c=S.cmp;const titles={photo:"Yeni fotoğraf",reel:
 async function publishComposer(){const c=S.cmp;const l=$('#overlay [data-layer="composer"]');const go=$("#cmpGo",l);const id=rid();const at=now();
  const base={uid:S.uid,at,caption:cleanText((c.caption||"").trim()),loc:(c.loc||"").trim(),...(c.noKids?{noKids:1}:{})};let doc,path="posts/"+id;
  try{
-  if(c.kind==="photo"){if(c.src&&c.ar==="1/1")doc={...base,kind:"photo",src:c.src,css:FILTERS[c.filter][1]||"",ar:c.ar,exif:`Filtre: ${FILTERS[c.filter][0]}`};
+  if(c.kind==="photo"&&c.imgs&&c.imgs.length>1){go.disabled=true;doc={...base,...await phPack(c,go)};if(!l.isConnected)return}
+  else if(c.kind==="photo"){if(c.src&&c.ar==="1/1")doc={...base,kind:"photo",src:c.src,css:FILTERS[c.filter][1]||"",ar:c.ar,exif:`Filtre: ${FILTERS[c.filter][0]}`};
    else{const cv=$("#cCv",l);doc={...base,kind:"photo",img:encode(cv,170000),ar:c.ar,exif:`Filtre: ${FILTERS[c.filter][0]} · ${cv.width} × ${cv.height}`}}}
   else if(c.kind==="story"){path="stories/"+id;doc={uid:S.uid,at,img:encode($("#cCv",l),170000)}}
   else if(c.kind==="note"){if(!(c.text||"").trim())return toast("Notuna bir şey yaz.");doc={...base,kind:"note",text:kidClean(c.text.trim()),bg:c.bg}}
@@ -4959,7 +4993,7 @@ const RULES=rulesText([]);
 const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır, herkes kendi e-postasıyla hesap açar). Alt dok: Akış, Keşfet, ortada + (Oluştur), Sohbet, Ben.
 - Oluştur (+): Fotoğraf, Klaket (kısa video, Kadraj'da Reels'in adı), Hikâye, Not (renkli zeminde yazı), Anket (2-4 seçenek), Çizim (parmakla).
 - Fotoğraf kaynakları: telefondan seç, kamera, Kadraj galerisi (hazır 10 fotoğraf), parmakla çizim, panodan yapıştırma. Dosya seçici açılmazsa galeri, çizim ya da yapıştırma kullanılır.
-- Fotoğraf: Kare/Dikey/Yatay kırpma, 7 filtre, açıklama, konum; "Rota açıklama yazsın" düğmesi.
+- Fotoğraf: Kare/Dikey/Yatay kırpma, 7 filtre, açıklama, konum; "Rota açıklama yazsın" düğmesi. Bir paylaşıma 10 fotoğrafa kadar eklenebilir (seçicide birden çok seç ya da şeritteki + ile ekle); şeritten seç, çıkar, sola/sağa taşı. Filtre ve oran hepsine uygulanır. Akışta yana kaydırarak bakılır, sağ üstte 2/5 gibi sayaç ve altta noktalar çıkar; ızgarada köşede üst üste kare ikonu.
 - Klaket: "Fotoğraflardan" (1-3 kare, ekrandaki yazı, hareket: Yakınlaş/Kaydır/Nabız, müzik: Lo-fi/Enerjik/Sakin; müzik cihazda üretilir) ya da "Video yükle" (en fazla 2 dakika, 40 MB; büyükler otomatik küçültülür). Klaketler ekranında sesi sağ üstteki hoparlör açar, çift dokunuş beğenir.
 - Hikâye: 24 saat görünür, üstüne yazı eklenebilir; yanıtlar mesaj olarak gelir.
 - Etkileşim: beğeni (çift dokunuş da olur), yorum, kaydet, arkadaşına gönder, anket oyu.
@@ -5277,6 +5311,7 @@ setTimeout(verTidyCache,9000);
 
 /* ---- A · Neler yeni ---- */
 const WN_ITEMS=[
+ {ic:"image",g:"linear-gradient(135deg,#0c7a63,#d97706)",t:"Çoklu fotoğraf",d:"Bir paylaşıma 10 fotoğrafa kadar ekle; akışta yana kaydırarak bakılır. Sırasını oluştur ekranındaki şeritten değiştirebilirsin",go:"feed"},
  {ic:"chat",g:"linear-gradient(135deg,#0c7a63,#2f6bff)",t:"@ ile bahset",d:"Mesajda @ yazınca öneriler çıkar. Birebir sohbette @rota yaz, Rota ikinize de katılsın; grupta arkadaşlarından bahset",go:"chats"},
  {ic:"reply",g:"linear-gradient(135deg,#5856d6,#0ea5e9)",t:"Kaydırarak yanıtla",d:"Kendi mesajını sola, karşı tarafınkini sağa kaydır; yanıt hazır",go:"chats"},
  {ic:"users",g:"linear-gradient(135deg,#ff8a3d,#e23e57)",t:"Grupta kim yazıyor",d:"Yazanlar fotoğraflarıyla görünür; iki kişi aynı anda yazarsa fotoğraflar üst üste biner",go:"chats"},
@@ -10721,6 +10756,45 @@ rotaJoin=async function(key,k){S.botTyping="bot:rota@"+key;renderMsgs();let repl
  if(k.type==="meydan")await write(()=>DB.set("chats/meydan",last),{quiet:true});else await write(()=>DB.update("chats/"+k.cid,last),{quiet:true})};
 rotaInRoom=function(key,k){return rotaJoin(key,k)};
 /*}@js:520*/
+/*@js:530{*/
+/* 5.3.0 Çoklu fotoğraf: bir paylaşımda en fazla PH_MAX fotoğraf. İlk fotoğraf eskisi gibi `src`/`img` alanında durur
+   (eski sürümler ve küçük resimler onu gösterir), diğerleri `posts.more:[...]` dizisinde (`phList` hepsini sırayla verir).
+   Filtre (`css`) ve oran (`ar`) hepsine uygulanır. Oluştur: `openComposer` fotoğrafı çoklu seçiciyle alır (`phPick`), S.cmp.imgs=[{img,src}],
+   S.cmp.cur seçili olan (c.img/c.src her zaman onu gösterir; `phEnsure`). Şerit `phStripHtml`/`phWire`: seç, çıkar, ekle, sola/sağa taşı.
+   Yayın `phPack`: her fotoğraf ayrı bütçeyle sıkıştırılır, belge 1 MB'ı aşmaz. Akış: `mediaHtml` → `phCarousel` (scroll-snap şerit,
+   sayaç, noktalar, fareyle oklar); kalınan fotoğraf `PHI[id]` ile yeniden çizimde korunur. Izgarada köşede `stack` ikonu. */
+const PH_MAX=10;const PHI={};
+Object.assign(IP,{stack:'<rect x="7" y="7" width="14" height="14" rx="2.5"/><path d="M3 15V5.5A2.5 2.5 0 0 1 5.5 3H15"/>'});
+function phList(p){if(!p||p.kind!=="photo")return[];return[p.src||p.img,...(Array.isArray(p.more)?p.more:[])].filter(x=>typeof x==="string"&&x)}
+function phCarousel(p,im){const id=esc(p.id),n=im.length,i=Math.min(PHI[p.id]||0,n-1);const css=p.css?` style="filter:${esc(p.css)}"`:"";const alt=esc((p.caption||"").slice(0,60));
+ return`<div class="media phc" style="--ar:${esc(p.ar||"1/1")}" data-dbl="${id}"><div class="phc-tr" data-phc="${id}">${im.map((s,k)=>`<img src="${esc(R(s))}" alt="${alt?alt+" · ":""}Fotoğraf ${k+1}/${n}" loading="lazy" draggable="false"${css}>`).join("")}</div><span class="phc-n">${i+1}/${n}</span><div class="phc-d" aria-hidden="true">${im.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div><button type="button" class="phc-b pv" data-phn="-1" aria-label="Önceki fotoğraf" ${i?"":"hidden"}>${I("prev")}</button><button type="button" class="phc-b nx" data-phn="1" aria-label="Sonraki fotoğraf" ${i<n-1?"":"hidden"}>${I("next")}</button></div>`}
+function phUpd(tr){const m=tr.parentElement;const n=tr.children.length;const i=Math.max(0,Math.min(n-1,Math.round(tr.scrollLeft/(tr.clientWidth||1))));PHI[tr.dataset.phc]=i;
+ const c=m.querySelector(".phc-n");if(c)c.textContent=`${i+1}/${n}`;m.querySelectorAll(".phc-d i").forEach((d,k)=>d.classList.toggle("on",k===i));
+ const pv=m.querySelector(".phc-b.pv"),nx=m.querySelector(".phc-b.nx");if(pv)pv.hidden=!i;if(nx)nx.hidden=i>=n-1}
+document.addEventListener("scroll",e=>{const t=e.target;if(t&&t.classList&&t.classList.contains("phc-tr"))phUpd(t)},true);
+/* oklar: tıklama ana dağıtıcıya gitmez, iki hızlı tıklama çift dokunma beğenisi sayılmaz */
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-phn]");if(!b)return;e.preventDefault();e.stopPropagation();const tr=b.parentElement.querySelector(".phc-tr");if(!tr)return;
+ const w=tr.clientWidth||1;const i=Math.round(tr.scrollLeft/w)+(+b.dataset.phn);tr.scrollTo({left:i*w,behavior:kbReduce()?"auto":"smooth"})},true);
+document.addEventListener("pointerup",e=>{if(e.target.closest&&e.target.closest("[data-phn]"))e.stopPropagation()},true);
+HOOKS.after.push(()=>{for(const tr of $$("#main .phc-tr")){const i=PHI[tr.dataset.phc]||0;if(i)tr.scrollLeft=i*tr.clientWidth}});
+/* oluştur */
+async function phPick(max){const a=await kmpOpen({title:"Fotoğraf ekle",accept:"image",multi:max>1,max,record:false});const r=(a||[]).filter(x=>x&&x.img).map(x=>({img:x.img,src:x.src||null}));return r.length?r:null}
+function phEnsure(c){if(!Array.isArray(c.imgs)||!c.imgs.length){c.imgs=[{img:c.img,src:c.src||null}];c.cur=0}c.cur=Math.max(0,Math.min(c.cur|0,c.imgs.length-1));const it=c.imgs[c.cur];c.img=it.img;c.src=it.src}
+function phThumb(it){if(!it._t)try{it._t=toCanvas(it.img,120,120).toDataURL("image/jpeg",.7)}catch{it._t=""}return it._t}
+function phStripHtml(c){const n=c.imgs.length;
+ return`<div class="phs"><div class="phs-r" id="phR">${c.imgs.map((it,i)=>`<div class="phs-t" data-on="${i===c.cur?1:0}"><button type="button" data-phi="${i}" aria-label="Fotoğraf ${i+1}" aria-pressed="${i===c.cur}"><img src="${esc(phThumb(it))}" alt=""><span class="phs-k">${i+1}</span></button>${n>1?`<button type="button" class="phs-x" data-phx="${i}" aria-label="Fotoğraf ${i+1}'i çıkar">${I("close")}</button>`:""}</div>`).join("")}${n<PH_MAX?`<button type="button" class="phs-add" id="phAdd" aria-label="Fotoğraf ekle">${I("add")}</button>`:""}</div>
+ <div class="phs-f"><span class="muted">${n>1?`${n} fotoğraf · filtre ve oran hepsine uygulanır`:`${PH_MAX} fotoğrafa kadar ekleyebilirsin`}</span>${n>1?`<span class="phs-mv"><button type="button" class="ib plain" data-phm="-1" ${c.cur?"":"disabled"} aria-label="Sola taşı">${I("prev")}</button><button type="button" class="ib plain" data-phm="1" ${c.cur<n-1?"":"disabled"} aria-label="Sağa taşı">${I("next")}</button></span>`:""}</div></div>`}
+function phWire(c,l){const open=()=>S.cmp===c&&!!$('#overlay [data-layer="composer"]');
+ const sel=i=>{if(!open())return;c.cur=i;const it=c.imgs[i];c.img=it.img;c.src=it.src;drawComposer()};
+ $$("[data-phi]",l).forEach(b=>b.onclick=()=>{const i=+b.dataset.phi;if(i!==c.cur)sel(i)});
+ $$("[data-phx]",l).forEach(b=>b.onclick=()=>{const i=+b.dataset.phx;if(c.imgs.length<2)return;c.imgs.splice(i,1);sel(i<c.cur?c.cur-1:Math.min(c.cur,c.imgs.length-1))});
+ $$("[data-phm]",l).forEach(b=>b.onclick=()=>{const j=c.cur+(+b.dataset.phm);if(j<0||j>=c.imgs.length)return;const t=c.imgs[c.cur];c.imgs[c.cur]=c.imgs[j];c.imgs[j]=t;sel(j)});
+ const ad=$("#phAdd",l);if(ad)ad.onclick=async()=>{const room=PH_MAX-c.imgs.length;if(room<1)return;const a=await phPick(room);if(!a||!open())return;const n=c.imgs.length;c.imgs.push(...a.slice(0,PH_MAX-n));sel(n)};
+ const r=$("#phR",l),on=r&&r.querySelector('[data-on="1"]');if(on)r.scrollLeft=Math.max(0,on.offsetLeft-(r.clientWidth-on.offsetWidth)/2)}
+async function phPack(c,go){const[w,h]=arSize(c.ar);const n=c.imgs.length;const per=Math.min(170000,Math.floor((S.mode==="local"?600000:860000)/n));const out=[];
+ for(let i=0;i<n;i++){go.textContent=`Hazırlanıyor ${i+1}/${n}`;await new Promise(r=>setTimeout(r,16));const it=c.imgs[i];out.push(it.src&&c.ar==="1/1"?it.src:encode(toCanvas(it.img,w,h),per))}
+ return{kind:"photo",src:out[0],more:out.slice(1),css:FILTERS[c.filter][1]||"",ar:c.ar,exif:`Filtre: ${FILTERS[c.filter][0]} · ${n} fotoğraf`}}
+/*}@js:530*/
 
 
 boot();
