@@ -3362,6 +3362,8 @@ html.reduce-motion .reel .rdisc img{animation:none}
 .k6-cover{position:absolute;z-index:-1;left:12px;right:12px;top:4px;height:84px;overflow:hidden;border-radius:26px;background:var(--surface-2);pointer-events:none}
 .k6-cover img{position:absolute;left:-25%;top:-60%;width:150%;height:220%;max-width:none;object-fit:cover;filter:blur(24px) saturate(1.5);opacity:.85}
 .k6-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 14%,transparent),transparent 55%,color-mix(in srgb,var(--bg) 55%,transparent))}
+:root[data-mode="dark"] .k6-cover img{opacity:.5}
+:root[data-mode="dark"] .k6-cover::after{background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent 45%,color-mix(in srgb,var(--bg) 75%,transparent))}
 :root[data-ui] .prof.k6-hasc{padding-top:52px}
 :root[data-ui] .prof.k6-hasc::before{content:none}
 :root[data-ui] .prof.k6-hasc .prof-top{align-items:flex-end;padding-left:8px}
