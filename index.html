@@ -3359,12 +3359,12 @@ html.reduce-motion .reel .rdisc img{animation:none}
 :root[data-ui] .prof{position:relative;isolation:isolate;gap:12px;padding:10px 16px 6px}
 :root[data-ui] .prof::before{content:"";position:absolute;z-index:-1;left:0;right:0;top:-150px;height:320px;pointer-events:none;background:radial-gradient(48% 52% at 22% 56%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 72%),radial-gradient(38% 46% at 80% 40%,color-mix(in srgb,var(--sun) 15%,transparent),transparent 72%)}
 /* kapak şeridi: kişinin fotoğrafı bulanık, altı zemine kaybolur; fotoğraf şeridin altına taşar */
-.k6-cover{position:absolute;z-index:-1;left:12px;right:12px;top:4px;height:96px;overflow:hidden;border-radius:26px;background:var(--surface-2);pointer-events:none}
+.k6-cover{position:absolute;z-index:-1;left:12px;right:12px;top:4px;height:84px;overflow:hidden;border-radius:26px;background:var(--surface-2);pointer-events:none}
 .k6-cover img{position:absolute;left:-25%;top:-60%;width:150%;height:220%;max-width:none;object-fit:cover;filter:blur(24px) saturate(1.5);opacity:.85}
 .k6-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 14%,transparent),transparent 55%,color-mix(in srgb,var(--bg) 55%,transparent))}
 :root[data-ui] .prof.k6-hasc{padding-top:52px}
-:root[data-ui] .prof.k6-hasc::before{top:40px}
-:root[data-ui] .prof.k6-hasc .prof-top{align-items:flex-end}
+:root[data-ui] .prof.k6-hasc::before{content:none}
+:root[data-ui] .prof.k6-hasc .prof-top{align-items:flex-end;padding-left:8px}
 :root[data-ui] .prof.k6-hasc .prof-top>.av img{box-shadow:0 0 0 4px var(--bg),var(--k6-e2)}
 :root[data-ui] .prof.k6-hasc .prof-top>.av.ring::before{inset:calc(var(--s,44px) * -.085 - 4px)}
 :root[data-ui] .prof-top{gap:18px}
@@ -3448,6 +3448,7 @@ html.reduce-motion .reel .rdisc img{animation:none}
  :root[data-ui] #shell:is([data-r="explore"],[data-r="profile"],[data-r="admin"],[data-r="chess"]){--k6-w:800px}
  :root[data-ui] #shell:not([data-r="chat"]):not([data-r="chessgame"]) main:not(.snap){padding-left:calc((100% - var(--k6-w)) / 2);padding-right:calc((100% - var(--k6-w)) / 2)}
  :root[data-ui] #shell:not([data-r="chat"]):not([data-r="chessgame"]) .hd{padding-left:max(16px,calc((100% - var(--k6-w)) / 2 + 16px));padding-right:max(16px,calc((100% - var(--k6-w)) / 2 + 16px))}
+ :root[data-ui]:not([data-ui="vizor"]) .dock nav{max-width:600px}
 }
 /*}@css:60UI*/
 /*@css:580{*/
