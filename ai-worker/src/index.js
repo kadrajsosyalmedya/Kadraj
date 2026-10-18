@@ -206,6 +206,38 @@ function flatText(c) {
   if (typeof c === "string") return c;
   return (c || []).filter((b) => b.type === "text").map((b) => b.text).join("\n");
 }
+// Ücretsiz yolda metin modeli fotoğraf göremez. Son kullanıcı mesajında fotoğraf varsa önce bir görsel modeline betimletilir,
+// betimleme sisteme eklenir. Modeller sırayla denenir (Cloudflare model kaldırırsa sıradaki çalışır; VISION_MODEL ile değiştirilebilir).
+const VISION_MODELS = ["@cf/google/gemma-4-26b-a4b-it", "@cf/meta/llama-4-scout-17b-16e-instruct", "@cf/llava-hf/llava-1.5-7b-hf"];
+const VISION_PROMPT = "Describe this photo factually in 3-5 sentences: the main subject, the setting, colors, mood and any visible text. Do not guess names of people.";
+function lastImage(messages) {
+  const m = messages[messages.length - 1];
+  if (!m || m.role !== "user" || !Array.isArray(m.content)) return null;
+  const b = m.content.find((x) => x.type === "image");
+  return b ? b.source : null;
+}
+async function describeImage(env, src) {
+  const list = env.VISION_MODEL ? [String(env.VISION_MODEL), ...VISION_MODELS] : VISION_MODELS;
+  for (const model of list) {
+    try {
+      let r;
+      if (/llava/.test(model)) {
+        const bin = atob(src.data);
+        const bytes = new Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        r = await env.AI.run(model, { image: bytes, prompt: VISION_PROMPT, max_tokens: 300 });
+      } else {
+        r = await env.AI.run(model, {
+          messages: [{ role: "user", content: [{ type: "text", text: VISION_PROMPT }, { type: "image_url", image_url: { url: "data:" + src.media_type + ";base64," + src.data } }] }],
+          max_tokens: 300,
+        });
+      }
+      const t = String((r && (r.description ?? r.response ?? r.result?.response ?? r.choices?.[0]?.message?.content)) || "").trim();
+      if (t) return t.slice(0, 1500);
+    } catch {}
+  }
+  return "";
+}
 async function askFree(env, body, uid, fetcher = fetch) {
   const messages = cleanMessages(body.messages);
   if (!messages) return { status: 400, data: { error: "bad_request", message: "İstek biçimi hatalı." } };
@@ -225,10 +257,21 @@ async function askFree(env, body, uid, fetcher = fetch) {
       }
     } catch {}
   }
+  const img = lastImage(messages);
+  let saw = false;
+  if (img) {
+    const desc = await describeImage(env, img);
+    if (desc) {
+      saw = true;
+      sys += "\n\nKişinin gönderdiği fotoğrafın betimlemesi (görsel modelinden, İngilizce):\n" + desc + "\nYanıtını bu betimlemeye dayandır; betimlemede olmayan ayrıntı uydurma.";
+    } else {
+      sys += "\n\nKişi bir fotoğraf gönderdi ama şu an fotoğrafı göremiyorsun. Fotoğrafta ne olduğuna dair hiçbir ayrıntı uydurma; içerikten bağımsız, genel bir yanıt ver.";
+    }
+  }
   const msgs = [{ role: "system", content: sys }, ...messages.map((m) => ({ role: m.role, content: flatText(m.content) }))];
   const r = await env.AI.run(model, { messages: msgs, max_tokens: 900 });
   const text = String((r && (r.response ?? r.result?.response)) || "").trim();
-  return { status: 200, data: { text, sources, model, provider: "free", searched: !!sources.length } };
+  return { status: 200, data: { text, sources, model, provider: "free", searched: !!sources.length, ...(img ? { saw } : {}) } };
 }
 
 async function ask(env, body) {
