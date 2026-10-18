@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50701">
+<meta name="kadraj-version" content="50702">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -2999,7 +2999,7 @@ html.reduce-motion #msgs .mn-ty.gl-in,html.reduce-motion .kpop svg.i,html.reduce
 /* 5.7.0 Klaket ekranı yenilendi: boşluklar düz siyah, hafif gölge, cam düğmeler, dönen ses plağı; geniş ekranda düğmeler videonun yanında */
 .reel{container-type:size}
 .reel .rblur{display:none!important}
-.reel video.rfill{object-fit:cover}
+.reel video{object-fit:contain!important}
 .reel .shade{background:linear-gradient(to bottom,rgba(0,0,0,.28),transparent 13%,transparent 70%,rgba(0,0,0,.42) 100%)}
 .reel-top>div{padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px}
 .reel-top .ib,.reel-top .rnew{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);color:#fff;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
@@ -3108,7 +3108,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50701,APP_VER="5.7.1";
+const APP_V=50702,APP_VER="5.7.2";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -5151,7 +5151,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.5 Rota fotoğrafa bakar: Rota sohbetinde + ile fotoğraf gönderilebilir; Rota fotoğrafa bakıp yanıt verir ("Bu ne?", "Bu soruyu çöz", "Hangisi daha güzel?"). Fotoğrafı göremezse bunu söyler, uydurmaz.
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
-- 5.7 Klaket ekranı: videonun dışında kalan yerler düz siyah; dikey videolar ekranı doldurur, yatay videolar siyah boşlukla tamamen görünür. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
+- 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -11155,10 +11155,7 @@ function ciAct(a,key,k,paint){const c=S.chats[k.cid]||{};
    if(!ok)return;S.chats={...S.chats,[k.cid]:{...c,nicks:{...cur,...ch}}};closeLayer("cinick");toast("Takma adlar kaydedildi");
    const nm=(me().name||me().username||"").trim();for(const[u,v]of Object.entries(ch)){const who=u===S.uid?"kendi":P(u).name+" için";sendMessage(key,{text:v?`${nm} ${who} takma adını “${v}” yaptı`:`${nm} ${who} takma adını kaldırdı`,sys:"nick"}).catch(()=>{})}
    renderTop();renderMsgs()};return}}
-/* Klaket: dikey video ekrana yakın orandaysa ekranı doldurur (kenarlardan en fazla %22 kırpılır), değilse (yatay video) siyah boşlukla tamamı görünür */
-function rfillFit(v){const vw=v.videoWidth,vh=v.videoHeight,r=v.closest(".reel");if(!vw||!vh||!r)return;const va=vw/vh,ca=r.clientWidth/Math.max(1,r.clientHeight);const crop=1-Math.min(va,ca)/Math.max(va,ca);v.classList.toggle("rfill",vh>=vw&&crop<=.22)}
-document.addEventListener("loadedmetadata",e=>{const v=e.target;if(v&&v.matches&&v.matches(".reel video"))rfillFit(v)},true);
-addEventListener("resize",()=>{for(const v of $$("#main .reel video"))rfillFit(v)});
+/* 5.7.2: Klaket videosu hiç kırpılmaz, her zaman tamamı görünür (object-fit:contain); boşluklar siyah */
 /* Klaket: sağ altta dönen ses plağı */
 function rdiscHtml(p){const own=P(p.uid);return`<span class="rdisc" aria-hidden="true"><img src="${esc(own.avatar||"")}" alt=""></span>`}
 /* açıklamaya dokununca tamamı açılır */
