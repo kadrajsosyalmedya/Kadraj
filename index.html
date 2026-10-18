@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50700">
+<meta name="kadraj-version" content="50701">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3005,19 +3005,28 @@ html.reduce-motion #msgs .mn-ty.gl-in,html.reduce-motion .kpop svg.i,html.reduce
 .reel-top .ib,.reel-top .rnew{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);color:#fff;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 .reel-top .ib{border-radius:50%}
 .reel-top .rnew{border-radius:999px;color:#fff}
-.reel .side{right:max(8px,calc(50% - 28.125cqh - 4.4rem));gap:18px;bottom:calc(5.6rem + env(safe-area-inset-bottom,0px))}
+.reel .side{right:8px;gap:18px;bottom:calc(5.2rem + env(safe-area-inset-bottom,0px))}
 .reel .side button{font:600 .74rem/1 var(--f-body);text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .reel .side button>span:first-child{width:2.9rem;height:2.9rem;border-radius:50%;background:none;filter:drop-shadow(0 1px 4px rgba(0,0,0,.45))}
 .reel .side svg.i{width:1.85rem;height:1.85rem;stroke-width:1.9}
 .reel .side button:active>span:first-child{transform:scale(.88);transition:transform .12s}
-.reel .info{left:max(14px,calc(50% - 28.125cqh + 14px));right:max(4.6rem,calc(50% - 28.125cqh + 4.6rem));bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));gap:9px}
-.reel .info .u .av{box-shadow:0 0 0 2px rgba(255,255,255,.9)}
+.reel .info{left:12px;right:4.6rem;bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));gap:9px}
+/* yalnızca ekran videodan çok genişse (yatay tablet, bilgisayar) düğmeler ve yazılar 9:16 videonun yanına gelir */
+@container (min-aspect-ratio:4/5){.reel .side{right:max(8px,calc(50% - 28.125cqh - 4.4rem))}.reel .info{left:max(12px,calc(50% - 28.125cqh + 12px));right:max(4.6rem,calc(50% - 28.125cqh + 4.6rem))}}
+/* 5.7.1 Klaket alt bilgisi: yuvarlak profil fotoğrafı en solda, adın yanında Takip et; ses satırı yok */
+.reel .info .u{gap:10px;flex-wrap:nowrap;min-width:0}
+.reel .info .u>button[data-prof]{gap:10px!important;min-width:0;flex:0 1 auto;overflow:hidden}
+.reel .info .u .fbtn{flex:none}
+.reel .info .u .av{--s:38px!important;width:38px;height:38px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.95);flex:none}
+.reel .info .u .av img{border-radius:50%}
+.reel .info .u>button[data-prof]>span:last-child{font-weight:700;font-size:.98rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reel .info .aud{display:none}
+.reel .fbtn{border:1.5px solid rgba(255,255,255,.9);border-radius:10px;padding:5px 14px;font-size:.84rem;font-weight:700;background:rgba(0,0,0,.12)}
 .reel .info .c{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.92rem;line-height:1.35}
 .reel .info .c.open{-webkit-line-clamp:unset;display:block;max-height:40cqh;overflow:auto}
-.reel .fbtn{border-radius:999px;padding:5px 12px;background:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .reel .aud{max-width:100%;overflow:hidden;white-space:nowrap}
-.reel .rdisc{display:block;width:2.3rem;height:2.3rem;border-radius:10px;padding:3px;background:#1b1b1b;box-shadow:0 0 0 1.5px rgba(255,255,255,.55);overflow:hidden;margin-top:2px}
-.reel .rdisc img{width:100%;height:100%;object-fit:cover;border-radius:7px;display:block}
+.reel .rdisc{display:block;width:2.3rem;height:2.3rem;border-radius:50%;padding:5px;background:radial-gradient(circle,#333 0 30%,#111 31%);box-shadow:0 0 0 1.5px rgba(255,255,255,.5);overflow:hidden;margin-top:2px}
+.reel .rdisc img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
 .reel:not(.paused) .rdisc img{animation:rdisc 8s linear infinite}
 @keyframes rdisc{to{transform:rotate(360deg)}}
 .reel .rprog{height:2px;background:rgba(255,255,255,.18)}
@@ -3099,7 +3108,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50700,APP_VER="5.7.0";
+const APP_V=50701,APP_VER="5.7.1";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -5142,7 +5151,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.5 Rota fotoğrafa bakar: Rota sohbetinde + ile fotoğraf gönderilebilir; Rota fotoğrafa bakıp yanıt verir ("Bu ne?", "Bu soruyu çöz", "Hangisi daha güzel?"). Fotoğrafı göremezse bunu söyler, uydurmaz.
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
-- 5.7 Klaket ekranı: videonun dışında kalan yerler düz siyah; dikey videolar ekranı doldurur, yatay videolar siyah boşlukla tamamen görünür. Açıklamaya dokununca tamamı açılır. Sağ altta paylaşanın fotoğrafıyla dönen ses plağı var.
+- 5.7 Klaket ekranı: videonun dışında kalan yerler düz siyah; dikey videolar ekranı doldurur, yatay videolar siyah boşlukla tamamen görünür. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
