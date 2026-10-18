@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50704">
+<meta name="kadraj-version" content="50705">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3108,7 +3108,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50704,APP_VER="5.7.4";
+const APP_V=50705,APP_VER="5.7.5";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -8357,7 +8357,9 @@ function cwMeasProfile(){const pr=document.querySelector("#main .prof");if(!pr)r
  return{in:pr,left,right:sr.right,top,bottom,grow:{el:bt,prop:"marginTop",max:44}}}
 function cwMeasNook(){const reel=activeReel&&activeReel.isConnected?activeReel:document.querySelector("#main .reel");if(!reel)return null;const side=reel.querySelector(".side");if(!side)return null;
  const rr=cwRect(reel),sr=cwRect(side);if(rr.height<200)return null;const u=cwDpF(Math.min(CW.uRoam*.8,(rr.width*.5)/44));if(u<2)return null;const w=44*u,h=24*u;
- const right=Math.min(rr.right-6,sr.right+4),bottom=sr.top-8;if(bottom-h<rr.top+72)return null;return{reel,u,w,h,left:right-w,top:bottom-h,rr}}
+ const right=Math.min(rr.right-6,sr.right+4),bottom=sr.top-8;if(bottom-h<rr.top+72)return null;
+ /* 5.7.5: raf Klaketle birlikte kaymaz; konum kaydırma kutusuna (#main) göre hesaplanır, raf #shell içinde sabit durur */
+ const mr=cwRect(document.getElementById("main")||reel);return{reel,u,w,h,left:mr.left+(right-w-rr.left),top:mr.top+(bottom-h-rr.top),rr}}
 function cwMeasDisco(){const sh=document.querySelector('#overlay .layer[data-layer="comments"] .sheet');if(!sh)return null;const r=cwRect(sh);const u=cwDpF(Math.min(CW.uRoam*.8,3.4));const h=32*u;
  const T=(window.visualViewport?window.visualViewport.offsetTop:0)+8;if(r.top-h<T)return null;return{sheet:sh,u,w:44*u,h}}
 function cwRoomWant(){if(!CW.root||(!cwOn()&&!CW.leaving)||!S.authed||!S.uid)return null;
@@ -8382,7 +8384,7 @@ function cwRoomPos(R,g){const el=R.el;let x,y;
  if(R.kind==="room"){if(g.in){const c=g.in;if(!c.classList.contains("cw-rc"))c.classList.add("cw-rc");if(el.parentNode!==c)c.appendChild(el);if(CW.hostEl&&CW.hostEl.isConnected)CW.hostEl.remove();
    const cr=cwRect(c);x=g.right-R.w-cr.left-c.clientLeft;y=g.bottom-R.h-cr.top-c.clientTop}
   else{const h=cwHost(g.after);if(el.parentNode!==h)h.appendChild(el);const hr=cwRect(h);x=g.right-R.w-hr.left;y=g.bottom-R.h-hr.top}}
- else if(R.kind==="nook"){if(el.parentNode!==g.reel){g.reel.appendChild(el);if(R.reel&&R.reel!==g.reel)setTimeout(cwClap,350)}R.reel=g.reel;x=g.left-g.rr.left;y=g.top-g.rr.top}
+ else if(R.kind==="nook"){const host=document.getElementById("shell")||document.body;if(el.parentNode!==host)host.appendChild(el);if(R.reel&&R.reel!==g.reel)setTimeout(cwClap,350);R.reel=g.reel;const hr=cwRect(host);x=g.left-hr.left-host.clientLeft;y=g.top-hr.top-host.clientTop}
  else{if(el.parentNode!==g.sheet)g.sheet.appendChild(el);el.style.left="";el.style.top="";return}
  x=cwDp(x);y=cwDp(y);const k=x+","+y;if(R.pk!==k){R.pk=k;el.style.left=x+"px";el.style.top=y+"px"}}
 function cwRoomSync(){if(!CW.root||CW.syncing)return;CW.syncing=true;try{
