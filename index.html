@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50602">
+<meta name="kadraj-version" content="50700">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -2995,6 +2995,70 @@ html.reduce-motion #msgs .mn-ty.gl-in,html.reduce-motion .kpop svg.i,html.reduce
 .dock .create{width:3.2rem;height:3.2rem}
 @media (max-width:370px){.dock nav>button .dl{display:none}.dock nav>button{padding:9px 0}.dock nav{grid-template-columns:repeat(3,minmax(0,1fr)) 3.2rem repeat(3,minmax(0,1fr))}:root[data-ui="vizor"] .dock nav{grid-template-columns:repeat(3,minmax(0,1fr)) 3.6rem repeat(3,minmax(0,1fr))}.dock .create{width:2.9rem;height:2.9rem;border-radius:17px}:root[data-ui="vizor"] .dock .create{width:3rem;height:3rem}}
 /*}@css:560*/
+/*@css:570{*/
+/* 5.7.0 Klaket ekranı yenilendi: boşluklar düz siyah, hafif gölge, cam düğmeler, dönen ses plağı; geniş ekranda düğmeler videonun yanında */
+.reel{container-type:size}
+.reel .rblur{display:none!important}
+.reel video.rfill{object-fit:cover}
+.reel .shade{background:linear-gradient(to bottom,rgba(0,0,0,.28),transparent 13%,transparent 70%,rgba(0,0,0,.42) 100%)}
+.reel-top>div{padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px}
+.reel-top .ib,.reel-top .rnew{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.18);color:#fff;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.reel-top .ib{border-radius:50%}
+.reel-top .rnew{border-radius:999px;color:#fff}
+.reel .side{right:max(8px,calc(50% - 28.125cqh - 4.4rem));gap:18px;bottom:calc(5.6rem + env(safe-area-inset-bottom,0px))}
+.reel .side button{font:600 .74rem/1 var(--f-body);text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.reel .side button>span:first-child{width:2.9rem;height:2.9rem;border-radius:50%;background:none;filter:drop-shadow(0 1px 4px rgba(0,0,0,.45))}
+.reel .side svg.i{width:1.85rem;height:1.85rem;stroke-width:1.9}
+.reel .side button:active>span:first-child{transform:scale(.88);transition:transform .12s}
+.reel .info{left:max(14px,calc(50% - 28.125cqh + 14px));right:max(4.6rem,calc(50% - 28.125cqh + 4.6rem));bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));gap:9px}
+.reel .info .u .av{box-shadow:0 0 0 2px rgba(255,255,255,.9)}
+.reel .info .c{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.92rem;line-height:1.35}
+.reel .info .c.open{-webkit-line-clamp:unset;display:block;max-height:40cqh;overflow:auto}
+.reel .fbtn{border-radius:999px;padding:5px 12px;background:rgba(255,255,255,.12);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.reel .aud{max-width:100%;overflow:hidden;white-space:nowrap}
+.reel .rdisc{display:block;width:2.3rem;height:2.3rem;border-radius:10px;padding:3px;background:#1b1b1b;box-shadow:0 0 0 1.5px rgba(255,255,255,.55);overflow:hidden;margin-top:2px}
+.reel .rdisc img{width:100%;height:100%;object-fit:cover;border-radius:7px;display:block}
+.reel:not(.paused) .rdisc img{animation:rdisc 8s linear infinite}
+@keyframes rdisc{to{transform:rotate(360deg)}}
+.reel .rprog{height:2px;background:rgba(255,255,255,.18)}
+.reel .rpause{background:rgba(0,0,0,.38);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html.reduce-motion .reel .rdisc img{animation:none}
+@media (prefers-reduced-motion:reduce){.reel .rdisc img{animation:none}}
+/* 5.7.0 sohbet ayrıntıları */
+.cinfo{overflow-y:auto}
+.ci-top{display:grid;justify-items:center;gap:6px;padding:18px 16px 6px;text-align:center}
+.ci-top .nm{font:600 1.25rem/1.25 var(--f-display);margin-top:6px}
+.ci-top .sub{color:var(--muted);font-size:.86rem}
+.ci-acts{display:flex;justify-content:center;gap:clamp(10px,5vw,30px);padding:16px 12px 10px;flex-wrap:wrap}
+.ci-acts button{display:grid;justify-items:center;gap:7px;min-width:4.4rem;font-size:.8rem;font-weight:600;color:var(--fg);background:none;border:0;padding:0;cursor:pointer}
+.ci-acts button>span:first-child{width:3.1rem;height:3.1rem;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;transition:transform .15s}
+.ci-acts button:active>span:first-child{transform:scale(.9)}
+.ci-acts button.on>span:first-child{background:var(--accent-soft);color:var(--accent)}
+.ci-acts svg.i{width:1.35rem;height:1.35rem}
+.ci-list{margin:8px 12px 4px;border-radius:18px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+.ci-row{display:flex;align-items:center;gap:14px;width:100%;padding:13px 16px;background:none;border:0;border-top:1px solid var(--line);color:var(--fg);font:inherit;text-align:left;cursor:pointer}
+.ci-row:first-child{border-top:0}
+.ci-row .ic{width:2.3rem;height:2.3rem;border-radius:12px;display:grid;place-items:center;color:#fff;flex:none}
+.ci-row .ic svg.i{width:1.15rem;height:1.15rem}
+.ci-row .t{flex:1;min-width:0}.ci-row .t b{display:block;font-weight:600}.ci-row .t small{color:var(--muted);font-size:.8rem}
+.ci-row>svg.i{color:var(--muted);width:1.1rem;height:1.1rem}
+.ci-sw{width:1.4rem;height:1.4rem;border-radius:50%;box-shadow:0 0 0 2px var(--surface),0 0 0 3px var(--line)}
+.ci-tabs{display:flex;justify-content:center;gap:6px;margin:18px 12px 0;border-bottom:1px solid var(--line)}
+.ci-tabs button{flex:1;max-width:9rem;display:grid;justify-items:center;gap:4px;padding:10px 0;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);font-size:.78rem;font-weight:600;cursor:pointer}
+.ci-tabs button[aria-pressed="true"]{color:var(--fg);border-bottom-color:var(--fg)}
+.ci-tabs svg.i{width:1.3rem;height:1.3rem}
+.ci-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;padding:2px 0 24px}
+.ci-grid>*{position:relative;aspect-ratio:1;overflow:hidden;background:var(--surface-2);border:0;padding:0;cursor:pointer}
+.ci-grid img{width:100%;height:100%;object-fit:cover;display:block}
+.ci-grid .k{position:absolute;top:6px;right:6px;color:#fff;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.ci-grid .k svg.i{width:1.05rem;height:1.05rem}
+.ci-grid .nt{display:grid;place-items:center;padding:8px;color:#fff;font-size:.72rem;font-weight:600;text-align:center}
+.ci-links{padding:6px 12px 24px;display:grid;gap:8px}
+.ci-links a{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);color:var(--fg);text-decoration:none;min-width:0}
+.ci-links a span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ci-links a small{display:block;color:var(--muted);font-size:.74rem}
+.ci-empty{padding:28px 16px 36px;text-align:center;color:var(--muted);font-size:.88rem}
+/*}@css:570*/
 
 
 </style>
@@ -3035,7 +3099,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50602,APP_VER="5.6.2";
+const APP_V=50700,APP_VER="5.7.0";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3302,9 +3366,9 @@ const noteOf=u=>{const n=S.profiles[u]&&S.profiles[u].note;return n&&n.text&&n.a
 function saveHidden(){const h=S.hidden||{};return write(()=>DB.set(`data/users/${S.uid}/hidden`,{msgs:h.msgs||{},chats:h.chats||{}}),{quiet:true})}
 function chatHead(key){const k=keyInfo(key);
  if(k.type==="meydan")return`<div class="chat-head"><span class="av" style="--s:40px"><img src="${MEYDAN_AV}" alt=""></span><div class="t"><div>Meydan</div><div>${S.online.size+1} kişi şu an burada · herkese açık</div></div></div>`;
- if(k.type==="group"){const c=S.chats[k.cid]||{};const on=(c.members||[]).filter(u=>u!==S.uid&&S.online.has(u)).length;return`<button class="chat-head" data-act="groupmenu"><span class="av" style="--s:40px"><img src="${esc(groupAv(c,k.cid))}" alt=""></span><div class="t"><div>${esc(c.name||"Grup")}</div><div>${(c.members||[]).length} kişi${on?` · ${on} çevrimiçi`:""}</div></div></button><button class="ib plain" data-act="groupmenu" aria-label="Grup seçenekleri">${I("more")}</button>`}
+ if(k.type==="group"){const c=S.chats[k.cid]||{};const on=(c.members||[]).filter(u=>u!==S.uid&&S.online.has(u)).length;return`<button class="chat-head" data-act="chatinfo"><span class="av" style="--s:40px"><img src="${esc(groupAv(c,k.cid))}" alt=""></span><div class="t"><div>${esc(c.name||"Grup")}</div><div>${(c.members||[]).length} kişi${on?` · ${on} çevrimiçi`:""}</div></div></button><button class="ib plain" data-act="groupmenu" aria-label="Grup seçenekleri">${I("more")}</button>`}
  const uid=k.uid;const p=P(uid);const typing=S.typing[uid]===cidFor(S.uid,uid);const st=p.ai?"Yapay zekâ rehberi · her zaman açık":BOT[uid]?"Bot · otomatik yanıt":typing?"yazıyor…":seenText(uid);
- return`<button class="chat-head" data-prof="${esc(uid)}">${avatar(uid,40,{click:false})}<div class="t"><div>${esc(p.name)}${badge(uid)}</div><div class="${S.online.has(uid)||typing?"onl":""}">${esc(st)}</div></div></button>${!BOT[uid]&&S.mode==="cloud"?`<button class="ib" data-call="${esc(uid)}" data-v="0" aria-label="Sesli ara">${I("phone")}</button><button class="ib" data-call="${esc(uid)}" data-v="1" aria-label="Görüntülü ara">${I("video")}</button>`:!BOT[uid]&&S.online.has(uid)?`<button class="ib" data-nudge="${esc(uid)}" aria-label="Dürt">${I("hand")}</button>`:""}`}
+ return`<button class="chat-head" ${BOT[uid]?`data-prof="${esc(uid)}"`:`data-act="chatinfo"`}>${avatar(uid,40,{click:false})}<div class="t"><div>${esc(nickOf(cidFor(S.uid,uid),uid)||p.name)}${badge(uid)}</div><div class="${S.online.has(uid)||typing?"onl":""}">${esc(st)}</div></div></button>${!BOT[uid]&&S.mode==="cloud"?`<button class="ib" data-call="${esc(uid)}" data-v="0" aria-label="Sesli ara">${I("phone")}</button><button class="ib" data-call="${esc(uid)}" data-v="1" aria-label="Görüntülü ara">${I("video")}</button>`:!BOT[uid]&&S.online.has(uid)?`<button class="ib" data-nudge="${esc(uid)}" aria-label="Dürt">${I("hand")}</button>`:""}`}
 function vChats(){const all=chatList();const list=all.filter(c=>c.key!=="u:bot:rota");const rota=all.find(c=>c.key==="u:bot:rota");const md=S.meydan;
  const onl=[...S.online].filter(u=>S.profiles[u]&&u!==S.uid);
  let h=isChild(S.uid)?"":`<button class="square" data-chat="meydan"><span class="ic">${I("globe")}</span><span style="min-width:0"><b>Meydan</b><small>${md&&md.last?esc(((md.last.from===S.uid?"Sen: ":P(md.last.from).username+": ")+md.last.text).slice(0,60)):"Bu sayfadaki herkesin ortak sohbeti"}</small></span><span class="live">${meydanUnread()?"YENİ":(onl.length+1)+" burada"}</span></button>`;
@@ -3416,7 +3480,7 @@ function renderTop(){if(!S.authed)return;const r=S.route.name;const t=$("#top");
  else if(r==="profile"){const p=P(S.route.params.uid);const own=p.uid===S.uid;h=(S.stack.length?backBtn:"")+`<h1>${esc(p.username)}${badge(p.uid)}</h1>`+(own?`<div class="acts">${S.mode==="cloud"?`<button class="ib" data-act="posta" aria-label="Kadraj Posta">${I("mail")}${postaUnread()?'<i class="dot"></i>':""}</button>`:""}<button class="ib" data-go="settings" aria-label="Ayarlar">${I("gear")}</button></div>`:`<button class="ib" data-act="profmenu" data-uid="${esc(p.uid)}" aria-label="Diğer">${I("more")}</button>`)}
  else if(r==="post")h=backBtn+`<h1>Paylaşım</h1>`;
  else if(r==="activity")h=(S.stack.length?backBtn:"")+`<h1>Bildirimler</h1>`;
- else if(r==="chat")h=backBtn+chatHead(S.route.params.key)+`<button class="ib" data-act="wallpaper" aria-label="Sohbet teması">${I("palette")}</button>`;
+ else if(r==="chat"){const ck=S.route.params.key;let ty="";try{ty=keyInfo(ck).type}catch{}h=backBtn+chatHead(ck)+(ty==="dm"||ty==="group"?`<button class="ib" data-act="chatinfo" aria-label="Sohbet ayrıntıları">${I("info")}</button>`:`<button class="ib" data-act="wallpaper" aria-label="Sohbet teması">${I("palette")}</button>`)}
  else if(r==="settings")h=backBtn+`<h1>Ayarlar</h1>`;
  else if(r==="edit")h=backBtn+`<h1>Profili düzenle</h1>`;
  else if(r==="people")h=backBtn+`<h1>${esc(P(S.route.params.uid).username)}</h1>`;
@@ -5077,6 +5141,8 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.5 öne çıkan hikâyeler: kendi hikâyeni açıp "Öne çıkar"a bas, var olan bir öne çıkanı seç ya da ad verip yenisini oluştur (Tatil, Okul...). Profilde ad ve paylaşım sayılarının altında yuvarlaklar olarak durur, 24 saat sonra silinmez. Profilindeki "Yeni" yuvarlağıyla son 24 saatteki hikâyelerinden ya da telefondan fotoğraf seçerek de oluşturulur. Bir öne çıkanda en fazla 8 kare olur. Açınca kendi öne çıkanında Ekle, Kaldır ve Düzenle (ad değiştir, sil) düğmeleri var. Gizli hesabın öne çıkanlarını yalnızca takipçiler görür.
 - 5.5 Rota fotoğrafa bakar: Rota sohbetinde + ile fotoğraf gönderilebilir; Rota fotoğrafa bakıp yanıt verir ("Bu ne?", "Bu soruyu çöz", "Hangisi daha güzel?"). Fotoğrafı göremezse bunu söyler, uydurmaz.
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
+- 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
+- 5.7 Klaket ekranı: videonun dışında kalan yerler düz siyah; dikey videolar ekranı doldurur, yatay videolar siyah boşlukla tamamen görünür. Açıklamaya dokununca tamamı açılır. Sağ altta paylaşanın fotoğrafıyla dönen ses plağı var.
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -5368,6 +5434,8 @@ setTimeout(verTidyCache,9000);
 
 /* ---- A · Neler yeni ---- */
 const WN_ITEMS=[
+ {ic:"info",g:"linear-gradient(135deg,#1d4ed8,#7c3aed)",t:"Sohbet ayrıntıları",d:"Sohbetin başlığına dokun: tema, takma adlar, sessize al, gizlilik ve sohbette paylaşılan fotoğraflar, paylaşımlar, bağlantılar tek yerde",go:"chats"},
+ {ic:"reels",g:"linear-gradient(135deg,#111,#db2777)",t:"Yeni Klaket ekranı",d:"Kenarlar artık düz siyah, düğmeler daha sade; sağ altta ses plağı dönüyor. Açıklamaya dokununca tamamı açılır",go:"reels"},
  {ic:"reels",g:"linear-gradient(135deg,#db2777,#7c3aed)",t:"Alt menüde Klaket",d:"Klaketlere artık alttaki menüden tek dokunuşla gidiyorsun. Videolar her girişte karışık sırayla geliyor",go:"reels"},
  {ic:"spark",g:"linear-gradient(135deg,#0c7a63,#d97706)",t:"Rota'dan sürüm paylaşımı",d:"Her güncellemede Rota Akış'a küçük ve her seferinde farklı bir paylaşım yapıyor: not, anket ya da fotoğraf",go:"feed"},
  {ic:"spark",g:"linear-gradient(135deg,#e23e57,#d97706)",t:"Öne çıkan hikâyeler",d:"Hikâyeni açıp \"Öne çıkar\"a bas; profilinde Tatil, Okul gibi yuvarlaklarda kalıcı durur. Profilindeki \"Yeni\" ile telefondan fotoğraf da ekleyebilirsin",go:"profile"},
@@ -8997,6 +9065,7 @@ notifyChats=function(m){for(const[id,c]of Object.entries(m||{})){const o=S.chats
  for(const[id,c]of Object.entries(m||{})){const o=S.chats[id];const l=c&&c.last;
   if(!l||l.from===S.uid||!(l.at>S.bootAt)||(o&&o.last&&o.last.at>=l.at))continue;
   if(((c.reads||{})[S.uid]||0)>=l.at)continue;
+  if(chatMuted(id))continue;
   const open=S.route.name==="chat"&&(()=>{try{return keyInfo(S.route.params.key).cid===id}catch{return false}})();
   if(open&&document.visibilityState==="visible")continue;
   if(Array.isArray(c.members)&&!c.members.includes(S.uid))continue;
@@ -9080,7 +9149,7 @@ const KP={cache:new Map(),denied:0,
  async reg(){if(!this.supported())return null;return await withTimeout(navigator.serviceWorker.ready,8000)},
  async vapid(){const r=await fetch(kAI.url()+"/vapid");let d=null;try{d=await r.json()}catch{}if(!r.ok||!d||!d.key)throw Object.assign(new Error((d&&d.message)||"Köprüden bildirim anahtarı alınamadı."),{code:(d&&d.error)||"vapid"});return d.key},
  keyBytes(k){const s=String(k).replace(/-/g,"+").replace(/_/g,"/");const b=atob(s+"===".slice((s.length+3)%4));const u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u},
- prefs(){return{notify:!!settings.notify,nMsg:settings.nMsg!==false,nLike:settings.nLike!==false,nComment:settings.nComment!==false,nFollow:settings.nFollow!==false}},
+ prefs(){return{notify:!!settings.notify,nMsg:settings.nMsg!==false,nLike:settings.nLike!==false,nComment:settings.nComment!==false,nFollow:settings.nFollow!==false,mute:mutesOf()}},
  async save(sub){const j=sub.toJSON?sub.toJSON():sub;if(!j||!j.endpoint||!j.keys)return false;const uid=S.uid;const h=hash32(j.endpoint,7)+hash32(j.endpoint,99);
   let d=null;try{d=await DB.get("push/"+uid)}catch{}const subs={};const lim=now()-60*24*H;for(const[k,v]of Object.entries((d&&d.subs)||{}))if(v&&v.endpoint&&(v.at||0)>lim&&v.endpoint!==j.endpoint)subs[k]=v;
   subs[h]={endpoint:j.endpoint,keys:{p256dh:j.keys.p256dh,auth:j.keys.auth},at:now(),ua:String(navigator.userAgent||"").replace(/\s*\(.*?\)\s*/g," ").slice(0,80)};
@@ -9114,7 +9183,7 @@ const KP={cache:new Map(),denied:0,
  async send(uids,payload,pref){try{if(!this.can()||now()-this.denied<10*60e3)return;
   const list=[...new Set(uids||[])].filter(u=>u&&u!==S.uid&&!BOT[u]&&!String(u).startsWith("bot:")).slice(0,40);if(!list.length)return;
   const dead=new Set(this.dead());const subs=[];const lim=now()-60*24*H;
-  for(const u of list){const d=await this.doc(u);if(!d||!d.subs)continue;const pr=d.prefs||{};if(pr.notify===false||(pref&&pr[pref]===false))continue;
+  for(const u of list){const d=await this.doc(u);if(!d||!d.subs)continue;const pr=d.prefs||{};if(pr.notify===false||(pref&&pr[pref]===false)||(payload&&payload.cid&&pr.mute&&pr.mute[payload.cid]))continue;
    for(const s of Object.values(d.subs).slice(0,8))if(s&&s.endpoint&&s.keys&&!dead.has(s.endpoint)&&(s.at||0)>lim)subs.push({endpoint:s.endpoint,keys:{p256dh:s.keys.p256dh,auth:s.keys.auth}})}
   if(!subs.length)return;let tok="";try{tok=await FB.auth.currentUser.getIdToken()}catch{return}
   const body={...payload,at:payload.at||now()};const gone=[];
@@ -10768,7 +10837,7 @@ function mnTag(el,map,myU){const re=/@([\w.ğüşıöçĞÜŞİÖÇ]{2,30})/g;le
  for(const n of nodes){const v=n.nodeValue;re.lastIndex=0;if(!re.test(v))continue;re.lastIndex=0;const fr=document.createDocumentFragment();let last=0,m;
   while((m=re.exec(v))){const name=m[1].replace(/\.+$/,"");const uid=map.get(name.toLowerCase());if(!uid)continue;fr.append(v.slice(last,m.index));const b=document.createElement("span");b.className="mtag";b.dataset.prof=uid;b.textContent="@"+name;fr.append(b);last=m.index+1+name.length;if(name.toLowerCase()===myU)hit=true}
   if(last){fr.append(v.slice(last));n.replaceWith(fr)}}return hit}
-function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)return;let k;try{k=keyInfo(key)}catch{return}if(!k||k.type==="bot")return;
+function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)return;try{nickPaint(key,box)}catch(e){console.warn(e)}let k;try{k=keyInfo(key)}catch{return}if(!k||k.type==="bot")return;
  const byId=new Map((S.msgs||[]).map(m=>[m.id,m]));const map=mnUserMap();const myU=String(me().username||"").toLowerCase();
  for(const el of box.querySelectorAll(".msg[data-mid]")){const m=byId.get(el.dataset.mid);if(!m||m.del)continue;
   if(m.text&&m.text.includes("@")&&!el.dataset.mn){el.dataset.mn="1";if(mnTag(el,map,myU)&&m.from!==S.uid)el.classList.add("mme")}
@@ -11001,7 +11070,9 @@ reelList=function(...a){const L=reelListBase560.apply(this,a);if(S.route.name!==
 const goBase562=go;
 go=function(name,params,...r){if(name==="reels"&&params&&params.start&&!params.by&&S.route.name==="profile"){const u=S.route.params&&S.route.params.uid;const p=postById(params.start);if(u&&p&&p.uid===u)params={...params,by:u}}return goBase562.call(this,name,params,...r)};
 const vReelsBase562=vReels;
-vReels=function(...a){const h=vReelsBase562.apply(this,a);const by=S.route.params&&S.route.params.by;return by?h.replace("<b>Klaketler</b>",`<b>@${esc(P(by).username)}</b>`):h};
+vReels=function(...a){let h=vReelsBase562.apply(this,a);const by=S.route.params&&S.route.params.by;if(by)h=h.replace("<b>Klaketler</b>",`<b>@${esc(P(by).username)}</b>`);
+ /* 5.7.0: yan düğmelerin altına ses plağı */
+ try{h=h.replace(/(<section class="reel" data-pid="([^"]+)">[\s\S]*?<div class="side">[\s\S]*?)(<\/div>\s*<div class="info">)/g,(m0,a1,id,a3)=>{const p=postById(id.replace(/&quot;/g,'"'));return p?a1+rdiscHtml(p)+a3:m0})}catch(e){console.warn(e)}return h};
 const RU_NOTES=["Günün sorusu: Bugün kaç kez gülümsedin? Bir tane daha ekle.","İpucu: Bir mesajı yana kaydırırsan ona yanıt verirsin.","İpucu: Hikâyeni öne çıkarırsan profilinde kalıcı durur.","Kadraj yine yenilendi. Ne değişti merak ediyorsan bana sor.","Bugün bir arkadaşına güzel bir şey yaz, günü değişsin.","İpucu: Sohbette @rota yazarsan ben de katılırım.","Satrançta bugün beni yenebilecek misin? Keşfet'te bekliyorum.","Kısa bir mola: omuzlarını gevşet, derin bir nefes al.","İpucu: Tek paylaşıma 10 fotoğraf ekleyebilirsin, yana kaydırarak bakılır.","Bugünün kelimesi: merak. Yeni bir şey dene.","İpucu: Bana fotoğraf at, ne gördüğümü anlatayım.","Su içmeyi unutma. Ben unutmam, çünkü içemiyorum.","İpucu: Klaket izlerken ekranın kenarına basılı tutarsan video hızlanır.","Bugün kimi takip etmedin? Keşfet'e bir göz at."];
 const RU_POLLS=[["Bugün hangisi?",["Kahve","Çay","Su"]],["Hafta sonu planın ne?",["Dışarı çıkmak","Evde dinlenmek","Satranç"]],["En sevdiğin Kadraj köşesi?",["Klaket","Sohbet","Satranç","Hikâye"]],["Sen hangisisin?",["Gece kuşu","Sabahçı"]],["Kadraj'ın vurgu rengi hangisi olsun?",["Yeşil","Mavi","Turuncu","Mor"]],["Bugün enerjin nasıl?",["Fırtına gibi","İdare eder","Pil bitik"]],["Hangisini daha çok seversin?",["Deniz","Dağ","Şehir"]]];
 const RU_CAPS=["Bugünün karesi.","Bu manzaraya bir dakika bak.","Sence burası neresi?","Kadraj galerisinden bir seçki.","Ekranın bir köşesi böyle güzel olsun."];
@@ -11012,6 +11083,78 @@ function rotaRelease(v){const n=i=>parseInt(hash32("ru"+v+":"+i,7),16);const kin
  const src=GALLERY[n(2)%GALLERY.length];return{...base,kind:"photo",src,loc:"Kadraj galerisi",caption:RU_CAPS[n(3)%RU_CAPS.length]+tag}}
 (()=>{try{const k="kadraj_ru_"+APP_V;let at=LS.get(k,0);if(!at){at=Date.now();LS.set(k,at)}BOT_POSTS.unshift({...rotaRelease(APP_V),at})}catch(e){console.warn("ru",e)}})();
 /*}@js:560*/
+/*@js:570{*/
+/* 5.7.0
+   Klaket ekranı: bulanık kenar dolgusu yok (düz siyah), hafif gölge, cam üst düğmeler, yuvarlak/gölgeli yan düğmeler, açıklama 2 satır (dokununca açılır),
+     sağ altta dönen ses plağı (`.rdisc`, sahibin fotoğrafı); geniş ekranda yan düğmeler ve yazılar 9:16 videonun yanında (container query `cqh`).
+     vReels 562 sarmalayıcısı içinde `.rdisc` eklenir (rdiscHtml).
+   Sohbet ayrıntıları (`chatInfo`, data-act="chatinfo"): DM ve grupta başlığa ya da sağ üstteki (i) düğmesine dokununca tam ekran açılır.
+     Üstte fotoğraf, ad; düğmeler Profil/Üyeler, Ara (chatSearch), Sessize al (`settings.muteBy[uid][cid]`, `chatMuted`, `mutesOf`;
+     uygulama içi bildirim ve KP.prefs.mute ile telefon bildirimi gitmez), Seçenekler (chatRowMenu). Satırlar: Tema (wallpaperMenu; eskiden üst çubuktaydı),
+     Takma adlar (`chats/{cid}.nicks={uid:ad}`, `nickOf`, `nickPaint`: DM başlığı ve grupta gönderen adı; değişince sistem notu),
+     Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), DM'de Grup sohbeti oluştur (openNewGroup + kişi seçili).
+     Altta paylaşılanlar: Medya (fotoğraf/video), Paylaşımlar, Bağlantılar (açık sohbetin S.msgs'inden). Süreli mesajlar yok (sahibinin isteği). */
+function mutesOf(){const m=(settings.muteBy||{})[S.uid]||{};const o={};for(const k in m)if(m[k])o[k]=1;return o}
+function chatMuted(cid){return!!(cid&&((settings.muteBy||{})[S.uid]||{})[cid])}
+function chatMuteSet(cid,on){const mb={...(settings.muteBy||{})};const m={...(mb[S.uid]||{})};if(on)m[cid]=1;else delete m[cid];mb[S.uid]=m;settings.muteBy=mb;saveSettings();try{KP.sync(true)}catch{}}
+function nickOf(cid,uid){const c=S.chats[cid];const n=c&&c.nicks&&c.nicks[uid];return typeof n==="string"&&n.trim()?n.trim():""}
+function nickPaint(key,box){const k=keyInfo(key);if(k.type!=="group")return;for(const b of box.querySelectorAll(".sender[data-prof]")){const n=nickOf(k.cid,b.dataset.prof);const t=b.firstChild;if(n&&t&&t.nodeType===3&&t.nodeValue!==n)t.nodeValue=n}}
+ACT.chatinfo=()=>chatInfo();
+function chatInfo(key){key=key||(S.route.params&&S.route.params.key);if(!key)return;let k;try{k=keyInfo(key)}catch{return}if(k.type!=="dm"&&k.type!=="group")return;
+ const draw=(tab)=>{const c=S.chats[k.cid]||{};const muted=chatMuted(k.cid);const dm=k.type==="dm";const uid=k.uid;const p=dm?P(uid):null;tab=tab||"media";
+  const th=c.theme&&c.theme.id&&c.theme.id!=="none"?(typeof kbThLabel==="function"?kbThLabel(c.theme.id):"Seçili"):"Varsayılan";
+  const nicks=Object.values(c.nicks||{}).filter(x=>typeof x==="string"&&x.trim()).length;
+  const top=dm?`<div class="ci-top">${avatar(uid,92,{click:false,ring:false})}<div class="nm">${esc(nickOf(k.cid,uid)||p.name)}</div><div class="sub">@${esc(p.username)}${nickOf(k.cid,uid)?" · "+esc(p.name):""} · ${esc(seenText(uid))}</div></div>`
+   :`<div class="ci-top"><span class="av" style="--s:92px"><img src="${esc(groupAv(c,k.cid))}" alt=""></span><div class="nm">${esc(c.name||"Grup")}</div><div class="sub">${(c.members||[]).length} üye</div></div>`;
+  const acts=`<div class="ci-acts">${dm?`<button data-ci="prof"><span>${I("users")}</span>Profil</button>`:`<button data-ci="members"><span>${I("users")}</span>Üyeler</button>`}<button data-ci="search"><span>${I("search")}</span>Ara</button><button data-ci="mute" class="${muted?"on":""}"><span>${I(muted?"mute":"bell")}</span>${muted?"Sesi aç":"Sessize al"}</button><button data-ci="more"><span>${I("more")}</span>Seçenekler</button></div>`;
+  const row=(id,ic,col,t,sub,extra)=>`<button class="ci-row" data-ci="${id}"><span class="ic" style="background:${col}">${I(ic)}</span><span class="t"><b>${t}</b>${sub?`<small>${sub}</small>`:""}</span>${extra||I("next")}</button>`;
+  const rows=`<div class="ci-list">${row("theme","palette","linear-gradient(135deg,#7c3aed,#ec4899)","Tema","Sohbet rengi ve duvar kağıdı: "+esc(th))}${row("nick","type","#0C7A63","Takma adlar",nicks?nicks+" takma ad":"Bu sohbette kime ne denileceğini seç")}${dm?row("priv","lock","#1d4ed8","Gizlilik ve güvenlik",iBlocked(uid)?"Engelledin":"Engelle, görüldü bilgisi"):""}${dm?row("group","add","#d97706","Grup sohbeti oluştur","@"+esc(p.username)+" ile birlikte"):""}</div>`;
+  const hid=(S.hidden&&S.hidden.msgs)||{};const msgs=(S.msgs||[]).filter(m=>m&&!m.del&&!m.sys&&!(m.id&&hid[m.id]));
+  const media=msgs.filter(m=>m.img||m.video).reverse(),posts=msgs.filter(m=>m.post&&postById(m.post)&&canSee(postById(m.post))).reverse();
+  const links=[];for(const m of msgs.slice().reverse())for(const u of String(m.text||"").match(/https?:\/\/[^\s<>"']+/gi)||[])if(links.length<60)links.push({u,m});
+  const tabs=`<div class="ci-tabs" role="tablist">${[["media","image","Medya",media.length],["posts","grid","Paylaşımlar",posts.length],["links","link","Bağlantılar",links.length]].map(([id,ic,lb,n])=>`<button data-cit="${id}" aria-pressed="${tab===id}">${I(ic)}${lb}${n?` (${n})`:""}</button>`).join("")}</div>`;
+  let body="";
+  if(tab==="media")body=media.length?`<div class="ci-grid">${media.map(m=>m.img?`<button type="button" class="cim"><img src="${esc(m.img)}" alt="Fotoğraf" data-view="1" loading="lazy"></button>`:`<button type="button" data-cij="${esc(m.id||"")}" aria-label="Videoya git">${m.poster?`<img src="${esc(R(m.poster))}" alt="" loading="lazy">`:""}<span class="k">${I("play")}</span></button>`).join("")}</div>`:`<div class="ci-empty">Bu sohbette paylaşılan fotoğraf ya da video yok.</div>`;
+  else if(tab==="posts")body=posts.length?`<div class="ci-grid">${posts.map(m=>{const q=postById(m.post);const th2=postThumb(q);return`<button type="button" data-open="${esc(q.id)}" aria-label="Paylaşımı aç">${th2?`<img src="${esc(th2)}" alt="" loading="lazy">`:`<span class="nt" style="background:${q.kind==="poll"?"#0c7a63":NOTE_BG[q.bg||0]}">${esc((q.text||q.question||"").slice(0,60))}</span>`}${q.kind==="reel"?`<span class="k">${I("reels")}</span>`:""}</button>`}).join("")}</div>`:`<div class="ci-empty">Bu sohbette gönderilen paylaşım yok.</div>`;
+  else body=links.length?`<div class="ci-links">${links.map(({u,m})=>{let h="";try{h=new URL(u).hostname.replace(/^www\./,"")}catch{}return`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${I("link")}<span>${esc(h||u)}<small>${esc(u)} · ${esc(P(m.from).username)}, ${ago(m.at)}</small></span></a>`}).join("")}</div>`:`<div class="ci-empty">Bu sohbette paylaşılan bağlantı yok.</div>`;
+  return top+acts+rows+tabs+body};
+ const l=openLayer("cinfo",`<div class="full cinfo" role="dialog" aria-label="Sohbet ayrıntıları"><div class="hd"><button class="ib plain" data-act="close" aria-label="Kapat">${I("back")}</button><h1>Ayrıntılar</h1><span style="width:2.6rem"></span></div><div class="body" id="ciB"></div></div>`,{noScrim:true});
+ let tab="media";const paint=()=>{const b=$("#ciB",l);if(!b)return;const y=b.scrollTop;b.innerHTML=draw(tab);b.scrollTop=y;wire()};
+ const wire=()=>{const b=$("#ciB",l);
+  $$("[data-cit]",b).forEach(x=>x.onclick=()=>{tab=x.dataset.cit;paint()});
+  $$("[data-cij]",b).forEach(x=>x.onclick=()=>{closeLayer("cinfo");const el=document.getElementById("m-"+x.dataset.cij);if(el){el.scrollIntoView({block:"center",behavior:"smooth"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}});
+  $$("[data-ci]",b).forEach(x=>x.onclick=()=>ciAct(x.dataset.ci,key,k,paint))};
+ paint();l._ciPaint=paint}
+function ciAct(a,key,k,paint){const c=S.chats[k.cid]||{};
+ if(a==="prof"){closeLayer("cinfo");return go("profile",{uid:k.uid})}
+ if(a==="members"){closeLayer("cinfo");return groupMenu()}
+ if(a==="search"){closeLayer("cinfo");return chatSearch()}
+ if(a==="mute"){const on=!chatMuted(k.cid);chatMuteSet(k.cid,on);vib(12);toast(on?"Sohbet sessize alındı: bildirim gelmez":"Sohbetin sesi açıldı");return paint()}
+ if(a==="more"){closeLayer("cinfo");return chatRowMenu(key)}
+ if(a==="theme")return wallpaperMenu(key);
+ if(a==="group"){closeLayer("cinfo");openNewGroup();setTimeout(()=>{const x=$(`#overlay [data-layer="newgroup"] input[type="checkbox"][value="${CSS.escape(k.uid)}"]`);if(x&&!x.checked){x.checked=true;x.dispatchEvent(new Event("change",{bubbles:true}))}},60);return}
+ if(a==="priv"){const u=k.uid;const bl=iBlocked(u);const sw=(id,on,t,s)=>`<label class="srow"><span class="t">${t}<small>${s}</small></span><span class="sw"><input type="checkbox" id="${id}" ${on?"checked":""}><span></span></span></label>`;
+  const l=sheet("cipriv","Gizlilik ve güvenlik",`<div class="form">${sw("ciRr",settings.readReceipts!==false,"Görüldü bilgisi","Kapatırsan okuduğun görünmez (bütün sohbetlerde)")}${sw("ciAc",settings.showActive!==false,"Çevrimiçi durumu","Ne zaman aktif olduğun görünür (bütün sohbetlerde)")}<button class="btn ${bl?"sec":"danger"} block" id="ciBl" type="button">${I("lock")}${bl?"Engeli kaldır":"@"+esc(P(u).username)+" kişisini engelle"}</button></div>`,{onClose:()=>paint()});
+  $("#ciRr",l).onchange=e=>{settings.readReceipts=e.target.checked;saveSettings();toast(e.target.checked?"Görüldü bilgisi açık":"Görüldü bilgisi kapalı")};
+  $("#ciAc",l).onchange=e=>{settings.showActive=e.target.checked;saveSettings();toast(e.target.checked?"Çevrimiçi durumun görünür":"Çevrimiçi durumun gizli")};
+  $("#ciBl",l).onclick=()=>{const go2=async()=>{if(await blkSet(u,!bl)){closeLayer("cipriv");toast(bl?"Engel kaldırıldı":"Engellendi");paint()}};if(bl)return go2();dialog("Engellensin mi?",`@${esc(P(u).username)} sana mesaj atamaz, seni arayamaz ve paylaşımlarını görmezsin.`,[{label:"Vazgeç"},{label:"Engelle",cls:"danger",fn:go2}])};return}
+ if(a==="nick"){const mem=k.type==="dm"?[S.uid,k.uid]:(c.members||[]);
+  const l=sheet("cinick","Takma adlar",`<div class="form"><p class="muted" style="margin:0;font-size:.85rem">Takma adı bu sohbetteki herkes görür.</p>${mem.map(u=>`<div class="field"><label for="nk-${esc(u)}">${esc(P(u).name)}${u===S.uid?" (sen)":""} · @${esc(P(u).username)}</label><input class="in" id="nk-${esc(u)}" data-nk="${esc(u)}" maxlength="24" placeholder="Takma ad yok" value="${esc(nickOf(k.cid,u))}"></div>`).join("")}<button class="btn block" id="nkGo" type="button">Kaydet</button></div>`,{tall:mem.length>3,onClose:()=>paint()});
+  $("#nkGo",l).onclick=async()=>{if(!guard())return;const cur=c.nicks||{};const ch={};for(const x of $$("[data-nk]",l)){const v=kidClean(x.value.trim()).slice(0,24);if(v!==(cur[x.dataset.nk]||""))ch[x.dataset.nk]=v}
+   if(!Object.keys(ch).length)return closeLayer("cinick");const at=now();
+   const ok=await write(async()=>{try{await DB.update("chats/"+k.cid,{nicks:ch})}catch(e){const cd=e&&e.code;if(k.type==="dm"&&(cd==="invalid_argument"||cd==="not-found"))await DB.set("chats/"+k.cid,{members:[S.uid,k.uid].sort(),updatedAt:at,reads:{[S.uid]:at},nicks:ch});else throw e}});
+   if(!ok)return;S.chats={...S.chats,[k.cid]:{...c,nicks:{...cur,...ch}}};closeLayer("cinick");toast("Takma adlar kaydedildi");
+   const nm=(me().name||me().username||"").trim();for(const[u,v]of Object.entries(ch)){const who=u===S.uid?"kendi":P(u).name+" için";sendMessage(key,{text:v?`${nm} ${who} takma adını “${v}” yaptı`:`${nm} ${who} takma adını kaldırdı`,sys:"nick"}).catch(()=>{})}
+   renderTop();renderMsgs()};return}}
+/* Klaket: dikey video ekrana yakın orandaysa ekranı doldurur (kenarlardan en fazla %22 kırpılır), değilse (yatay video) siyah boşlukla tamamı görünür */
+function rfillFit(v){const vw=v.videoWidth,vh=v.videoHeight,r=v.closest(".reel");if(!vw||!vh||!r)return;const va=vw/vh,ca=r.clientWidth/Math.max(1,r.clientHeight);const crop=1-Math.min(va,ca)/Math.max(va,ca);v.classList.toggle("rfill",vh>=vw&&crop<=.22)}
+document.addEventListener("loadedmetadata",e=>{const v=e.target;if(v&&v.matches&&v.matches(".reel video"))rfillFit(v)},true);
+addEventListener("resize",()=>{for(const v of $$("#main .reel video"))rfillFit(v)});
+/* Klaket: sağ altta dönen ses plağı */
+function rdiscHtml(p){const own=P(p.uid);return`<span class="rdisc" aria-hidden="true"><img src="${esc(own.avatar||"")}" alt=""></span>`}
+/* açıklamaya dokununca tamamı açılır */
+document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest(".reel .info .c");if(!c||e.target.closest("a,button,[data-htag]"))return;e.stopPropagation();c.classList.toggle("open")},true);
+/*}@js:570*/
 
 
 boot();
