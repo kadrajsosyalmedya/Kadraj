@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50401">
+<meta name="kadraj-version" content="50500">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -2960,6 +2960,30 @@ html.reduce-motion .k51pt,html.reduce-motion .rzchip{transition:none!important}
 html.reduce-motion #msgs .mn-ty.gl-in,html.reduce-motion .kpop svg.i,html.reduce-motion #msgs .seenav{animation:none}
 @media (prefers-reduced-motion:reduce){#msgs .mn-ty.gl-in,.kpop svg.i,#msgs .seenav{animation:none}}
 /*}@css:540*/
+/*@css:550{*/
+/* 5.5.0 öne çıkan hikâyeler */
+.hlr{display:flex;gap:14px;overflow-x:auto;padding:4px 16px 14px;scrollbar-width:none}
+.hlr::-webkit-scrollbar{display:none}
+.hlc{display:grid;justify-items:center;gap:6px;width:4.4rem;flex:none;background:none;border:0;padding:0;color:inherit;cursor:pointer;font:inherit}
+.hlc .hav{width:3.9rem;height:3.9rem;border-radius:50%;padding:3px;background:var(--surface);box-shadow:0 0 0 1.5px var(--line);display:block;overflow:hidden;transition:transform .2s cubic-bezier(.2,1.4,.4,1)}
+.hlc .hav img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.hlc.new .hav{display:grid;place-items:center;color:var(--muted);box-shadow:0 0 0 1.5px var(--line) inset;border:1.5px dashed var(--line);background:transparent;padding:0}
+.hlc small{font-size:.74rem;font-weight:600;max-width:4.4rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hlc:active .hav{transform:scale(.92)}
+.sv .ft>.btn{padding:0 12px;min-height:2.6rem;font-size:.86rem;gap:6px;white-space:nowrap}
+.sv .ft>.btn svg.i{width:1.05rem;height:1.05rem}
+@media (max-width:370px){.sv .ft{gap:6px;padding-inline:8px}.sv .ft>.btn{padding:0 10px;font-size:.8rem}}
+.sv{z-index:0}
+.hlpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(5.2rem,1fr));gap:8px}
+.hlpick button{position:relative;aspect-ratio:9/16;border-radius:12px;overflow:hidden;border:2px solid transparent;padding:0;background:var(--surface-2);cursor:pointer}
+.hlpick button img{width:100%;height:100%;object-fit:cover;display:block}
+.hlpick button[aria-pressed="true"]{border-color:var(--accent)}
+.hlpick button .ck{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.45);border:1.5px solid #fff;display:grid;place-items:center;color:#fff}
+.hlpick button[aria-pressed="true"] .ck{background:var(--accent)}
+.hlpick button .ck svg.i{width:12px;height:12px;opacity:0}
+.hlpick button[aria-pressed="true"] .ck svg.i{opacity:1}
+.hllist .opt img{width:2.4rem;height:2.4rem;border-radius:50%;object-fit:cover;flex:none}
+/*}@css:550*/
 
 
 </style>
@@ -3000,7 +3024,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50401,APP_VER="5.4.1";
+const APP_V=50500,APP_VER="5.5.0";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3693,7 +3717,7 @@ function openNewChat(){const people=[...humans(),...BOTS.map(b=>b.uid)];
 /* ============ Hikâye görüntüleyici ============ */
 let canSeeUser=uid=>{const o=S.profiles[uid];return!o||!o.private||uid===S.uid||isFollowing(S.uid,uid)};
 function openStories(uid){if(!canSeeUser(uid))return toast("Bu hesap gizli. Hikâyelerini görmek için takip et.");const list=storiesOf(uid);if(!list.length)return;let i=0;const seen=seenStories();const fu=list.findIndex(s=>!seen[s.id]);if(fu>0)i=fu;let raf=0;
- const l=openLayer("story",`<div class="sv" role="dialog" aria-label="Hikâye"><div class="bars">${list.map(()=>"<i><b></b></i>").join("")}</div><div class="shd">${avatar(uid,34,{ring:false,click:false})}<div class="n">${esc(P(uid).username)}<small id="svT"></small></div><button class="ib" data-act="close" aria-label="Kapat">${I("close")}</button></div><div class="img"><img id="svImg" alt=""></div><button class="tap l" id="svPrev" aria-label="Önceki"></button><button class="tap r" id="svNext" aria-label="Sonraki"></button>${uid===S.uid?`<div class="ft"><button class="btn sec" id="svViews">${I("eye")}<span id="svVc">0</span> görüntüleme</button><button class="btn sec" id="svDel" style="margin-left:auto">${I("trash")}Sil</button></div>`:`<form class="ft" id="svF"><span class="svrx">${["heart","fire","laugh","wow"].map(t=>`<button type="button" data-svrx="${t}" aria-label="${esc((REACTS.find(r=>r[0]===t)||[0,""])[1])} gönder">${rxSvg(t)}</button>`).join("")}</span><input id="svIn" placeholder="${esc(P(uid).username)} kişisine yanıt yaz…" aria-label="Yanıt"><button class="ib" aria-label="Gönder">${I("send")}</button></form>`}</div>`,{noScrim:true,onClose:()=>{cancelAnimationFrame(raf);scheduleRefresh()}});
+ const l=openLayer("story",`<div class="sv" role="dialog" aria-label="Hikâye"><div class="bars">${list.map(()=>"<i><b></b></i>").join("")}</div><div class="shd">${avatar(uid,34,{ring:false,click:false})}<div class="n">${esc(P(uid).username)}<small id="svT"></small></div><button class="ib" data-act="close" aria-label="Kapat">${I("close")}</button></div><div class="img"><img id="svImg" alt=""></div><button class="tap l" id="svPrev" aria-label="Önceki"></button><button class="tap r" id="svNext" aria-label="Sonraki"></button>${uid===S.uid?`<div class="ft"><button class="btn sec" id="svViews">${I("eye")}<span id="svVc">0</span> görüntüleme</button><button class="btn sec" id="svHl">${I("spark")}Öne çıkar</button><button class="btn sec" id="svDel" style="margin-left:auto">${I("trash")}Sil</button></div>`:`<form class="ft" id="svF"><span class="svrx">${["heart","fire","laugh","wow"].map(t=>`<button type="button" data-svrx="${t}" aria-label="${esc((REACTS.find(r=>r[0]===t)||[0,""])[1])} gönder">${rxSvg(t)}</button>`).join("")}</span><input id="svIn" placeholder="${esc(P(uid).username)} kişisine yanıt yaz…" aria-label="Yanıt"><button class="ib" aria-label="Gönder">${I("send")}</button></form>`}</div>`,{noScrim:true,onClose:()=>{cancelAnimationFrame(raf);scheduleRefresh()}});
  const bars=$$(".bars b",l);let start=0,paused=false;const dur=5000;
  const show=()=>{const s=list[i];$("#svImg",l).src=R(s.img);$("#svT",l).textContent=ago(s.at);const sn=seenStories();sn[s.id]=1;LS.set("kadraj_seen",sn);if(uid!==S.uid&&S.stories[s.id]&&!((S.stories[s.id].views||{})[S.uid])&&S.canWrite&&!S.guest){S.stories[s.id]={...S.stories[s.id],views:{...(S.stories[s.id].views||{}),[S.uid]:now()}};DB.update("stories/"+s.id,{views:{[S.uid]:now()}}).catch(()=>{})}const vc=$("#svVc",l);if(vc)vc.textContent=Object.values((S.stories[s.id]||{}).views||{}).filter(Boolean).length;bars.forEach((b,j)=>b.style.width=j<i?"100%":"0");start=performance.now();tick()};
  const tick=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(function f(t){if(!l.isConnected)return;if(paused){l._pz=l._pz||t;raf=requestAnimationFrame(f);return}if(l._pz){start+=t-l._pz;l._pz=0}const pr=Math.min(1,(t-start)/dur);bars[i].style.width=pr*100+"%";if(pr>=1)next();else raf=requestAnimationFrame(f)})};
@@ -3701,6 +3725,7 @@ function openStories(uid){if(!canSeeUser(uid))return toast("Bu hesap gizli. Hik�
  $("#svNext",l).onclick=next;$("#svPrev",l).onclick=()=>{if(i>0)i--;show()};
  const f=$("#svF",l);if(f){const inp=$("#svIn",l);inp.onfocus=()=>paused=true;inp.onblur=()=>paused=false;f.onsubmit=async e=>{e.preventDefault();const v=inp.value.trim();if(!v)return;inp.value="";if(guard()){if(await sendMessage("u:"+uid,{text:"Hikâyene yanıt: "+v}))toast("Yanıt gönderildi")}};$$("[data-svrx]").forEach(b=>b.onclick=async ev=>{ev.preventDefault();ev.stopPropagation();if(!guard())return;const lb=(REACTS.find(r=>r[0]===b.dataset.svrx)||[0,"Kalp"])[1];b.animate([{transform:"scale(1)"},{transform:"scale(1.5)"},{transform:"scale(1)"}],{duration:350});vib(15);if(await sendMessage("u:"+uid,{text:"Hikâyene tepki: "+lb}))toast("Tepkin gönderildi")})}
  const vb=$("#svViews",l);if(vb)vb.onclick=()=>{paused=true;const s=list[i];const v=Object.entries((S.stories[s.id]||{}).views||{}).filter(([,t])=>t).sort((a,b)=>b[1]-a[1]);sheet("views","Görenler",v.length?`<div class="box">${v.map(([u,t])=>`<div class="row">${avatar(u,40,{click:false,ring:false})}<div class="t"><div><b>${esc(P(u).name)}</b></div><div class="s">@${esc(P(u).username)} · ${ago(t)}</div></div></div>`).join("")}</div>`:`<div class="empty" style="padding:24px"><b>Henüz kimse görmedi</b>Arkadaşların açınca burada listelenir.</div>`,{onClose:()=>{paused=false}})};
+ const hb=$("#svHl",l);if(hb)hb.onclick=()=>{paused=true;hlAddSheet([list[i]],()=>{paused=false})};
  const del=$("#svDel",l);if(del)del.onclick=async()=>{const s=list[i];paused=true;if(await write(()=>DB.del("stories/"+s.id))){const st={...S.stories};delete st[s.id];S.stories=st;toast("Hikâye silindi")}closeLayer("story")};
  show()}
 
@@ -4713,6 +4738,7 @@ service cloud.firestore {
     match /posts/{id} { allow read, write: if girdi(); }
     match /meta/{id} { allow read, write: if girdi(); }
     match /stories/{id} { allow read, write: if girdi(); }
+    match /hl/{id} { allow read: if girdi(); allow create: if girdi() && request.resource.data.uid == request.auth.uid; allow update: if girdi() && resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid; allow delete: if girdi() && (resource.data.uid == request.auth.uid || yonetici()); }
     match /vchunks/{id} { allow read, write: if girdi(); }
     match /pokes/{id} { allow read, write: if girdi(); }
     match /games/{id} { allow read, write: if girdi(); }
@@ -5037,6 +5063,8 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.0 yenilikleri (Kadraj 5.0): Yeni görünüm "Vizör": alttaki yüzen çubukta etkin sekme odak köşeleriyle çerçevelenir, ortadaki deklanşör düğmesi paylaşım menüsünü açar; paylaşımlar numaralı "kare"lerdir; görülmemiş hikâyeler diyafram halkasıyla işaretlenir; eski görünüm Ayarlar > Görünüm > Arayüz'den "Klasik" seçilerek geri gelir.
 - 5.0 arama: sohbet başlığındaki telefon ya da kamera ile. Arama ekranında Mikrofon, Kamera (sesli aramada da açılır), Ekran (bilgisayarda ekran paylaşımı), Tepki ve Diğer (kamerayı çevir, ses çıkışı, gürültü engelleme, Küçült) var. Küçült aramayı yüzen pencereye alır. Gelen aramada "Kamerasız yanıtla" ve "Mesajla yanıtla" var. Ekran paylaşımı ve tepkiler için iki tarafın da 5.0 kullanması gerekir.
 - 5.4 gelen arama: bildirim izni verildiyse Kadraj açıkken de gelen aramada cihazın kendi bildirim sesi çalar (5 saniyede bir yinelenir, yanıtlanınca kapanır); izin yoksa Kadraj'ın zil sesi çalar. Sohbet yeni mesajda ya da biri yazmaya başlayınca zıplamaz, yavaşça kayar.
+- 5.5 öne çıkan hikâyeler: kendi hikâyeni açıp "Öne çıkar"a bas, var olan bir öne çıkanı seç ya da ad verip yenisini oluştur (Tatil, Okul...). Profilde ad ve paylaşım sayılarının altında yuvarlaklar olarak durur, 24 saat sonra silinmez. Profilindeki "Yeni" yuvarlağıyla son 24 saatteki hikâyelerinden ya da telefondan fotoğraf seçerek de oluşturulur. Bir öne çıkanda en fazla 8 kare olur. Açınca kendi öne çıkanında Ekle, Kaldır ve Düzenle (ad değiştir, sil) düğmeleri var. Gizli hesabın öne çıkanlarını yalnızca takipçiler görür.
+- 5.5 Rota fotoğrafa bakar: Rota sohbetinde + ile fotoğraf gönderilebilir; Rota fotoğrafa bakıp yanıt verir ("Bu ne?", "Bu soruyu çöz", "Hangisi daha güzel?"). Fotoğrafı göremezse bunu söyler, uydurmaz.
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -5064,19 +5092,19 @@ const FAQ=[[/sohbette ara|mesaj(ı|ları)? ara|eski mesaj|mesaj(ı)? ilet|iletme
  [/debounce/i,"Basit bir debounce:\n```js\nfunction debounce(fn, ms = 300) {\n  let t;\n  return (...args) => {\n    clearTimeout(t);\n    t = setTimeout(() => fn(...args), ms);\n  };\n}\n```\nArama kutusu gibi sık tetiklenen olaylarda gereksiz çağrıları önler."]];
 const BOT_CANNED={deniz:["Selam! Bu sabah yine iskeledeydim, ışık harikaydı.","Uzun pozlama için tripod şart, gerisi sabır.","Gün doğumunu yakalamak için 05.30'da çıkıyorum, gelmek ister misin?"],mira:["Chelsea şu an uyuyor, uyanınca ileteceğim.","Miyav. (Chelsea mama saatinin geçtiğini söylüyor.)","Kutu buldum, mutluyum. — Chelsea"],kahve:["Selam! Bugün Kolombiya demledim, çok yumuşak.","Espresso mu filtre mi? Ben bugün filtre modundayım.","Moda'ya yolun düşerse kahve benden."],roket:["Bu hafta iki fırlatma var, takvime ekle!","Hubble'ın derin alan görüntüsü hâlâ en sevdiğim kare.","Bu akşam gökyüzü açıksa Jüpiter'i çıplak gözle görebilirsin."],garaj:["Ellerim yağlı, kısa yazıyorum: selam!","Karbüratör ayarı bitti, şimdi elektrik tesisatı.","Motor işinden anlıyor musun? Bir yardım lazım olabilir."],arsiv:["Merhaba! Bu ay kataloğa yeni parçalar girdi.","Sikkelerin üstündeki her figürün bir hikâyesi var.","En sevdiğin tarih dönemi hangisi?"],dag:["Selam! Yeni bir manzara üstünde çalışıyorum.","Bu sefer sadece dört renk kullanacağım, bakalım.","Hangi renk paleti seni sakinleştiriyor?"]};
 async function sendToBot(uid,payload){const b=BOT[uid];const k=b.key;const path=`data/users/${S.uid}/bot-${k}`;if(S.guest&&!b.ai)return guard();if(isChild(S.uid)&&payload&&payload.text)payload={...payload,text:cleanText(payload.text)};
- const cur=(S.botchats[k]?.msgs||[]).slice(-60);const mine={from:S.uid,text:payload.text||"",at:now()};if(payload.post)mine.post=payload.post;
+ const cur=(S.botchats[k]?.msgs||[]).slice(-60);const mine={from:S.uid,text:payload.text||"",at:now()};if(payload.post)mine.post=payload.post;if(payload.img)mine.img=await botImg(payload.img);
  let msgs=[...cur,mine];S.botchats={...S.botchats,[k]:{msgs,readAt:now()}};renderMsgs();
- if(!S.guest)DB.set(path,{msgs,readAt:now()}).catch(()=>{});
+ if(!S.guest)DB.set(path,{msgs:botSlim(msgs),readAt:now()}).catch(()=>{});
  S.botTyping=uid;renderMsgs();let reply="";
  try{reply=await botReply(b,msgs)}catch(e){console.warn(e)}
  if(!reply){const cn=b.replies||BOT_CANNED[k]||["Merhaba!"];reply=b.ai?fallbackRota(payload.text||""):cn[Math.floor(Math.random()*cn.length)]}
  S.botTyping=null;S.stream=null;
  msgs=[...(S.botchats[k]?.msgs||msgs),{from:uid,text:reply,at:now()}];const onScreen=S.route.name==="chat"&&S.route.params.key==="u:"+uid;S.botchats={...S.botchats,[k]:{msgs,readAt:onScreen?now():0}};
- if(!S.guest)DB.set(path,{msgs:msgs.slice(-80),readAt:onScreen?now():0}).catch(()=>{});
+ if(!S.guest)DB.set(path,{msgs:botSlim(msgs.slice(-80)),readAt:onScreen?now():0}).catch(()=>{});
  if(onScreen)renderMsgs();else if(settings.notify)toast(`${b.name}: ${String(reply).replace(/\*\*|__|`/g,"").replace(/\s+/g," ").slice(0,70)}`,uid);scheduleRefresh()}
 function fallbackRota(q){for(const[re,a]of FAQ)if(re.test(q))return a;return"Şu an yapay zekâ bağlantım yok, hazır yanıtlarla çalışıyorum. Şunları sorabilirsin: nasıl kullanırım, arkadaşlarımla nasıl konuşurum, fotoğraf yüklenmiyor, Klaket, sesli mesaj, arama, hikâye, tema, şifre. Ya da “Test bildirimleri oluştur” de."}
 async function botReply(b,msgs){const sample=S.caps.sample;if(!sample)return null;const meName=me().name||"kullanıcı";
- const transcript=msgs.slice(-14).map(m=>`${m.from===S.uid?meName:b.name}: ${m.text||(m.post?"[bir paylaşım gönderdi: "+(postById(m.post)?.caption||postById(m.post)?.text||"")+"]":"")}`).join("\n");
+ const transcript=msgs.slice(-14).map(m=>`${m.from===S.uid?meName:b.name}: ${m.img?"[fotoğraf gönderdi] ":""}${m.text||(m.post?"[bir paylaşım gönderdi: "+(postById(m.post)?.caption||postById(m.post)?.text||"")+"]":"")}`).join("\n");
  const prompt=b.ai?`${ROTA_SYS}\n\nKonuşma:\n${transcript}\n\nRota olarak son mesaja yanıt ver. Sadece yanıt metnini yaz.`:`Kadraj adlı sosyal uygulamada test amaçlı bir bot hesabısın. Karakterin: ${b.persona} Kullanıcı adın @${b.username}. Türkçe, doğal ve samimi bir mesaj yanıtı yaz: 1-2 kısa cümle, emoji yok, karakterden çıkma.\n\nKonuşma:\n${transcript}\n\n${b.name} olarak yanıtın:`;
  const key="u:"+b.uid;if(b.ai)S.stream={key,text:""};
  const r=await sample(prompt,{cache:false,modelTier:b.ai?"default":"quick",onText:b.ai?({text})=>{S.botTyping=null;S.stream={key,text};if(S.route.name==="chat"&&S.route.params.key===key)renderMsgs()}:undefined});
@@ -5328,6 +5356,8 @@ setTimeout(verTidyCache,9000);
 
 /* ---- A · Neler yeni ---- */
 const WN_ITEMS=[
+ {ic:"spark",g:"linear-gradient(135deg,#e23e57,#d97706)",t:"Öne çıkan hikâyeler",d:"Hikâyeni açıp \"Öne çıkar\"a bas; profilinde Tatil, Okul gibi yuvarlaklarda kalıcı durur. Profilindeki \"Yeni\" ile telefondan fotoğraf da ekleyebilirsin",go:"profile"},
+ {ic:"image",g:"linear-gradient(135deg,#0c7a63,#2f6bff)",t:"Rota fotoğrafa bakar",d:"Rota sohbetinde + ile fotoğraf gönder: \"Bu ne?\", \"Bu soruyu çöz\", \"Hangisi daha güzel?\" diye sor",go:"chats"},
  {ic:"chat",g:"linear-gradient(135deg,#2f6bff,#0c7a63)",t:"Akıcı sohbet",d:"Biri yazmaya başlayınca ya da yeni mesaj gelince sohbet zıplamıyor, yavaşça kayıyor. Beğen ve kaydet düğmeleri de artık zıplıyor",go:"chats"},
  {ic:"spark",g:"linear-gradient(135deg,#d97706,#e23e57)",t:"Rota fotoğrafı görüyor",d:"\"Rota açıklama yazsın\" artık fotoğrafa bakıp ona uygun açıklama yazıyor",go:"feed"},
  {ic:"phone",g:"linear-gradient(135deg,#0c7a63,#5856d6)",t:"Arama sesi telefonundan",d:"Bildirim izni verdiysen gelen aramada telefonunun ya da tabletinin kendi bildirim sesi çalar",go:"chats"},
@@ -10545,8 +10575,9 @@ async function rtTypewrite(key,text){const box=$("#msgs");if(!box||!rtTypeOk(key
 const botReplyBase511=botReply;
 botReply=async function(b,msgs){const key="u:"+b.uid;const smp=S.caps.sample;let calls=0;
  /* köprü yanıtı tek seferde onText ile verir: ilk çağrı tutulur (yazıyor noktaları kalır); ikinci çağrı gelirse gerçek akıştır, iletilir */
- const lastQ=b.ai?String(([...msgs].reverse().find(m=>m.from===S.uid)||{}).text||"").slice(0,400):"";/* köprü genel sorularda internette arar (Tavily) */
- const wrap=smp&&b.ai?Object.assign((p,o)=>smp(p,{...(o||{}),...(lastQ?{search:lastQ}:{}),...(o&&typeof o.onText==="function"?{onText:x=>{calls++;if(calls>1)o.onText(x)}}:{})}),smp):null;if(wrap)S.caps.sample=wrap;
+ const lastU=b.ai?([...msgs].reverse().find(m=>m.from===S.uid)||{}):{};const imgB=lastU.img?dataBlob(lastU.img):null;
+ const lastQ=b.ai&&!imgB?String(lastU.text||"").slice(0,400):"";/* köprü genel sorularda internette arar (Tavily); fotoğraflı soruda aramaz, fotoğrafı gönderir (5.5.0) */
+ const wrap=smp&&b.ai?Object.assign((p,o)=>smp(p,{...(o||{}),...(lastQ?{search:lastQ}:{}),...(imgB?{images:[imgB]}:{}),...(o&&typeof o.onText==="function"?{onText:x=>{calls++;if(calls>1)o.onText(x)}}:{})}),smp):null;if(wrap)S.caps.sample=wrap;
  let r;try{r=await botReplyBase511(b,msgs)}finally{if(wrap&&S.caps.sample===wrap)S.caps.sample=smp}
  if(r&&b.ai&&calls<=1)try{await rtTypewrite(key,r)}catch(e){console.warn(e)}
  return r};
@@ -10874,6 +10905,70 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 HOOKS.after.push(()=>{const k=kPopAt;if(!k)return;const dt=performance.now()-k.t;if(dt>420){kPopAt=null;return}
  for(const el of $$(`[data-${k.a}="${CSS.escape(k.id)}"]`)){if(el.classList.contains("kpop"))continue;el.classList.add("kpop");const sv=el.querySelector("svg.i");if(sv)sv.style.animationDelay=-Math.round(dt)+"ms"}});
 /*}@js:540*/
+/*@js:550{*/
+/* 5.5.0
+   Rota fotoğrafa bakar: Rota sohbetinde fotoğraf gönderilebilir (sendToBot artık `img` taşır; `botImg` 640 px / 60000 karaktere küçültür,
+     `botSlim` kayıtta yalnızca son 3 fotoğrafı tutar, eskiler "[fotoğraf]" olur: belge 1 MB'ı aşmasın). botReply (511 sarmalayıcısı) son mesajdaki
+     fotoğrafı `images` ile köprüye yollar (`dataBlob`); köprü görsel modelle betimler (5.4.0). Fotoğraflı soruda internet araması yapılmaz.
+   Öne çıkan hikâyeler: `hl/{id}` = {uid, name, at, up, items:[{img, at}]} (en fazla HL_MAX kare, kare başı ~100000 karakter 540x960).
+     Kurallarda yeni `match /hl/{id}` var: yönetici kuralları yeniden yayınlamalı. Profil açılınca o kişinin öne çıkanları izlenir (`hlWatch`, S.hl[uid]),
+     satır `hlRowHtml` ile `.ptabs`tan önce (vProfile sarıldı → vProfileBase550). Hikâye görüntüleyicide "Öne çıkar" (`hlAddSheet`), profilde "Yeni" (`hlNew`:
+     ad + aktif hikâyeler ya da telefondan fotoğraf), izleyici `hlOpen` (5 sn çubuklar; sahibine Ekle / Kaldır / Düzenle). Gizli hesapta `canSeeUser`. */
+function dataBlob(u){try{const m=/^data:([^;,]+);base64,(.*)$/.exec(u||"");if(!m)return null;const b=atob(m[2]);const a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return new Blob([a],{type:m[1]})}catch{return null}}
+async function botImg(src){try{const im=await loadImg(src);const w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;const s=Math.min(1,640/Math.max(w,h));const c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(h*s);c.getContext("2d").drawImage(im,0,0,c.width,c.height);return encode(c,60000,.8)}catch{return src}}
+function botSlim(ms){let n=0;return ms.slice().reverse().map(m=>{if(!m.img)return m;if(++n<=3)return m;const{img,...r}=m;return{...r,text:r.text||"[fotoğraf]"}}).reverse()}
+/* öne çıkanlar */
+const HL_MAX=8;S.hl=S.hl||{};let hlUn=null,hlFor=null;
+function hlWatch(uid){if(hlFor===uid)return;try{hlUn&&hlUn()}catch{}hlUn=null;hlFor=uid;if(!uid||!DB||!DB.watchCol)return;
+ try{hlUn=DB.watchCol("hl",docs=>{S.hl={...S.hl,[uid]:docs.filter(d=>d.uid===uid&&Array.isArray(d.items)&&d.items.length).sort((a,b)=>(a.at||0)-(b.at||0))};if(S.route.name==="profile")scheduleRefresh()},{where:["uid","==",uid],onError:()=>{}})}catch(e){console.warn("hl",e)}}
+const hlOf=uid=>(S.hl[uid]||[]);
+HOOKS.after.push(r=>{if(r==="profile"){const u=(S.route.params&&S.route.params.uid)||S.uid;hlWatch(u)}});
+function hlRowHtml(uid){const own=uid===S.uid;const list=hlOf(uid);if(!own&&(!list.length||!canSeeUser(uid)))return"";if(own&&S.guest)return"";
+ return`<div class="hlr" aria-label="Öne çıkanlar">${own?`<button class="hlc new" data-hlnew="1" aria-label="Yeni öne çıkan"><span class="hav">${I("add")}</span><small>Yeni</small></button>`:""}${list.map(d=>{const it=d.items[0];return`<button class="hlc" data-hl="${esc(d.id)}" data-hlu="${esc(uid)}" aria-label="Öne çıkan: ${esc(d.name)}"><span class="hav"><img src="${esc(R(it.img))}" alt="" loading="lazy"></span><small>${esc(d.name)}</small></button>`}).join("")}</div>`}
+const vProfileBase550=vProfile;
+vProfile=function(uid){const h=vProfileBase550.apply(this,arguments);try{const u=uid||S.uid;const row=hlRowHtml(u);if(!row)return h;const i=h.indexOf('<div class="ptabs"');return i<0?h+row:h.slice(0,i)+row+h.slice(i)}catch(e){console.warn("hl",e);return h}};
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-hl],[data-hlnew]");if(!t)return;e.preventDefault();e.stopPropagation();
+ if(t.dataset.hlnew)return hlNew();hlOpen(t.dataset.hlu,t.dataset.hl)},true);
+/* kare: hikâye resmi ya da telefondaki fotoğraf → 540x960 */
+async function hlImg(src){const im=typeof src==="string"?await loadImg(R(src)):src;return encode(toCanvas(im,540,960),100000,.82)}
+function hlErr(e){console.warn("hl",e);toast(e&&e.code==="permission-denied"?"Öne çıkanlar için yöneticinin Firebase kurallarını yeniden yayınlaması gerekiyor.":"Kaydedilemedi: "+(e&&e.message?e.message:"bilinmeyen hata"))}
+async function hlSave(d){if(!S.canWrite){noWrite();return false}try{await DB.set("hl/"+d.id,{uid:d.uid,name:d.name,at:d.at,up:now(),items:d.items});const list=hlOf(S.uid).filter(x=>x.id!==d.id);S.hl={...S.hl,[S.uid]:[...list,d].sort((a,b)=>a.at-b.at)};render(false);return true}catch(e){hlErr(e);return false}}
+/* seçilen kareleri (hikâye nesneleri ya da {img}) var olan ya da yeni öne çıkana ekler */
+function hlAddSheet(stories,onClose){if(!guard())return onClose&&onClose();const list=hlOf(S.uid);
+ const l=sheet("hladd","Öne çıkar",`<div class="box hllist">${list.map(d=>`<button class="opt" data-hlto="${esc(d.id)}"><img src="${esc(R(d.items[0].img))}" alt=""><span><b>${esc(d.name)}</b><br><small class="muted">${d.items.length}/${HL_MAX} kare</small></span></button>`).join("")}</div>
+ <div class="form"><div class="field"><label for="hlNm">${list.length?"Ya da yeni bir öne çıkan":"Öne çıkanın adı"}</label><input class="in" id="hlNm" maxlength="20" placeholder="Örn. Tatil, Okul, Arkadaşlar"></div><button class="btn block" id="hlMk" type="button">${I("add")}Yeni öne çıkan oluştur</button></div>`,{onClose});
+ const add=async d=>{const room=HL_MAX-d.items.length;if(room<1)return toast(`Bir öne çıkanda en fazla ${HL_MAX} kare olur.`);const pick=stories.slice(0,room);const items=[...d.items];
+  for(const s of pick)items.push({img:await hlImg(s.img),at:s.at||now()});if(await hlSave({...d,items})){closeLayer("hladd");toast(`“${d.name}” öne çıkanına eklendi`+(stories.length>room?` (${room} kare sığdı)`:""))}};
+ $$("[data-hlto]",l).forEach(b=>b.onclick=()=>{const d=list.find(x=>x.id===b.dataset.hlto);if(d){b.disabled=true;add(d).finally(()=>b.disabled=false)}});
+ $("#hlMk",l).onclick=()=>{const nm=kidClean($("#hlNm",l).value.trim()).slice(0,20);if(!nm){$("#hlNm",l).focus();return toast("Öne çıkana bir ad ver.")}const b=$("#hlMk",l);b.disabled=true;add({id:rid(),uid:S.uid,name:nm,at:now(),items:[]}).finally(()=>b.disabled=false)}}
+/* kare seçici: aktif hikâyeler + telefondan fotoğraf */
+function hlPick(title,max,cb){const act=storiesOf(S.uid).filter(s=>!s.bot&&s.img);const sel=new Set();
+ const l=sheet("hlpick",title,`<div class="form">${act.length?`<span class="lbl">Son 24 saatteki hikâyelerin</span><div class="hlpick">${act.map((s,i)=>`<button type="button" data-hp="${i}" aria-pressed="false" aria-label="Hikâye ${i+1}"><img src="${esc(R(s.img))}" alt=""><span class="ck">${I("check")}</span></button>`).join("")}</div>`:`<p class="muted" style="margin:0">Son 24 saatte hikâyen yok. Telefonundan fotoğraf seçebilirsin.</p>`}
+ <button class="btn sec block" id="hlPh" type="button">${I("image")}Telefondan fotoğraf seç</button>${act.length?`<button class="btn block" id="hlGo" type="button" disabled>Devam</button>`:""}</div>`);
+ $$("[data-hp]",l).forEach(b=>b.onclick=()=>{const i=+b.dataset.hp;if(sel.has(i))sel.delete(i);else{if(sel.size>=max)return toast(`En fazla ${max} kare seçebilirsin.`);sel.add(i)}b.setAttribute("aria-pressed",sel.has(i));const g=$("#hlGo",l);g.disabled=!sel.size;g.textContent=sel.size?`Devam (${sel.size})`:"Devam"});
+ const g=$("#hlGo",l);if(g)g.onclick=()=>{closeLayer("hlpick");cb([...sel].sort((a,b)=>a-b).map(i=>act[i]))};
+ $("#hlPh",l).onclick=async()=>{const a=await kmpOpen({title:"Fotoğraf seç",accept:"image",multi:max>1,max,record:false});const r=(a||[]).filter(x=>x&&x.img).map(x=>({img:x.img,at:now()}));if(r.length){closeLayer("hlpick");cb(r)}}}
+function hlNew(){if(!guard())return;hlPick("Yeni öne çıkan",HL_MAX,items=>hlAddSheet(items))}
+/* izleyici */
+function hlOpen(uid,id,start=0){if(!canSeeUser(uid))return toast("Bu hesap gizli. Öne çıkanlarını görmek için takip et.");const d=hlOf(uid).find(x=>x.id===id);if(!d||!d.items.length)return;
+ const own=uid===S.uid;const its=d.items;let i=Math.min(start,its.length-1),raf=0,start0=0,paused=false,pz=0;const dur=5000;
+ const l=openLayer("hl",`<div class="sv" role="dialog" aria-label="Öne çıkan: ${esc(d.name)}"><div class="bars">${its.map(()=>"<i><b></b></i>").join("")}</div><div class="shd">${avatar(uid,34,{ring:false,click:false})}<div class="n">${esc(d.name)}<small id="hlT"></small></div><button class="ib" data-act="close" aria-label="Kapat">${I("close")}</button></div><div class="img"><img id="hlImg" alt=""></div><button class="tap l" id="hlPrev" aria-label="Önceki"></button><button class="tap r" id="hlNext" aria-label="Sonraki"></button>${own?`<div class="ft"><button class="btn sec" id="hlAdd">${I("add")}Ekle</button><button class="btn sec" id="hlRm">${I("trash")}Kaldır</button><button class="btn sec" id="hlEd" style="margin-left:auto">${I("edit")}Düzenle</button></div>`:""}</div>`,{noScrim:true,onClose:()=>{cancelAnimationFrame(raf);scheduleRefresh()}});
+ const bars=$$(".bars b",l);
+ const show=()=>{$("#hlImg",l).src=R(its[i].img);$("#hlT",l).textContent=ago(its[i].at||d.at);bars.forEach((b,j)=>b.style.width=j<i?"100%":"0");start0=performance.now();tick()};
+ const tick=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(function f(t){if(!l.isConnected)return;if(paused){pz=pz||t;raf=requestAnimationFrame(f);return}if(pz){start0+=t-pz;pz=0}const pr=Math.min(1,(t-start0)/dur);bars[i].style.width=pr*100+"%";if(pr>=1)next();else raf=requestAnimationFrame(f)})};
+ const next=()=>{if(i<its.length-1){i++;show()}else closeLayer("hl")};
+ $("#hlNext",l).onclick=next;$("#hlPrev",l).onclick=()=>{if(i>0)i--;show()};
+ if(own){const hold=fn=>()=>{paused=true;fn()};
+  $("#hlAdd",l).onclick=hold(()=>{const room=HL_MAX-d.items.length;if(room<1){paused=false;return toast(`Bir öne çıkanda en fazla ${HL_MAX} kare olur.`)}
+   hlPick("Kare ekle",room,async picked=>{const items=[...d.items];for(const s of picked.slice(0,room))items.push({img:await hlImg(s.img),at:s.at||now()});if(await hlSave({...d,items})){closeLayer("hl");toast("Eklendi")}});const pl=$('#overlay [data-layer="hlpick"]');if(!pl)paused=false});
+  $("#hlRm",l).onclick=hold(()=>dialog("Kare kaldırılsın mı?",its.length>1?"Bu kare öne çıkandan kalkar.":"Son kare bu; öne çıkan da silinir.",[{label:"Vazgeç",fn:()=>{paused=false}},{label:"Kaldır",cls:"danger",fn:async()=>{
+   if(its.length>1){const items=its.filter((_,j)=>j!==i);if(await hlSave({...d,items})){closeLayer("hl");toast("Kare kaldırıldı")}}else await hlDel(d)}}]));
+  $("#hlEd",l).onclick=hold(()=>{const e=sheet("hled","Öne çıkanı düzenle",`<div class="form"><div class="field"><label for="hlEn">Ad</label><input class="in" id="hlEn" maxlength="20" value="${esc(d.name)}"></div><button class="btn block" id="hlEs" type="button">Kaydet</button><button class="btn ghost block" id="hlEx" type="button" style="color:var(--heart)">${I("trash")}Öne çıkanı sil</button></div>`,{onClose:()=>{paused=false}});
+   $("#hlEs",e).onclick=async()=>{const nm=kidClean($("#hlEn",e).value.trim()).slice(0,20);if(!nm)return toast("Bir ad yaz.");if(await hlSave({...d,name:nm})){closeLayer("hled");closeLayer("hl");toast("Kaydedildi")}};
+   $("#hlEx",e).onclick=()=>dialog("Öne çıkan silinsin mi?",`“${esc(d.name)}” ve içindeki ${its.length} kare silinir.`,[{label:"Vazgeç"},{label:"Sil",cls:"danger",fn:()=>hlDel(d)}])})}
+ show()}
+async function hlDel(d){try{await DB.del("hl/"+d.id);S.hl={...S.hl,[S.uid]:hlOf(S.uid).filter(x=>x.id!==d.id)};closeLayer("hled");closeLayer("hl");render(false);toast("Öne çıkan silindi")}catch(e){hlErr(e)}}
+/*}@js:550*/
 
 
 boot();
