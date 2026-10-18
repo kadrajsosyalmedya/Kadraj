@@ -1,0 +1,21 @@
+// Fotoğraf betimleme testi: node test/vision-test.mjs (Workers AI taklit edilir, internete bağlanmaz).
+import { _askFree } from "../src/index.js";
+let fail = 0;
+const ok = (c, m) => { console.log((c ? "PASS " : "FAIL ") + m); if (!c) fail++; };
+const img = { type: "image", source: { type: "base64", media_type: "image/jpeg", data: btoa("\xff\xd8\xff\xe0fake") } };
+const msg = [{ role: "user", content: [img, { type: "text", text: "Bu fotoğrafa açıklama yaz." }] }];
+let calls = [], sys = "";
+const mk = (vision) => ({ AI: { run: async (m, o) => { calls.push(m); if (o.messages && o.messages[0].role === "system") { sys = o.messages[0].content; return { response: "Kahve keyfi #kahve" }; } return vision(m, o); } } });
+let r = await _askFree(mk(async () => ({ response: "A red cup of espresso on a wooden table." })), { messages: msg }, "u1");
+ok(r.data.saw === true && sys.includes("espresso") && calls[0] === "@cf/google/gemma-4-26b-a4b-it", "ilk görsel model betimledi, sisteme eklendi");
+calls = []; sys = "";
+r = await _askFree(mk(async (m, o) => { if (!/llava/.test(m)) throw new Error("model yok"); ok(Array.isArray(o.image) && o.image[0] === 255, "llava'ya bayt dizisi gitti"); return { description: "A cat sleeping." }; }), { messages: msg }, "u1");
+ok(r.data.saw === true && sys.includes("cat") && calls.length === 4, "modeller sırayla denendi, llava betimledi");
+calls = []; sys = "";
+r = await _askFree(mk(async () => { throw new Error("yok"); }), { messages: msg }, "u1");
+ok(r.data.saw === false && sys.includes("göremiyorsun") && r.data.text, "hiçbiri olmazsa uydurmama notu, yine yanıt");
+calls = [];
+r = await _askFree(mk(async () => ({ response: "x" })), { messages: [{ role: "user", content: "selam" }] }, "u1");
+ok(calls.length === 1 && r.data.saw === undefined, "fotoğrafsız soruda görsel model çağrılmaz");
+console.log(fail ? fail + " hata" : "hepsi geçti");
+process.exit(fail ? 1 : 0);

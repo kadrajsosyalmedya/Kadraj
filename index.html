@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50300">
+<meta name="kadraj-version" content="50400">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -2944,6 +2944,22 @@ html.reduce-motion .k51pt,html.reduce-motion .rzchip{transition:none!important}
 .phs-mv{display:flex;gap:2px}
 .phs-mv .ib:disabled{opacity:.35}
 /*}@css:530*/
+/*@css:540{*/
+/* 5.4.0: basılı tutunca tarayıcının resim menüsü çıkmaz; sohbet kayması, yazıyor girişi, beğen/kaydet zıplaması */
+.media img,.tile img,.reel img,.sv img,.mp img{-webkit-touch-callout:none;-webkit-user-drag:none}
+.gl-sp{flex:none;pointer-events:none}
+#msgs .mn-ty.gl-in{animation:glTy .34s cubic-bezier(.2,1.3,.4,1) both;transform-origin:left bottom}
+@keyframes glTy{from{opacity:0;transform:scale(.55)}}
+.pill.kpop svg.i,.rside .kpop svg.i{animation:kPop .42s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes kPop{0%{transform:scale(1)}35%{transform:scale(1.45) rotate(-8deg)}70%{transform:scale(.92)}100%{transform:scale(1)}}
+#msgs .seenrow:not(.sr-ph) .seenav{animation:glSeen .3s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes glSeen{from{opacity:0;transform:scale(.3)}}
+#msgs .seenrow.gl-old .seenav{animation:none}
+.phc-tr img{transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.media.phc:active .phc-tr img{transform:scale(.985)}
+html.reduce-motion #msgs .mn-ty.gl-in,html.reduce-motion .kpop svg.i,html.reduce-motion #msgs .seenav{animation:none}
+@media (prefers-reduced-motion:reduce){#msgs .mn-ty.gl-in,.kpop svg.i,#msgs .seenav{animation:none}}
+/*}@css:540*/
 
 
 </style>
@@ -2984,7 +3000,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50300,APP_VER="5.3.0";
+const APP_V=50400,APP_VER="5.4.0";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3308,7 +3324,7 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
  box.innerHTML=h;if(atBottom||S.forceBottom){box.scrollTop=box.scrollHeight;box._pin=true;S.forceBottom=false}
  /* 4.4.1: klavye açılınca, yanıt çubuğu çıkınca ya da fotoğraf geç yüklenince en alttaysan altta kal */
  if(!box._wired){box._wired=1;box._pin=true;box.addEventListener("scroll",()=>{box._pin=box.scrollHeight-box.scrollTop-box.clientHeight<90},{passive:true});
-  if(window.ResizeObserver)new ResizeObserver(()=>{if(box._pin)box.scrollTop=box.scrollHeight}).observe(box);box.addEventListener("load",()=>{if(box._pin)box.scrollTop=box.scrollHeight},true)}}
+  if(window.ResizeObserver)new ResizeObserver(()=>{if(box._pin)msgsPin(box)}).observe(box);box.addEventListener("load",()=>{if(box._pin)msgsPin(box)},true)}}
 
 const meydanUnread=()=>{const m=S.meydan;return!!(m&&m.last&&m.last.from!==S.uid&&m.last.at>LS.get("kadraj_meydan_"+S.uid,0))};
 const unreadCount=()=>chatList().filter(c=>c.unread).length+(meydanUnread()?1:0);
@@ -4993,7 +5009,7 @@ const RULES=rulesText([]);
 const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır, herkes kendi e-postasıyla hesap açar). Alt dok: Akış, Keşfet, ortada + (Oluştur), Sohbet, Ben.
 - Oluştur (+): Fotoğraf, Klaket (kısa video, Kadraj'da Reels'in adı), Hikâye, Not (renkli zeminde yazı), Anket (2-4 seçenek), Çizim (parmakla).
 - Fotoğraf kaynakları: telefondan seç, kamera, Kadraj galerisi (hazır 10 fotoğraf), parmakla çizim, panodan yapıştırma. Dosya seçici açılmazsa galeri, çizim ya da yapıştırma kullanılır.
-- Fotoğraf: Kare/Dikey/Yatay kırpma, 7 filtre, açıklama, konum; "Rota açıklama yazsın" düğmesi. Bir paylaşıma 10 fotoğrafa kadar eklenebilir (seçicide birden çok seç ya da şeritteki + ile ekle); şeritten seç, çıkar, sola/sağa taşı. Filtre ve oran hepsine uygulanır. Akışta yana kaydırarak bakılır, sağ üstte 2/5 gibi sayaç ve altta noktalar çıkar; ızgarada köşede üst üste kare ikonu.
+- Fotoğraf: Kare/Dikey/Yatay kırpma, 7 filtre, açıklama, konum; "Rota açıklama yazsın" düğmesi (Rota seçili fotoğrafa bakıp ona uygun açıklama yazar; fotoğrafı göremezse genel bir açıklama yazar). Paylaşım resimlerine basılı tutunca indirme menüsü çıkmaz. Bir paylaşıma 10 fotoğrafa kadar eklenebilir (seçicide birden çok seç ya da şeritteki + ile ekle); şeritten seç, çıkar, sola/sağa taşı. Filtre ve oran hepsine uygulanır. Akışta yana kaydırarak bakılır, sağ üstte 2/5 gibi sayaç ve altta noktalar çıkar; ızgarada köşede üst üste kare ikonu.
 - Klaket: "Fotoğraflardan" (1-3 kare, ekrandaki yazı, hareket: Yakınlaş/Kaydır/Nabız, müzik: Lo-fi/Enerjik/Sakin; müzik cihazda üretilir) ya da "Video yükle" (en fazla 2 dakika, 40 MB; büyükler otomatik küçültülür). Klaketler ekranında sesi sağ üstteki hoparlör açar, çift dokunuş beğenir.
 - Hikâye: 24 saat görünür, üstüne yazı eklenebilir; yanıtlar mesaj olarak gelir.
 - Etkileşim: beğeni (çift dokunuş da olur), yorum, kaydet, arkadaşına gönder, anket oyu.
@@ -5020,6 +5036,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.2 sohbet: mesaj yazarken @ yazınca öneri listesi açılır. Birebir sohbette yalnızca Rota çıkar; @rota yazıp gönderince Rota o sohbete katılır ve ikinize de yanıt verir; Rota'nın bir mesajına kaydırıp yanıt verirsen (her sohbette) Rota da cevap verir. Rota'nın cevabı harf harf yazılır. Grupta grup üyeleri ve Rota, Meydan'da herkes ve Rota önerilir. Mesajlardaki @adlar renkli görünür, dokununca profil açılır; senden bahseden mesajın çerçevesi renklenir. Bir mesajı yanıtlamak için kaydır: kendi mesajını sola, karşı tarafınkini sağa. Grupta ve Meydan'da yazanlar fotoğraflarıyla görünür ("Ali ve Ayşe yazıyor"), birden fazla kişi yazıyorsa fotoğraflar üst üste biner.
 - 5.0 yenilikleri (Kadraj 5.0): Yeni görünüm "Vizör": alttaki yüzen çubukta etkin sekme odak köşeleriyle çerçevelenir, ortadaki deklanşör düğmesi paylaşım menüsünü açar; paylaşımlar numaralı "kare"lerdir; görülmemiş hikâyeler diyafram halkasıyla işaretlenir; eski görünüm Ayarlar > Görünüm > Arayüz'den "Klasik" seçilerek geri gelir.
 - 5.0 arama: sohbet başlığındaki telefon ya da kamera ile. Arama ekranında Mikrofon, Kamera (sesli aramada da açılır), Ekran (bilgisayarda ekran paylaşımı), Tepki ve Diğer (kamerayı çevir, ses çıkışı, gürültü engelleme, Küçült) var. Küçült aramayı yüzen pencereye alır. Gelen aramada "Kamerasız yanıtla" ve "Mesajla yanıtla" var. Ekran paylaşımı ve tepkiler için iki tarafın da 5.0 kullanması gerekir.
+- 5.4 gelen arama: bildirim izni verildiyse Kadraj açıkken de gelen aramada cihazın kendi bildirim sesi çalar (5 saniyede bir yinelenir, yanıtlanınca kapanır); izin yoksa Kadraj'ın zil sesi çalar. Sohbet yeni mesajda ya da biri yazmaya başlayınca zıplamaz, yavaşça kayar.
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -5311,6 +5328,9 @@ setTimeout(verTidyCache,9000);
 
 /* ---- A · Neler yeni ---- */
 const WN_ITEMS=[
+ {ic:"chat",g:"linear-gradient(135deg,#2f6bff,#0c7a63)",t:"Akıcı sohbet",d:"Biri yazmaya başlayınca ya da yeni mesaj gelince sohbet zıplamıyor, yavaşça kayıyor. Beğen ve kaydet düğmeleri de artık zıplıyor",go:"chats"},
+ {ic:"spark",g:"linear-gradient(135deg,#d97706,#e23e57)",t:"Rota fotoğrafı görüyor",d:"\"Rota açıklama yazsın\" artık fotoğrafa bakıp ona uygun açıklama yazıyor",go:"feed"},
+ {ic:"phone",g:"linear-gradient(135deg,#0c7a63,#5856d6)",t:"Arama sesi telefonundan",d:"Bildirim izni verdiysen gelen aramada telefonunun ya da tabletinin kendi bildirim sesi çalar",go:"chats"},
  {ic:"image",g:"linear-gradient(135deg,#0c7a63,#d97706)",t:"Çoklu fotoğraf",d:"Bir paylaşıma 10 fotoğrafa kadar ekle; akışta yana kaydırarak bakılır. Sırasını oluştur ekranındaki şeritten değiştirebilirsin",go:"feed"},
  {ic:"chat",g:"linear-gradient(135deg,#0c7a63,#2f6bff)",t:"@ ile bahset",d:"Mesajda @ yazınca öneriler çıkar. Birebir sohbette @rota yaz, Rota ikinize de katılsın; grupta arkadaşlarından bahset",go:"chats"},
  {ic:"reply",g:"linear-gradient(135deg,#5856d6,#0ea5e9)",t:"Kaydırarak yanıtla",d:"Kendi mesajını sola, karşı tarafınkini sağa kaydır; yanıt hazır",go:"chats"},
@@ -5540,7 +5560,7 @@ sendMessage=async function(key,payload){let k=null;try{k=keyInfo(key)}catch{}
   if(k.type==="group"){const gc=S.chats[k.cid];if(gc?(Array.isArray(gc.members)&&!gc.members.includes(S.uid)):S._chatsIn){toast("Bu grubun üyesi değilsin.");return}}}
  return sendMessageBase(key,payload)};
 /* 4.4.1 klavye: klavye açılınca yalnızca görünür alan küçülür (iOS ve yeni Android); sayfa yukarı kaymasın, üst çubuk (grup adı) yerinde kalsın */
-(function(){const vv=window.visualViewport;if(!vv)return;let q=0;const fit=()=>{q=0;document.documentElement.style.setProperty("--vvh",Math.round(vv.height)+"px");if(vv.offsetTop>0||window.scrollY>0)window.scrollTo(0,0);const b=document.getElementById("msgs");if(b&&b._pin)b.scrollTop=b.scrollHeight};
+(function(){const vv=window.visualViewport;if(!vv)return;let q=0;const fit=()=>{q=0;document.documentElement.style.setProperty("--vvh",Math.round(vv.height)+"px");if(vv.offsetTop>0||window.scrollY>0)window.scrollTo(0,0);const b=document.getElementById("msgs");if(b&&b._pin)msgsPin(b)};
  const k=()=>{if(!q)q=requestAnimationFrame(fit)};vv.addEventListener("resize",k);vv.addEventListener("scroll",k);fit()})();
 /* ortak temayı değiştir: önce sohbete küçük bir not (DM'de sohbet belgesini de oluşturur), sonra chats/{cid}.theme */
 async function setSharedTheme(key,id,photo,tone){let k=null;try{k=keyInfo(key)}catch{}if(!k||!(k.type==="dm"||k.type==="group"))return false;if(!guard())return false;
@@ -10722,10 +10742,12 @@ function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)re
 const renderMsgsBase520=renderMsgs;
 /* 5.2.1: etiket ve "Rota" yazısı çizimden sonra eklendiği için sohbet en alttan kayıyor, sonra düzelirken aşağı yukarı oynuyordu.
    Çizimden önce en alttaysa (ya da çizim alta sabitlediyse) eklemelerden sonra aynı karede yeniden en alta sabitlenir. */
-renderMsgs=function(...a){const b0=$("#msgs");const was=!!b0&&(b0.scrollHeight-b0.scrollTop-b0.clientHeight<120||b0._pin===true);
+renderMsgs=function(...a){const b0=$("#msgs");const g0=glBefore(b0);const was=!!b0&&(!!GL.from||b0.scrollHeight-b0.scrollTop-b0.clientHeight<120||b0._pin===true);
  const r=renderMsgsBase520.apply(this,a);const b=$("#msgs");const h0=b?b.scrollHeight:0;const at=b?b.scrollHeight-b.scrollTop-b.clientHeight<2:false;
  try{mnAfterRender()}catch(e){console.warn(e)}
- if(b&&(was||at)&&b.scrollHeight!==h0||b&&at)b.scrollTop=b.scrollHeight;return r};
+ if(b&&(was||at)&&b.scrollHeight!==h0||b&&at)b.scrollTop=b.scrollHeight;
+ /* 5.4.0: yükseklik değiştiyse sohbet zıplamaz, yavaşça kayar (bölge 540) */
+ try{glAfter(b0,b,was,g0)}catch(e){console.warn(e)}return r};
 /* kaydırarak yanıtla */
 (()=>{let st=null;
  document.addEventListener("pointerdown",e=>{st=null;if(S.route.name!=="chat"||e.button>0)return;const row=e.target.closest&&e.target.closest("#msgs .mrow");if(!row)return;const msg=row.querySelector(".msg[data-mid]");
@@ -10795,6 +10817,56 @@ async function phPack(c,go){const[w,h]=arSize(c.ar);const n=c.imgs.length;const 
  for(let i=0;i<n;i++){go.textContent=`Hazırlanıyor ${i+1}/${n}`;await new Promise(r=>setTimeout(r,16));const it=c.imgs[i];out.push(it.src&&c.ar==="1/1"?it.src:encode(toCanvas(it.img,w,h),per))}
  return{kind:"photo",src:out[0],more:out.slice(1),css:FILTERS[c.filter][1]||"",ar:c.ar,exif:`Filtre: ${FILTERS[c.filter][0]} · ${n} fotoğraf`}}
 /*}@js:530*/
+/*@js:540{*/
+/* 5.4.0
+   Basılı tutma: paylaşım, ızgara, Klaket ve hikâye resimlerinde tarayıcının "Resmi indir/paylaş" menüsü çıkmaz (contextmenu + -webkit-touch-callout).
+   Sohbet kayması (GL): renderMsgs (520 sarmalayıcısı) en alttayken içerik yüksekliği değişirse zıplamak yerine ~320 ms'de kayar.
+     Büyüme (yazıyor satırı, yeni mesaj): kaydırma konumu alttan `off` kadar yukarıda başlar, alta iner (en fazla 80 px; `_pin` 90 px eşiğinin altında kalır).
+     Küçülme (yazıyor bitti): en alta `.gl-sp` boşluğu eklenir ve küçülür. glBefore/glAfter/glFrame; dokunma ya da tekerlek kaymayı bırakır; hareket azaltılmışsa yok.
+   Arama sesi: gelen aramada Kadraj'ın kendi zil sesi yerine (bildirim izni varsa) cihazın bildirimi 5 sn'de bir yinelenir (`krRing`, etiket call-<id>);
+     yanıtlanınca/bitince kapanır (`stopTone` → `krStop`). İzin yoksa eski zil sesi. Arayan taraftaki bekleme sesi aynı.
+   Zıplamalar: beğen/kaydet ikonunda `.kpop` (tıklayınca; yeniden çizimde kaldığı yerden sürer), yazıyor satırı girişi `.gl-in`, görüldü fotoğrafı ilk çıkışta. */
+document.addEventListener("contextmenu",e=>{const t=e.target;if(t&&t.tagName==="IMG"&&t.closest&&t.closest(".media,.tile,.reel,.sv,.mp"))e.preventDefault()},true);
+const GL={from:0,t0:0,raf:0,dur:320};
+function glOff(){if(!GL.from)return 0;const p=Math.min(1,(performance.now()-GL.t0)/GL.dur);return p>=1?0:GL.from*Math.pow(1-p,3)}
+function glStop(){cancelAnimationFrame(GL.raf);GL.raf=0;GL.from=0;const b=$("#msgs");const sp=b&&b.querySelector(":scope>.gl-sp");if(sp)sp.remove()}
+function glFrame(){cancelAnimationFrame(GL.raf);GL.raf=0;const box=$("#msgs");if(!box||!GL.from){GL.from=0;return}
+ const p=Math.min(1,(performance.now()-GL.t0)/GL.dur);const o=p>=1?0:GL.from*Math.pow(1-p,3);let sp=box.querySelector(":scope>.gl-sp");
+ if(o<-.5){if(!sp){sp=document.createElement("div");sp.className="gl-sp";sp.setAttribute("aria-hidden","true");sp.style.marginTop=-(parseFloat(getComputedStyle(box).rowGap)||0)+"px"}if(box.lastElementChild!==sp)box.appendChild(sp);sp.style.height=(-o)+"px"}else if(sp)sp.remove();
+ box.scrollTop=box.scrollHeight-box.clientHeight-Math.max(0,o);
+ if(p>=1){GL.from=0;return}GL.raf=requestAnimationFrame(glFrame)}
+/* sohbeti en alta sabitleyen yerler (resim yüklenince, boyut değişince, klavye) kayma sürerken onu bozmaz */
+function msgsPin(b){if(GL.from&&b===$("#msgs"))glFrame();else b.scrollTop=b.scrollHeight}
+function glBefore(b0){if(!b0)return null;const sp=b0.querySelector(":scope>.gl-sp");return{cur:glOff(),H:b0.scrollHeight-(sp?sp.offsetHeight:0),ty:!!b0.querySelector(".mn-ty"),rows:!!b0.querySelector(".mrow"),seen:b0.querySelector(".seenrow:not(.sr-ph)")?b0.querySelector(".seenrow:not(.sr-ph)").previousElementSibling:null,key:S.route.params&&S.route.params.key}}
+function glAfter(b0,b,was,g){if(!b){GL.from=0;return}
+ if(g&&!g.ty)b.querySelectorAll(".mn-ty").forEach(x=>x.classList.add("gl-in"));
+ /* görüldü fotoğrafı yalnızca yeni çıktığında zıplar */
+ {const sr=b.querySelector(".seenrow:not(.sr-ph)");const prev=sr&&sr.previousElementSibling;const pm=prev&&prev.querySelector&&prev.querySelector(".msg[data-mid]");const om=g&&g.seen&&g.seen.querySelector&&g.seen.querySelector(".msg[data-mid]");if(sr&&(!g||!g.rows||pm&&om&&pm.dataset.mid===om.dataset.mid))sr.classList.add("gl-old")}
+ if(!g||b!==b0||!was||kbReduce()||g.key!==(S.route.params&&S.route.params.key)){glStop();return}
+ const sp=b.querySelector(":scope>.gl-sp");const H1=b.scrollHeight-(sp?sp.offsetHeight:0);
+ if(Math.abs(H1-g.H)<2){if(GL.from)glFrame();return}
+ const d=Math.max(-240,Math.min(80,g.cur+(H1-g.H)));if(Math.abs(d)<2){glStop();b.scrollTop=b.scrollHeight;return}
+ GL.from=d;GL.t0=performance.now();glFrame()}
+["touchstart","wheel"].forEach(ev=>document.addEventListener(ev,e=>{if(GL.from&&e.target&&e.target.closest&&e.target.closest("#msgs"))glStop()},{capture:true,passive:true}));
+/* arama: cihazın kendi bildirimi */
+const KR={id:null,t:0};
+function krCan(){try{return typeof Notification!=="undefined"&&Notification.permission==="granted"&&settings.notify!==false&&!!navigator.serviceWorker}catch{return false}}
+function krRing(c){krStop();KR.id=c.id;const p=P(c.peer);
+ const ring=()=>{if(CALL!==c||c.status!=="incoming")return krStop();sysNote(p.name+" arıyor",(c.video?"Görüntülü arama":"Sesli arama")+" · yanıtlamak için Kadraj'a dön","call-"+c.id,{icon:p.avatar,force:true,kind:"call"})};
+ ring();KR.t=setInterval(ring,5000)}
+function krStop(){clearInterval(KR.t);KR.t=0;const id=KR.id;KR.id=null;if(!id||!navigator.serviceWorker)return;
+ navigator.serviceWorker.ready.then(reg=>reg.getNotifications({tag:"call-"+id})).then(ns=>(ns||[]).forEach(n=>n.close())).catch(()=>{})}
+const startToneBase540=startTone;
+startTone=function(kind){if(kind==="ring"&&typeof CALL!=="undefined"&&CALL&&CALL.role==="callee"&&CALL.status==="incoming"&&krCan()){stopTone();return krRing(CALL)}return startToneBase540(kind)};
+const stopToneBase540=stopTone;
+stopTone=function(){krStop();return stopToneBase540()};
+/* beğen/kaydet zıplaması */
+let kPopAt=null;
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-like],[data-save]");if(!b)return;const lk=b.hasAttribute("data-like");const id=lk?b.dataset.like:b.dataset.save;
+ if(lk?iLike(id):isSaved(id))return;kPopAt={a:lk?"like":"save",id,t:performance.now()};b.classList.remove("kpop");void b.offsetWidth;b.classList.add("kpop")},true);
+HOOKS.after.push(()=>{const k=kPopAt;if(!k)return;const dt=performance.now()-k.t;if(dt>420){kPopAt=null;return}
+ for(const el of $$(`[data-${k.a}="${CSS.escape(k.id)}"]`)){if(el.classList.contains("kpop"))continue;el.classList.add("kpop");const sv=el.querySelector("svg.i");if(sv)sv.style.animationDelay=-Math.round(dt)+"ms"}});
+/*}@js:540*/
 
 
 boot();

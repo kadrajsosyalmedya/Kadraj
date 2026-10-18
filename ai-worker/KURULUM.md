@@ -14,6 +14,7 @@ Bu kurulumdan sonra Rota ve Clawd gerçek yapay zekâyla konuşur. Aynı köprü
 | Gereken | Yalnızca ücretsiz bir Cloudflare hesabı | Cloudflare hesabı ve Anthropic API anahtarı |
 | Model | Açık kaynaklı Llama 3.3 70B | Claude (varsayılan: Claude Opus 5.5) |
 | İnternette arama | Tavily anahtarı eklenirse var (ücretsiz, ayda 1000 arama; 4. bölüm) | Var |
+| Fotoğrafı görme | Var: fotoğraf önce ücretsiz bir görsel modeline betimletilir (Gemma 4, Llama 4 Scout, LLaVA sırayla denenir; `VISION_MODEL` ile değiştirilebilir) | Var |
 
 Önce ücretsiz başla. İstersen sonra Claude anahtarını eklersin; anahtar eklendiği anda köprü kendiliğinden Claude'a geçer.
 
@@ -112,6 +113,7 @@ Worker'da **Settings**, sonra **Variables** bölümünden değiştirebilirsin:
 | `DAILY_LIMIT` | `60` | Bir kişinin günde sorabileceği soru sayısı. |
 | `PUSH_DAILY_LIMIT` | `600` | Bir kişinin günde gönderebileceği bildirim isteği sayısı. |
 | `SEARCH_DAILY_LIMIT` | `20` | Bir kişinin günde yapabileceği internet araması sayısı (Tavily kotası ayda 1000). |
+| `VISION_MODEL` | (boş) | Ücretsiz yolda fotoğrafı betimleyen Workers AI modeli. Boşsa sırayla `@cf/google/gemma-4-26b-a4b-it`, `@cf/meta/llama-4-scout-17b-16e-instruct`, `@cf/llava-hf/llava-1.5-7b-hf` denenir. |
 
 ## Sorun giderme
 
