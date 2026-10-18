@@ -574,7 +574,7 @@ function css(){if($("#cpCss"))return;const st=document.createElement("style");st
 .cp-ban small{font-size:.78rem;color:#c9d6e8}
 .cp-ring{position:relative;width:64px;height:64px;display:grid;place-items:center;font:800 1.6rem var(--f-display)}
 .cp-ring svg{position:absolute;inset:0;width:64px;height:64px;transform:rotate(-90deg)}
-.cp-bp{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));width:min(640px,calc(100% - 16px));padding:10px 10px 8px;display:grid;gap:7px;z-index:3}
+.cp-bp{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));width:min(640px,calc(100% - 16px));padding:10px 10px 8px;display:grid;gap:7px;z-index:3;grid-template-columns:minmax(0,1fr)}
 .cp-r1{display:flex;align-items:center;gap:8px;min-width:0}
 .cp-r1 .fl{width:30px;height:20px;border-radius:4px;box-shadow:0 0 0 1px rgba(255,255,255,.35);flex:none;background-size:cover}
 .cp-r1 .nm{font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -584,18 +584,18 @@ function css(){if($("#cpCss"))return;const st=document.createElement("style");st
 .cp-kv small,.cp-lbl{font:800 .55rem/1 var(--f-mono);letter-spacing:.12em;color:#9fb0c6;text-transform:uppercase}
 .cp-kv b{font:700 .8rem/1.15 var(--f-mono)}
 .cp-kv em{font:600 .62rem var(--f-mono);font-style:normal;color:#8ce99a}
-.cp-tp{display:grid;gap:4px}
-.cp-tp .h{display:flex;align-items:baseline;gap:8px}
+.cp-tp{display:grid;gap:4px;grid-template-columns:minmax(0,1fr)}
+.cp-tp .h{display:flex;align-items:baseline;gap:8px;min-width:0}
 .cp-tp .h b{font:800 1rem var(--f-mono)}
 .cp-tp .h span{font:600 .72rem var(--f-mono);color:#c3d0e2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .cp-tp .h em{white-space:nowrap}
 .cp-tp .h em{font:700 .7rem var(--f-mono);font-style:normal;color:#8ce99a;margin-left:auto}
 .cp-tb{height:8px;border-radius:5px;background:rgba(255,255,255,.14);overflow:hidden}
 .cp-tb i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#4ade80,#a3e635);transition:width .3s}
-.cp-r3{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.cp-ch{padding:6px 0;min-width:2.7rem;border-radius:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);font:800 .72rem var(--f-mono)}
+.cp-r3{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.cp-ch{flex:1 1 0;padding:6px 0;min-width:2.5rem;border-radius:9px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.1);font:800 .72rem var(--f-mono)}
 .cp-ch[aria-pressed=true]{background:#ffd166;color:#1b2333;border-color:#ffd166}
-.cp-send{font:600 .72rem var(--f-mono);color:#e7eef8;margin-left:auto;white-space:nowrap}
+.cp-send{font:600 .72rem var(--f-mono);color:#e7eef8;margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .cp-sl{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
 .cp-tabs{display:flex;gap:4px}.cp-tab{flex:1;text-align:center;padding:6px 0;border-radius:9px;border:0;background:rgba(255,255,255,.07);font:800 .68rem var(--f-body);letter-spacing:.02em}.cp-tab[aria-pressed=true]{background:#fff;color:#1b2333}
 .cp-s.dip svg{color:#8ce99a}
@@ -868,7 +868,7 @@ const relOf=(g,a,b)=>{const A=g.pl[a],B=g.pl[b];if(!A||!B)return"";if(B.ov===a)r
  if(g.att.some(x=>(x.o===a&&x.t===b)||(x.o===b&&x.t===a)))return"SAVAŞTA";return g.peace>0?"BARIŞ SÜRESİ":"SINIRDA"};
 function hud(){if(!V||!G||!V.cv)return;const g=G,p=g.pl[V.me],m=g.m;if(!p)return;const land=m.land;
  const set=(id,v)=>{const e=document.getElementById(id);if(e&&e.textContent!==v)e.textContent=v};
- const C=troopCap(p),tr=troopRate(p),pr=popRate(p);set("cpPct",pf(p.cells/land,2));set("cpPop",nf(p.pop));set("cpPopR",(pr>=0?"+":"−")+nf(Math.abs(pr))+"/sn");set("cpGo",nf(p.gold));set("cpGr","+"+nf(goldRate(p))+"/sn");
+ const C=troopCap(p),tr=troopRate(p),pr=popRate(p);set("cpPct",pf(p.cells/land,2));set("cpPop",kf(p.pop));set("cpPopR",(pr>=0?"+":"−")+kf(Math.abs(pr))+"/sn");set("cpGo",kf(p.gold));set("cpGr","+"+kf(goldRate(p))+"/sn");
  set("cpTr",nf(p.troops+p.front));set("cpCap",(p.front>0?`· cephede ${nf(p.front)} `:"")+"/ "+kf(C));set("cpTrr",(tr>=0?"+":"−")+nf(Math.abs(tr))+"/sn");
  const tb=$("#cpTb"),tf=$("#cpTf");if(tb)tb.style.width=clamp(p.troops/C*100,0,100)+"%";if(tf){tf.style.left=clamp(p.troops/C*100,0,100)+"%";tf.style.width=clamp(p.front/C*100,0,100-p.troops/C*100)+"%"}
  set("cpSend",`${nf(p.troops*V.ratio)} asker · güç ${power(p)}${p.gens.length?` · ${p.gens.length} general`:""}`);
