@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50601">
+<meta name="kadraj-version" content="50602">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3035,7 +3035,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50601,APP_VER="5.6.1";
+const APP_V=50602,APP_VER="5.6.2";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -5076,7 +5076,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.4 gelen arama: bildirim izni verildiyse Kadraj açıkken de gelen aramada cihazın kendi bildirim sesi çalar (5 saniyede bir yinelenir, yanıtlanınca kapanır); izin yoksa Kadraj'ın zil sesi çalar. Sohbet yeni mesajda ya da biri yazmaya başlayınca zıplamaz, yavaşça kayar.
 - 5.5 öne çıkan hikâyeler: kendi hikâyeni açıp "Öne çıkar"a bas, var olan bir öne çıkanı seç ya da ad verip yenisini oluştur (Tatil, Okul...). Profilde ad ve paylaşım sayılarının altında yuvarlaklar olarak durur, 24 saat sonra silinmez. Profilindeki "Yeni" yuvarlağıyla son 24 saatteki hikâyelerinden ya da telefondan fotoğraf seçerek de oluşturulur. Bir öne çıkanda en fazla 8 kare olur. Açınca kendi öne çıkanında Ekle, Kaldır ve Düzenle (ad değiştir, sil) düğmeleri var. Gizli hesabın öne çıkanlarını yalnızca takipçiler görür.
 - 5.5 Rota fotoğrafa bakar: Rota sohbetinde + ile fotoğraf gönderilebilir; Rota fotoğrafa bakıp yanıt verir ("Bu ne?", "Bu soruyu çöz", "Hangisi daha güzel?"). Fotoğrafı göremezse bunu söyler, uydurmaz.
-- 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
+- 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -10992,9 +10992,16 @@ async function hlDel(d){try{await DB.del("hl/"+d.id);S.hl={...S.hl,[S.uid]:hlOf(
      BOT_POSTS başına eklenir (id `ru-v<APP_V>`, beğeni ve yorumlar meta'da); zamanı bu cihazın sürümü ilk gördüğü an (`kadraj_ru_<APP_V>`), böylece güncellemeden sonra Akış'ın üstünde çıkar. */
 const reelListBase560=reelList;
 reelList=function(...a){const L=reelListBase560.apply(this,a);if(S.route.name!=="reels")return L;
+ /* 5.6.2: profilden açılan Klaket: yalnızca o kişinin Klaketleri, profildeki sırayla (yeniden eskiye); başlangıç yerine kaydırılır */
+ const by=S.route.params&&S.route.params.by;if(by)return L.filter(p=>p.uid===by).sort((a,b)=>b.at-a.at);
  if(S._rsSeedFor!==S.route){S._rsSeedFor=S.route;S.reelSeed=(Math.random()*4294967295)>>>0}
  const sd=S.reelSeed,k={};for(const p of L)k[p.id]=hash32(String(p.id),sd);const out=L.slice().sort((a,b)=>k[a.id]<k[b.id]?-1:k[a.id]>k[b.id]?1:0);
  const st=S.route.params&&S.route.params.start;if(st){const i=out.findIndex(p=>p.id===st);if(i>0)out.unshift(out.splice(i,1)[0])}return out};
+/* 5.6.2: profildeki ızgaradan o kişinin Klaketi açılınca `params.by` eklenir; başlıkta @kullanıcıadı yazar */
+const goBase562=go;
+go=function(name,params,...r){if(name==="reels"&&params&&params.start&&!params.by&&S.route.name==="profile"){const u=S.route.params&&S.route.params.uid;const p=postById(params.start);if(u&&p&&p.uid===u)params={...params,by:u}}return goBase562.call(this,name,params,...r)};
+const vReelsBase562=vReels;
+vReels=function(...a){const h=vReelsBase562.apply(this,a);const by=S.route.params&&S.route.params.by;return by?h.replace("<b>Klaketler</b>",`<b>@${esc(P(by).username)}</b>`):h};
 const RU_NOTES=["Günün sorusu: Bugün kaç kez gülümsedin? Bir tane daha ekle.","İpucu: Bir mesajı yana kaydırırsan ona yanıt verirsin.","İpucu: Hikâyeni öne çıkarırsan profilinde kalıcı durur.","Kadraj yine yenilendi. Ne değişti merak ediyorsan bana sor.","Bugün bir arkadaşına güzel bir şey yaz, günü değişsin.","İpucu: Sohbette @rota yazarsan ben de katılırım.","Satrançta bugün beni yenebilecek misin? Keşfet'te bekliyorum.","Kısa bir mola: omuzlarını gevşet, derin bir nefes al.","İpucu: Tek paylaşıma 10 fotoğraf ekleyebilirsin, yana kaydırarak bakılır.","Bugünün kelimesi: merak. Yeni bir şey dene.","İpucu: Bana fotoğraf at, ne gördüğümü anlatayım.","Su içmeyi unutma. Ben unutmam, çünkü içemiyorum.","İpucu: Klaket izlerken ekranın kenarına basılı tutarsan video hızlanır.","Bugün kimi takip etmedin? Keşfet'e bir göz at."];
 const RU_POLLS=[["Bugün hangisi?",["Kahve","Çay","Su"]],["Hafta sonu planın ne?",["Dışarı çıkmak","Evde dinlenmek","Satranç"]],["En sevdiğin Kadraj köşesi?",["Klaket","Sohbet","Satranç","Hikâye"]],["Sen hangisisin?",["Gece kuşu","Sabahçı"]],["Kadraj'ın vurgu rengi hangisi olsun?",["Yeşil","Mavi","Turuncu","Mor"]],["Bugün enerjin nasıl?",["Fırtına gibi","İdare eder","Pil bitik"]],["Hangisini daha çok seversin?",["Deniz","Dağ","Şehir"]]];
 const RU_CAPS=["Bugünün karesi.","Bu manzaraya bir dakika bak.","Sence burası neresi?","Kadraj galerisinden bir seçki.","Ekranın bir köşesi böyle güzel olsun."];
