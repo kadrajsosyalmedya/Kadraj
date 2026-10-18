@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50801">
+<meta name="kadraj-version" content="50900">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3114,7 +3114,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50801,APP_VER="5.8.1";
+const APP_V=50900,APP_VER="5.9.0";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -5162,7 +5162,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
-- 5.8 Cephe (piksel savaşı): Keşfet'teki Cephe kartından açılır. Ana menüde harita (Avrasya, Dünya, Avrupa, Asya, Kore Savaşı 1950, 1. Dünya Savaşı 1914, 2. Dünya Savaşı 1939), bot zorluğu (Kolay/Normal/Zor), bot sayısı ve bayrak (Türkiye, Osmanlı, Kadraj ve 30'dan fazla ülke; toprağın bayrağınla boyanır) seçilir. "Botlarla oyna", "Oda kur, arkadaşını çağır" (5 harfli oda kodu; sohbette davet gelir, "Savaşa katıl" düğmesi) ve "Odaya katıl". Başlarken 5 saniye içinde haritada yerini seçersin. Asker zamanla artar; alttaki çubukla gönderilecek asker yüzdesini seç, komşu toprağa ya da boş karaya dokun. İnşa et: Şehir (nüfus ve asker sınırı), Fabrika (altın), Liman (altın, denizden çıkarma), Füze deposu (bomba atmak için), SAM (gelen bombayı düşürür). Bomba: Atom, Nükleer füze, Hidrojen bombası. Güç seviyesi 1-10: asker başına güç seviye×10 (2. seviyede 15.000 asker, 1. seviyede 30.000 askere denk). Üstte nüfus, asker, altın, güç, toprak yüzdesi ve süre; sağda sıralama. Haritanın %70'ini alan kazanır.
+- 5.9 Cephe (piksel savaşı, 5.9'da baştan yenilendi): Keşfet'teki Cephe kartından açılır. Harita gerçek arazili ve canlı renkli: yeşil ovalar, kum çöller, beyaz dağlar ve buzullar, mavi deniz. Ana menüde harita (Avrasya, Dünya, Avrupa, Asya, Kurtuluş Savaşı 1919, Kore Savaşı 1950, 1. Dünya Savaşı 1914, 2. Dünya Savaşı 1939), ülke botu sayısı (Botsuz, 4, 8, 12, 16), küçük kabileler (Yok, Az, Çok), bot zorluğu (Kolay/Normal/Zor) ve bayrak seçilir. "Oyna", "Oda kur, arkadaşını çağır" (5 harfli oda kodu; sohbette davet gelir, "Savaşa katıl" düğmesi; botsuz seçilirse yalnızca arkadaşlarla) ve "Odaya katıl". Başlarken haritada yerine dokunursun (arazi türü ve yakındaki oyuncu sayısı görünür), 5 saniye sonra savaş başlar; ilk 25 saniye barış, yalnızca boş topraklara yayılınır. Topraklar açık renkle boyanır, sınırları koyu; ülke adının yanında bayrak ve altında asker sayısı yazar. Saldırmak için haritaya dokun: boş toprağa, komşuya ya da denizin karşısına (gemiyle, en fazla 3 gemi). Alttaki yüzde (%10-%100) kaç asker gideceğini seçer; Saldırılar panelinden geri çekilir. Arazi zorluğu: ova kolay, yayla/çöl/tundra orta, dağ ve buzul en zor. Alt panel: nüfus, altın, asker/sınır ve saniyelik artış; 1-0 tuşlu yuvalar: Şehir (asker sınırı), Liman (kıyıda, altın), Fabrika (altın), Savunma (çevresini almak iki kat zor), Füze deposu, SAM (bombaları vurur), Atom, Nükleer, Hidrojen bombası, Güç (asker gücü 1-10, her seviye +10: 2. seviyede 15.000 asker 1. seviyede 30.000'e denk). Üstte Dünya hakimiyeti çubuğu (sen, lider, %80 hedefi) ve süre, sağ üstte sıra, sol üstte çık, sıralama, konumuma git ve nasıl oynanır. Bilgisayarda ülkenin üstüne gelince, telefonda basılı tutunca bilgisi çıkar. Dünyanın %80'ini alan ya da son kalan ülke kazanır; 30 dakika dolarsa en büyük kazanır.
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -5454,6 +5454,7 @@ setTimeout(verTidyCache,9000);
 
 /* ---- A · Neler yeni ---- */
 const WN_ITEMS=[
+ {ic:"flag",g:"linear-gradient(135deg,#16a34a,#2563eb)",t:"Cephe baştan yenilendi",d:"Canlı renkli gerçek arazi haritası, ülke adları ve asker sayıları, Dünya hakimiyeti çubuğu, saldırı yüzdeleri, numaralı yapı ve bomba yuvaları, küçük kabileler, Kurtuluş Savaşı haritası ve botsuz oyun (yalnızca arkadaşınla)",go:"explore"},
  {ic:"flag",g:"linear-gradient(135deg,#b91c1c,#0c7a63)",t:"Cephe: piksel savaşı",d:"Keşfet'te. Haritada yerini seç, topraklarını büyüt; şehir, fabrika, liman, füze deposu ve SAM kur; atom, nükleer, hidrojen bombası at. Botlarla ya da arkadaşınla oyna, bayrağını seç",go:"explore"},
  {ic:"info",g:"linear-gradient(135deg,#1d4ed8,#7c3aed)",t:"Sohbet ayrıntıları",d:"Sohbetin başlığına dokun: tema, takma adlar, sessize al, gizlilik ve sohbette paylaşılan fotoğraflar, paylaşımlar, bağlantılar tek yerde",go:"chats"},
  {ic:"reels",g:"linear-gradient(135deg,#111,#db2777)",t:"Yeni Klaket ekranı",d:"Kenarlar artık düz siyah, düğmeler daha sade; sağ altta ses plağı dönüyor. Açıklamaya dokununca tamamı açılır",go:"reels"},
@@ -11176,7 +11177,7 @@ function rdiscHtml(p){const own=P(p.uid);return`<span class="rdisc" aria-hidden=
 document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest(".reel .info .c");if(!c||e.target.closest("a,button,[data-htag]"))return;e.stopPropagation();c.classList.toggle("open")},true);
 /*}@js:570*/
 /*@js:580{*/
-/* 5.8.0 Cephe (piksel savaşı): oyunun bütün kodu ayrı dosyada (cephe.js, haritalar cephe/*.json). Burada yalnızca yükleyici var:
+/* 5.8.0 Cephe (piksel savaşı; 5.9.0'da baştan yazıldı): oyunun bütün kodu ayrı dosyada (cephe.js, haritalar cephe/*.png, menü resimleri cephe/*.jpg). Burada yalnızca yükleyici var:
    Keşfet'teki Cephe kartı (data-act="cephe") cephe.js'i ilk dokunuşta bir kez indirir (?v=APP_V) ve CEPHE.open() çağırır.
    Sohbette Cephe daveti (mesajda `cephe:<oda kodu>`) mnAfterRender içinde "Savaşa katıl" düğmesi alır (cpMsgPaint, data-cpjoin). */
 let cpP=null;
