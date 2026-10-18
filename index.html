@@ -11027,10 +11027,9 @@ function ch60HovHide(){const h=ch60Hov();if(h&&!h.hidden)h.hidden=true}
 /* sürüklenen taş: farede hafif büyür, dokunmatikte büyüyüp parmağın üstüne kalkar */
 function ch60Lift(el,e){const bd=$("#cBoard");if(!bd||!el)return;const r=bd.getBoundingClientRect(),z=r.width/8;const touch=e.pointerType!=="mouse";
  el.style.transform=`translate(${e.clientX-r.left-z/2}px,${e.clientY-r.top-z/2-(touch?z*.5:0)}px) scale(${touch?1.32:1.08})`}
-function ch60Down(e){if(!CH)return;const bd=$("#cBoard");if(!bd)return;
+function ch60Down(e){if(!CH)return;const bd=$("#cBoard");if(!bd)return;if(e.target.closest&&e.target.closest("#cOv.on"))return;
  if(e.button===2){const s=chSqAt(e);A60=s>=0?{s,c:e.shiftKey?"g":(e.ctrlKey||e.altKey||e.metaKey)?"b":"r"}:null;e.preventDefault();e.stopImmediatePropagation();return}
  if(e.pointerType==="mouse"&&e.button!==0)return;
- if(e.target.closest&&e.target.closest("#cOv.on"))return;
  if(CH.ann&&(CH.ann.a.size||CH.ann.h.size)){CH.ann=null;ch60AnnDraw();chMarks()}
  if(!ch60PreOn()){ch60PreClear();return}
  const s=chSqAt(e);if(s<0)return;e.stopImmediatePropagation();e.preventDefault();const p=CH.g.b[s];
