@@ -168,41 +168,73 @@ function baseCanvas(m){if(m.base)return m.base;const L=new Uint8Array(256*3);L.s
   d[k]=clamp(L[v*3]*(1+sh),0,255);d[k+1]=clamp(L[v*3+1]*(1+sh),0,255);d[k+2]=clamp(L[v*3+2]*(1+sh),0,255);d[k+3]=255}
  x.putImageData(im,0,0);return m.base=cv}
 
-/* ---------- oyun kuralları ---------- */
-const BLD={ev:{n:"Şehir",d:"Asker sınırı +30.000, nüfus artar",c:3000,inc:2500},lim:{n:"Liman",d:"Kıyıya kurulur, altın getirir",c:4000,inc:3000},fab:{n:"Fabrika",d:"Saniyede +220 altın",c:5000,inc:4000},sav:{n:"Savunma",d:"Çevresini almak iki kat zor",c:2500,inc:1500},silo:{n:"Füze deposu",d:"Bomba atmak için gerekir",c:25000,inc:15000},sam:{n:"SAM",d:"Yakına gelen bombaları vurur",c:15000,inc:8000}};
+/* ---------- oyun kuralları (6.0: Age of History tarzı piksel savaş) ----------
+   Nüfus p.pop, sınırı popCap (toprak + şehir + hastane; işgal altındaki hücre az sayılır), artışı hastane ve kalkınma ile hızlanır.
+   Asker: yedek p.troops + cephedeki p.front. Üretim nüfusa, şehre ve kışlaya bağlı; sınır troopCap (nüfusun %22'si + kışla).
+   Altın: nüfus, fabrika, liman × kalkınma (1-10). Vasal gelirinin dörtte birini efendisine öder.
+   Cephe: her saldırı a = {o saldıran, t savunan (-1 boş toprak), n saldıranın cephedeki askeri, d savunanın cephedeki askeri, tx/ty hedef noktası}.
+     Savunan yedeğinden cepheye kendiliğinden takviye gönderir (reinforce). Güç = asker × eğitim seviyesi × 10 × (1 + generaller × %8) × (savunmada sur/dağ).
+     İki taraf her saniye karşının gücüyle orantılı kayıp verir (K_CMB); güçlü taraf ilerler, ilerleme hızı cephedeki asker sayısıyla artar; zayıf taraf toprak kaybeder.
+     Saldırı hedef noktasına doğru ilerler (pickCand uzaklığa bakar), her yöne değil.
+   İşgal: düşmandan alınan hücre işgal altında (g.occ), zamanla asimile olur (assim). Kuşatma: düşmanın tamamen çevrelenen küçük toprağı kuşatana geçer (encircle).
+   Diplomasi: barış antlaşması (PACT_T boyunca saldırı yok), vasal (efendisine saldıramaz, haraç öder). İnsanlara teklif (g.offers) gelir, botlar kendisi karar verir. */
+const BLD={ev:{n:"Şehir",d:"Nüfus sınırı ve asker üretimi artar",c:3000,inc:2500},fab:{n:"Fabrika",d:"Saniyede +260 altın",c:5000,inc:4000},
+ lim:{n:"Liman",d:"Kıyıya kurulur, altın getirir, gemileri hızlandırır",c:4000,inc:3000},kis:{n:"Kışla",d:"Asker üretimi %25 artar, asker sınırı yükselir",c:6000,inc:5000},
+ has:{n:"Hastane",d:"Nüfus sınırı ve nüfus artışı yükselir",c:4500,inc:3500},sav:{n:"Sur",d:"Çevresini savunan askerler %60 güçlü",c:2500,inc:1500},
+ silo:{n:"Füze deposu",d:"Bomba atmak için gerekir",c:25000,inc:15000},sam:{n:"SAM",d:"Yakına gelen bombaları havada vurur",c:15000,inc:8000}};
 const NUK={atom:{n:"Atom bombası",c:50000,r:6,sam:.9},nuk:{n:"Nükleer füze",c:120000,r:10,sam:.75},hid:{n:"Hidrojen bombası",c:260000,r:16,sam:.5}};
 const OPS=["Yıldırım","Kartal","Fırtına","Demir Yumruk","Şafak","Kızıl Ok","Kasırga","Çelik Kalkan","Anka","Bozkurt","Tayfun","Volkan","Mızrak","Kılıç","Gök Gürültüsü","Pençe","Şimşek","Akın","Barbarossa","Çığ","Kuzey Yıldızı","Kara Bulut","Deli Dalga","Tunç"];
-const SLOTS=["ev","lim","fab","sav","silo","sam","atom","nuk","hid","lvl"];
-const PEACE=25e3,WIN=.8,TLIM=30*60e3,START_T=3000,START_G=2000,BOAT_MAX=3,BOAT_V=14,SAM_R=22,SAM_CD=8000,SAV_R=8;
+const GEN_N=["Kara Paşa","Demir Mehmet","Fırtına Ali","Yıldız Selim","Bozkurt Ahmet","Kılıç Arslan","Şahin Murat","Çelik Kemal","Tunç Osman","Akıncı Hasan","Kartal Ömer","Volkan Cem","Toprak Rıza","Sancak Emre","Mete Han"];
+const TABS=[["insa","İnşa",["ev","fab","lim","kis","has","sav"]],["ordu","Ordu",["lvl","gen","eco"]],["silah","Silah",["silo","sam","atom","nuk","hid"]],["dip","Diplomasi",["baris","vasal"]]];
+const PEACE=25e3,WIN=.8,TLIM=35*60e3,START_T=3000,START_G=2000,BOAT_MAX=3,BOAT_V=16,SAM_R=22,SAM_CD=8000,SAV_R=9,PACT_T=180e3,K_CMB=.075,GEN_MAX=5,RAD_T=60e3,OFFER_T=30e3;
 let G=null;   /* oyun */
 let V=null;   /* görünüm ve arayüz */
 
-function newGame(m,opt){const g={m,opt,t:0,owner:new Int16Array(m.N),pl:[],bld:[],bmap:new Map(),att:[],boats:[],mis:[],booms:[],ev:[],over:null,seq:0,dirt:[],war:false,peace:0,chg:null};
+function newGame(m,opt){const g={m,opt,t:0,owner:new Int16Array(m.N),occ:new Uint8Array(m.N),pl:[],bld:[],bmap:new Map(),att:[],boats:[],mis:[],booms:[],rad:[],ev:[],pact:{},offers:[],over:null,seq:0,dirt:[],war:false,peace:0,chg:null,vis:new Int32Array(m.N),vg:0,q:new Int32Array(m.N)};
  for(let i=0;i<m.N;i++)g.owner[i]=m.kind[i]?-1:-2;return g}
 const hstr=t=>{let h=7;for(const ch of String(t))h=(h*31+ch.charCodeAt(0))>>>0;return h};
 function addPlayer(g,o){const col=o.col||(PCOL[o.flag]?hexRgb(PCOL[o.flag]):o.uid?hexRgb("#12b886"):hsl(hstr(o.name)%360,.55,.5));
- const p={i:g.pl.length,uid:o.uid||null,name:o.name,flag:o.flag||null,col,hex:rgbHex(col),fc:col.map(v=>v*.62+255*.38),bc:col.map(v=>v*.82),bh:rgbHex(col.map(v=>v*.82)),bot:o.bot||null,diff:o.diff||null,troops:START_T,gold:START_G,lvl:1,cells:0,alive:true,border:new Set(),nb:{},nk:0,think:1500+rng()*1500,kills:0,spawn:-1,lx:-1,ly:-1,lr:0,peak:START_T,boatT:0,nukeT:0};
+ const p={i:g.pl.length,uid:o.uid||null,name:o.name,flag:o.flag||null,col,hex:rgbHex(col),fc:col.map(v=>v*.62+255*.38),bc:col.map(v=>v*.82),bh:rgbHex(col.map(v=>v*.82)),bot:o.bot||null,diff:o.diff||null,
+  troops:START_T,front:0,gold:START_G,pop:0,lvl:1,eco:1,gens:[],ov:-1,occ:0,oq:[],trib:0,cells:0,alive:true,border:new Set(),nb:{},nk:0,think:1500+rng()*1500,kills:0,lost:0,spawn:-1,lx:-1,ly:-1,lr:0,peak:START_T,boatT:0,nukeT:0,dipT:0};
  if(p.uid){p.uname=p.name;p.uflag=p.flag;p.ucol=col}g.pl.push(p);return p}
 function isB(g,c){const ow=g.owner,o=ow[c],W=g.m.W,x=c%W;return(x>0&&ow[c-1]!==o)||(x<W-1&&ow[c+1]!==o)||(c>=W&&ow[c-W]!==o)||(c<g.m.N-W&&ow[c+W]!==o)}
 function refB(g,c){const o=g.owner[c];if(o<0)return;const P=g.pl[o];if(isB(g,c))P.border.add(c);else P.border.delete(c)}
-function setOwner(g,c,o){const old=g.owner[c];if(old===o)return;const W=g.m.W,x=c%W;
- if(old>=0){const P=g.pl[old];P.cells--;P.border.delete(c)}
- g.owner[c]=o;if(o>=0)g.pl[o].cells++;
+/* hücrenin sahibi değişir; oc=1 ise yeni sahibi için işgal altında sayılır */
+function setOwner(g,c,o,oc){const old=g.owner[c];if(old===o)return;const W=g.m.W,x=c%W;
+ if(old>=0){const P=g.pl[old];P.cells--;P.border.delete(c);if(g.occ[c])P.occ--}
+ g.owner[c]=o;g.occ[c]=0;if(o>=0){const Q=g.pl[o];Q.cells++;if(oc){g.occ[c]=1;Q.occ++;Q.oq.push(c)}}
  refB(g,c);if(x>0)refB(g,c-1);if(x<W-1)refB(g,c+1);if(c>=W)refB(g,c-W);if(c<g.m.N-W)refB(g,c+W);
  g.dirt.push(c);if(g.chg)g.chg.add(c);
  const b=g.bmap.get(c);if(b){if(old>=0)g.pl[old].nb[b.k]--;if(o>=0){b.o=o;g.pl[o].nb[b.k]=(g.pl[o].nb[b.k]||0)+1}else delBld(g,b)}}
 function delBld(g,b){const i=g.bld.indexOf(b);if(i>=0)g.bld.splice(i,1);g.bmap.delete(b.c);if(b.o>=0&&g.owner[b.c]===b.o&&g.pl[b.o].nb[b.k])g.pl[b.o].nb[b.k]--}
 const cnt=(p,k)=>p.nb[k]||0;
-const cap=p=>4000+p.cells*70+cnt(p,"ev")*30000;
-const popOf=p=>p.cells*520+cnt(p,"ev")*75000;
-const goldRate=p=>p.alive?30+p.cells*.5+cnt(p,"fab")*220+cnt(p,"lim")*130:0;
+const inRad=(g,c)=>{if(!g.rad.length)return false;const W=g.m.W,x=c%W,y=(c/W)|0;for(const z of g.rad)if(z.until>g.t&&Math.hypot(z.c%W-x,((z.c/W)|0)-y)<=z.r)return true;return false};
+const popCap=p=>Math.max(1500,(p.cells-p.occ*.6)*800+cnt(p,"ev")*120000+cnt(p,"has")*80000);
+const troopCap=p=>5000+p.pop*.22+cnt(p,"kis")*40000;
+const cap=troopCap;
 const gm=p=>p.bot==="t"?TRIBE.g:p.bot?DIFF[p.diff].g:1;
-const troopRate=p=>{if(!p.alive)return 0;const C=cap(p);return p.troops>C?-(p.troops-C)*.02:(600+C*.018)*(1-p.troops/C)*gm(p)};
+const ecoM=p=>1+.15*(p.eco-1);
+const popRate=p=>{if(!p.alive)return 0;const C=popCap(p);return p.pop>C?-(p.pop-C)*.03:(C-p.pop)*.012*(1+.15*cnt(p,"has"))*(1+.08*(p.eco-1))+5};
+const troopRate=p=>{if(!p.alive)return 0;const C=troopCap(p),t=p.troops+p.front;if(t>C)return -Math.min(p.troops,(t-C))*.02;return(300+p.pop*.004)*(1+.06*cnt(p,"ev")+.25*cnt(p,"kis"))*gm(p)*(1-t/C)};
+const goldGross=p=>p.alive?(40+p.pop*.00012+cnt(p,"fab")*260+cnt(p,"lim")*160)*ecoM(p):0;
+const goldRate=p=>goldGross(p)*(p.ov>=0?.75:1)+(p.trib||0);
 const power=p=>p.lvl*10;
-const lvlCost=p=>p.lvl>=10?Infinity:6000*2**(p.lvl-1);
+const genM=p=>1+.08*p.gens.length;
+const atkM=p=>power(p)*genM(p);
+/* büyük ülke için eğitim, kalkınma ve general pahalıdır (sf: ülke büyüklüğü) */
+const sf=p=>1+p.cells/1500;
+const lvlCost=p=>p.lvl>=10?Infinity:Math.round(6000*2**(p.lvl-1)*sf(p));
+const ecoCost=p=>p.eco>=10?Infinity:Math.round(8000*2**(p.eco-1)*sf(p));
+const genCost=p=>p.gens.length>=GEN_MAX?Infinity:Math.round(30000*(1+p.gens.length)**1.6*sf(p));
 const bCost=(p,k)=>BLD[k].c+BLD[k].inc*cnt(p,k);
 const nCost=(p,k)=>Math.round(NUK[k].c*(1+.25*p.nk));
-const slotCost=(p,k)=>k==="lvl"?lvlCost(p):NUK[k]?nCost(p,k):bCost(p,k);
+const slotCost=(p,k)=>k==="lvl"?lvlCost(p):k==="eco"?ecoCost(p):k==="gen"?genCost(p):NUK[k]?nCost(p,k):BLD[k]?bCost(p,k):0;
+const strength=p=>(p.troops+p.front)*atkM(p)+p.cells*20;
+const pkey=(a,b)=>a<b?a+","+b:b+","+a;
+/* iki oyuncu birbirine saldırabilir mi: barış antlaşması ya da vasallık varsa hayır */
+function pactOf(g,a,b){if(a<0||b<0)return false;if((g.pact[pkey(a,b)]||0)>g.t)return true;const A=g.pl[a],B=g.pl[b];if(!A||!B)return false;
+ if(A.ov===b||B.ov===a)return true;if(A.ov>=0&&A.ov===B.ov)return true;return false}
+const bloc=(g,p)=>{let c=p.cells;for(const q of g.pl)if(q.alive&&q.ov===p.i)c+=q.cells;return c};
 function ev(g,s,w,k){g.ev.push({id:++g.seq,t:g.t,s,w:w||[],k:k||""});if(g.ev.length>40)g.ev.splice(0,g.ev.length-40)}
 const tname=(g,t)=>t>=0?g.pl[t].name:"boş topraklar";
 
@@ -231,11 +263,11 @@ function setupCountries(g,sc,diff){const m=g.m,cnt=new Int32Array(256);for(let i
   if(f){if(gp[f]==null){const b=sc.b.find(b=>b[1]===f);gp[f]=addPlayer(g,{name:b?b[0]:FL[f]?FL[f][0]:ctrInfo(en).name,flag:f,bot:"n",diff}).i}pid[v]=gp[f]}
   else{const ci=ctrInfo(en);pid[v]=addPlayer(g,{name:ci.name,flag:ci.flag&&FL[ci.flag]?ci.flag:null,bot:"n",diff}).i}}
  for(let i=0;i<m.N;i++){if(!m.kind[i])continue;const o=pid[m.ctry[i]];if(o>=0)setOwner(g,i,o)}
- for(const p of g.pl)if(p.bot==="n"&&p.cells){let b=-1;for(const c of p.border){b=c;break}p.spawn=b;p.troops=Math.round(cap(p)*.45);p.gold=3000+Math.min(p.cells,20000)*.6;p.peak=p.troops}
+ for(const p of g.pl)if(p.bot==="n"&&p.cells){let b=-1;for(const c of p.border){b=c;break}p.spawn=b;p.pop=popCap(p)*.7;p.troops=Math.round(troopCap(p)*.4);p.gold=3000+Math.min(p.cells,20000)*.6;p.peak=p.troops}
  g.hz=true}
 function claim(g,h,c){if(c<0)return"yok";const o=g.owner[c];if(o<0)return"bos";if(o===h.i)return"ok";const P=g.pl[o];if(P.uid)return"dolu";unclaim(g,h);
  const ow=g.owner;for(let i=0;i<ow.length;i++)if(ow[i]===o)setOwner(g,i,h.i);
- Object.assign(h,{took:o,name:P.name,flag:P.flag,troops:P.troops,gold:P.gold,lvl:P.lvl,spawn:P.spawn,peak:P.troops,alive:true});setCol(h,P.col);P.alive=false;P.gone=true;return"ok"}
+ Object.assign(h,{took:o,name:P.name,flag:P.flag,troops:P.troops,gold:P.gold,lvl:P.lvl,pop:P.pop,eco:P.eco,gens:P.gens.slice(),spawn:P.spawn,peak:P.troops,alive:true});setCol(h,P.col);P.alive=false;P.gone=true;return"ok"}
 function unclaim(g,h){if(h.took==null)return;const P=g.pl[h.took],ow=g.owner;for(let i=0;i<ow.length;i++)if(ow[i]===h.i)setOwner(g,i,P.i);P.alive=true;P.gone=false;
  Object.assign(h,{took:null,spawn:-1,name:h.uname,flag:h.uflag});setCol(h,h.ucol)}
 function setCol(p,col){Object.assign(p,{col,hex:rgbHex(col),fc:col.map(v=>v*.62+255*.38),bc:col.map(v=>v*.82),bh:rgbHex(col.map(v=>v*.82))})}
@@ -245,56 +277,126 @@ function nearCount(g,c,R=40){const W=g.m.W,x=c%W,y=(c/W)|0;let n=0;for(const p o
 /* ---------- benzetim ---------- */
 function step(g,dt){if(g.over||!g.war)return;g.t+=dt;const s=dt/1000;
  if(g.peace>0){g.peace-=dt;if(g.peace<=0){g.peace=0;ev(g,"Barış bitti, artık ülkelere saldırılabilir.",[],"peace")}}
- for(const p of g.pl){if(!p.alive)continue;p.troops=Math.max(0,p.troops+troopRate(p)*s);p.gold+=goldRate(p)*s;if(p.troops>p.peak)p.peak=p.troops}
+ for(const p of g.pl){p.front=0;p.trib=0}
+ for(const a of g.att){const A=g.pl[a.o];if(A)A.front+=a.n;if(a.t>=0&&g.pl[a.t])g.pl[a.t].front+=a.d||0}
+ for(const p of g.pl)if(p.alive&&p.ov>=0){const O=g.pl[p.ov];if(O&&O.alive)O.trib+=goldGross(p)*.25;else p.ov=-1}
+ for(const p of g.pl){if(!p.alive)continue;p.pop=Math.max(0,p.pop+popRate(p)*s);p.troops=Math.max(0,p.troops+troopRate(p)*s);p.gold+=goldRate(p)*s;const tt=p.troops+p.front;if(tt>p.peak)p.peak=tt}
  for(const a of g.att.slice())runAtt(g,a,dt);
- for(const b of g.boats.slice()){b.pi+=s*BOAT_V;if(b.pi>=b.path.length-1){g.boats.splice(g.boats.indexOf(b),1);landBoat(g,b)}}
+ for(const b of g.boats.slice()){const P=g.pl[b.o];b.pi+=s*BOAT_V*(1+.1*Math.min(5,cnt(P,"lim")));if(b.pi>=b.path.length-1){g.boats.splice(g.boats.indexOf(b),1);landBoat(g,b)}}
  for(const ms of g.mis.slice()){ms.f+=dt/ms.dur;if(!ms.chk&&ms.f>=.72){ms.chk=1;samCheck(g,ms)}if(ms.f>=1||ms.dn){g.mis.splice(g.mis.indexOf(ms),1);if(!ms.dn)boom(g,ms)}}
- if(g.booms.length)g.booms=g.booms.filter(b=>g.t-b.t<3000);
+ if(g.booms.length)g.booms=g.booms.filter(b=>g.t-b.t<(b.air?3000:9000));
+ if(g.rad.length)g.rad=g.rad.filter(z=>z.until>g.t);
+ if(g.offers.length)g.offers=g.offers.filter(f=>g.t-f.at<OFFER_T);
  for(const p of g.pl)if(p.bot&&p.alive){p.think-=dt;if(p.think<=0){const D=p.bot==="t"?TRIBE:DIFF[p.diff];p.think=D.think*(.7+rng()*.6);botThink(g,p)}}
+ const sec=Math.floor(g.t/1000);if(sec!==g.sec){g.sec=sec;assim(g);if(sec%2===0)for(const a of g.att.slice())if(g.pl[a.o]&&g.pl[a.o].alive&&g.att.includes(a))encircle(g,a)}
  for(const p of g.pl)if(p.alive&&p.cells<=0&&p.spawn>=0)die(g,p,null);
  checkOver(g)}
-function die(g,T,A){if(!T.alive)return;T.alive=false;T.troops=0;g.att=g.att.filter(a=>a.o!==T.i);g.boats=g.boats.filter(b=>b.o!==T.i);
+function die(g,T,A){if(!T.alive)return;T.alive=false;T.troops=0;
+ for(const a of g.att.slice()){if(a.o===T.i){a.n=0;endAtt(g,a,0)}else if(a.t===T.i){a.d=0;endAtt(g,a,1)}}
+ g.boats=g.boats.filter(b=>b.o!==T.i);for(const q of g.pl)if(q.ov===T.i)q.ov=-1;g.offers=g.offers.filter(f=>f.from!==T.i&&f.to!==T.i);
  if(A){A.kills++;A.gold+=T.gold;T.gold=0;ev(g,`${A.name}, ${T.name} ülkesini haritadan sildi.`,[A.i,T.i],"kill")}else ev(g,`${T.name} yok oldu.`,[T.i],"kill")}
-function checkOver(g){if(g.over)return;const land=g.m.land;let lead=null;for(const p of g.pl)if(p.alive&&(!lead||p.cells>lead.cells))lead=p;if(!lead)return;
- const big=g.pl.filter(p=>p.bot!=="t"),alive=big.filter(p=>p.alive);
- if(lead.cells/land>=WIN)g.over={w:lead.i,why:"pct"};
+function checkOver(g){if(g.over)return;const land=g.m.land;let lead=null,lb=0;for(const p of g.pl)if(p.alive&&p.ov<0){const b=bloc(g,p);if(!lead||b>lb){lead=p;lb=b}}if(!lead)return;
+ const big=g.pl.filter(p=>p.bot!=="t"&&!p.gone),alive=big.filter(p=>p.alive&&p.ov<0);
+ if(lb/land>=WIN)g.over={w:lead.i,why:"pct"};
  else if(big.length>1&&alive.length===1)g.over={w:alive[0].i,why:"son"};
  else if(big.length&&!alive.length)g.over={w:lead.i,why:"son"};
  else if(g.t>=TLIM)g.over={w:lead.i,why:"sure"};
  if(g.over)ev(g,`${g.pl[g.over.w].name} savaşı kazandı!`,[g.over.w],"win")}
 
-/* saldırı: cephe adayları (hedefe ait, saldırana komşu hücreler) arasından komşusu en çok olan seçilir, cephe düzgün ilerler */
+/* ---------- cephe savaşı ---------- */
 const ownN=(g,c,o)=>{const ow=g.owner,W=g.m.W,x=c%W;return(x>0&&ow[c-1]===o)+(x<W-1&&ow[c+1]===o)+(c>=W&&ow[c-W]===o)+(c<g.m.N-W&&ow[c+W]===o)};
 function seedCand(g,a){const A=g.pl[a.o],ow=g.owner;a.cand.length=0;for(const b of A.border)nbrs(g.m,b,j=>{if(ow[j]===a.t)a.cand.push(j)})}
-function pickCand(g,a){const C=a.cand,ow=g.owner;let best=-1,bs=-1,ok=0;
- for(let k=0;k<10&&C.length&&ok<3;k++){const j=(rng()*C.length)|0,c=C[j];if(ow[c]!==a.t){C[j]=C[C.length-1];C.pop();continue}const n=ownN(g,c,a.o);if(!n){C[j]=C[C.length-1];C.pop();continue}ok++;const sc=n+rng()*.9;if(sc>bs){bs=sc;best=c}}
+/* hedef noktasına yakın, saldırana çok komşu olan aday seçilir: cephe dokunulan yere doğru ilerler */
+function pickCand(g,a){const C=a.cand,ow=g.owner,W=g.m.W,tg=a.tx!=null;let best=-1,bs=-1e9,ok=0;
+ for(let k=0;k<16&&C.length&&ok<5;k++){const j=(rng()*C.length)|0,c=C[j];if(ow[c]!==a.t){C[j]=C[C.length-1];C.pop();continue}const n=ownN(g,c,a.o);if(!n){C[j]=C[C.length-1];C.pop();continue}ok++;
+  let sc=n*1.2+rng()*1.4;if(tg)sc-=Math.hypot(c%W-a.tx,((c/W)|0)-a.ty)*.16;if(sc>bs){bs=sc;best=c}}
  return best}
-function defMul(g,c,t){const W=g.m.W,x=c%W,y=(c/W)|0;for(const b of g.bld)if(b.o===t&&b.k==="sav"&&Math.abs(b.c%W-x)<=SAV_R&&Math.abs(((b.c/W)|0)-y)<=SAV_R)return 2;return 1}
-function cellCost(g,c,A,T){const mul=KMUL[g.m.kind[c]];if(!T)return(6+Math.sqrt(A.cells)*.45)*mul;const dens=T.troops/Math.max(1,T.cells);return(18+dens*1.1)*mul*power(T)/power(A)*defMul(g,c,T.i)}
-function runAtt(g,a,dt){const A=g.pl[a.o],T=a.t>=0?g.pl[a.t]:null,W=g.m.W;if(!A.alive){g.att.splice(g.att.indexOf(a),1);return}if(T&&!T.alive)return retreat(g,a,1);
- if(!a.cand){a.cand=[];seedCand(g,a)}
- if(a.sx==null&&a.cand.length){let sx=0,sy=0;const k=Math.min(300,a.cand.length);for(let i=0;i<k;i++){const c=a.cand[(i*a.cand.length/k)|0];sx+=c%W;sy+=(c/W)|0}a.sx=sx/k;a.sy=sy/k}
- a.acc+=dt/1000*(T?3+Math.sqrt(a.cand.length)*1.6:5+Math.sqrt(a.cand.length)*4);let n=0;
- while(a.acc>=1&&n++<60){let c=pickCand(g,a);if(c<0){if(!a.rs){a.rs=1;seedCand(g,a);continue}return retreat(g,a,1)}a.rs=0;
-  const cost=cellCost(g,c,A,T);if(a.n<cost){g.att.splice(g.att.indexOf(a),1);if(T&&!T.bot)ev(g,`${T.name}, ${A.name} saldırısını durdurdu.`,[T.i,A.i],"hold");return}
-  a.n-=cost;a.acc-=KMUL[g.m.kind[c]];
-  if(T){const dens=T.troops/Math.max(1,T.cells);T.troops=Math.max(0,T.troops-(dens*.85+2))}
-  setOwner(g,c,a.o);const x=c%W,y=(c/W)|0;if(a.fx==null){a.fx=x;a.fy=y}else{a.fx=a.fx*.9+x*.1;a.fy=a.fy*.9+y*.1}
+function fortAt(g,t,x,y){for(const b of g.bld)if(b.o===t&&b.k==="sav"&&Math.abs(b.c%g.m.W-x)<=SAV_R&&Math.abs(((b.c/g.m.W)|0)-y)<=SAV_R)return 1.6;return 1}
+const defM=(g,a,T)=>power(T)*genM(T)*(a.fort||1)*(1+((a.km||1)-1)*.3)*(a.push?1.1:1);
+/* ilerleme hızı (hücre/sn): cephe ne kadar genişse ve cephede ne kadar çok asker varsa o kadar hızlı */
+const spd=a=>a.t<0?(5+Math.sqrt(a.fl||8)*3)*clamp(.6+Math.sqrt(a.n/10000)*.5,.7,15):(2.5+Math.sqrt(a.fl||8)*1.4)*clamp(.4+Math.sqrt((a.n+(a.d||0))/20000)*.4,.5,12);
+/* cephe noktaları: cephedeki hücrelerden birbirine uzak en çok 10 tanesi (asker bayrakları burada durur) */
+function frontPts(g,a){const C=a.cand,ow=g.owner,W=g.m.W,kind=g.m.kind;a.fp=[];if(!C||!C.length){a.fl=0;return}
+ const seen=new Set(),val=[];const tries=Math.min(C.length,500);for(let k=0;k<tries;k++){const c=C[(rng()*C.length)|0];if(seen.has(c))continue;seen.add(c);if(ow[c]===a.t&&ownN(g,c,a.o)>0)val.push(c)}
+ a.fl=Math.max(1,Math.round(val.length*Math.max(1,C.length/1000)));if(!val.length)return;
+ let first=val[0];if(a.tx!=null){let bd=1e18;for(const c of val){const d=(c%W-a.tx)**2+(((c/W)|0)-a.ty)**2;if(d<bd){bd=d;first=c}}}
+ const pts=[first],md=val.map(c=>(c%W-first%W)**2+(((c/W)|0)-((first/W)|0))**2);
+ while(pts.length<10){let bi=-1,bv=-1;for(let i=0;i<val.length;i++)if(md[i]>bv){bv=md[i];bi=i}if(bv<9)break;const c=val[bi];pts.push(c);for(let i=0;i<val.length;i++){const d=(val[i]%W-c%W)**2+(((val[i]/W)|0)-((c/W)|0))**2;if(d<md[i])md[i]=d}}
+ let sx=0,sy=0,km=0;for(const c of pts){const x=c%W,y=(c/W)|0;let dx=0,dy=0;if(x>0&&ow[c-1]===a.o)dx=1;else if(x<W-1&&ow[c+1]===a.o)dx=-1;else if(c>=W&&ow[c-W]===a.o)dy=1;else dy=-1;a.fp.push(x,y,dx,dy);sx+=x;sy+=y;km+=KMUL[kind[c]]}
+ a.fx=sx/pts.length;a.fy=sy/pts.length;a.km=km/pts.length;a.fort=a.t>=0?fortAt(g,a.t,a.fx,a.fy):1}
+/* savunan yedeğinden cepheye asker gönderir; fazlası yedeğe döner */
+function reinforce(g,a,A,T){const des=T.uid?1.05:T.bot==="t"?.8:({kolay:.8,normal:1,zor:1.15}[T.diff]||1);
+ const need=(a.n*atkM(A)*des)/defM(g,a,T)-a.d;
+ if(need>0){const take=Math.min(need,T.troops*.7);if(take>0){T.troops-=take;a.d+=take}}
+ else if(a.d>0&&-need>a.d*.4){const back=Math.min(a.d*.25,-need*.5);a.d-=back;T.troops+=back}}
+function runAtt(g,a,dt){const A=g.pl[a.o],T=a.t>=0?g.pl[a.t]:null,s=dt/1000;
+ if(!A||!A.alive)return endAtt(g,a,0);
+ if(T&&(!T.alive||pactOf(g,a.o,a.t)))return endAtt(g,a,1);
+ if(!a.cand){a.cand=[];seedCand(g,a);a.fpT=0}
+ if(g.t>=(a.fpT||0)){a.fpT=g.t+600;frontPts(g,a)}
+ if(!T){a.r=1;return advance(g,a,A,null,spd(a)*s)}
+ if(g.t>=(a.rt||0)){a.rt=g.t+800;reinforce(g,a,A,T)}
+ const mA=atkM(A),mD=defM(g,a,T),SA=a.n*mA,SD=a.d*mD+1e-6;
+ const la=K_CMB*SD/mA*s,ld=K_CMB*SA/mD*s;a.n=Math.max(0,a.n-la);a.d=Math.max(0,a.d-ld);A.lost+=la;T.lost+=ld;
+ if(a.n<1){if(!A.bot||!T.bot)ev(g,`${T.name}, ${A.name} saldırısını durdurdu.`,[T.i,A.i],"hold");return endAtt(g,a,1)}
+ const r=SA/(SA+SD);a.r=r;
+ if(r>.52)advance(g,a,A,T,spd(a)*Math.min(1,(r-.5)*2.4)*s);
+ else if(r<.48)pushBack(g,a,A,T,spd(a)*Math.min(1,(.5-r)*2.4)*s)}
+function advance(g,a,A,T,budget){const W=g.m.W,kind=g.m.kind;a.acc+=budget;let n=0;
+ while(a.acc>=1&&n++<300){const c=pickCand(g,a);if(c<0){if(!a.rs){a.rs=1;seedCand(g,a);continue}return endAtt(g,a,1)}a.rs=0;
+  const mul=KMUL[kind[c]]*(inRad(g,c)?3:1);let cost;
+  if(!T)cost=(6+Math.sqrt(A.cells)*.45)*mul;
+  else if(a.d<1){const dens=T.troops/Math.max(1,T.cells);cost=(8+dens*.5)*mul;T.troops=Math.max(0,T.troops-dens*.5)}
+  else cost=2*mul;
+  if(a.n<cost){if(!T&&!A.bot)ev(g,"Boş topraklara giden askerlerin tükendi.",[A.i],"hold");return endAtt(g,a,1)}
+  a.n-=cost;a.acc-=mul;setOwner(g,c,a.o,T?1:0);
   nbrs(g.m,c,j=>{if(g.owner[j]===a.t)a.cand.push(j)});
-  if(T&&T.cells<=0){die(g,T,A);return retreat(g,a,1)}}}
-function retreat(g,a,auto){const i=g.att.indexOf(a);if(i<0)return;g.att.splice(i,1);const A=g.pl[a.o];if(A.alive)A.troops+=a.n*(auto?1:.85)}
+  if(a.tx!=null&&c%W===Math.round(a.tx)&&((c/W)|0)===Math.round(a.ty)){if(T){a.tx=T.lx;a.ty=T.ly}else a.tx=a.ty=null}
+  if(T&&T.cells<=0){die(g,T,A);return endAtt(g,a,1)}}}
+/* savunan güçlüyse saldıranın topraklarına girer */
+function pushBack(g,a,A,T,budget){const W=g.m.W,kind=g.m.kind,ow=g.owner;a.bacc=(a.bacc||0)+budget;
+ if(!a.rc||g.t>=(a.rcT||0)){a.rcT=g.t+1500;a.rc=[];for(const c of a.cand){if(ow[c]!==a.t)continue;nbrs(g.m,c,j=>{if(ow[j]===a.o&&a.rc.length<4000)a.rc.push(j)})}}
+ const R=a.rc,ttx=a.ctx!=null?a.ctx:A.lx,tty=a.ctx!=null?a.cty:A.ly;let n=0;
+ while(a.bacc>=1&&n++<300){let best=-1,bs=-1e9,ok=0;for(let k=0;k<16&&R.length&&ok<5;k++){const j=(rng()*R.length)|0,c=R[j];if(ow[c]!==a.o||!ownN(g,c,a.t)){R[j]=R[R.length-1];R.pop();continue}ok++;const sc=ownN(g,c,a.t)*1.2+rng()*1.4-Math.hypot(c%W-ttx,((c/W)|0)-tty)*.08;if(sc>bs){bs=sc;best=c}}
+  if(best<0){a.rcT=0;break}const mul=KMUL[kind[best]];if(a.d<2*mul)break;a.d-=2*mul;a.bacc-=mul;setOwner(g,best,a.t,1);a.cand.push(best);
+  nbrs(g.m,best,j=>{if(ow[j]===a.o)R.push(j)});if(A.cells<=0){die(g,A,T);return endAtt(g,a,1)}}
+ if(a.bacc>3)a.bacc=3}
+function endAtt(g,a,mult){const i=g.att.indexOf(a);if(i<0)return;g.att.splice(i,1);const A=g.pl[a.o];if(A&&A.alive)A.troops+=a.n*mult;if(a.t>=0){const T=g.pl[a.t];if(T&&T.alive)T.troops+=a.d||0}}
+function retreat(g,a,auto){endAtt(g,a,auto?1:.85)}
 function adjacent(g,o,t){const P=g.pl[o],ow=g.owner,W=g.m.W,N=g.m.N;for(const b of P.border){const x=b%W;if((x>0&&ow[b-1]===t)||(x<W-1&&ow[b+1]===t)||(b>=W&&ow[b-W]===t)||(b<N-W&&ow[b+W]===t))return true}return false}
-function attack(g,o,t,n){const P=g.pl[o];n=Math.min(n,P.troops);if(n<20||t===o)return"az";P.troops-=n;
- const op=g.att.find(a=>a.o===t&&a.t===o);if(op){const k=Math.min(op.n,n);op.n-=k;n-=k;if(op.n<1)g.att.splice(g.att.indexOf(op),1);if(n<1)return"ok"}
- const ex=g.att.find(a=>a.o===o&&a.t===t);if(ex){ex.n+=n;ex.cand=null}else{const T=t>=0?g.pl[t]:null,op=T&&P.bot!=="t"&&T.bot!=="t"?OPS[(g.seq*7+o)%OPS.length]+" Harekâtı":null;g.att.push({id:++g.seq,o,t,n,acc:0,cand:null,op});
-  if(T)ev(g,op?`${op}: ${P.name} sana ${nf(n)} askerle saldırıyor!`:`${P.name} sana ${nf(n)} askerle saldırıyor!`,[t],"att");if(op&&!P.bot)ev(g,`${op} başladı: ${T.name} üzerine ${nf(n)} asker.`,[o],"op")}return"ok"}
-function attackAt(g,o,c,n){const P=g.pl[o],m=g.m;if(c<0||!P||!P.alive)return"yok";const t=g.owner[c];if(t===-2)return"deniz";if(t===o)return"kendi";if(t>=0&&g.peace>0)return"baris";
- const mine=new Set();for(const b of P.border)mine.add(m.lm[b]);
- if(mine.has(m.lm[c])&&adjacent(g,o,t))return attack(g,o,t,n);
- const r=sendBoat(g,o,c,n);if(r==="ok"||r==="az"||r==="gemi")return r;return mine.has(m.lm[c])?"komsu":r}
+function attack(g,o,t,n,tc){const P=g.pl[o];n=Math.min(n,P.troops);if(n<20||t===o)return"az";if(t>=0&&pactOf(g,o,t))return"antlasma";
+ const W=g.m.W,has=tc!=null&&tc>=0,tx=has?tc%W:null,ty=has?(tc/W)|0:null;P.troops-=n;
+ const op=t>=0?g.att.find(a=>a.o===t&&a.t===o):null;
+ if(op){op.d+=n;op.push=1;if(has){op.ctx=tx;op.cty=ty}return"ok"}
+ const ex=g.att.find(a=>a.o===o&&a.t===t);if(ex){ex.n+=n;if(has){ex.tx=tx;ex.ty=ty}ex.cand=null;return"ok"}
+ const T=t>=0?g.pl[t]:null,opn=T&&P.bot!=="t"&&T.bot!=="t"?OPS[(g.seq*7+o)%OPS.length]+" Harekâtı":null;
+ const a={id:++g.seq,o,t,n,d:0,acc:0,cand:null,op:opn,tx:has?tx:T&&T.lx>=0?T.lx:null,ty:has?ty:T&&T.ly>=0?T.ly:null,born:g.t};g.att.push(a);
+ if(T){reinforce(g,a,P,T);a.rt=g.t+800;ev(g,opn?`${opn}: ${P.name} sana ${nf(n)} askerle saldırıyor!`:`${P.name} sana ${nf(n)} askerle saldırıyor!`,[t],"att");if(opn&&!P.bot)ev(g,`${opn} başladı: ${T.name} üzerine ${nf(n)} asker.`,[o],"op")}return"ok"}
+/* dokunulan yere karadan gidilebilir mi: o yerin sahibinin topraklarında arama, bizim toprağa değerse evet */
+function landReach(g,o,c){const t=g.owner[c],W=g.m.W,N=g.m.N,ow=g.owner,q=g.q,vis=g.vis;const vg=++g.vg;let h=0,e=0;q[e++]=c;vis[c]=vg;
+ while(h<e){const x=q[h++],xx=x%W;const f=j=>{const v=ow[j];if(v===o){h=e=-1;return}if(v===t&&vis[j]!==vg){vis[j]=vg;q[e++]=j}};
+  if(xx>0)f(x-1);if(h<0)return true;if(xx<W-1)f(x+1);if(h<0)return true;if(x>=W)f(x-W);if(h<0)return true;if(x<N-W)f(x+W);if(h<0)return true}
+ return false}
+function attackAt(g,o,c,n){const P=g.pl[o];if(c<0||!P||!P.alive)return"yok";const t=g.owner[c];if(t===-2)return"deniz";if(t===o)return"kendi";if(t>=0&&g.peace>0)return"baris";if(t>=0&&pactOf(g,o,t))return"antlasma";
+ if(landReach(g,o,c))return attack(g,o,t,n,c);
+ return sendBoat(g,o,c,n)}
+/* kuşatma: cephedeki düşman (ya da boş) toprağın tamamen çevrelenmiş küçük parçaları saldırana geçer */
+function encircle(g,a){const A=g.pl[a.o],t=a.t,T=t>=0?g.pl[t]:null,C=a.cand;if(!C||!C.length)return;const m=g.m,W=m.W,H=m.H,N=m.N,ow=g.owner,q=g.q,vis=g.vis;
+ const lim=T?Math.min(4000,Math.max(60,T.cells*.25)):2500,vg=++g.vg;
+ for(let k=0;k<6;k++){const s0=C[(rng()*C.length)|0];if(ow[s0]!==t||vis[s0]===vg)continue;let h=0,e=0,ok=true;q[e++]=s0;vis[s0]=vg;
+  while(h<e){const x=q[h++],xx=x%W,yy=(x/W)|0;if(xx===0||yy===0||xx===W-1||yy===H-1){ok=false;break}
+   for(const j of [x-1,x+1,x-W,x+W]){const v=ow[j];if(v===t){if(vis[j]!==vg){vis[j]=vg;q[e++]=j}}else if(v!==a.o){ok=false;break}}
+   if(!ok||e>lim){ok=false;break}}
+  if(!ok)continue;const size=e;for(let i=0;i<size;i++)setOwner(g,q[i],a.o,T?1:0);
+  if(T){T.troops=Math.max(0,T.troops-T.troops*Math.min(.5,size/Math.max(1,T.cells+size)));if(!A.bot||!T.bot)ev(g,`Kuşatma: ${A.name}, ${T.name} ülkesinin ${nf(size)} hücresini çevirdi, teslim oldular.`,[A.i,T.i],"enc");if(T.cells<=0){die(g,T,A);return endAtt(g,a,1)}}
+  else if(!A.bot&&size>20)ev(g,`Çevrelenen ${nf(size)} hücrelik boş toprak senin oldu.`,[A.i],"enc")}}
+/* asimilasyon: işgal altındaki hücreler zamanla ülkene katılır */
+function assim(g){for(const p of g.pl){if(!p.alive||p.occ<=0){p.oq.length=0;p.oqh=0;continue}let k=Math.ceil(2+p.occ*.02+cnt(p,"ev")+cnt(p,"has")*.5);let h=p.oqh||0;
+  while(k>0&&h<p.oq.length){const c=p.oq[h++];if(g.owner[c]!==p.i||!g.occ[c])continue;g.occ[c]=0;p.occ--;g.dirt.push(c);if(g.chg)g.chg.add(c);k--}
+  if(h>5000){p.oq=p.oq.slice(h);h=0}p.oqh=h}}
 
-/* gemiyle çıkarma: hedefin yanındaki denizden geriye doğru arama, kendi kıyımıza ulaşınca yol hazır */
-function seaPath(g,o,target){const m=g.m,W=m.W,N=m.N,ow=g.owner,kind=m.kind;const prev=new Int32Array(N).fill(-1),q=new Int32Array(N);let h=0,e=0;
+/* ---------- gemiyle çıkarma ---------- */
+function seaPath(g,o,target){const m=g.m,W=m.W,N=m.N,ow=g.owner,kind=m.kind;const prev=new Int32Array(N).fill(-1),q=g.q;let h=0,e=0;
  nbrs(m,target,j=>{if(!kind[j]&&prev[j]<0){prev[j]=j;q[e++]=j}});
  while(h<e&&h<260000){const c=q[h++],x=c%W;let found=-1;
   const f=j=>{if(found>=0)return;if(kind[j]){if(ow[j]===o)found=j;return}if(prev[j]<0){prev[j]=c;q[e++]=j}};
@@ -303,62 +405,94 @@ function seaPath(g,o,target){const m=g.m,W=m.W,N=m.N,ow=g.owner,kind=m.kind;cons
  return null}
 function sendBoat(g,o,target,n){const P=g.pl[o];if(g.boats.filter(b=>b.o===o).length>=BOAT_MAX)return"gemi";n=Math.min(n,P.troops);if(n<20)return"az";const path=seaPath(g,o,target);if(!path)return"yol";
  P.troops-=n;g.boats.push({id:++g.seq,o,n,path,pi:0,tc:target});return"ok"}
-function landBoat(g,b){const P=g.pl[b.o];if(!P.alive)return;const c=b.tc,t=g.owner[c];if(t===b.o||t===-2||(t>=0&&g.peace>0)){P.troops+=b.n;return}
- const T=t>=0?g.pl[t]:null;const cost=cellCost(g,c,P,T)*1.5;if(b.n<cost){ev(g,`${P.name} gemisinin çıkarması püskürtüldü.`,[b.o,t],"boat");return}
- setOwner(g,c,b.o);if(T){const d=T.troops/Math.max(1,T.cells);T.troops=Math.max(0,T.troops-d)}
- ev(g,`${P.name} ${T?T.name:"boş kıyıya"} ${T?"kıyısına ":""}çıkarma yaptı.`,[b.o,t],"boat");
- const n=b.n-cost;if(n>=20){P.troops+=n;attack(g,b.o,t,n)}}
+function landBoat(g,b){const P=g.pl[b.o];if(!P.alive)return;const c=b.tc,t=g.owner[c];if(t===b.o||t===-2||(t>=0&&(g.peace>0||pactOf(g,b.o,t)))){P.troops+=b.n;return}
+ const T=t>=0?g.pl[t]:null,mul=KMUL[g.m.kind[c]];const cost=T?(20+T.troops/Math.max(1,T.cells))*mul*atkM(T)/atkM(P):(6+Math.sqrt(P.cells)*.45)*mul;
+ if(b.n<cost){ev(g,`${P.name} gemisinin çıkarması püskürtüldü.`,[b.o,t],"boat");return}
+ setOwner(g,c,b.o,T?1:0);if(T){const d=T.troops/Math.max(1,T.cells);T.troops=Math.max(0,T.troops-d)}
+ ev(g,`${P.name} ${T?T.name+" kıyısına":"boş kıyıya"} çıkarma yaptı.`,[b.o,t],"boat");
+ const n=b.n-cost;if(n>=20){P.troops+=n;attack(g,b.o,t,n,c)}}
 
-/* yapılar, asker gücü, bombalar */
+/* ---------- yapılar, eğitim, kalkınma, generaller, bombalar ---------- */
 function tooClose(g,c,r){const W=g.m.W,x=c%W,y=(c/W)|0;return g.bld.some(b=>Math.abs(b.c%W-x)<=r&&Math.abs(((b.c/W)|0)-y)<=r)}
 function build(g,o,k,c){const P=g.pl[o];if(!P||!P.alive||!BLD[k])return"yok";if(c<0||g.owner[c]!==o)return"toprak";
  if(k==="lim"&&!g.m.coast[c]){const W=g.m.W,x0=c%W,y0=(c/W)|0;let best=-1,bd=1e9;for(let dy=-8;dy<=8;dy++)for(let dx=-8;dx<=8;dx++){const x=x0+dx,y=y0+dy;if(x<0||y<0||x>=W||y>=g.m.H)continue;const i=y*W+x;if(g.m.coast[i]&&g.owner[i]===o&&dx*dx+dy*dy<bd&&!tooClose(g,i,2)){bd=dx*dx+dy*dy;best=i}}if(best<0)return"kiyi";c=best}
- if(tooClose(g,c,2))return"dolu";const cost=bCost(P,k);if(P.gold<cost)return"altin";P.gold-=cost;const b={id:++g.seq,k,o,c};g.bld.push(b);g.bmap.set(c,b);P.nb[k]=(P.nb[k]||0)+1;return"ok"}
-function lvlUp(g,o){const P=g.pl[o];if(!P||!P.alive)return"yok";if(P.lvl>=10)return"max";const c=lvlCost(P);if(P.gold<c)return"altin";P.gold-=c;P.lvl++;if(!P.bot)ev(g,`Asker gücü ${P.lvl}. seviyeye çıktı: her asker artık ${power(P)} güçte.`,[o],"lvl");return"ok"}
-function launch(g,o,k,c){const P=g.pl[o],N=NUK[k];if(!P||!N||!P.alive||c<0)return"yok";if(g.peace>0)return"baris";if(g.owner[c]===o)return"kendi";
+ if(tooClose(g,c,2))return"dolu";const cost=bCost(P,k);if(P.gold<cost)return"altin";P.gold-=cost;const b={id:++g.seq,k,o,c,t0:g.t};g.bld.push(b);g.bmap.set(c,b);P.nb[k]=(P.nb[k]||0)+1;return"ok"}
+function lvlUp(g,o){const P=g.pl[o];if(!P||!P.alive)return"yok";if(P.lvl>=10)return"max";const c=lvlCost(P);if(P.gold<c)return"altin";P.gold-=c;P.lvl++;if(!P.bot)ev(g,`Ordu eğitimi ${P.lvl}. seviye: her asker artık ${power(P)} güçte.`,[o],"lvl");return"ok"}
+function ecoUp(g,o){const P=g.pl[o];if(!P||!P.alive)return"yok";if(P.eco>=10)return"max";const c=ecoCost(P);if(P.gold<c)return"altin";P.gold-=c;P.eco++;if(!P.bot)ev(g,`Kalkınma ${P.eco}. seviye: altın geliri %${(P.eco-1)*15} arttı, nüfus daha hızlı büyüyor.`,[o],"lvl");return"ok"}
+function hireGen(g,o){const P=g.pl[o];if(!P||!P.alive)return"yok";const c=genCost(P);if(!isFinite(c))return"max";if(P.gold<c)return"altin";P.gold-=c;const nm=GEN_N.find(n=>!P.gens.includes(n))||"General "+(P.gens.length+1);P.gens.push(nm);
+ if(!P.bot)ev(g,`${nm} orduya katıldı: saldırı ve savunma gücün %${P.gens.length*8} arttı.`,[o],"lvl");return"ok"}
+function launch(g,o,k,c){const P=g.pl[o],N=NUK[k];if(!P||!N||!P.alive||c<0)return"yok";if(g.peace>0)return"baris";if(g.owner[c]===o)return"kendi";const t=g.owner[c];if(t>=0&&pactOf(g,o,t))return"antlasma";
  const silos=g.bld.filter(b=>b.o===o&&b.k==="silo");if(!silos.length)return"silo";const cost=nCost(P,k);if(P.gold<cost)return"altin";
  const W=g.m.W,tx=c%W,ty=(c/W)|0;let s=silos[0],sd=1e12;for(const b of silos){const d=(b.c%W-tx)**2+(((b.c/W)|0)-ty)**2;if(d<sd){sd=d;s=b}}
- P.gold-=cost;P.nk++;const t=g.owner[c];g.mis.push({id:++g.seq,k,o,from:s.c,to:c,f:0,dur:clamp(Math.sqrt(sd)*40,2400,7000)});
+ P.gold-=cost;P.nk++;g.mis.push({id:++g.seq,k,o,from:s.c,to:c,f:0,dur:clamp(Math.sqrt(sd)*40,2600,7500)});
  ev(g,`${P.name} ${N.n.toLocaleLowerCase("tr-TR")} fırlattı${t>=0?" → "+g.pl[t].name:""}!`,[o,t],"nuke");return"ok"}
-function samCheck(g,ms){const W=g.m.W,tx=ms.to%W,ty=(ms.to/W)|0;for(const b of g.bld){if(b.k!=="sam"||b.o===ms.o||(b.cd||0)>g.t)continue;if(Math.hypot(b.c%W-tx,((b.c/W)|0)-ty)>SAM_R)continue;b.cd=g.t+SAM_CD;
-  if(rng()<NUK[ms.k].sam){ms.dn=1;ms.sx=b.c;g.booms.push({c:ms.to,r:0,t:g.t,air:1,f:ms.f,from:ms.from});ev(g,`${g.pl[b.o].name} SAM'ı ${g.pl[ms.o].name} bombasını havada vurdu!`,[b.o,ms.o],"sam");return}}}
+/* SAM: bomba hedefe yaklaşınca havada vurulur; patlama füzenin o anki yerinde ve yüksekliğinde olur */
+function samCheck(g,ms){const W=g.m.W,tx=ms.to%W,ty=(ms.to/W)|0;for(const b of g.bld){if(b.k!=="sam"||b.o===ms.o||(b.cd||0)>g.t)continue;if(Math.hypot(b.c%W-tx,((b.c/W)|0)-ty)>SAM_R)continue;if(pactOf(g,b.o,ms.o))continue;b.cd=g.t+SAM_CD;
+  if(rng()<NUK[ms.k].sam){ms.dn=1;const fx=ms.from%W,fy=(ms.from/W)|0,f=ms.f,d=Math.hypot(tx-fx,ty-fy);
+   g.booms.push({c:ms.to,r:NUK[ms.k].r,t:g.t,air:1,ax:fx+(tx-fx)*f,ay:fy+(ty-fy)*f,ah:Math.sin(Math.PI*f)*d*.32,sam:b.c,k:ms.k});
+   ev(g,`${g.pl[b.o].name} SAM'ı ${g.pl[ms.o].name} bombasını havada vurdu!`,[b.o,ms.o],"sam");return}}}
 function boom(g,ms){const N=NUK[ms.k],m=g.m,W=m.W,tx=ms.to%W,ty=(ms.to/W)|0,r=N.r,hit={},before={};for(const p of g.pl)before[p.i]=p.cells;
  for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){const d=Math.hypot(dx,dy);if(d>r)continue;const x=tx+dx,y=ty+dy;if(x<0||y<0||x>=W||y>=m.H)continue;const c=y*W+x;const o=g.owner[c];if(o<0)continue;
   if(d<r*.6||rng()<(1-(d-r*.6)/(r*.4))*.9){hit[o]=(hit[o]||0)+1;setOwner(g,c,-1)}}
  for(const b of g.bld.slice())if(Math.hypot(b.c%W-tx,((b.c/W)|0)-ty)<=r)delBld(g,b);
- for(const o in hit){const T=g.pl[o];T.troops*=Math.max(0,1-hit[o]/Math.max(1,before[o])*1.3);if(T.cells<=0)die(g,T,g.pl[ms.o])}
- g.booms.push({c:ms.to,r,t:g.t,k:ms.k})}
+ for(const a of g.att){if(a.fx==null||Math.hypot(a.fx-tx,a.fy-ty)>r*1.3)continue;a.n*=.4;a.d=(a.d||0)*.4}
+ for(const o in hit){const T=g.pl[o],f=Math.min(1,hit[o]/Math.max(1,before[o]));T.troops*=Math.max(0,1-f*1.3);T.pop*=Math.max(0,1-f*1.5);if(T.cells<=0)die(g,T,g.pl[ms.o])}
+ g.rad.push({c:ms.to,r:Math.round(r*1.3),until:g.t+RAD_T});g.booms.push({c:ms.to,r,t:g.t,k:ms.k})}
+
+/* ---------- diplomasi ---------- */
+function makePeace(g,a,b){for(const x of g.att.slice())if((x.o===a&&x.t===b)||(x.o===b&&x.t===a))endAtt(g,x,1);g.pact[pkey(a,b)]=g.t+PACT_T;ev(g,`${g.pl[a].name} ile ${g.pl[b].name} barış antlaşması imzaladı (3 dakika).`,[a,b],"pact")}
+function makeVassal(g,o,t){const T=g.pl[t];for(const x of g.att.slice())if((x.o===o&&x.t===t)||(x.o===t&&x.t===o))endAtt(g,x,1);T.ov=o;for(const q of g.pl)if(q.ov===t)q.ov=o;ev(g,`${T.name}, ${g.pl[o].name} ülkesinin vasalı oldu.`,[o,t],"vassal")}
+function offer(g,k,o,t){if(g.offers.some(f=>f.from===o&&f.to===t&&f.k===k))return"bekle";g.offers.push({id:++g.seq,k,from:o,to:t,at:g.t});ev(g,k==="peace"?`${g.pl[o].name} sana barış teklif ediyor.`:`${g.pl[o].name} senden vasalı olmanı istiyor.`,[t],"offer");return"teklif"}
+function dipPeace(g,o,t){const P=g.pl[o],T=g.pl[t];if(!P||!T||!T.alive||t===o)return"yok";if(pactOf(g,o,t))return"zaten";if(g.peace>0)return"zaten";
+ if(T.uid)return offer(g,"peace",o,t);if(g.t<(T.dipT||0))return"red";
+ const war=g.att.some(a=>(a.o===o&&a.t===t)||(a.o===t&&a.t===o)),sp=strength(P),st=strength(T);
+ let ch=war?(st<sp*.7?.85:st<sp*1.2?.45:.15):.6;if(T.bot==="t")ch+=.2;if(rng()<ch){makePeace(g,o,t);return"kabul"}T.dipT=g.t+20000;return"red"}
+function dipVassal(g,o,t){const P=g.pl[o],T=g.pl[t];if(!P||!T||!T.alive||t===o)return"yok";if(T.ov===o)return"zaten";if(P.ov===t)return"efendi";
+ if(!adjacent(g,o,t)&&!g.att.some(a=>(a.o===o&&a.t===t)||(a.o===t&&a.t===o)))return"komsu";if(strength(T)>strength(P)*.6)return"guclu";
+ if(T.uid)return offer(g,"vassal",o,t);if(g.t<(T.dipT||0))return"red";
+ const r=strength(T)/strength(P),ch=r<.2?.85:r<.35?.5:.2;if(rng()<ch){makeVassal(g,o,t);return"kabul"}T.dipT=g.t+25000;return"red"}
+function answerOffer(g,o,id,yes){const f=g.offers.find(f=>f.id===id&&f.to===o);if(!f)return"yok";g.offers.splice(g.offers.indexOf(f),1);const F=g.pl[f.from];if(!F||!F.alive)return"yok";
+ if(!yes){ev(g,`${g.pl[o].name} teklifini reddetti.`,[f.from],"offer");return"ok"}if(f.k==="peace")makePeace(g,f.from,o);else makeVassal(g,f.from,o);return"ok"}
 
 /* ---------- botlar ---------- */
 function botThink(g,p){const tribe=p.bot==="t",D=tribe?TRIBE:DIFF[p.diff],ow=g.owner,W=g.m.W,N=g.m.N;
- const nb=new Map(),stepN=Math.max(1,Math.floor(p.border.size/300));let k=0;
- for(const c of p.border){if(k++%stepN)continue;const x=c%W;const f=j=>{const o=ow[j];if(o!==-2&&o!==p.i)nb.set(o,(nb.get(o)||0)+1)};if(x>0)f(c-1);if(x<W-1)f(c+1);if(c>=W)f(c-W);if(c<N-W)f(c+W)}
- if(!tribe)botBuild(g,p,D,nb);
+ const nb=new Map(),cellOf=new Map(),stepN=Math.max(1,Math.floor(p.border.size/300));let k=0;
+ for(const c of p.border){if(k++%stepN)continue;const x=c%W;const f=j=>{const o=ow[j];if(o!==-2&&o!==p.i){nb.set(o,(nb.get(o)||0)+1);if(!cellOf.has(o)||rng()<.15)cellOf.set(o,j)}};if(x>0)f(c-1);if(x<W-1)f(c+1);if(c>=W)f(c-W);if(c<N-W)f(c+W)}
+ if(!tribe){botBuild(g,p,D,nb);botDip(g,p,D,nb)}
  const mine=g.att.filter(a=>a.o===p.i).length;if(mine>=(tribe?1:3))return;
- const C=cap(p);if(p.troops<C*(tribe?.4:.3+(1-D.agg)*.25))return;
+ const C=troopCap(p);if(p.troops<C*(tribe?.4:.25+(1-D.agg)*.25))return;
  const send=p.troops*D.pct*(.85+rng()*.3);
- if(nb.has(-1)&&(rng()<.8||nb.size===1))return void attack(g,p.i,-1,send);
+ if(nb.has(-1)&&(rng()<.8||nb.size===1))return void attack(g,p.i,-1,send,cellOf.get(-1));
  let best=null,bs=-1e18;
- if(g.peace<=0)for(const[o,n]of nb){if(o<0)continue;const T=g.pl[o];if(!T.alive)continue;const eff=T.troops*power(T),my=send*power(p);if(my<eff*(tribe?1:.5))continue;
-  const hostile=g.att.some(a=>a.o===o&&a.t===p.i);let sc=n*2-eff/Math.max(1,my)*40+(T.bot==="t"?15:0)+(!T.bot&&!tribe?D.agg*25:0)+(hostile?30:0);if(sc>bs){bs=sc;best=o}}
- if(best!==null)return void attack(g,p.i,best,send);
- if(!tribe&&!nb.has(-1)&&g.t>p.boatT&&p.troops>C*.55&&rng()<.35){p.boatT=g.t+12000;botBoat(g,p,send*.8)}}
-function botBoat(g,p,n){const W=g.m.W;let best=-1,bd=1e9;for(let k=0;k<50;k++){const c=(rng()*g.m.N)|0;if(!g.m.coast[c])continue;const o=g.owner[c];if(o===p.i)continue;if(o>=0&&(g.peace>0||g.pl[o].troops*power(g.pl[o])>n*power(p)*.6))continue;const d=Math.hypot(c%W-p.lx,((c/W)|0)-p.ly);if(d<bd){bd=d;best=c}}
+ if(g.peace<=0)for(const[o,n]of nb){if(o<0)continue;const T=g.pl[o];if(!T.alive||pactOf(g,p.i,o))continue;
+  const my=send*atkM(p),their=T.troops*.7*atkM(T)*(T.uid?1.05:1);if(my<their*(tribe?1.1:.8))continue;
+  const hostile=g.att.some(a=>a.o===o&&a.t===p.i);const sc=n*2-their/Math.max(1,my)*40+(T.bot==="t"?15:0)+(!T.bot&&!tribe?D.agg*25:0)+(hostile?30:0);if(sc>bs){bs=sc;best=o}}
+ if(best!==null)return void attack(g,p.i,best,send,cellOf.get(best));
+ if(!tribe&&!nb.has(-1)&&g.t>p.boatT&&p.troops>C*.5&&rng()<.35){p.boatT=g.t+12000;botBoat(g,p,send*.8)}}
+function botBoat(g,p,n){const W=g.m.W;let best=-1,bd=1e9;for(let k=0;k<50;k++){const c=(rng()*g.m.N)|0;if(!g.m.coast[c])continue;const o=g.owner[c];if(o===p.i)continue;if(o>=0&&(g.peace>0||pactOf(g,p.i,o)||g.pl[o].troops*atkM(g.pl[o])>n*atkM(p)*.6))continue;const d=Math.hypot(c%W-p.lx,((c/W)|0)-p.ly);if(d<bd){bd=d;best=c}}
  if(best>=0&&bd<W*.45)sendBoat(g,p.i,best,n)}
 function ownCell(g,p,near){const W=g.m.W;for(let k=0;k<40;k++){const r=Math.max(2,p.lr*(near?1.4:.85));const x=Math.round(p.lx+(rng()*2-1)*r),y=Math.round(p.ly+(rng()*2-1)*r);if(x<0||y<0||x>=W||y>=g.m.H)continue;const c=y*W+x;if(g.owner[c]===p.i&&!tooClose(g,c,2))return c}
  const arr=[...p.border];for(let k=0;k<20&&arr.length;k++){const c=arr[(rng()*arr.length)|0];if(!tooClose(g,c,2))return c}return -1}
 function botBuild(g,p,D,nb){if(rng()>D.build)return;const gold=p.gold;
  if(p.lvl<10&&gold>lvlCost(p)*1.8&&rng()<D.lvl&&p.cells>150)return void lvlUp(g,p.i);
- const coastal=[...p.border].some(c=>g.m.coast[c]);const attacked=g.att.some(a=>a.t===p.i);const foeSilo=g.bld.some(b=>b.k==="silo"&&b.o!==p.i);
- let want=null;
- const ne=cnt(p,"ev");if(ne<Math.min(14,1+p.cells/700))want="ev";else if(cnt(p,"fab")<Math.min(ne,10))want="fab";else if(coastal&&cnt(p,"lim")<Math.min(4,1+ne/3))want="lim";
- else if(attacked&&cnt(p,"sav")<Math.min(8,2+p.cells/1500))want="sav";else if(D.nuke&&p.cells>1200&&cnt(p,"silo")<1)want="silo";else if(D.nuke&&foeSilo&&cnt(p,"sam")<1+cnt(p,"ev")/4)want="sam";
+ if(p.eco<10&&gold>ecoCost(p)*1.7&&rng()<D.lvl*.7&&p.cells>150)return void ecoUp(g,p.i);
+ if(p.gens.length<GEN_MAX&&gold>genCost(p)*1.6&&rng()<D.lvl*.5&&p.cells>400)return void hireGen(g,p.i);
+ const coastal=[...p.border].some(c=>g.m.coast[c]),attacked=g.att.some(a=>a.t===p.i),foeSilo=g.bld.some(b=>b.k==="silo"&&b.o!==p.i);
+ const ne=cnt(p,"ev");let want=null;
+ if(ne<Math.min(14,1+p.cells/700))want="ev";else if(cnt(p,"fab")<Math.min(ne,10))want="fab";else if(cnt(p,"kis")<Math.min(6,Math.ceil(ne/2)))want="kis";else if(cnt(p,"has")<Math.min(6,Math.ceil(ne/2)))want="has";
+ else if(coastal&&cnt(p,"lim")<Math.min(4,1+ne/3))want="lim";else if(attacked&&cnt(p,"sav")<Math.min(8,2+p.cells/1500))want="sav";else if(D.nuke&&p.cells>1200&&cnt(p,"silo")<1)want="silo";else if(D.nuke&&foeSilo&&cnt(p,"sam")<1+ne/4)want="sam";
  if(want&&gold>=bCost(p,want)){const c=ownCell(g,p,want==="sav");if(c>=0)build(g,p.i,want,c);return}
  if(D.nuke&&cnt(p,"silo")&&g.peace<=0&&g.t>p.nukeT&&rng()<D.nuke){const ks=["hid","nuk","atom"].filter(k=>gold>=nCost(p,k)*1.15);if(!ks.length)return;
-  let tgt=null;for(const o of nb.keys()){if(o<0)continue;const T=g.pl[o];if(T.bot!=="t"&&T.cells>p.cells*.7&&(!tgt||T.cells>tgt.cells))tgt=T}
-  const lead=g.pl.filter(q=>q.alive&&q.i!==p.i).sort((a,b)=>b.cells-a.cells)[0];if(!tgt&&lead&&lead.cells>p.cells*1.3)tgt=lead;if(!tgt)return;
+  let tgt=null;for(const o of nb.keys()){if(o<0)continue;const T=g.pl[o];if(T.bot!=="t"&&!pactOf(g,p.i,o)&&T.cells>p.cells*.7&&(!tgt||T.cells>tgt.cells))tgt=T}
+  const lead=g.pl.filter(q=>q.alive&&q.i!==p.i&&!pactOf(g,p.i,q.i)).sort((a,b)=>b.cells-a.cells)[0];if(!tgt&&lead&&lead.cells>p.cells*1.3)tgt=lead;if(!tgt)return;
   const cities=g.bld.filter(b=>b.o===tgt.i&&(b.k==="ev"||b.k==="silo"));const c=cities.length?cities[(rng()*cities.length)|0].c:Math.round(tgt.ly)*g.m.W+Math.round(tgt.lx);
   if(launch(g,p.i,ks[0],c)==="ok")p.nukeT=g.t+45000}}
+/* bot diplomasisi: kaybettiği savaşta barış ister, zayıf komşuyu vasal yapar, güçlenen vasal bağımsızlığını ilan eder */
+function botDip(g,p,D,nb){if(g.t<(p.dipN||0))return;p.dipN=g.t+12000+rng()*12000;
+ if(p.ov>=0){const O=g.pl[p.ov];if(!O||!O.alive||strength(p)>strength(O)*1.3){const o=p.ov;p.ov=-1;if(O)ev(g,`${p.name} bağımsızlığını ilan etti!`,[p.i,o],"vassal")}return}
+ for(const a of g.att){if(a.t!==p.i&&a.o!==p.i)continue;const o=a.o===p.i?a.t:a.o;if(o<0||!g.pl[o].alive)continue;const losing=a.t===p.i?(a.r||.5)>.56:(a.r||.5)<.44;
+  if(losing&&rng()<.45){dipPeace(g,p.i,o);return}}
+ if(D.agg>=.5&&rng()<.25)for(const a of g.att){if(a.o!==p.i||a.t<0)continue;const T=g.pl[a.t];if(!T.alive||T.ov>=0||T.cells>p.cells*.15||(a.r||.5)<.6)continue;if(strength(T)<strength(p)*.2){dipVassal(g,p.i,a.t);return}}}
 
 /* ---------- etiket yerleri: sınıra en uzak hücre (iki geçişli uzaklık dönüşümü) ---------- */
 let DT=null;
@@ -373,27 +507,34 @@ function labels(g){const m=g.m,W=m.W,H=m.H,N=m.N,ow=g.owner;if(!DT||DT.length!==
   if(v>bv[o]){bv[o]=v;best[o]=i}}
  for(const p of g.pl){if(best[p.i]<0){p.lr=0;continue}p.lx=best[p.i]%W;p.ly=(best[p.i]/W)|0;p.lr=bv[p.i]/3}}
 
-/* ---------- oda anlık görüntüsü ---------- */
-function rleOf(ow){const s=[];let prev=ow[0],run=0;for(let i=0;i<ow.length;i++){const v=ow[i];if(v===prev)run++;else{s.push((prev+2).toString(36)+(run>1?"."+run.toString(36):""));prev=v;run=1}}s.push((prev+2).toString(36)+(run>1?"."+run.toString(36):""));return s.join(",")}
-function rawSet(g,c,o){if(g.owner[c]!==o){g.owner[c]=o;g.dirt.push(c)}}
-function rleApply(g,str){let i=0;for(const part of str.split(",")){const[v,r]=part.split(".");const val=parseInt(v,36)-2,len=r?parseInt(r,36):1;for(let k=0;k<len;k++)rawSet(g,i+k,val);i+=len}}
-function encD(g){const a=[...g.chg].sort((x,y)=>x-y),s=[];let prev=0;for(let i=0;i<a.length;){let j=i;const o=g.owner[a[i]];while(j+1<a.length&&a[j+1]===a[j]+1&&g.owner[a[j+1]]===o)j++;s.push((a[i]-prev).toString(36)+"."+(j-i+1).toString(36)+"."+(o+2).toString(36));prev=a[i];i=j+1}return s.join(",")}
-function decD(g,str){if(!str)return;let prev=0;for(const part of str.split(",")){const[gp,l,o]=part.split(".").map(v=>parseInt(v,36));const st=prev+gp;for(let k=0;k<l;k++)rawSet(g,st+k,o-2);prev=st}}
-function snapOf(g){return JSON.stringify({t:Math.round(g.t),pe:Math.round(g.peace),w:g.war?1:0,
- p:g.pl.map(p=>[Math.round(p.troops),Math.round(p.gold),p.lvl,p.alive?1:0,p.nk,p.kills,p.spawn,p.cells,Math.round(p.peak)]),
- b:g.bld.map(b=>[b.k,b.o,b.c]),a:g.att.map(a=>[a.id,a.o,a.t,Math.round(a.n),a.fx==null?-1:Math.round(a.fx),a.fy==null?-1:Math.round(a.fy),a.sx==null?-1:Math.round(a.sx),a.sy==null?-1:Math.round(a.sy),a.op||0]),
- bo:g.boats.map(b=>[b.id,b.o,Math.round(b.n),b.path[Math.min(b.path.length-1,Math.floor(b.pi))],b.tc]),
- mi:g.mis.map(m=>[m.id,m.k,m.o,m.from,m.to,+m.f.toFixed(3),Math.round(m.dur)]),bm:g.booms.map(b=>[b.c,b.r,Math.round(g.t-b.t),b.air?1:0]),
- ev:g.ev.slice(-10).map(e=>[e.id,e.s,e.w,e.k]),over:g.over,hu:g.pl.filter(p=>p.uid).map(p=>[p.i,p.name,p.flag,p.hex]),go:g.pl.filter(p=>p.gone).map(p=>p.i)})}
+/* ---------- oda anlık görüntüsü: hücre değeri (sahip+2)*2+işgal ---------- */
+const cv_=(g,i)=>(g.owner[i]+2)*2+g.occ[i];
+function rleOf(g){const N=g.owner.length,s=[];let prev=cv_(g,0),run=0;for(let i=0;i<N;i++){const v=cv_(g,i);if(v===prev)run++;else{s.push(prev.toString(36)+(run>1?"."+run.toString(36):""));prev=v;run=1}}s.push(prev.toString(36)+(run>1?"."+run.toString(36):""));return s.join(",")}
+function rawSet(g,c,v){const o=(v>>1)-2,oc=v&1;if(g.owner[c]!==o||g.occ[c]!==oc){g.owner[c]=o;g.occ[c]=oc;g.dirt.push(c)}}
+function rleApply(g,str){let i=0;for(const part of str.split(",")){const[v,r]=part.split(".");const val=parseInt(v,36),len=r?parseInt(r,36):1;for(let k=0;k<len;k++)rawSet(g,i+k,val);i+=len}}
+function encD(g){const a=[...g.chg].sort((x,y)=>x-y),s=[];let prev=0;for(let i=0;i<a.length;){let j=i;const v=cv_(g,a[i]);while(j+1<a.length&&a[j+1]===a[j]+1&&cv_(g,a[j+1])===v)j++;s.push((a[i]-prev).toString(36)+"."+(j-i+1).toString(36)+"."+v.toString(36));prev=a[i];i=j+1}return s.join(",")}
+function decD(g,str){if(!str)return;let prev=0;for(const part of str.split(",")){const[gp,l,v]=part.split(".").map(x=>parseInt(x,36));const st=prev+gp;for(let k=0;k<l;k++)rawSet(g,st+k,v);prev=st}}
+const R1=v=>Math.round(v);
+function snapOf(g){return JSON.stringify({t:R1(g.t),pe:R1(g.peace),w:g.war?1:0,
+ p:g.pl.map(p=>[R1(p.troops),R1(p.gold),p.lvl,p.alive?1:0,p.nk,p.kills,p.spawn,p.cells,R1(p.peak),R1(p.pop),p.eco,p.gens.length,p.ov,R1(p.front),p.occ]),
+ b:g.bld.map(b=>[b.k,b.o,b.c,b.t0==null?-1:R1(g.t-b.t0)]),
+ a:g.att.map(a=>[a.id,a.o,a.t,R1(a.n),R1(a.d||0),a.fx==null?-1:+a.fx.toFixed(1),a.fy==null?-1:+a.fy.toFixed(1),a.op||0,(a.fp||[]).join(" "),+(a.r||1).toFixed(2)]),
+ bo:g.boats.map(b=>[b.id,b.o,R1(b.n),b.path[Math.min(b.path.length-1,Math.floor(b.pi))],b.tc]),
+ mi:g.mis.map(m=>[m.id,m.k,m.o,m.from,m.to,+m.f.toFixed(3),R1(m.dur)]),
+ bm:g.booms.map(b=>[b.c,b.r,R1(g.t-b.t),b.air?1:0,b.ax==null?-1:+b.ax.toFixed(1),b.ay==null?-1:+b.ay.toFixed(1),b.ah==null?0:+b.ah.toFixed(1),b.sam==null?-1:b.sam,b.k||""]),
+ rz:g.rad.map(z=>[z.c,z.r,R1(z.until-g.t)]),pa:Object.entries(g.pact).filter(([,u])=>u>g.t).map(([k,u])=>[k,R1(u-g.t)]),of:g.offers.map(f=>[f.id,f.k,f.from,f.to,R1(g.t-f.at)]),
+ ev:g.ev.slice(-10).map(e=>[e.id,e.s,e.w,e.k]),over:g.over,hu:g.pl.filter(p=>p.uid).map(p=>[p.i,p.name,p.flag,p.hex,p.gens.join("|")]),go:g.pl.filter(p=>p.gone).map(p=>p.i)})}
 function applySnap(g,str){const d=JSON.parse(str);g.t=d.t;g.peace=d.pe;g.war=!!d.w;
- d.p.forEach((a,i)=>{const p=g.pl[i];if(!p)return;[p.troops,p.gold,p.lvl]=a;p.alive=!!a[3];p.nk=a[4];p.kills=a[5];p.spawn=a[6];p.cells=a[7];p.peak=a[8]});
- g.bld=d.b.map(([k,o,c])=>({k,o,c}));g.bmap=new Map(g.bld.map(b=>[b.c,b]));for(const p of g.pl)p.nb={};for(const b of g.bld)if(g.pl[b.o])g.pl[b.o].nb[b.k]=(g.pl[b.o].nb[b.k]||0)+1;
- g.att=d.a.map(([id,o,t,n,fx,fy,sx,sy,op])=>({id,o,t,n,fx:fx<0?null:fx,fy:fy<0?null:fy,sx:sx==null||sx<0?null:sx,sy:sy==null||sy<0?null:sy,op:op||null}));
+ d.p.forEach((a,i)=>{const p=g.pl[i];if(!p)return;[p.troops,p.gold,p.lvl]=a;p.alive=!!a[3];p.nk=a[4];p.kills=a[5];p.spawn=a[6];p.cells=a[7];p.peak=a[8];p.pop=a[9]||0;p.eco=a[10]||1;
+  const gc=a[11]||0;if(p.gens.length!==gc)p.gens=Array.from({length:gc},(_,k)=>p.gens[k]||"");p.ov=a[12]==null?-1:a[12];p.front=a[13]||0;p.occ=a[14]||0});
+ g.bld=d.b.map(([k,o,c,age])=>({k,o,c,t0:age<0?null:g.t-age}));g.bmap=new Map(g.bld.map(b=>[b.c,b]));for(const p of g.pl)p.nb={};for(const b of g.bld)if(g.pl[b.o])g.pl[b.o].nb[b.k]=(g.pl[b.o].nb[b.k]||0)+1;
+ g.att=d.a.map(([id,o,t,n,dd,fx,fy,op,fp,r])=>({id,o,t,n,d:dd,fx:fx<0?null:fx,fy:fy<0?null:fy,op:op||null,fp:fp?fp.split(" ").map(Number):[],r}));
  g.boats=d.bo.map(([id,o,n,at,tc])=>({id,o,n,at,tc}));
  const t0=performance.now();g.mis=d.mi.map(([id,k,o,from,to,f,dur])=>({id,k,o,from,to,f,dur,rt:t0-f*dur}));
- g.booms=d.bm.map(([c,r,age,air])=>({c,r,t:g.t-age,air,rt:t0-age}));
+ g.booms=d.bm.map(([c,r,age,air,ax,ay,ah,sam,k])=>({c,r,t:g.t-age,air,rt:t0-age,ax:ax<0?null:ax,ay:ay<0?null:ay,ah,sam:sam<0?null:sam,k}));
+ g.rad=(d.rz||[]).map(([c,r,left])=>({c,r,until:g.t+left}));g.pact={};for(const[k,left]of d.pa||[])g.pact[k]=g.t+left;g.offers=(d.of||[]).map(([id,k,from,to,age])=>({id,k,from,to,at:g.t-age}));
  for(const e of d.ev)if(!g.ev.some(x=>x.id===e[0]))g.ev.push({id:e[0],s:e[1],w:e[2],k:e[3]});if(g.ev.length>40)g.ev.splice(0,g.ev.length-40);
- g.over=d.over||null;for(const[i,n,f,hx]of d.hu||[]){const p=g.pl[i];if(!p)continue;p.name=n;p.flag=f;if(hx!==p.hex)setCol(p,hexRgb(hx))}const go=new Set(d.go||[]);for(const p of g.pl)p.gone=go.has(p.i)}
+ g.over=d.over||null;for(const[i,n,f,hx,gn]of d.hu||[]){const p=g.pl[i];if(!p)continue;p.name=n;p.flag=f;if(hx!==p.hex)setCol(p,hexRgb(hx));if(gn!=null)p.gens=gn?gn.split("|"):[]}const go=new Set(d.go||[]);for(const p of g.pl)p.gone=go.has(p.i)}
 
 /* ---------- görünüm ---------- */
 function css(){if($("#cpCss"))return;const st=document.createElement("style");st.id="cpCss";st.textContent=`
@@ -883,7 +1024,7 @@ function hostCmds(u,c){if(!c||!c.q||!G)return;let q=[];try{q=JSON.parse(c.q)}cat
  for(const k of q){if(k.s<=(V.lastSeq[u]||0))continue;V.lastSeq[u]=k.s;if(k.a==="spawn"){if(V.mode==="spawn"){if(G.hz)claim(G,G.pl[o],k.c);else spawnAt(G,G.pl[o],k.c)}continue}applyCmd(G,o,k)}}
 function sendCmd(c){if(c.a==="spawn"&&V.mode!=="spawn")return;V.cmdQ.push({...c,s:++V.cmdSeq});V.cmdQ=V.cmdQ.slice(-30);DB.set(cmdPath(V.room,S.uid),{q:JSON.stringify(V.cmdQ),up:now()}).catch(()=>{});vib&&vib(10);if(c.a==="bld"||c.a==="nuk")setTool(null)}
 function roomSnap(full){if(!V.room||!G||!V.host)return;const g=G;const u={st:g.over?"done":V.mode==="spawn"?"spawn":"play",s:snapOf(g),up:now()};
- if(full||!V.kn||performance.now()-V.kfT>10000||g.chg.size>9000){V.kn=(V.kn||0)+1;V.kfT=performance.now();u.kf=rleOf(g.owner);u.kn=V.kn;g.chg.clear();u.d=""}else u.d=encD(g);
+ if(full||!V.kn||performance.now()-V.kfT>10000||g.chg.size>9000){V.kn=(V.kn||0)+1;V.kfT=performance.now();u.kf=rleOf(g);u.kn=V.kn;g.chg.clear();u.d=""}else u.d=encD(g);
  DB.update(roomPath(V.room),u).catch(e=>console.warn("cephe",e))}
 function leaveRoom(){const c=V&&V.room;if(!c)return;V.room=null;try{V.roomUn&&V.roomUn()}catch{}V.roomUn=null;(V.cmdUn||[]).forEach(f=>{try{f()}catch{}});V.cmdUn=null;
  if(V.host)DB.update(roomPath(c),{st:"over",why:"Kurucu odadan çıktı, savaş bitti.",up:now()}).catch(()=>{});else DB.update(roomPath(c),{oy:{[S.uid]:null},up:now()}).catch(()=>{});
