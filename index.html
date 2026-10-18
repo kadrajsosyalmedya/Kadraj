@@ -2858,6 +2858,172 @@ html.reduce-motion .k51pt,html.reduce-motion .rzchip{transition:none!important}
 :root[data-ui="vizor"] .rv-acc>div{border:1px solid var(--vz-hair,var(--line))}
 @media (prefers-reduced-motion:reduce){.crv .rvbd.pop{animation:none}.rv-pg i{transition:none}}
 /*}@css:51REV*/
+/*@css:60CHS{*/
+/* ===== 6.0 · Satranç yenilendi (chess.com benzeri) =====
+   Oyun ekranı .chess.c6: telefonda hamle şeridi üstte (.c6side display:contents + order), tahta neredeyse kenardan kenara, altta düz
+   düğme çubuğu; ≥900px'te tahta solda, sağda hamle tablosu, inceleme satırı, düğmeler ve sohbet (grid alanları t/m/b/s).
+   Vurgular: Turnuva tahtasında son hamle ve seçili kare sarımsı; yasal hamle noktası ve alma halkası; sürüklerken alttaki kare çerçeveli
+   (.c6hov); ön hamle kırmızımsı (.pre/.psel/.pdot); sağ tık kareleri (.ann) ve oklar (#cAnn). Sonuç kartı .c6end, lobi .c6lob. */
+main.chessmode{padding:0 0 calc(8px + env(safe-area-inset-bottom,0px))}
+.chess.c6{gap:5px;padding:2px 0 6px;min-height:100%}
+.c6 .cchat{order:3}.c6 .cctl{order:4;margin-top:auto}
+.c6 .c6side{display:contents}
+.c6>.cpl,.c6 .c6side>*{margin-left:10px;margin-right:10px}
+.c6 #cMoves{order:-2}
+.c6 .crvbar{order:-1}
+.c6 .cmain{gap:4px;padding:0 6px}
+.c6 .cbfr{max-width:calc(100dvh - 292px);container-type:inline-size}
+.c6 .cboard{border-radius:5px;box-shadow:0 3px 14px rgba(0,0,0,.2)}
+/* koordinatlar karenin içinde, tahtayla büyür */
+.c6 .csq em{font:700 max(8.5px,2.35cqw)/1 var(--f-body)}
+.c6 .csq .rk{left:max(2px,.5cqw);top:max(2px,.4cqw)}.c6 .csq .fl{right:max(2px,.5cqw);bottom:max(1px,.3cqw)}
+/* işaretler */
+.c6 .cmk .dot::after{inset:34.5%;background:rgba(0,0,0,.15)}
+.c6 .cmk .cap::after{inset:0;border:0;border-radius:50%;background:radial-gradient(circle,transparent 0 62%,rgba(0,0,0,.15) 63%)}
+.c6[data-cth="turnuva"] .cmk .lm,.c6[data-cth="yesil"] .cmk .lm,.c6[data-cth="ahsap"] .cmk .lm{background:rgba(255,255,51,.5)}
+.c6[data-cth="turnuva"] .cmk .sel,.c6[data-cth="yesil"] .cmk .sel,.c6[data-cth="ahsap"] .cmk .sel{background:rgba(255,255,51,.5)}
+.c6[data-cth="turnuva"] .cmk .hint{background:rgba(255,140,0,.38)}
+.c6 .cmk .pre{background:rgba(232,52,60,.55)}
+.c6 .cmk .psel{background:rgba(232,52,60,.38)}
+.c6 .cmk .pdot::after{content:"";position:absolute;inset:39%;border-radius:50%;background:rgba(232,52,60,.42)}
+.c6 .cmk .ann{opacity:.82}.c6 .cmk .ann.a-r{background:#eb6150}.c6 .cmk .ann.a-g{background:#7fb446}.c6 .cmk .ann.a-b{background:#3c96dc}
+.c6hov{position:absolute;left:0;top:0;width:12.5%;height:12.5%;box-shadow:inset 0 0 0 max(3px,.55cqw) rgba(255,255,255,.75);pointer-events:none}
+.c6hov[hidden]{display:none}
+.c6ann{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+.c6 .pc.drag img{filter:drop-shadow(0 10px 8px rgba(0,0,0,.32))}
+.c6 .pc.drag{transition:none}
+/* oyuncu çubukları */
+.c6 .cpl-in{min-height:50px;gap:9px;padding:4px 6px;border-radius:12px}
+.c6 .cpl-in.turn{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.c6 .cpl-in .av{--s:40px!important}
+.c6 .cpl-in .av img{border-radius:8px}
+.c6 .cpl-in .rbot{--s:42px!important}
+.c6 .cpl-in .cwav{width:44px;height:40px}
+.c6 .cpl-in .cside{width:40px;height:40px;border-radius:8px}
+.c6 .cwho{gap:2px}
+.c6 .cwho>div{gap:6px;font-size:.93rem}
+.c6 .crt{font:600 .78rem/1 var(--f-mono);color:var(--muted)}
+.c6acc{flex:none;font:700 .68rem/1 var(--f-mono);padding:3px 6px;border-radius:6px;background:var(--surface-2);color:var(--fg);letter-spacing:-.02em}
+.c6 .ctray .ctg img{width:18px;height:18px;margin-right:-9px}
+.c6 .ctray .cadv{background:none;padding:0 2px;color:var(--muted);font-size:.72rem}
+.c6 .cclk{min-width:5.4em;justify-content:flex-end;padding:8px 10px;border-radius:7px;font-size:1.2rem}
+/* hamle şeridi */
+.c6 .cmoves{min-height:36px;padding:3px 5px;border-radius:12px;gap:0}
+.c6 .cn{font:600 .74rem/1 var(--f-mono);padding:0 2px 0 8px}
+.c6 .cmv{padding:5px 7px;border-radius:6px;font-size:.88rem;font-weight:700;align-items:center}
+.c6 .cmv.cur{background:color-mix(in srgb,var(--fg) 13%,transparent);color:var(--fg)}
+.c6 .cmv.cur em{color:inherit}
+/* düğme çubuğu */
+.c6 .cctl{display:flex;gap:2px;padding:4px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.c6 .cctl button{flex:1 1 0;min-width:0;background:none;border:0;border-radius:12px;padding:7px 0 6px;font-size:.64rem;color:var(--muted)}
+.c6 .cctl button svg.i{width:1.4rem;height:1.4rem;color:var(--fg)}
+.c6 .cctl button[aria-pressed="true"],.c6 .cctl button[aria-pressed="true"] svg.i{color:var(--accent)}
+.c6 .cctl button:not(:disabled):active{background:var(--surface-2)}
+@media (hover:hover){.c6 .cctl button:not(:disabled):hover{background:var(--surface-2);color:var(--fg)}}
+/* değerlendirme çubuğu */
+.c6 .cevalbar{width:13px;border-radius:4px;background:#403e3b;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.c6 .cevalbar i{background:#f6f6f2}
+.c6 .cevalbar span{font-size:.47rem}
+/* terfi seçici */
+.c6 .cpromo{top:0;padding:0;gap:0;border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.c6 .cpromo button{border-radius:0;background:#fff}
+.c6 .cpromo button:hover{background:#e8e8e3}
+.c6 .cpromo .x{background:#f1f1ec;color:#555}
+/* sonuç kartı */
+.c6 .cov{background:rgba(10,14,12,.42)}
+.c6end{position:relative;width:min(92%,348px);max-height:calc(100% - 12px);overflow:auto;padding:0 0 14px;gap:10px;scrollbar-width:none}
+.c6e-x{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--muted);z-index:1}
+.c6e-x svg.i{width:1.1rem;height:1.1rem}
+.c6e-hd{width:100%;display:grid;justify-items:center;gap:6px;padding:20px 44px 10px;background:linear-gradient(180deg,var(--c6e,#8e9994) -60%,var(--surface) 92%);text-align:center}
+.c6end.win{--c6e:#81b64c}.c6end.loss{--c6e:#e0604c}.c6end.draw{--c6e:#9aa39e}
+.c6e-ic{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:var(--c6e);color:#fff;box-shadow:0 4px 14px color-mix(in srgb,var(--c6e) 45%,transparent);flex:none}
+.c6e-ic svg.i{width:1.6rem;height:1.6rem}
+.c6e-tt{display:grid;gap:3px;min-width:0}
+.c6e-tt b{font:600 1.35rem/1.2 var(--f-display)}
+.c6e-tt small{color:var(--muted);font-size:.85rem}
+.c6e-vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:start;gap:8px;width:100%;padding:0 14px}
+.c6e-p{display:grid;justify-items:center;gap:3px;min-width:0}
+.c6e-av{display:grid;place-items:center;border-radius:12px;padding:2px}
+.c6e-av .av{--s:48px!important}.c6e-av .cside{width:48px;height:48px}
+.c6e-p.won .c6e-av{box-shadow:0 0 0 2.5px var(--c6e,#81b64c)}
+.c6e-p b{font-size:.86rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c6e-p small{font:600 .74rem/1 var(--f-mono);color:var(--muted)}
+.c6e-a{display:grid;justify-items:center;gap:1px;margin-top:3px;padding:5px 10px;border-radius:10px;background:var(--surface-2)}
+.c6e-a[hidden]{display:none}
+.c6e-a b{font:700 1rem/1.1 var(--f-mono)}.c6e-a small{font:700 .58rem/1 var(--f-body);text-transform:uppercase;letter-spacing:.06em}
+.c6e-sc{align-self:center;margin-top:-18px;font:700 1.1rem/1 var(--f-mono);color:var(--muted);white-space:nowrap}
+.c6e-rt{font-size:.86rem;color:var(--muted)}.c6e-rt b{color:var(--fg);font-family:var(--f-mono)}.c6e-rt em{font-style:normal;font-weight:800;font-family:var(--f-mono)}
+.c6e-rt em.up{color:#5d9b2f}.c6e-rt em.dn{color:#d2453a}
+.c6e-w{color:var(--muted);font-size:.76rem;font-weight:600}
+.c6e-w[hidden]{display:none}
+.c6end .cbtns{padding:0 14px;margin-top:2px}
+.c6e-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.c6e-2 .btn{padding:0 8px}
+.c6end .btn .rvi{width:1.25rem;height:1.25rem;flex:none}
+/* küçük tahtada (telefon) sıkı kart: başlık yatay, avatarlar küçük, "Tahtaya bak" yalnızca çarpı */
+.c6end.sm{gap:7px;padding-bottom:10px;width:min(94%,340px)}
+.c6end.sm .c6e-hd{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;gap:10px;padding:12px 44px 8px 14px;text-align:left}
+.c6end.sm .c6e-ic{width:38px;height:38px;border-radius:12px}.c6end.sm .c6e-ic svg.i{width:1.25rem;height:1.25rem}
+.c6end.sm .c6e-tt b{font-size:1.12rem}.c6end.sm .c6e-tt small{font-size:.78rem}
+.c6end.sm .c6e-av .av{--s:38px!important}.c6end.sm .c6e-av .cside{width:38px;height:38px}
+.c6end.sm .c6e-av .rbot{--s:40px!important}.c6end.sm .c6e-av .cwav{width:42px;height:38px}
+.c6end.sm .c6e-a{padding:3px 8px}.c6end.sm .c6e-a b{font-size:.9rem}
+.c6end.sm .btn{min-height:2.55rem}
+.c6end.sm .cbtns{gap:5px}
+/* geniş ekran: tahta solda, yan panel sağda */
+@media (min-width:900px){
+ main.chessmode:not(.snap),:root[data-ui="vizor"] main.chessmode:not(.snap){padding-left:max(12px,calc((100% - 1140px)/2));padding-right:max(12px,calc((100% - 1140px)/2))}
+ .chess.c6{min-height:0;display:grid;grid-template-columns:auto minmax(270px,400px);grid-template-rows:auto auto auto 1fr;grid-template-areas:"t s" "m s" "b s" ". s";justify-content:center;column-gap:18px;row-gap:6px;align-items:start;padding:6px 0 10px}
+ .c6>.cpl{margin:0}
+ .c6 #cplT{grid-area:t}.c6 #cplB{grid-area:b}
+ .c6 .cmain{grid-area:m;padding:0}
+ .c6 .cbfr{width:min(calc(100dvh - 232px),700px);max-width:none;flex:none}
+ .c6 .c6side{grid-area:s;display:flex;flex-direction:column;gap:8px;align-self:stretch;min-height:0;max-height:calc(100dvh - 92px)}
+ .c6 .c6side>*{margin:0}
+ .c6 #cMoves{order:0;flex:1 1 auto;display:grid;grid-template-columns:3em 1fr 1fr;align-content:start;align-items:center;overflow-y:auto;overflow-x:hidden;min-height:140px;padding:6px;gap:2px}
+ .c6 #cMoves>.muted{grid-column:1/-1;padding:10px 6px}
+ .c6 .cn{padding:0 6px 0 0;text-align:right}
+ .c6 .cmv{justify-content:flex-start;padding:6px 8px}
+ .c6[data-cm="puzzle"] #cMoves{display:flex;flex-wrap:wrap;align-content:flex-start}
+ .c6 .crvbar{order:1}.c6 .chwbar{order:2}.c6 .cctl{order:3;margin-top:0}.c6 .cchat{order:4}
+ .c6 .cch-list{max-height:min(32vh,260px)}
+}
+/* lobi */
+.c6lob{display:grid;gap:12px;margin:0 0 16px}
+.c6lob .box{margin:0 12px}
+.c6me{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.c6me .av{--s:52px!important}
+.c6me .t{min-width:0;flex:1;display:grid;gap:3px}
+.c6me .t b{font:600 1.05rem/1.2 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c6me .t small{color:var(--muted);font-size:.78rem}
+.c6me .rt{display:grid;justify-items:end;gap:3px;flex:none}
+.c6me .rt b{font:700 1.7rem/1 var(--f-mono);letter-spacing:-.03em}
+.c6me .rt small{color:var(--muted);font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.c6play{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 12px}
+.c6tile{position:relative;display:flex;align-items:center;gap:11px;padding:13px 12px;border-radius:18px;background:var(--surface);border:1px solid var(--line);text-align:left;min-height:74px;min-width:0;color:var(--fg)}
+.c6tile .ic{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);flex:none}
+.c6tile .ic svg.i{width:1.4rem;height:1.4rem}
+.c6tile .tx{min-width:0;display:grid;gap:2px}
+.c6tile b{font-size:.93rem;line-height:1.2}
+.c6tile small{color:var(--muted);font-size:.74rem;line-height:1.25}
+.c6tile.pri{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.c6tile.pri .ic{background:rgba(255,255,255,.18);color:inherit}
+.c6tile.pri small{color:inherit;opacity:.82}
+.c6dot{position:absolute;top:8px;right:8px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--heart);color:#fff;font:700 .7rem/20px var(--f-mono);font-style:normal;text-align:center}
+.c6tile:active{transform:scale(.97)}
+.c6bot .c6say{display:flex;align-items:center;gap:12px;margin-bottom:2px}
+.c6bf{display:grid;place-items:center;width:64px;height:64px;flex:none}
+.c6bf.cw{width:70px}
+.c6sb{position:relative;flex:1;min-width:0;padding:9px 12px;border-radius:14px;background:var(--surface-2);font-size:.86rem;font-weight:600;line-height:1.35}
+.c6sb::before{content:"";position:absolute;left:-6px;top:calc(50% - 6px);width:12px;height:12px;background:inherit;transform:rotate(45deg);border-radius:2px}
+.c6cst{margin:4px 0 0}
+#c6bots{scroll-margin-top:calc(var(--vz-th,62px) + 8px)}
+@media (min-width:640px){.c6play{grid-template-columns:repeat(4,1fr)}.c6tile{flex-direction:column;align-items:flex-start;min-height:118px}}
+:root[data-ui="vizor"] .c6tile,:root[data-ui="vizor"] .c6sb{border-radius:20px}
+:root[data-ui="vizor"] .c6 .cboard{border-radius:3px}
+:root[data-ui="vizor"] .c6acc{border-radius:999px}
+html.reduce-motion .c6tile:active{transform:none}
+/*}@css:60CHS*/
 /*@css:511{*/
 .ak5{margin-top:14px;display:grid;gap:10px}
 .ak5 .ak5-st{font-size:.86rem;line-height:1.5;color:var(--muted)}
@@ -7390,8 +7556,8 @@ admUserSheet=function(uid){admUserSheetOld(uid);const l=$('#overlay [data-layer=
    - Taş setleri: PSETS (kadraj = yeni geometrik set, varsayılan; klasik = eski PIMG'nin kopyası). Seçim settings.pieces.
      chPimg(p) seçili setin resmini verir. PIMG silinmedi: chDraw (chDrawBase50) ve chPromo (chPromoBase50) çizdikten sonra resimleri değiştirir,
      chShare (chShareBase50) paylaşım resmini çizerken PIMG'yi geçici olarak seçili setle doldurur. Küçük tahtalar (.cmini) CSS ile (#chPsCss).
-   - Animasyon: chAnim yeniden yazıldı (chAnimBase50 duruyor). Taş kayarak gider (WAAPI, yalnızca transform), rokta kale de kayar,
-     alınan taş patlar ve kıvılcım saçar (#cFx), terfide halka + kıvılcım, şah karesi nabız atar (CSS), matta tahta sarsılır (chOver sarıldı),
+   - Animasyon: chAnim yeniden yazıldı. Taş düz kayarak gider (WAAPI, yalnızca transform; 6.0'dan beri sıçramasız), rokta kale de kayar,
+     alınan taş söner (6.0'dan beri kıvılcımsız), terfide halka + kıvılcım (#cFx), şah karesi nabız atar (CSS), matta tahta sarsılır (chOver sarıldı),
      oyun açılınca kareler ve taşlar sırayla gelir (chOpen sarıldı → CHX.enter). kbReduce() ise hepsi anında.
    - Tahta temaları: CTHEMES'e zumrut, gunbatimi, vizor eklendi (.chess[data-cth] ile vurgu renkleri). Lobide "Görünüm" kartı: canlı önizleme (#cPrev),
      taş seti ve tahta seçimi. Ayarlar > Satranç'a "Taş seti" satırı (vSettings sarıldı).
@@ -7455,11 +7621,10 @@ chPromo=function(cands){chPromoBase50(cands);const ov=$("#cOv");if(!ov||!cands.l
 const chOpenBase50=chOpen;
 chOpen=function(){CHX.enter=true;return chOpenBase50()};
 function chFxLayer(){const bd=$("#cBoard");if(!bd)return null;let fx=$("#cFx");if(!fx){fx=document.createElement("div");fx.className="cfx";fx.id="cFx";bd.insertBefore(fx,$("#cOv")||null)}return fx}
-const chMid=(a,b,sc)=>{const[x1,y1]=sqXY(a),[x2,y2]=sqXY(b);return`translate(${(x1+x2)*50}%,${(y1+y2)*50}%) scale(${sc})`};
 /* taşı kaydır: satır içi transform hemen hedefe yazılır, WAAPI aradaki yolu oynatır */
 function chGlide(el,from,to,dur,o={}){el.style.transform=to;if(!dur||kbReduce()||!el.animate)return null;
  el.classList.add("cgl");el.style.zIndex=o.z||4;
- const a=el.animate(o.mid?[{transform:from},{transform:o.mid,offset:.5},{transform:to}]:[{transform:from},{transform:to}],{duration:dur,delay:o.delay||0,easing:o.ease||"cubic-bezier(.3,.75,.25,1)",fill:"backwards"});
+ const a=el.animate([{transform:from},{transform:to}],{duration:dur,delay:o.delay||0,easing:o.ease||"cubic-bezier(.25,.75,.3,1)",fill:"backwards"});
  const done=()=>{el.classList.remove("cgl");el.style.zIndex=""};a.onfinish=done;a.oncancel=done;return a}
 /* kıvılcım: kare merkezinden dışa */
 function chBurst(s,cols,n,delay,big){const fx=chFxLayer(),bd=$("#cBoard");if(!fx||!bd||kbReduce())return;const[x,y]=sqXY(s);const z=bd.offsetWidth/8||40;
@@ -7467,22 +7632,22 @@ function chBurst(s,cols,n,delay,big){const fx=chFxLayer(),bd=$("#cBoard");if(!fx
   const ang=(i/n)*Math.PI*2+Math.random()*.7,d=z*(big?.75+Math.random()*.85:.42+Math.random()*.38),dx=Math.cos(ang)*d,dy=Math.sin(ang)*d,sc=(.6+Math.random()*.8).toFixed(2),rt=Math.round(Math.random()*240-120);
   const a=p.animate([{transform:"translate(0,0) scale(.3)",opacity:1},{transform:`translate(${dx*.72}px,${dy*.72}px) scale(${sc}) rotate(${rt}deg)`,opacity:1,offset:.55},{transform:`translate(${dx}px,${dy+z*.15}px) scale(0) rotate(${rt*2}deg)`,opacity:0}],{duration:big?950:560,delay:delay||0,easing:"cubic-bezier(.2,.7,.3,1)",fill:"both"});
   a.onfinish=()=>p.remove();a.oncancel=()=>p.remove()}}
-const CH_SPARK={0:["#ffffff","#d9e4dd","#12a07c","#3fd3ab"],8:["#3d4d46","#ff8a4c","#222d29","#ffb27d"]};
-function chCapFx(c,s,col,delay){if(kbReduce()||!c.animate){c.remove();return}const base=tf(s);c.style.zIndex=3;
- const a=c.animate([{transform:base,opacity:1},{transform:base+" scale(1.18)",opacity:1,offset:.3},{transform:base+" scale(.2) rotate(-14deg)",opacity:0}],{duration:340,delay,easing:"cubic-bezier(.3,.6,.35,1)",fill:"both"});
- a.onfinish=()=>c.remove();a.oncancel=()=>c.remove();chBurst(s,CH_SPARK[col]||CH_SPARK[0],10,delay+40,false)}
+/* alınan taş: saldıran taş varınca hafifçe küçülüp söner */
+function chCapFx(c,s,delay){if(kbReduce()||!c.animate){c.remove();return}const base=tf(s);c.style.zIndex=1;
+ const a=c.animate([{transform:base,opacity:1},{transform:base+" scale(.82)",opacity:0}],{duration:200,delay,easing:"ease-out",fill:"both"});
+ a.onfinish=()=>c.remove();a.oncancel=()=>c.remove()}
 function chPromoFx(el,s){if(kbReduce())return;const im=el.firstElementChild;if(im&&im.animate)im.animate([{transform:"scale(1)"},{transform:"scale(1.3) rotate(-6deg)",offset:.35},{transform:"scale(1)"}],{duration:560,easing:"cubic-bezier(.3,1.4,.5,1)"});
  const fx=chFxLayer();if(fx){const r=document.createElement("i");r.className="cring";const[x,y]=sqXY(s);r.style.left=x*12.5+"%";r.style.top=y*12.5+"%";fx.appendChild(r);const a=r.animate([{transform:"scale(.3)",opacity:1},{transform:"scale(1.9)",opacity:0}],{duration:680,easing:"cubic-bezier(.2,.7,.3,1)",fill:"both"});a.onfinish=()=>r.remove();a.oncancel=()=>r.remove()}
  chBurst(s,["#ffcf4d","#ff8a4c","#3fd3ab","#ffffff"],14,60,true)}
 chAnim=function(m){if(!$("#cBoard")||!CH)return;const pcs=CHEL,mover=m.p&8,rm=kbReduce();
  const capSq=m.fl&1?m.t+(mover?-8:8):(pcs[m.t]?m.t:-1);const el=pcs[m.f];const drag=!!(el&&el.classList.contains("drag"));
  const[fx,fy]=sqXY(m.f),[tx,ty]=sqXY(m.t);const dist=Math.hypot(tx-fx,ty-fy);
- const dur=rm?0:drag?120:Math.round(Math.min(380,170+dist*30));
- if(capSq>=0&&pcs[capSq]&&pcs[capSq]!==el){const c=pcs[capSq];delete pcs[capSq];chCapFx(c,capSq,mover^8,rm?0:Math.max(0,dur-80))}
+ const dur=rm?0:drag?110:Math.round(Math.min(290,150+dist*22));
+ if(capSq>=0&&pcs[capSq]&&pcs[capSq]!==el){const c=pcs[capSq];delete pcs[capSq];chCapFx(c,capSq,rm?0:Math.max(0,dur-60))}
  if(el){delete pcs[m.f];const from=drag?el.style.transform:tf(m.f);el.classList.remove("drag");pcs[m.t]=el;
-  chGlide(el,from,tf(m.t),dur,{mid:!drag&&dist>0?chMid(m.f,m.t,1.1):null,z:5});
+  chGlide(el,from,tf(m.t),dur,{z:5});
   if(m.pr){const swap=()=>{const im=el.firstElementChild;if(im)im.src=chPimg(m.pr);chPromoFx(el,m.t)};if(rm)swap();else setTimeout(swap,dur)}}
- if(m.fl&2){const rf=m.t>m.f?m.t+1:m.t-2,rt=m.t>m.f?m.t-1:m.t+1;const r=pcs[rf];if(r){delete pcs[rf];pcs[rt]=r;chGlide(r,tf(rf),tf(rt),rm?0:Math.round(dur*.95),{delay:rm?0:Math.round(dur*.4),mid:chMid(rf,rt,1.08)})}}};
+ if(m.fl&2){const rf=m.t>m.f?m.t+1:m.t-2,rt=m.t>m.f?m.t-1:m.t+1;const r=pcs[rf];if(r){delete pcs[rf];pcs[rt]=r;chGlide(r,tf(rf),tf(rt),rm?0:Math.round(dur*.95),{delay:rm?0:Math.round(dur*.35)})}}};
 /* oyun açılınca: kareler köşeden yayılır, taşlar dış sıralardan içe düşer */
 function chCascade(){if(kbReduce())return;const sq=$$("#cSq>i");if(!sq.length||!sq[0].animate)return;
  sq.forEach((el,i)=>{const x=i&7,y=i>>3;el.animate([{transform:"scale(.4)",opacity:0},{transform:"none",opacity:1}],{duration:420,delay:(x+y)*16,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"})});
@@ -10793,7 +10958,8 @@ HOOKS.after.push(r=>{if(r!=="settings"||S.guest)return;const m=$("#main");if(!m|
      + sonrası kaybetmiyor + zaten ezici önde değil. Harika: tek iyi hamle (ikinci en iyi ≥.20 kötü), geri alma/kaçma/bedava alma değil.
      Kaçırılan: rakip az önce Hata/Büyük hata yaptı ve bu hamle fırsatı geri verdi. Kitap: RV_BOOK (yaklaşık 170 açılış çizgisi,
      önek sıkıştırmalı UCI; konum anahtarıyla, aktarım sayılır).
-   - Gösterim: settings.chessReview "live" (varsayılan) | "end" (oyun bitince) | "off". Çevrim içi oyunda her zaman yalnızca oyun bitince.
+   - Gösterim: settings.chessReview "live" (varsayılan) | "end" (oyun bitince) | "off". 6.0'dan beri çevrim içi oyunda da aynı ayar geçerli
+     (önce oyun bitene kadar gizliydi); her oyuncu kendi cihazında görür.
      Tahtada son (ya da geçmişte bakılan) hamlenin hedef karesinde rozet (#cRv), hamle listesinde renkli simge.
      Oyun sonu kartında ve oyun menüsünde "Oyun incelemesi" (rvOpen): doğruluk (hamle başına 103.17·e^(-4.354·kayıp)-3.17,
      aritmetik ve harmonik ortalamanın ortası), sınıf sayıları, değerlendirme grafiği (dokununca o hamleye gider), "Hamleleri incele"
@@ -10912,7 +11078,7 @@ async function rvStep(){if(RVS.busy||!rvActive())return;let P;try{P=rvPos()}catc
  if(CH===tok)rvRefresh();rvKick()}
 
 /* --- gösterim --- */
-function rvShow(){if(!CH||CH.mode==="puzzle")return false;if(CH.mode==="online"&&!CH.over)return false;if(CH._rvForce)return true;const md=rvMode();if(md==="off")return false;return md==="live"||!!CH.over}
+function rvShow(){if(!CH||CH.mode==="puzzle")return false;if(CH._rvForce)return true;const md=rvMode();if(md==="off")return false;return md==="live"||!!CH.over}
 function rvRefresh(){if(!CH||!$("#cBoard"))return;try{rvClassAll();rvPaintUI();rvSheetPaint();rvReact()}catch(e){console.warn("rv",e)}}
 function rvPaintUI(){if(!CH||CH.mode==="puzzle")return;const P=rvClassAll();rvList(P);rvBadge(P);rvBar(P)}
 function rvList(P){const mv=$("#cMoves");if(!mv||!rvShow())return;
@@ -10972,7 +11138,7 @@ function rvSheetPaint(){const body=$("#rvBody");if(!body||!CH)return;const P=rvP
  <button class="btn block" data-act="rvstep">${I("play")}Hamleleri incele</button><small class="rv-nt">Değerlendirme cihazında, hızlı bir analizle yapılır; yaklaşık sonuç verir.</small>`;
  if(body._h===h)return;body._h=h;body.innerHTML=h;
  const gr=$("#rvGr",body);if(gr)gr.onclick=e=>{const r=gr.getBoundingClientRect();if(!r.width)return;rvJump(Math.round((e.clientX-r.left)/r.width*n))}}
-function rvOpen(){if(!CH||CH.mode==="puzzle")return;if(CH.mode==="online"&&!CH.over)return toast("Çevrim içi oyun bitince incelenebilir");if(!CH.moves.length)return toast("Henüz hamle yok");
+function rvOpen(){if(!CH||CH.mode==="puzzle")return;if(!CH.moves.length)return toast("Henüz hamle yok");
  CH._rvForce=true;closeLayer("cmenu");sheet("rvsheet","Oyun incelemesi",`<div class="rv" id="rvBody"></div>`,{tall:true});rvClassAll();rvSheetPaint();rvKick();rvPaintUI()}
 function rvCloseOv(){const ov=$("#cOv");if(ov&&ov.classList.contains("on")){ov.classList.remove("on");ov.innerHTML=""}}
 function rvJump(k){if(!CH)return;const n=CH.moves.length;k=Math.max(0,Math.min(n,k|0));CH._rvForce=true;CH._rvStep=true;closeLayer("rvsheet");rvCloseOv();CH.view=k>=n?null:k;CH.sel=-1;CH.targets=[];chDraw()}
@@ -10997,8 +11163,8 @@ const chwCardBase51R=chwCard;
 chwCard=function(...a){const r=chwCardBase51R.apply(this,a);try{rvEndBtn()}catch{}return r};
 const chMenuBase51R=chMenu;
 chMenu=function(...a){const r=chMenuBase51R.apply(this,a);try{const l=$('#overlay [data-layer="cmenu"]');if(l&&CH&&CH.mode!=="puzzle"){const md=rvMode();
-  const x=l.querySelector('.opt[data-act="close"]');const can=CH.moves.length&&(CH.mode!=="online"||CH.over);
-  const h=`<div class="set rv-set" style="margin:0 0 6px"><h3>Hamle değerlendirmesi</h3><div class="seg rv-seg" role="group" aria-label="Hamle değerlendirmesi">${[["live","Canlı"],["end","Oyun sonunda"],["off","Kapalı"]].map(([v,t])=>`<button data-act="rvmode" data-v="${v}" aria-pressed="${md===v}">${t}</button>`).join("")}</div><small class="rv-hint">Hamlelere Muhteşem, En iyi, Hata gibi rozetler verir. Çevrim içi oyunlarda yalnızca oyun bitince görünür.</small></div>${can?`<button class="opt" data-act="rvopen">${rvIcon("be","rvo")}Oyun incelemesi</button>`:""}`;
+  const x=l.querySelector('.opt[data-act="close"]');const can=CH.moves.length;
+  const h=`<div class="set rv-set" style="margin:0 0 6px"><h3>Hamle değerlendirmesi</h3><div class="seg rv-seg" role="group" aria-label="Hamle değerlendirmesi">${[["live","Canlı"],["end","Oyun sonunda"],["off","Kapalı"]].map(([v,t])=>`<button data-act="rvmode" data-v="${v}" aria-pressed="${md===v}">${t}</button>`).join("")}</div><small class="rv-hint">Hamlelere Kitap, Muhteşem, En iyi, Hata gibi rozetler verir, doğruluğu hesaplar. Arkadaşınla oynarken de çalışır; yalnızca senin cihazında görünür.</small></div>${can?`<button class="opt" data-act="rvopen">${rvIcon("be","rvo")}Oyun incelemesi</button>`:""}`;
   if(x)x.insertAdjacentHTML("beforebegin",h);else l.querySelector(".body")?.insertAdjacentHTML("beforeend",h)}}catch(e){console.warn("rv",e)}return r};
 ACT.rvopen=()=>rvOpen();
 ACT.rvmode=(t,d)=>{if(!["live","end","off"].includes(d.v))return;settings.chessReview=d.v;saveSettings();vib(6);$$('[data-act="rvmode"]').forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===d.v)));if(CH){rvKick();chUI()}};
@@ -11006,6 +11172,266 @@ ACT.rvstep=()=>{if(!CH)return;rvJump(CH.moves.length?1:0)};
 ACT.rvstepx=()=>{if(!CH)return;CH._rvStep=false;const b=$("#cRvBar");if(b)b.remove();CH.view=null;chDraw()};
 HOOKS.after.push(r=>{if(r==="chessgame"&&CH&&CH.mode!=="puzzle")rvKick()});
 /*}@js:51REV*/
+/*@js:60CHS{*/
+/* ===== 6.0 · Satranç yenilendi: chess.com benzeri görünüm ve his, çevrim içi inceleme, ön hamle, 4 kişilik satranç yükleyicisi =====
+   ChessCore değişmedi. Bu bölgedeki her şey sarma ile (…Base60); başka bölgelerde yalnızca küçük, yerinde düzeltmeler var (aşağıda C ve E).
+   A. Modern taş seti ve Turnuva tahtası. ch60Shapes/ch60PieceSvg: özgün SVG çizimler (tombul gövde, soldan ışık sağa gölge, koyu kontur);
+      renkler CH60_PAL (beyaz/siyah). satranc4.js aynı çizimleri kendi dört rengiyle kullanır. PSETS.modern ve CTHEMES.turnuva (#eeeed2/#769656)
+      listelerin başına eklenir. Taş seti ya da tahta seçmemiş herkes için varsayılandır (settings.pieces/board boşsa bellekte atanır);
+      seçim yapmış olan kendi seçimini korur.
+   B. Oyun ekranı (vChessGame yeniden yazıldı, .chess.c6; kimlikler aynı: cplT, cBoard, cplB, cMoves, cCtl, cChat, chwBar):
+      telefonda hamle şeridi en üstte, tahta neredeyse kenardan kenara, altta düz düğme çubuğu; ≥900px'te tahta solda, sağda dikey hamle tablosu,
+      inceleme satırı, düğmeler ve sohbet (main.chessmode genişler). Oyuncu çubuklarına canlı doğruluk (%…, .c6acc) eklenir.
+      Değerlendirme çubuğu artık aynı telefonda ve çevrim içi oyunda da görünür: inceleme analizinden (RVS.cache) okunur (ch60EvalCp),
+      canlı inceleme ve settings.evalBar açıksa. Oyun menüsünde her modda "Değerlendirme çubuğu" anahtarı.
+   C. Çevrim içi inceleme (sahibinin şikayeti: arkadaşla oynarken doğruluk, kitap hamlesi vb. görünmüyordu). Kök neden: 51REV çevrim içi
+      oyunu bilerek dışlıyordu: rvShow() oyun bitmeden false dönüyordu, rvOpen() "oyun bitince" deyip açmıyordu, menüdeki düğme gizliydi.
+      51REV'de bu üç yer yerinde düzeltildi: artık settings.chessReview (canlı/oyun sonunda/kapalı) her iki oyuncunun kendi cihazında geçerli.
+   D. Sonuç kartı (chOver sarıldı → ch60End, .c6end): sonuç, iki oyuncu (beyaz solda), puan değişimi (chRate sarıldı → CH._d60),
+      doğruluk (analiz sürerken "Analiz ediliyor…", bitince güncellenir: rvPaintUI sarıldı), Oyun incelemesi / Yeni oyun ya da Rövanş /
+      Paylaş / Tahtaya bak. İzleme ve bulmaca kendi kartlarını kullanır.
+   E. Ses ve hareket: CSND.play yeniden yazıldı (Web Audio, dosya yok): move, capture, castle, check, promote, start, end, lose, draw, bad,
+      premove, low (süre 10 sn altına inince bir kez). chSoundFor sarıldı (terfi sesi; oyun sonu sesini chOver çalar). 50CHS'de taşlar artık
+      düz kayar (sıçrama yok) ve alınan taş kıvılcımsız söner (chAnim/chCapFx yerinde sadeleşti; chMid ve CH_SPARK kalktı).
+   F. Tahta etkileşimi (chWire sarıldı; dinleyiciler yakalama aşamasında, tahta başına bir kez):
+      - sürüklerken parmağın/farenin altındaki kare çerçevelenir (#c6Hov); dokunmatikte taş büyür ve parmağın üstüne kalkar;
+      - ön hamle: Rota/Clawd düşünürken ya da çevrim içi oyunda rakibin sırasındayken kendi taşına dokun/sürükle → CH.pre {f,t,pr};
+        sıra gelince yasalsa oynanır (chApply sarıldı → ch60PreRun), değilse sessizce düşer. Hedefler geniş (ışınlar engel saymaz).
+      - sağ tık: karede kırmızı işaret, sağ sürükle: ok (atta L); shift yeşil, ctrl/alt mavi. CH.ann {a: oklar, h: kareler}; sol tık ya da
+        bir hamle temizler. Oklar #cAnn (svg), kareler #cMk içinde.
+   G. Lobi (vChess yeniden yazıldı → ch60Lobby, .c6lob): profil kartı (puan), dört büyük kutu (Botlara karşı, Arkadaşınla, Bulmacalar,
+      Aynı telefonda), oyunların, bot kutusu (#c6bots: rakip, seviye, renk, süre, oyna/devam), bulmaca kartı, Clawd–Rota, sıralama, Görünüm.
+      Eski parçalar ve işleyicileri aynen kullanılır (data-clvl, data-ccol, chopp, chclvl, chtc, botnew, cwnew, pzgo…).
+   H. 4 kişilik satranç: satranc4.js (window.SATRANC4) ilk kullanımda yüklenir (s4Load/s4Go, cephe.js'in kalıbı). Tek giriş Yönetici paneli
+      (ADM_EXTRA "s4", yalnızca S.admin açabilir). Sahibi açana kadar sürpriz: Keşfet'te, lobide, Neler yeni'de ve Rota'nın bilgisinde yok. */
+
+/* --- A. Modern taş seti ve Turnuva tahtası --- */
+const CH60_PAL={w:{lit:"#ffffff",mid:"#f3f1ec",sh:"#c8c4bb",st:"#383632",ln:"#5b5852",hi:"#ffffff",base:"#e4e1da"},
+ b:{lit:"#716d68",mid:"#504d49",sh:"#2b2927",st:"#141312",ln:"#bdb9b2",hi:"#a29e97",base:"#3d3b38"}};
+/* t: 1 piyon 2 at 3 fil 4 kale 5 vezir 6 şah; 100x96'lık alanda, taban y≈91 */
+function ch60Shapes(t){
+ const base='<path class="bs" d="M23 79.5h54a5 5 0 0 1 5 5v2.8a3.7 3.7 0 0 1-3.7 3.7H21.7a3.7 3.7 0 0 1-3.7-3.7v-2.8a5 5 0 0 1 5-5z"/>';
+ const skirt='<path d="M31 73.5h38l4.6 7H26.4z"/><rect x="27.5" y="64.5" width="45" height="9" rx="4.5"/>';
+ return({
+  1:'<path d="M38.5 48.5C38 61 33 71 24.5 80h51c-8.5-9-13.5-19-14-31.5z"/><rect x="32.5" y="39.5" width="35" height="9" rx="4.5"/><circle cx="50" cy="25.5" r="14.5"/>'+base+'<path class="hl" d="M42.5 20.2a8.4 8.4 0 0 1 6-4M38 70.5c2-4 3.4-9 4.1-15"/>',
+  4:'<path d="M30 37.5h40l2.8 37H27.2z"/><path d="M23 11h11.5v8h8v-8h15v8h8v-8H77v20.5l-5.5 6h-43L23 31.5z"/><rect x="24" y="72.5" width="52" height="8.5" rx="3.5"/>'+base+'<path class="ln" d="M28.6 31.5h42.8"/><path class="hl" d="M35.6 44l-1.4 24"/>',
+  3:'<path d="M38.5 68c-.9 6-5 10-13 12.5h49c-8-2.5-12.1-6.5-13-12.5z"/><path d="M50 17.5C34 28 28.5 43 33.5 55c2.5 6 8.5 8.8 16.5 8.8s14-2.8 16.5-8.8C71.5 43 66 28 50 17.5z"/><rect x="32.5" y="60" width="35" height="8.5" rx="4.25"/><circle cx="50" cy="11.5" r="6.5"/>'+base+'<path class="ln" d="M60.2 30.3 47.8 44.6"/><path class="hl" d="M39.6 37c1.1-4.3 3.5-8.2 6.8-11.4"/>',
+  5:'<path d="M16 32l13.5 35h41L84 32 67 48.5 64 22.5 50 44 36 22.5l-3 26z"/><circle cx="14.5" cy="28.5" r="6"/><circle cx="31.5" cy="18" r="6"/><circle cx="50" cy="13" r="6.5"/><circle cx="68.5" cy="18" r="6"/><circle cx="85.5" cy="28.5" r="6"/>'+skirt+base+'<path class="ln" d="M32.5 58.8c11.3-3.6 23.7-3.6 35 0"/><path class="hl" d="M29 40.5l5 13.2"/>',
+  6:'<path d="M45.5 3h9v7.5H62v8.8h-7.5V28h-9v-8.7H38v-8.8h7.5z"/><path d="M50 30.5c-5.8-6.8-27.2-10.5-31.4 3.6C15.5 44.7 23.2 55 29.3 67.5h41.4C76.8 55 84.5 44.7 81.4 34.1 77.2 20 55.8 23.7 50 30.5z"/>'+skirt+base+'<path class="ln" d="M50 31v27.5M32.5 58.8c11.3-3.6 23.7-3.6 35 0"/><path class="hl" d="M24.6 37c.9-3.8 3.3-6.2 7-7.2"/>',
+  2:'<g transform="matrix(1.1 0 0 1.08 -5.5 -6.4)"><path d="M28.5 80c-.6-9.8 1.9-17.3 7.6-23.4l6.4-6.8-6.8 1.9c-4.2 4.6-9.7 7.3-14.1 6.4-4.1-.9-6.6-4.3-5.6-8.6l1.6-6.1c1.4-5.1 4.5-8.9 8.7-12.5l6.8-6.4 2.5-9.8 5.5 5.8 1.4-8.1 6.4 7.3C70 21.4 81.6 34.2 81.6 54.6c0 9.6-2.4 17.8-5.3 25.4z"/><path class="ln" d="M52.5 22.3c10.6 4.4 17.6 15.4 18.6 30.6M24.8 51.8l3.6-1.4"/><ellipse class="ey" cx="37.4" cy="35.3" rx="2.9" ry="3.6" transform="rotate(28 37.4 35.3)"/><path class="hl" d="M58 30c5 4.5 7.6 10.6 8.2 17.6"/></g>'+base})[t]||""}
+/* P: {lit, mid, sh (gövde degradesi), st (kontur), ln (iç çizgi), hi (parlama), base (taban)} */
+function ch60PieceSvg(t,P){return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 0 96 96"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${P.lit}"/><stop offset=".5" stop-color="${P.mid}"/><stop offset="1" stop-color="${P.sh}"/></linearGradient></defs><style>.p *{fill:url(#g);stroke:${P.st};stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}.p .bs{fill:${P.base}}.p g{fill:none;stroke:none}.p .ln{fill:none;stroke:${P.ln};stroke-width:2.2}.p .hl{fill:none;stroke:${P.hi};stroke-width:2.4;opacity:.55}.p .ey{fill:${P.st};stroke:none}</style><g class="p">${ch60Shapes(t)}</g></svg>`}
+const ch60Uri=s=>"data:image/svg+xml,"+encodeURIComponent(s);
+function ch60Set(){const o={};for(const t of[1,2,3,4,5,6]){o[t]=ch60Uri(ch60PieceSvg(t,CH60_PAL.w));o[8|t]=ch60Uri(ch60PieceSvg(t,CH60_PAL.b))}return o}
+/* nesnenin başına anahtar ekle (seçim listeleri bu sırayla çizilir) */
+function ch60Front(obj,k,v){const keep={...obj};for(const x of Object.keys(obj))delete obj[x];obj[k]=v;Object.assign(obj,keep)}
+ch60Front(PSETS,"modern",{n:"Modern",s:"Tombul, yumuşak gölgeli",img:ch60Set()});
+ch60Front(CTHEMES,"turnuva",["#eeeed2","#769656","Turnuva"]);
+if(!PSETS[settings.pieces])settings.pieces="modern";
+if(!CTHEMES[settings.board])settings.board="turnuva";
+chPsCss();
+
+/* --- B. oyun ekranı --- */
+const vChessGameBase60=vChessGame;
+vChessGame=function(){if(!CH)return vChessGameBase60();try{const k=chThKey(),th=CTHEMES[k];
+ const side=`<div class="cmoves" id="cMoves"></div>${chwOn()?'<div class="chwbar" id="chwBar"></div>':""}<div class="cctl" id="cCtl"></div>${CH.mode==="online"?chmHtml():""}`;
+ return`<div class="chess c6" data-cth="${k}" data-ps="${chPsKey()}" data-cm="${esc(CH.mode)}" style="--cl:${th[0]};--cd:${th[1]}"><div class="cpl" id="cplT"></div><div class="cmain"><div class="cevalbar" id="cEval" hidden><i></i><span></span></div><div class="cbfr"><div class="cboard" id="cBoard"><div class="csq" id="cSq"></div><div class="cmk" id="cMk"></div><i class="c6hov" id="c6Hov" hidden></i><div class="cpcs" id="cPcs"></div><div class="cfx" id="cFx"></div><svg class="carrow" id="cArrow" viewBox="0 0 800 800"></svg><svg class="c6ann" id="cAnn" viewBox="0 0 800 800" aria-hidden="true"></svg><div class="cov" id="cOv"></div></div></div></div><div class="cpl" id="cplB"></div><div class="c6side">${side}</div></div>`}
+ catch(e){console.warn("chs60",e);return vChessGameBase60()}};
+/* değerlendirme: Rota/Clawd'a karşı motorun puanı (CH.eval), aynı telefonda ve çevrim içi oyunda inceleme analizi */
+function ch60EvalCp(){if(!CH||!(CH.mode==="local"||CH.mode==="online")||settings.evalBar===false||!rvShow())return null;const P=CH._rvP;if(!P)return CH._ev60??null;
+ const n=P.n,i=CH.view==null?n:Math.min(CH.view,n);
+ if(i===n&&CH.over&&CH.view==null){const o=CH.over;if(o.reason==="mat")return o.result==="1-0"?CC.MATE:-CC.MATE;if(o.result==="1/2"&&o.reason!=="iptal")return 0}
+ let v=null;const A=i<n?RVS.cache.get(P.k[i]):null;if(A&&A.length)v=P.sd[i]===0?A[0].s:-A[0].s;
+ else if(i>0){const B=RVS.cache.get(P.k[i-1]);const e=B&&B.find(x=>x.u===CH.moves[i-1].u);if(e)v=P.sd[i-1]===0?e.s:-e.s}
+ else v=20;
+ if(v==null)return CH._ev60??null;CH._ev60=v;return v}
+function ch60EvalPaint(){const ev=$("#cEval");if(!ev||!CH||!(CH.mode==="local"||CH.mode==="online"))return;const cp=ch60EvalCp();if(cp==null){ev.hidden=true;return}ev.hidden=false;
+ const mate=Math.abs(cp)>CC.MATE-1000;const w=mate?(cp>0?100:0):50+50*(2/(1+Math.exp(-cp/350))-1);
+ ev.classList.toggle("fl",CH.flip);ev.classList.toggle("bl",w<50);ev.querySelector("i").style.height=w+"%";
+ const end=CH.over&&CH.view==null&&CH.over.reason!=="iptal";ev.querySelector("span").textContent=end?(CH.over.result==="1/2"?"½":CH.over.result):mate?"M"+Math.max(1,Math.ceil((CC.MATE-Math.abs(cp))/2)):(Math.abs(cp)/100).toFixed(1)}
+/* canlı doğruluk: oyuncu çubuğunda adın yanında */
+function ch60Acc(){if(!CH||CH.mode==="puzzle"||!$("#cBoard"))return;let st=null;try{if(CH.moves.length&&rvShow()&&CH._rvP)st=rvStats(CH._rvP).st}catch{}
+ for(const[id,side]of[["#cplT",CH.flip?0:8],["#cplB",CH.flip?8:0]]){const host=$(id+" .cwho>div");if(!host)continue;let el=host.querySelector(".c6acc");const a=st&&st[side]?st[side].acc:null;
+  if(a==null){if(el)el.remove();continue}if(!el){el=document.createElement("span");el.className="c6acc";el.title="Doğruluk";host.appendChild(el)}const t="%"+rvPct(a);if(el.textContent!==t)el.textContent=t}}
+const rvPaintUIBase60=rvPaintUI;
+rvPaintUI=function(...a){const r=rvPaintUIBase60.apply(this,a);try{ch60Acc();ch60EvalPaint();ch60EndAcc()}catch(e){console.warn("chs60",e)}return r};
+/* menü: her modda değerlendirme çubuğu anahtarı */
+const chMenuBase60=chMenu;
+chMenu=function(...a){const r=chMenuBase60.apply(this,a);try{const l=$('#overlay [data-layer="cmenu"]');if(l&&CH&&CH.mode!=="puzzle"&&!$("#cmEv",l)){const snd=$("#cmSnd",l);const lab=snd&&snd.closest("label");
+ if(lab){lab.insertAdjacentHTML("afterend",`<label class="srow"><span class="t">Değerlendirme çubuğu<small>${CH.mode==="bot"||chwOn()?"Kimin önde olduğunu gösterir":"Canlı incelemenin analizinden gelir"}</small></span><span class="sw"><input type="checkbox" id="cmEv" ${settings.evalBar!==false?"checked":""}><span></span></span></label>`);
+  $("#cmEv",l).onchange=e=>{settings.evalBar=e.target.checked;saveSettings();chUI()}}}}catch(e){console.warn("chs60",e)}return r};
+
+/* --- D. sonuç kartı --- */
+const chRateBase60=chRate;
+chRate=async function(...a){const tok=CH;const d=await chRateBase60.apply(this,a);if(CH&&CH===tok)CH._d60=d;return d};
+function ch60Who(side){const cw=chcOn();
+ if(CH.mode==="bot"){if(side===CH.my)return{av:avatar(S.uid,48,{click:false,ring:false}),n:"Sen",r:(cw?chcStats(S.uid):chessStats(S.uid)).r};
+  if(cw){const L=CHC_LV[CH.level]||CHC_LV[1];return{av:`<span class="cbotav cwav">${chcFace(46,"","idle")}</span>`,n:"Clawd",r:L.r}}
+  const L=CLEVELS[CH.level]||CLEVELS[1];return{av:`<span class="cbotav">${botFace(48)}</span>`,n:"Rota",r:L.r}}
+ if(CH.mode==="online"){const uid=side===CH.my?S.uid:oppOf(CH.doc||{});return{av:avatar(uid,48,{click:false,ring:false}),n:uid===S.uid?"Sen":P(uid).name,r:chessStats(uid).r}}
+ return{av:`<span class="cside ${side?"b":"w"}"><img src="${chPimg(side|6)}" alt=""></span>`,n:side?"Siyah":"Beyaz",r:null}}
+function ch60End(){if(!CH||!CH.over||chwOn()||CH.mode==="puzzle")return;const ov=$("#cOv");if(!ov||!ov.classList.contains("on")||!ov.querySelector(".cend"))return;
+ const o=CH.over,res=o.result,draw=res==="1/2",ipt=o.reason==="iptal",loc=CH.mode==="local";const myWin=(res==="1-0"&&CH.my===0)||(res==="0-1"&&CH.my===8);
+ const title=ipt?"İptal edildi":draw?"Berabere":loc?(res==="1-0"?"Beyaz kazandı":"Siyah kazandı"):myWin?"Kazandın!":"Kaybettin";
+ const cls=ipt||draw?"draw":loc||myWin?"win":"loss";
+ const pl=side=>{const w=ch60Who(side);const won=!draw&&!ipt&&((res==="1-0")===(side===0));return`<div class="c6e-p${won?" won":""}"><span class="c6e-av">${w.av}</span><b>${esc(w.n)}</b>${w.r!=null?`<small>${w.r}</small>`:""}<span class="c6e-a" data-acc="${side}" hidden></span></div>`};
+ const d=CH._d60;const cw=chcOn();const rt=!loc&&!ipt&&d!=null&&d!==0?`<div class="c6e-rt">${cw?"Clawd puanın":"Puanın"} <b>${(cw?chcStats(S.uid):chessStats(S.uid)).r}</b> <em class="${d>0?"up":"dn"}">${d>0?"+":""}${d}</em></div>`:"";
+ const sc=ipt?"–":draw?"½ – ½":res==="1-0"?"1 – 0":"0 – 1";const on=CH.mode==="online";const bd=$("#cBoard");const sm=!!bd&&bd.offsetHeight<470;
+ ov.innerHTML=`<div class="cend c6end ${cls}${sm?" sm":""}" role="dialog" aria-label="${esc(title)}"><button type="button" class="c6e-x" data-chs="review" aria-label="Kapat, tahtaya bak">${I("close")}</button>
+ <div class="c6e-hd"><span class="c6e-ic">${I(cls==="win"?"trophy":cls==="loss"?"flag":"hand")}</span><span class="c6e-tt"><b>${esc(title)}</b><small>${esc(REASON[o.reason]||o.reason||"")}</small></span></div>
+ <div class="c6e-vs">${pl(0)}<span class="c6e-sc">${sc}</span>${pl(8)}</div>${rt}<small class="c6e-w" id="c6EW" hidden></small>
+ <div class="cbtns">${CH.moves.length&&!ipt?`<button class="btn" data-act="rvopen">${rvIcon("be")}Oyun incelemesi</button>`:""}<div class="c6e-2"><button class="btn sec" data-chs="${on?"rematch":"again"}">${I("rotate")}${on?"Rövanş":"Yeni oyun"}</button><button class="btn sec" data-chs="share">${I("send")}Paylaş</button></div>${sm?"":`<button class="btn ghost" data-chs="review">Tahtaya bak</button>`}</div></div>`;
+ ch60EndAcc()}
+/* sonuç kartında oyuncuların altında doğruluk; analiz sürerken ilerleme satırı */
+function ch60EndAcc(){const card=$("#cOv .c6end");if(!card||!CH)return;let st=null,done=0,n=0;
+ try{const P=CH._rvP;if(P&&P.n&&rvShow()){const r=rvStats(P);st=r.st;done=r.done;n=P.n}}catch(e){console.warn("chs60",e)}
+ const busy=!!st&&done<n;
+ for(const el of card.querySelectorAll("[data-acc]")){const a=st?st[+el.dataset.acc].acc:null;const h=a==null?"":`<b>${busy?"~":""}%${rvPct(a)}</b><small>doğruluk</small>`;if(el._h!==h){el._h=h;el.innerHTML=h;el.hidden=!h}}
+ const w=card.querySelector("#c6EW");if(w){const t=busy?`Analiz ediliyor… ${done}/${n}`:"";if(w.textContent!==t)w.textContent=t;w.hidden=!t}}
+const chOverBase60=chOver;
+chOver=async function(...a){const r=await chOverBase60.apply(this,a);try{ch60End()}catch(e){console.warn("chs60",e)}return r};
+
+/* --- E. sesler --- */
+CSND.play=function(kind){if(settings.chessSound===false)return;let c;try{c=this.ctx||(this.ctx=new(window.AudioContext||window.webkitAudioContext)());if(c.state==="suspended"&&c.resume)c.resume()}catch{return}
+ if(!this.out){try{const k=c.createDynamicsCompressor();k.threshold.value=-14;k.ratio.value=6;const g=c.createGain();g.gain.value=.9;k.connect(g);g.connect(c.destination);this.out=k}catch{this.out=c.destination}}
+ const out=this.out,t=c.currentTime+.01;
+ if(!this.nb){const n=c.createBuffer(1,Math.floor(c.sampleRate*.25),c.sampleRate),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;this.nb=n}
+ /* ahşap tık: süzülmüş kısa gürültü + alçak gövde sesi */
+ const knock=(t0,{f=1000,q=1.1,v=.9,body=165,bv=.55,len=.085}={})=>{const s=c.createBufferSource(),bp=c.createBiquadFilter(),g=c.createGain();s.buffer=this.nb;bp.type="bandpass";bp.frequency.value=f;bp.Q.value=q;
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.0025);g.gain.exponentialRampToValueAtTime(.001,t0+len);s.connect(bp);bp.connect(g);g.connect(out);s.start(t0,Math.random()*.15,len+.02);
+  if(body){const o=c.createOscillator(),og=c.createGain();o.type="sine";o.frequency.setValueAtTime(body,t0);o.frequency.exponentialRampToValueAtTime(body*.55,t0+len);og.gain.setValueAtTime(0,t0);og.gain.linearRampToValueAtTime(bv,t0+.003);og.gain.exponentialRampToValueAtTime(.001,t0+len*1.2);o.connect(og);og.connect(out);o.start(t0);o.stop(t0+len*1.3)}};
+ const tone=(t0,f,d,v,type)=>{const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.value=f;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.012);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.connect(g);g.connect(out);o.start(t0);o.stop(t0+d+.05)};
+ if(kind==="move")knock(t);
+ else if(kind==="capture"){knock(t,{f:1500,v:1,body:135,bv:.6,len:.1});knock(t+.042,{f:760,v:.75,body:105,bv:.45,len:.11})}
+ else if(kind==="castle"){knock(t,{f:950});knock(t+.12,{f:1150,v:.75,body:185})}
+ else if(kind==="check"){knock(t,{f:1200,v:.85});tone(t+.03,988,.24,.06,"triangle");tone(t+.05,1480,.3,.04)}
+ else if(kind==="promote"){knock(t,{f:1100,v:.8});[784,988,1175,1568].forEach((f,i)=>tone(t+.06+i*.065,f,.28,.055,"triangle"))}
+ else if(kind==="start"){tone(t,523,.32,.06,"triangle");tone(t+.13,784,.42,.06,"triangle")}
+ else if(kind==="end"){[523,659,784,1047].forEach((f,i)=>tone(t+i*.1,f,.75,.06,"triangle"))}
+ else if(kind==="lose"){[440,370,311].forEach((f,i)=>tone(t+i*.15,f,.65,.065,"triangle"))}
+ else if(kind==="draw"){tone(t,587,.5,.06,"triangle");tone(t+.16,587,.6,.05,"triangle")}
+ else if(kind==="bad"){tone(t,150,.17,.08,"square");tone(t,155,.17,.05,"sawtooth")}
+ else if(kind==="premove")knock(t,{f:2300,v:.4,body:0,len:.05});
+ else if(kind==="low"){tone(t,1760,.08,.05,"square");tone(t+.12,1760,.08,.05,"square")}};
+const chSoundForBase60=chSoundFor;
+chSoundFor=function(m,st){if(st&&st.over)return CSND.play(st.check||CC.inCheck(CH.g)?"check":m.c?"capture":"move");if(st&&st.check)return CSND.play("check");if(m.pr)return CSND.play("promote");return chSoundForBase60(m,st)};
+/* oyun başlarken */
+const chOpenBase60=chOpen;
+chOpen=function(...a){const r=chOpenBase60.apply(this,a);try{if(CH&&!CH.moves.length&&!CH.over&&(CH.mode==="bot"||CH.mode==="local"||CH.mode==="watch"))setTimeout(()=>CSND.play("start"),260)}catch{}return r};
+/* süre 10 saniyenin altına inince bir kez uyarı (sıradaki benim tarafımsa ya da aynı telefonda) */
+const clkPaintBase60=clkPaint;
+clkPaint=function(...a){const r=clkPaintBase60.apply(this,a);try{if(clkOn()&&!CH.over){const s=CH.clk.run;if((s===0||s===8)&&(CH.mode==="local"||s===CH.my)){const ms=clkLeft(s);CH._low60=CH._low60||{};if(ms<10000&&ms>0&&!CH._low60[s]){CH._low60[s]=1;CSND.play("low")}}}}catch{}return r};
+
+/* --- F. tahta etkileşimi: sürükleme çerçevesi, ön hamle, sağ tık işaretleri --- */
+let P60D=null,A60=null;
+const ch60PreOn=()=>!!(CH&&!CH.over&&CH.view==null&&CH.g.turn!==CH.my&&(CH.mode==="bot"||(CH.mode==="online"&&CH.doc&&CH.doc.status==="active")));
+/* ön hamle hedefleri: taşın gidebileceği bütün kareler (ışınlar engel saymaz; yasallık sıra gelince bakılır) */
+function ch60PreTargets(s){const b=CH.g.b,p=b[s];if(!p)return[];const t=p&7,c=p&8,r=s>>3,f=s&7,out=[];const add=(R,F)=>{if(R>=0&&R<8&&F>=0&&F<8)out.push(R*8+F)};
+ if(t===1){const d=c?1:-1;add(r+d,f);if(r===(c?1:6))add(r+2*d,f);add(r+d,f-1);add(r+d,f+1)}
+ else if(t===2){for(const[a,e]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]])add(r+a,f+e)}
+ else if(t===6){for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)if(a||e)add(r+a,f+e);if(s===(c?4:60)){add(r,f+2);add(r,f-2)}}
+ else{const D=t===3?[[-1,-1],[-1,1],[1,-1],[1,1]]:t===4?[[-1,0],[1,0],[0,-1],[0,1]]:[[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]];for(const[a,e]of D){let R=r+a,F=f+e;while(R>=0&&R<8&&F>=0&&F<8){out.push(R*8+F);R+=a;F+=e}}}
+ return out}
+function ch60PreSet(f,t){const p=CH.g.b[f];const pr=(p&7)===1&&((t>>3)===0||(t>>3)===7)?5:0;CH.pre={f,t,pr};CH.psel=null;chMarks();CSND.play("premove");vib(6)}
+function ch60PreClear(){if(!CH||(!CH.pre&&CH.psel==null))return;CH.pre=null;CH.psel=null;chMarks()}
+function ch60PreRun(tok){if(CH!==tok||!CH.pre)return;const p=CH.pre;CH.pre=null;CH.psel=null;
+ if(!chCanMove()||CH.g.turn!==CH.my){chMarks();return}
+ const m=CC.legal(CH.g).find(x=>x.f===p.f&&x.t===p.t&&(!x.pr||(x.pr&7)===(p.pr||5)));chMarks();if(m)chUser(m)}
+const chApplyBase60=chApply;
+chApply=function(m,q){const r=chApplyBase60.call(this,m,q);try{if(CH&&!CHX.replay){if(CH.ann&&(CH.ann.a.size||CH.ann.h.size)){CH.ann=null;ch60AnnDraw()}
+ if(CH.pre){if(CH.over)CH.pre=null;else if(CH.g.turn===CH.my){const tok=CH;setTimeout(()=>ch60PreRun(tok),90)}}}}catch(e){console.warn("chs60",e)}return r};
+const chMarksBase60=chMarks;
+chMarks=function(...a){const r=chMarksBase60.apply(this,a);try{const mk=$("#cMk");if(!mk||!CH)return r;let h="";
+ if(CH.view==null&&!CH.over){if(CH.psel!=null){h+=`<i class="psel" style="transform:${tf(CH.psel)}"></i>`;for(const q of ch60PreTargets(CH.psel))h+=`<i class="pdot" style="transform:${tf(q)}"></i>`}
+  if(CH.pre)h+=`<i class="pre" style="transform:${tf(CH.pre.f)}"></i><i class="pre" style="transform:${tf(CH.pre.t)}"></i>`}
+ if(CH.ann)for(const[s,c]of CH.ann.h)h+=`<i class="ann a-${c}" style="transform:${tf(s)}"></i>`;
+ if(h)mk.insertAdjacentHTML("afterbegin",h)}catch(e){console.warn("chs60",e)}return r};
+const chDrawBase60=chDraw;
+chDraw=function(...a){const r=chDrawBase60.apply(this,a);try{ch60AnnDraw()}catch{}return r};
+const ch60AnnCol={r:"rgba(255,170,0,.8)",g:"rgba(120,180,60,.85)",b:"rgba(60,150,220,.85)"};
+function ch60AnnToggle(a,b,c){CH.ann=CH.ann||{a:new Map,h:new Map};if(a===b){if(CH.ann.h.get(a)===c)CH.ann.h.delete(a);else CH.ann.h.set(a,c);chMarks()}
+ else{const k=a+"-"+b;if(CH.ann.a.get(k)===c)CH.ann.a.delete(k);else CH.ann.a.set(k,c);ch60AnnDraw()}}
+function ch60AnnDraw(){const sv=$("#cAnn");if(!sv)return;if(!CH||!CH.ann||!CH.ann.a.size){if(sv.innerHTML)sv.innerHTML="";return}
+ const at=s=>{const[x,y]=sqXY(s);return[x*100+50,y*100+50]};let h="";
+ for(const[k,cl]of CH.ann.a){const[a,b]=k.split("-").map(Number);const[x1,y1]=at(a),[x2,y2]=at(b);const dx=Math.abs(x2-x1),dy=Math.abs(y2-y1);const kn=(dx===100&&dy===200)||(dx===200&&dy===100);
+  const pts=kn?[[x1,y1],dy>dx?[x1,y2]:[x2,y1],[x2,y2]]:[[x1,y1],[x2,y2]];const[px,py]=pts[pts.length-2];const L=Math.hypot(x2-px,y2-py)||1;const ux=(x2-px)/L,uy=(y2-py)/L;
+  const hl=40,hw=27,ex=x2-ux*hl,ey=y2-uy*hl;const line=[...pts.slice(0,-1),[ex,ey]];if(!kn){line[0]=[x1+ux*22,y1+uy*22]}
+  const col=ch60AnnCol[cl]||ch60AnnCol.r;
+  h+=`<polyline points="${line.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="${col}" stroke-width="18" stroke-linejoin="round"/><polygon points="${(x2-ux*6).toFixed(1)},${(y2-uy*6).toFixed(1)} ${(ex-uy*hw).toFixed(1)},${(ey+ux*hw).toFixed(1)} ${(ex+uy*hw).toFixed(1)},${(ey-ux*hw).toFixed(1)}" fill="${col}"/>`}
+ sv.innerHTML=h}
+const ch60Hov=()=>$("#c6Hov");
+function ch60HovAt(e){const h=ch60Hov();if(!h)return;const s=chSqAt(e);if(s<0){h.hidden=true;return}h.hidden=false;h.style.transform=tf(s)}
+function ch60HovHide(){const h=ch60Hov();if(h&&!h.hidden)h.hidden=true}
+/* sürüklenen taş: farede hafif büyür, dokunmatikte büyüyüp parmağın üstüne kalkar */
+function ch60Lift(el,e){const bd=$("#cBoard");if(!bd||!el)return;const r=bd.getBoundingClientRect(),z=r.width/8;const touch=e.pointerType!=="mouse";
+ el.style.transform=`translate(${e.clientX-r.left-z/2}px,${e.clientY-r.top-z/2-(touch?z*.5:0)}px) scale(${touch?1.32:1.08})`}
+function ch60Down(e){if(!CH)return;const bd=$("#cBoard");if(!bd)return;if(e.target.closest&&e.target.closest("#cOv.on"))return;
+ if(e.button===2){const s=chSqAt(e);A60=s>=0?{s,c:e.shiftKey?"g":(e.ctrlKey||e.altKey||e.metaKey)?"b":"r"}:null;e.preventDefault();e.stopImmediatePropagation();return}
+ if(e.pointerType==="mouse"&&e.button!==0)return;
+ if(CH.ann&&(CH.ann.a.size||CH.ann.h.size)){CH.ann=null;ch60AnnDraw();chMarks()}
+ if(!ch60PreOn()){ch60PreClear();return}
+ const s=chSqAt(e);if(s<0)return;e.stopImmediatePropagation();e.preventDefault();const p=CH.g.b[s];
+ if(CH.psel!=null&&CH.psel!==s&&ch60PreTargets(CH.psel).includes(s)){ch60PreSet(CH.psel,s);return}
+ if(p&&(p&8)===CH.my){const was=CH.psel===s;CH.pre=null;CH.psel=s;chMarks();P60D={s,el:CHEL[s],x:e.clientX,y:e.clientY,moved:false,was};try{bd.setPointerCapture(e.pointerId)}catch{}return}
+ ch60PreClear()}
+function ch60MoveCap(e){const D=P60D;if(!D)return;e.stopImmediatePropagation();if(!D.el)return;
+ if(!D.moved&&Math.hypot(e.clientX-D.x,e.clientY-D.y)>5){D.moved=true;D.el.classList.add("drag")}if(D.moved){ch60Lift(D.el,e);ch60HovAt(e)}}
+function ch60MoveBub(e){const D=CDRAG;if(D&&D.moved&&D.el){ch60Lift(D.el,e);ch60HovAt(e)}}
+function ch60Up(e){ch60HovHide();
+ if(e.button===2){const A=A60;A60=null;e.stopImmediatePropagation();e.preventDefault();if(!A||!CH)return;const s=chSqAt(e);if(s>=0)ch60AnnToggle(A.s,s,A.c);return}
+ const D=P60D;if(!D)return;P60D=null;e.stopImmediatePropagation();if(!CH)return;
+ if(D.el){D.el.classList.remove("drag");D.el.style.transform=tf(D.s)}
+ if(D.moved){const s=chSqAt(e);if(s>=0&&s!==D.s&&ch60PreOn()&&ch60PreTargets(D.s).includes(s))ch60PreSet(D.s,s);else{CH.psel=null;chMarks()}}
+ else if(D.was){CH.psel=null;chMarks()}}
+function ch60Cancel(){ch60HovHide();A60=null;const D=P60D;P60D=null;if(D&&D.el){D.el.classList.remove("drag");D.el.style.transform=tf(D.s)}}
+const chWireBase60=chWire;
+chWire=function(...a){const r=chWireBase60.apply(this,a);try{const bd=$("#cBoard");if(bd&&!bd._c60){bd._c60=1;
+ bd.addEventListener("pointerdown",ch60Down,true);bd.addEventListener("pointermove",ch60MoveCap,true);bd.addEventListener("pointermove",ch60MoveBub);
+ bd.addEventListener("pointerup",ch60Up,true);bd.addEventListener("pointercancel",ch60Cancel,true);bd.addEventListener("contextmenu",e=>e.preventDefault());
+ bd.addEventListener("lostpointercapture",()=>{if(!CDRAG&&!P60D)ch60HovHide()})}}catch(e){console.warn("chs60",e)}return r};
+
+/* --- G. lobi --- */
+function ch60GameRows(){const gs=myGames();if(!gs.length)return"";
+ return`<h3 class="sec-h"><span>Oyunların</span>${myTurnGames()?`<span class="cturn">${myTurnGames()} OYUNDA SIRA SENDE</span>`:""}</h3><div class="box">${gs.map(d=>{const o=oppOf(d);const p=P(o);const mine=d.status==="active"&&gTurnUid(d)===S.uid;const inv=d.status==="invite";
+  const sub=d.status==="over"?(d.reason==="iptal"?"İptal edildi":d.result==="1/2"?"Berabere bitti":((d.result==="1-0")===(d.w===S.uid)?"Kazandın":"Kaybettin")):inv?(d.to===S.uid?"Seni davet etti":"Davetin bekliyor"):mine?"Sıra sende":"Rakibin düşünüyor";
+  return`<button class="row" data-cgame="${esc(d.id)}">${avatar(o,44,{click:false,ring:false})}<div class="t"><div><b>${esc(p.name)}</b> <span class="crt">${chessStats(o).r}</span></div><div class="s">${esc(sub)} · ${Math.ceil((d.moves||[]).length/2)}. hamle · ${ago(d.updatedAt||d.at)}</div></div>${mine||(inv&&d.to===S.uid)?'<span class="cturn">SIRA SENDE</span>':""}</button>`}).join("")}</div>`}
+function ch60BotBox(){const opp=settings.chessOpp==="clawd"?"clawd":"rota";const cw=opp==="clawd";const col=settings.chessColor||"w";const tc=chTcKey();
+ const lv=cw?`<div class="lvls" role="group" aria-label="Clawd'un seviyesi">${CHC_LV.map((l,i)=>`<button class="lvl" data-act="chclvl" data-v="${i}" aria-pressed="${chcLv()===i}"><b>${l.n}</b><span>${l.r}</span></button>`).join("")}</div>`
+  :`<div class="lvls" role="group" aria-label="Rota'nın seviyesi">${CLEVELS.map((l,i)=>`<button class="lvl" data-clvl="${i}" aria-pressed="${(settings.chessLevel??1)===i}"><b>${l.n}</b><span>${l.r}</span></button>`).join("")}</div>`;
+ const sv=cw?LS.get(chcKey()):LS.get("kadraj_chess_bot_"+S.uid);const L=cw?CHC_LV:CLEVELS;
+ const resume=sv&&Array.isArray(sv.moves)&&sv.moves.length?`<button class="btn sec block" data-chs="${cw?"cwresume":"botresume"}">${I("play")}Yarım kalan oyuna dön · ${esc((L[sv.level]||L[1]).n)}, ${Math.ceil(sv.moves.length/2)}. hamle</button>`:"";
+ const face=cw?`<span class="c6bf cw">${chcFace(64,"happy","idle")}</span>`:`<span class="c6bf">${botFace(64)}</span>`;
+ const line=cw?chcLobbyLine():"Bir oyuna ne dersin? Seviyeni seç, ben hazırım.";
+ const cst=chcStats(S.uid);const cwRow=cw?`<div class="chcst c6cst"><span class="cwav">${chcFace(46,"","idle")}</span><div><b>Clawd'a karşı puanın: ${cst.r}</b><small>${cst.w} galibiyet · ${cst.d} beraberlik · ${cst.l} yenilgi · ana puanını etkilemez</small></div></div>`:"";
+ return`<h3 class="sec-h" id="c6bots"><span>Botlara karşı</span>${I("admbot")}</h3><div class="box cbox c6bot"><div class="c6say">${face}<div class="c6sb">${esc(line)}</div></div>
+ <span class="lbl">Rakibin</span>${chcOppPick(opp)}<span class="lbl">Seviye</span>${lv}
+ <span class="lbl">Taşların</span><div class="seg">${[["w","Beyaz"],["r","Rastgele"],["b","Siyah"]].map(([v,l])=>`<button data-ccol="${v}" aria-pressed="${col===v}">${l}</button>`).join("")}</div>
+ <span class="lbl">Süre<em>botlara karşı ve aynı telefonda</em></span><div class="seg ctcs" role="group" aria-label="Süre">${TCS.map(([v,l])=>`<button data-act="chtc" data-v="${v}" aria-pressed="${tc===v}">${v==="0"?"":I("chclock")}${esc(l)}</button>`).join("")}</div>
+ <button class="btn block" data-chs="${cw?"cwnew":"botnew"}">${I(cw?"clawd":"knight")}${cw?"Clawd'a karşı oyna":"Rota'ya karşı oyna"}</button>${resume}${cwRow}</div>`}
+function ch60Board(){const lb=Object.values(S.profiles).filter(p=>p&&p.chess&&p.chess.g).sort((a,b)=>b.chess.r-a.chess.r).slice(0,10);
+ return`<h3 class="sec-h"><span>Kadraj sıralaması</span>${I("trophy")}</h3>`+(lb.length?`<div class="box">${lb.map((p,i)=>`<button class="row ${p.uid===S.uid?"meh":""}" data-prof="${esc(p.uid)}"><span class="rank">${i+1}</span>${avatar(p.uid,40,{click:false,ring:false})}<div class="t"><div><b>${esc(P(p.uid).name)}</b></div><div class="s">${p.chess.w} galibiyet · ${p.chess.d} beraberlik · ${p.chess.l} yenilgi</div></div><b class="crate">${p.chess.r}</b></button>`).join("")}</div>`:`<div class="empty" style="padding:16px 24px">Henüz kimse oynamadı. İlk sıraya sen yerleş.</div>`)}
+function ch60Lobby(){const st=chessStats(S.uid),pr=P(S.uid);const pass=LS.get("kadraj_chess_local_"+S.uid);const passOn=!!(pass&&pass.moves&&pass.moves.length);
+ const pzN=pzSolvedN(),N=PUZZLES.length,pzI=pzNextIdx((pzProg().last??0)-1);const turn=myTurnGames();
+ let h=`<div class="c6lob"><div class="box c6me">${avatar(S.uid,52,{click:false,ring:false})}<div class="t"><b>${esc(pr.name||"")}</b><small>${st.w} galibiyet · ${st.d} berabere · ${st.l} yenilgi</small></div><div class="rt"><b>${st.r}</b><small>Puan</small></div></div>
+ <div class="c6play"><button class="c6tile pri" data-act="c6bots"><span class="ic">${I("admbot")}</span><span class="tx"><b>Botlara karşı</b><small>Rota ya da Clawd, beş seviye</small></span></button>
+ <button class="c6tile" data-chs="invite"><span class="ic">${I("users")}</span><span class="tx"><b>Arkadaşınla</b><small>${turn?`${turn} oyunda sıra sende`:"Çevrim içi davet et"}</small></span>${turn?`<i class="c6dot">${turn}</i>`:""}</button>
+ <button class="c6tile" data-act="pzgo" data-v="${pzI}"><span class="ic">${I("chpuzzle")}</span><span class="tx"><b>Bulmacalar</b><small>${pzN}/${N} çözüldü</small></span></button>
+ <button class="c6tile" data-chs="${passOn?"passresume":"pass"}"><span class="ic">${I("rotate")}</span><span class="tx"><b>Aynı telefonda</b><small>${passOn?"Yarım kalan oyuna dön":"İki kişi, tek tahta"}</small></span></button></div></div>`;
+ if(S.gamesDenied)h+=`<div class="banner">${I("info")}<span>Arkadaşla satranç için uygulamanın sahibi Firebase kurallarını güncellemeli (games satırı).</span></div>`;
+ h+=ch60GameRows()+ch60BotBox()+pzCard()+chwLobbyCard()+ch60Board()+chLookCard();
+ return h}
+const vChessBase60=vChess;
+vChess=function(){try{return ch60Lobby()}catch(e){console.warn("chs60",e);return vChessBase60()}};
+ACT.c6bots=()=>{const el=document.getElementById("c6bots");if(el)el.scrollIntoView({behavior:kbReduce()?"auto":"smooth",block:"start"});vib(6)};
+
+/* --- H. 4 kişilik satranç (gizli; yalnızca Yönetici panelinden) --- */
+let s4P=null;
+function s4Load(){return s4P||(s4P=new Promise((res,rej)=>{if(window.SATRANC4)return res();const sc=document.createElement("script");sc.src="satranc4.js?v="+APP_V;sc.onload=()=>window.SATRANC4?res():rej(new Error("yok"));sc.onerror=()=>{s4P=null;rej(new Error("indirilemedi"))};document.head.appendChild(sc)}))}
+function s4Go(fn){if(!S.authed||!S.admin)return;s4Load().then(()=>fn(window.SATRANC4)).catch(()=>{s4P=null;toast("4 kişilik satranç yüklenemedi. İnternetini kontrol et.")})}
+ACT.s4open=()=>s4Go(X=>X.open());
+try{ADM_EXTRA.push({id:"s4",title:"4 kişilik satranç",desc:"Gizli deneme: yalnızca sen açabilirsin",icon:"knight",order:68,count:()=>({t:"Gizli",c:"dim"}),
+ html:()=>`<p class="muted" style="margin:0 0 12px;font-size:.86rem;line-height:1.45">Dört renk, 14x14 artı biçimli tahta. Kırmızı sensin; Mavi, Sarı ve Yeşil botlar. Sıra saat yönünde döner; mat ya da pat olan, teslim olan oyundan çıkar, son kalan kazanır. Henüz kimse göremez: Keşfet'te ve Neler yeni'de yok.</p><button class="btn block" data-act="s4open">${I("knight")}4 kişilik satrancı aç</button>`})}catch(e){console.warn("chs60",e)}
+/*}@js:60CHS*/
 /*@js:511{*/
 /* ===== 5.1.1: Rota'nın yanıtı harf harf gelir =====
    Köprü (kAI) yanıtı tek parça döndürür; botReply sarıldı (botReplyBase511): yanıt gelince S.stream ile parça parça yazılır,
