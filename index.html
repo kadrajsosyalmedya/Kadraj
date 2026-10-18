@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50702">
+<meta name="kadraj-version" content="50703">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3108,7 +3108,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50702,APP_VER="5.7.2";
+const APP_V=50703,APP_VER="5.7.3";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3482,9 +3482,9 @@ function render(full){const m=main();const st=m.scrollTop;const r=S.route;
  switch(r.name){case"feed":html=vFeed();break;case"explore":html=vExplore();break;case"reels":m.className="snap";html=vReels();break;case"profile":html=vProfile(r.params.uid);break;case"post":html=vPost(r.params.id);break;case"activity":html=vActivity();break;case"chats":html=vChats();break;case"chat":m.className="chatmode";html=vChat(r.params.key);break;case"settings":html=vSettings();break;case"edit":html=vEdit();break;case"people":html=vPeople(r.params);break;case"invite":html=vInvite();break;case"chess":html=vChess();break;case"admin":html=vAdmin();break;case"chessgame":m.className="chessmode";html=vChessGame();break;default:html=vFeed()}
  m.innerHTML=html;m.scrollTop=full?0:st;if(full&&!["reels","chat","chessgame"].includes(r.name)){m.classList.add("enter");clearTimeout(m._et);m._et=setTimeout(()=>m.classList.remove("enter"),700)}afterRender()}
 function renderTop(){if(!S.authed)return;const r=S.route.name;const t=$("#top");let h="";const backBtn=`<button class="ib plain" data-act="back" aria-label="Geri">${I("back")}</button>`;
- const themeBtn=`<button class="ib" data-act="theme" aria-label="Temayı değiştir">${I(isDark()?"sun":"moon")}</button>`;
- if(r==="feed"){const a=newActivity();h=`<div class="brand">${VF}<span class="wordmark">kadraj</span></div><div class="acts"><button class="ib" data-go="chess" aria-label="Satranç">${I("knight")}${myTurnGames()?'<i class="dot"></i>':""}</button>${themeBtn}</div>`}
- else if(r==="explore")h=`<h1>Keşfet</h1>${themeBtn}`;
+ /* 5.7.3: üst çubukta satranç ve tema düğmesi yok (tema Ayarlar › Görünüm'de, satranç Keşfet'teki kartta) */
+ if(r==="feed"){h=`<div class="brand">${VF}<span class="wordmark">kadraj</span></div>`}
+ else if(r==="explore")h=`<h1>Keşfet</h1>`;
  else if(r==="chats")h=`<h1>Sohbet</h1><div class="acts"><button class="ib" data-act="invite" aria-label="Arkadaş davet et">${I("link")}</button><button class="ib" data-act="newgroup" aria-label="Grup kur">${I("users")}</button><button class="ib" data-act="newchat" aria-label="Yeni sohbet">${I("edit")}</button></div>`;
  else if(r==="profile"){const p=P(S.route.params.uid);const own=p.uid===S.uid;h=(S.stack.length?backBtn:"")+`<h1>${esc(p.username)}${badge(p.uid)}</h1>`+(own?`<div class="acts">${S.mode==="cloud"?`<button class="ib" data-act="posta" aria-label="Kadraj Posta">${I("mail")}${postaUnread()?'<i class="dot"></i>':""}</button>`:""}<button class="ib" data-go="settings" aria-label="Ayarlar">${I("gear")}</button></div>`:`<button class="ib" data-act="profmenu" data-uid="${esc(p.uid)}" aria-label="Diğer">${I("more")}</button>`)}
  else if(r==="post")h=backBtn+`<h1>Paylaşım</h1>`;
@@ -5125,8 +5125,8 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - Etkileşim: beğeni (çift dokunuş da olur), yorum, kaydet, arkadaşına gönder, anket oyu.
 - Sohbet sekmesi: Sesli mesaj (mesaj kutusu boşken mikrofon düğmesine dokun, konuş, gönder), sesli ve görüntülü arama (birebir sohbetin üstündeki telefon ve kamera düğmeleri; arkadaş uygulamayı açıkken çalar), mesaja uzun basıp Yanıtla, Meydan (sayfadaki herkesin ortak canlı sohbeti), Şu an burada listesi (çevrimiçi kişiler; Dürt düğmesi titreşimli dürtme gönderir), Yeni mesaj, Grup kur, Davet et, Rota, test botları. Mesajlarda fotoğraf ve paylaşım gönderilir; mesaja çift dokununca kalp, uzun basınca menü (kopyala, geri al). Birebir sohbette "Görüldü" ve "yazıyor…" görünür. Meydan'da ya da grupta mesaja @rota yazınca Rota yanıt verir.
 - Arkadaşlarla kullanmak: Sohbet > Davet et (ya da Ben > Davet et) ekranındaki davet bağlantısı WhatsApp gibi bir uygulamayla gönderilir. Arkadaş bağlantıyı açar, e-posta ve şifreyle hesap oluşturur, seni Keşfet'te bulup takip eder ve yazar. Giriş kullanıcı adıyla ya da e-postayla yapılır. Şifre unutulursa giriş ekranında Şifremi unuttum > Kadraj Anahtarı ile yenile (anahtar Ben > zarf simgesi, Kadraj Posta'da durur). Anahtar da kaybolduysa kişi yöneticiye kullanıcı adını ve kayıt e-postasını söyler; e-posta doğruysa yönetici anahtarı panelden görüp iletir, kişinin anahtarı sonra kendiliğinden yenilenir.
-- Ben (profil) > dişli: tema (Açık/Koyu/Sistem; Akış'taki ay/güneş düğmesi de değiştirir), yazı boyutu (Normal/Büyük/Çok büyük), gizli hesap, bildirimler, Klaketleri otomatik oynatma, Beni hatırla, şifre değiştir, çıkış, hesabı sil.
-- Satranç: Keşfet'teki Satranç kartı ya da Akış'ın üstündeki at simgesi. Rota'ya karşı 5 seviye (Çaylak 400, Acemi 800, Orta 1200, Zor 1600, Usta 2000), renk seçimi, taşı sürükle ya da dokun-dokun oyna, Geri al, İpucu (ok çizer), tahtayı çevir, hamleler arasında ileri-geri gez, değerlendirme çubuğu, tahta temaları (Kadraj, Klasik, Ahşap, Gece), ses. Kazanınca puanın artar, Kadraj sıralamasında görünür. Arkadaşınla oynamak için Arkadaşını davet et ya da birebir sohbetin üstündeki at düğmesi; davet sohbete kart olarak düşer. Aynı telefonda iki kişi de oynanabilir. Oyun bitince sonucu tahtanın resmiyle Akış'ta paylaşabilirsin.
+- Ben (profil) > dişli: tema (Açık/Koyu/Sistem), yazı boyutu (Normal/Büyük/Çok büyük), gizli hesap, bildirimler, Klaketleri otomatik oynatma, Beni hatırla, şifre değiştir, çıkış, hesabı sil.
+- Satranç: Keşfet'teki Satranç kartı. Rota'ya karşı 5 seviye (Çaylak 400, Acemi 800, Orta 1200, Zor 1600, Usta 2000), renk seçimi, taşı sürükle ya da dokun-dokun oyna, Geri al, İpucu (ok çizer), tahtayı çevir, hamleler arasında ileri-geri gez, değerlendirme çubuğu, tahta temaları (Kadraj, Klasik, Ahşap, Gece), ses. Kazanınca puanın artar, Kadraj sıralamasında görünür. Arkadaşınla oynamak için Arkadaşını davet et ya da birebir sohbetin üstündeki at düğmesi; davet sohbete kart olarak düşer. Aynı telefonda iki kişi de oynanabilir. Oyun bitince sonucu tahtanın resmiyle Akış'ta paylaşabilirsin.
 - Klaket kaynakları: Fotoğraflardan (müzikli), Video yükle ya da Kamerayla çek (uygulama içinde 60 saniyeye kadar kayıt; demo modunda daha kısa). Videoya da müzik eklenebilir.
 - Rota yapay zekâlı asistandır; yanında hazır yanıtlı deneme botları ve yöneticinin eklediği botlar da olabilir. "Test bildirimleri oluştur" komutu (çipe dokun ya da yaz) Rota'nın son paylaşımını beğenmesini, yorum yapmasını ve seni takip etmesini sağlar.
 - 4.0 yenilikleri: animasyonlu açılış; Ayarlar yenilendi (arama kutusu, Görünüm'de Açık/Koyu/Sistem tema ve 7 vurgu rengi, tema tüm cihazlarda aynı kalabilir, animasyonları azalt; Gizlilik'te aktiflik durumu, okundu bilgisi, beğeni sayılarını gizleme; bildirim türleri; Enter ile gönder; veri tasarrufu; önbelleği temizle; Neler yeni; Güncellemeleri denetle).
@@ -5173,7 +5173,7 @@ const FAQ=[[/sohbette ara|mesaj(ı|ları)? ara|eski mesaj|mesaj(ı)? ilet|iletme
  [/nasıl kullan|ne yapabil|özellik|başla/i,"Kısa tur:\n- Ortadaki **+** ile fotoğraf, Klaket, hikâye, not, anket ya da çizim paylaş.\n- Fotoğrafa çift dokun, beğen.\n- **Sohbet** sekmesinde Meydan, mesajlar ve gruplar var.\n- Ben > dişli: tema, yazı boyutu, Beni hatırla.\n- Bildirimleri denemek için bana “Test bildirimleri oluştur” de."],
  [/reels|çekim|sahne|flick|klaket|video/i,"Klaket (kısa video) için + > Klaket. İki yol var:\n- **Fotoğraflardan**: 1-3 kare seç, yazı ekle, hareket ve müzik seç.\n- **Video yükle**: en fazla 2 dakika (40 MB), büyük videolar otomatik küçültülür.\n\nKlaketler ekranında sesi sağ üstteki hoparlörden açarsın."],
  [/hikaye|hikâye|story/i,"Akışın üstündeki **Hikâyen** balonundaki + ile hikâye eklersin. Üstüne yazı koyabilirsin; 24 saat görünür."],
- [/tema|karanlık|koyu|açık mod|dark|yazı boyu/i,"Akış'taki ay/güneş düğmesi temayı anında değiştirir. Ben > dişli > Görünüm'den Sistem temasını ve yazı boyutunu da seçebilirsin."],
+ [/tema|karanlık|koyu|açık mod|dark|yazı boyu/i,"Tema Ben > dişli > Görünüm'den seçilir (Açık, Koyu ya da Sistem); yazı boyutu da orada."],
  [/şifre|unuttum|giriş|anahtar|posta/i,"Girişte **kullanıcı adını** ya da e-postanı yazabilirsin.\n- Şifreni unuttuysan **Şifremi unuttum** > **Kadraj Anahtarı ile yenile**: kullanıcı adını, Kadraj Anahtarını (XXXX-XXXX-XXXX) ve yeni şifreni yaz. Anahtarın **Ben > zarf simgesi (Kadraj Posta)**'da durur; şifreni unutmadan önce bir yere yaz.\n- Anahtarını da kaybettiysen yöneticiye kullanıcı adını ve kayıt e-postanı söyle; e-posta doğruysa anahtarını sana iletir. Sonra anahtarın kendiliğinden yenilenir.\n- Gerçek e-postayla kayıt olduysan e-postana bağlantı da isteyebilirsin.\n- E-postanı da unuttuysan **E-postamı unuttum** hangi adresle kayıt olduğunu (gizlenmiş olarak) gösterir.\n- Şifreyi değiştirmek için: Ben > dişli > Şifreyi değiştir."],
  [/ipucu|etkinlik|paylaşayım/i,"Birkaç fikir:\n1. Sabah ışığında bir fotoğraf çek ve Sıcak filtresiyle paylaş.\n2. Arkadaşlarına bir anket aç: “Bu hafta sonu ne yapalım?”\n3. Üç fotoğraftan Lo-fi müzikli bir Klaket hazırla."],
  [/debounce/i,"Basit bir debounce:\n```js\nfunction debounce(fn, ms = 300) {\n  let t;\n  return (...args) => {\n    clearTimeout(t);\n    t = setTimeout(() => fn(...args), ms);\n  };\n}\n```\nArama kutusu gibi sık tetiklenen olaylarda gereksiz çağrıları önler."]];
@@ -7663,7 +7663,7 @@ const CW_KB=[
  {t:"app",k:["taslak"],a:"Yazıp çıktığın mesaj taslak olarak saklanır; sohbet listesinde \"Taslak:\" diye görünür."},
  {t:"app",k:["mesaj sil","mesaj duzenle","duzenle","geri al"],a:"Mesaja basılı tut: düzenle, benden sil ya da herkesten sil seçenekleri çıkar."},
  {t:"app",k:["sohbet temasi","duvar kagidi","balon rengi","arka plan"],a:"Sohbetin üstündeki resim simgesine dokun. \"Herkes için\" seçersen tema sohbetteki herkeste değişir, \"Yalnızca bende\" sadece sende."},
- {t:"app",k:["tema","karanlik","koyu mod","acik mod","gece modu","dark"],a:"Ayarlar › Görünüm › Tema: Açık, Koyu ya da Sistem. Akış'taki ay/güneş düğmesi de anında değiştirir."},
+ {t:"app",k:["tema","karanlik","koyu mod","acik mod","gece modu","dark"],a:"Ayarlar › Görünüm › Tema: Açık, Koyu ya da Sistem."},
  {t:"app",k:["vurgu","renk","vurgu rengi"],a:"Ayarlar › Görünüm › Vurgu rengi. Otomatik seçersen yöneticinin ortak teması da gelir."},
  {t:"app",k:["yazi boyutu","buyuk yazi","font"],a:"Ayarlar › Görünüm › Yazı boyutu: Normal, Büyük ya da Çok büyük."},
  {t:"app",k:["vizor","klasik","arayuz","yeni gorunum","dok"],a:"Vizör, Kadraj 5.0'ın yeni görünümü: yüzen üst çubuk, hap şeklinde dok, ortada deklanşör. Ayarlar › Görünüm › Arayüz'den Klasik'e dönebilirsin."},
@@ -7678,7 +7678,7 @@ const CW_KB=[
  {t:"app",k:["kullanici adi","giris","nasil girerim","oturum ac"],a:"Girişte kullanıcı adını ya da e-postanı yazabilirsin. Beni hatırla açıksa bu cihazda şifre sorulmaz."},
  {t:"app",k:["cikis","cikis yap","oturumu kapat"],a:"Ayarlar › Oturum › Çıkış yap. Ama gitme, daha anlatacak esprim var."},
  {t:"app",k:["hesap sil","hesabimi sil","hesabi sil"],a:"Ayarlar › Gelişmiş › Hesabı sil. Profil, paylaşımlar ve hikâyeler kalıcı silinir; iyi düşün."},
- {t:"app",k:["satranc","chess","sah mat"],a:"Keşfet'teki Satranç kartı ya da Akış'ın üstündeki at simgesi. Rota'ya karşı 5 seviye, arkadaşına davet, aynı telefonda iki kişi. Kazanırsan dans ederim!"},
+ {t:"app",k:["satranc","chess","sah mat"],a:"Keşfet'teki Satranç kartı. Rota'ya karşı 5 seviye, arkadaşına davet, aynı telefonda iki kişi. Kazanırsan dans ederim!"},
  {t:"app",k:["cocuk modu","cocuk"],a:"Çocuk Modu'nda yazılar süzülür, yabancılar mesaj atamaz, Meydan kapalıdır. Paylaşırken \"Çocuk modundakiler göremez\" de seçebilirsin."},
  {t:"app",k:["kesfet","etiket","hashtag","arama kutusu","kisi ara"],a:"Keşfet'in üstündeki kutuya kişi ya da #etiket yaz. Süzgeçlerle kişi, kare, Klaket ya da etiket seç; en yeni ya da en çok beğenilen diye sırala."},
  {t:"app",k:["ana ekran","yukle","uygulama olarak","kur"],a:"Ayarlar › Uygulama ve depolama › Ana ekrana ekle. Kadraj simgesiyle tam ekran açılır."},
