@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50705">
+<meta name="kadraj-version" content="50800">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3068,6 +3068,12 @@ html.reduce-motion .reel .rdisc img{animation:none}
 .ci-links a small{display:block;color:var(--muted);font-size:.74rem}
 .ci-empty{padding:28px 16px 36px;text-align:center;color:var(--muted);font-size:.88rem}
 /*}@css:570*/
+/*@css:580{*/
+/* 5.8.0 Cephe kartı ve sohbetteki savaşa katıl düğmesi */
+.square.cpcard{background:linear-gradient(135deg,#7f1d1d,#0c7a63 70%,#0a5a8a)}
+.msg .cpj{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:8px;padding:9px 12px;border-radius:12px;background:linear-gradient(135deg,#b91c1c,#0C7A63);color:#fff;font-weight:700;font-size:.86rem}
+.msg .cpj svg.i{width:1.05rem;height:1.05rem}
+/*}@css:580*/
 
 
 </style>
@@ -3108,7 +3114,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50705,APP_VER="5.7.5";
+const APP_V=50800,APP_VER="5.8.0";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3548,6 +3554,7 @@ function vExplore(){const q=(S.q||"").trim().toLocaleLowerCase("tr");
   if(!people.length&&!tagPosts.length)h+=`<div class="empty"><b>Sonuç yok</b>“${esc(q)}” için bir şey bulamadık. Kullanıcı adının bir kısmını dene.</div>`;
   return h}
  const ppl=[...humans(),...BOTS.map(b=>b.uid)];const mt=myTurnGames();
+ h+=`<button class="square cpcard" data-act="cephe"><span class="ic">${I("flag")}</span><span style="min-width:0"><b>Cephe</b><small>Piksel savaşı: toprak kap, şehir kur, füze at. Botlarla ya da arkadaşınla</small></span><span class="live">SAVAŞ</span></button>`;
  h+=`<button class="square chesscard" data-go="chess"><span class="ic">${I("knight")}</span><span style="min-width:0"><b>Satranç</b><small>Rota'ya karşı oyna ya da arkadaşını davet et</small></span><span class="live">${mt?mt+" SIRA SENDE":"OYNA"}</span></button>`;
  h+=`<h3 class="sec-h"><span>Kişiler</span></h3><div class="hrow" style="margin-bottom:16px">${ppl.map(u=>{const p=P(u);return`<div class="pcard"><button data-prof="${esc(u)}">${avatar(u,56,{click:false})}</button><div class="n"><b>${esc(p.username)}</b></div>${u===S.uid||S.guest?"":`<button class="btn sm block ${isFollowing(S.uid,u)?"sec":""}" data-follow="${esc(u)}">${isFollowing(S.uid,u)?"Takiptesin":"Takip et"}</button>`}</div>`}).join("")}</div>`;
  const ps=allPosts().filter(canSee).sort((a,b)=>hash32(a.id,9).localeCompare(hash32(b.id,9)));
@@ -5155,6 +5162,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
+- 5.8 Cephe (piksel savaşı): Keşfet'teki Cephe kartından açılır. Ana menüde harita (Avrasya, Dünya, Avrupa, Asya, Kore Savaşı 1950, 1. Dünya Savaşı 1914, 2. Dünya Savaşı 1939), bot zorluğu (Kolay/Normal/Zor), bot sayısı ve bayrak (Türkiye, Osmanlı, Kadraj ve 30'dan fazla ülke; toprağın bayrağınla boyanır) seçilir. "Botlarla oyna", "Oda kur, arkadaşını çağır" (5 harfli oda kodu; sohbette davet gelir, "Savaşa katıl" düğmesi) ve "Odaya katıl". Başlarken 5 saniye içinde haritada yerini seçersin. Asker zamanla artar; alttaki çubukla gönderilecek asker yüzdesini seç, komşu toprağa ya da boş karaya dokun. İnşa et: Şehir (nüfus ve asker sınırı), Fabrika (altın), Liman (altın, denizden çıkarma), Füze deposu (bomba atmak için), SAM (gelen bombayı düşürür). Bomba: Atom, Nükleer füze, Hidrojen bombası. Güç seviyesi 1-10: asker başına güç seviye×10 (2. seviyede 15.000 asker, 1. seviyede 30.000 askere denk). Üstte nüfus, asker, altın, güç, toprak yüzdesi ve süre; sağda sıralama. Haritanın %70'ini alan kazanır.
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -5446,6 +5454,7 @@ setTimeout(verTidyCache,9000);
 
 /* ---- A · Neler yeni ---- */
 const WN_ITEMS=[
+ {ic:"flag",g:"linear-gradient(135deg,#b91c1c,#0c7a63)",t:"Cephe: piksel savaşı",d:"Keşfet'te. Haritada yerini seç, topraklarını büyüt; şehir, fabrika, liman, füze deposu ve SAM kur; atom, nükleer, hidrojen bombası at. Botlarla ya da arkadaşınla oyna, bayrağını seç",go:"explore"},
  {ic:"info",g:"linear-gradient(135deg,#1d4ed8,#7c3aed)",t:"Sohbet ayrıntıları",d:"Sohbetin başlığına dokun: tema, takma adlar, sessize al, gizlilik ve sohbette paylaşılan fotoğraflar, paylaşımlar, bağlantılar tek yerde",go:"chats"},
  {ic:"reels",g:"linear-gradient(135deg,#111,#db2777)",t:"Yeni Klaket ekranı",d:"Kenarlar artık düz siyah, düğmeler daha sade; sağ altta ses plağı dönüyor. Açıklamaya dokununca tamamı açılır",go:"reels"},
  {ic:"reels",g:"linear-gradient(135deg,#db2777,#7c3aed)",t:"Alt menüde Klaket",d:"Klaketlere artık alttaki menüden tek dokunuşla gidiyorsun. Videolar her girişte karışık sırayla geliyor",go:"reels"},
@@ -10851,7 +10860,7 @@ function mnTag(el,map,myU){const re=/@([\w.ğüşıöçĞÜŞİÖÇ]{2,30})/g;le
  for(const n of nodes){const v=n.nodeValue;re.lastIndex=0;if(!re.test(v))continue;re.lastIndex=0;const fr=document.createDocumentFragment();let last=0,m;
   while((m=re.exec(v))){const name=m[1].replace(/\.+$/,"");const uid=map.get(name.toLowerCase());if(!uid)continue;fr.append(v.slice(last,m.index));const b=document.createElement("span");b.className="mtag";b.dataset.prof=uid;b.textContent="@"+name;fr.append(b);last=m.index+1+name.length;if(name.toLowerCase()===myU)hit=true}
   if(last){fr.append(v.slice(last));n.replaceWith(fr)}}return hit}
-function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)return;try{nickPaint(key,box)}catch(e){console.warn(e)}let k;try{k=keyInfo(key)}catch{return}if(!k||k.type==="bot")return;
+function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)return;try{nickPaint(key,box)}catch(e){console.warn(e)}try{cpMsgPaint(box)}catch(e){console.warn(e)}let k;try{k=keyInfo(key)}catch{return}if(!k||k.type==="bot")return;
  const byId=new Map((S.msgs||[]).map(m=>[m.id,m]));const map=mnUserMap();const myU=String(me().username||"").toLowerCase();
  for(const el of box.querySelectorAll(".msg[data-mid]")){const m=byId.get(el.dataset.mid);if(!m||m.del)continue;
   if(m.text&&m.text.includes("@")&&!el.dataset.mn){el.dataset.mn="1";if(mnTag(el,map,myU)&&m.from!==S.uid)el.classList.add("mme")}
@@ -11166,6 +11175,18 @@ function rdiscHtml(p){const own=P(p.uid);return`<span class="rdisc" aria-hidden=
 /* açıklamaya dokununca tamamı açılır */
 document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest(".reel .info .c");if(!c||e.target.closest("a,button,[data-htag]"))return;e.stopPropagation();c.classList.toggle("open")},true);
 /*}@js:570*/
+/*@js:580{*/
+/* 5.8.0 Cephe (piksel savaşı): oyunun bütün kodu ayrı dosyada (cephe.js, haritalar cephe/*.json). Burada yalnızca yükleyici var:
+   Keşfet'teki Cephe kartı (data-act="cephe") cephe.js'i ilk dokunuşta bir kez indirir (?v=APP_V) ve CEPHE.open() çağırır.
+   Sohbette Cephe daveti (mesajda `cephe:<oda kodu>`) mnAfterRender içinde "Savaşa katıl" düğmesi alır (cpMsgPaint, data-cpjoin). */
+let cpP=null;
+function cpLoad(){return cpP||(cpP=new Promise((res,rej)=>{if(window.CEPHE)return res();const sc=document.createElement("script");sc.src="cephe.js?v="+APP_V;sc.onload=()=>window.CEPHE?res():rej(new Error("yok"));sc.onerror=()=>{cpP=null;rej(new Error("indirilemedi"))};document.head.appendChild(sc)}))}
+function cpGo(fn){if(!S.authed)return;cpLoad().then(()=>fn(window.CEPHE)).catch(()=>{cpP=null;toast("Cephe yüklenemedi. İnternetini kontrol et.")})}
+ACT.cephe=()=>cpGo(C=>C.open());
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-cpjoin]");if(!b)return;e.preventDefault();e.stopPropagation();const c=b.dataset.cpjoin;cpGo(C=>C.join(c))},true);
+function cpMsgPaint(box){const hid=(S.hidden&&S.hidden.msgs)||{};for(const m of S.msgs||[]){if(!m||!m.cephe||!m.id||m.del||hid[m.id])continue;const el=document.getElementById("m-"+m.id);if(!el||el.querySelector(".cpj"))continue;
+ el.insertAdjacentHTML("beforeend",`<button class="cpj" data-cpjoin="${esc(String(m.cephe).slice(0,8))}">${I("flag")}Savaşa katıl</button>`)}}
+/*}@js:580*/
 
 
 boot();
