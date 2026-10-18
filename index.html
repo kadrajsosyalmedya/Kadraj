@@ -2921,7 +2921,7 @@ main.chessmode{padding:0 0 calc(8px + env(safe-area-inset-bottom,0px))}
 .c6 .cctl button:not(:disabled):active{background:var(--surface-2)}
 @media (hover:hover){.c6 .cctl button:not(:disabled):hover{background:var(--surface-2);color:var(--fg)}}
 /* değerlendirme çubuğu */
-.c6 .cevalbar{width:13px;border-radius:4px;background:#403e3b}
+.c6 .cevalbar{width:13px;border-radius:4px;background:#403e3b;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
 .c6 .cevalbar i{background:#f6f6f2}
 .c6 .cevalbar span{font-size:.47rem}
 /* terfi seçici */
@@ -2972,7 +2972,7 @@ main.chessmode{padding:0 0 calc(8px + env(safe-area-inset-bottom,0px))}
 .c6end.sm .cbtns{gap:5px}
 /* geniş ekran: tahta solda, yan panel sağda */
 @media (min-width:900px){
- main.chessmode:not(.snap){padding-left:max(12px,calc((100% - 1140px)/2));padding-right:max(12px,calc((100% - 1140px)/2))}
+ main.chessmode:not(.snap),:root[data-ui="vizor"] main.chessmode:not(.snap){padding-left:max(12px,calc((100% - 1140px)/2));padding-right:max(12px,calc((100% - 1140px)/2))}
  .chess.c6{min-height:0;display:grid;grid-template-columns:auto minmax(270px,400px);grid-template-rows:auto auto auto 1fr;grid-template-areas:"t s" "m s" "b s" ". s";justify-content:center;column-gap:18px;row-gap:6px;align-items:start;padding:6px 0 10px}
  .c6>.cpl{margin:0}
  .c6 #cplT{grid-area:t}.c6 #cplB{grid-area:b}
