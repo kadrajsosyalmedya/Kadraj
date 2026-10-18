@@ -359,11 +359,11 @@ function pop(k){V.popOpen=k;const el=$("#cpPop");if(!el)return;if(!k){el.innerHT
  if(k==="build")el.innerHTML=`<div class="cp-pop">${Object.entries(BLD).map(([id,b])=>{const c=bCost(g,p,id);return`<button data-cpbld="${id}" ${p.gold<c?"disabled":""}>${svg(b.ic)}<span>${b.n}<small>${b.d} · sende ${cnt(g,p.i,id)}</small></span><em>${kf(c)}</em></button>`}).join("")}</div>`;
  else el.innerHTML=`<div class="cp-pop">${cnt(g,p.i,"silo")?"":`<button disabled>${svg("silo")}<span>Önce füze deposu kur<small>İnşa et › Füze deposu</small></span></button>`}${Object.entries(NUK).map(([id,n])=>`<button data-cpnuk="${id}" ${p.gold<nukCost(p,id)||!cnt(g,p.i,"silo")?"disabled":""}>${svg(id)}<span>${n.n}<small>Yarıçap ${n.r} kare · SAM ${n.sam<1?"bazen ":""}düşürebilir · her atışta %25 pahalanır</small></span><em>${kf(nukCost(p,id))}</em></button>`).join("")}</div>`}
 let hudT=0;function hud(){if(!V||!G||!$("#cpSt"))return;const g=G,p=g.pl[V.me];if(!p)return;
- const sec=Math.floor(g.t/1000);$("#cpSt").innerHTML=[["Nüfus",kf(popOf(g,p))],["Asker",kf(p.troops)+" / "+kf(cap(g,p))],["Altın",kf(p.gold)],["Güç",p.lvl+" · "+power(p)],["Toprak","%"+Math.round(p.cells/g.m.land*100)],["Süre",`${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")}`]].map(([a,b])=>`<div class="cp-chip"><small>${a}</small><b>${b}</b></div>`).join("");
+ const sec=Math.floor(g.t/1000);$("#cpSt").innerHTML=[["Nüfus",kf(popOf(g,p))],["Asker · sınır "+kf(cap(g,p)),nf(p.troops)],["Altın",kf(p.gold)],["Güç",p.lvl+" · "+power(p)],["Toprak","%"+Math.round(p.cells/g.m.land*100)],["Süre",`${Math.floor(sec/60)}:${String(sec%60).padStart(2,"0")}`]].map(([a,b])=>`<div class="cp-chip"><small>${a}</small><b>${b}</b></div>`).join("");
  const pv=$("#cpPctV");if(pv)pv.textContent=`%${V.pct||40} · ${nf(p.troops*(V.pct||40)/100)} asker`;
  const lv=$("#cpLvl"),lc=$("#cpLvlC");if(lv){lv.textContent=`Güç ${p.lvl}${p.lvl<10?" → "+(p.lvl+1):""}`;lc.textContent=p.lvl<10?kf(lvlCost(p)):"en yüksek";lv.closest("button").disabled=p.lvl>=10||p.gold<lvlCost(p)}
  const top=g.pl.filter(q=>q.alive).sort((a,b)=>b.cells-a.cells).slice(0,7);if(!top.includes(p)&&p.alive)top.push(p);
- const lbE=$("#cpLb"),hb=$(".cp-hud");if(hb&&lbE)lbE.style.top=(hb.offsetHeight+4)+"px";lbE.innerHTML=top.slice(0,innerWidth<520?5:8).map((q,i)=>`<div class="${q===p?"me":""}"><img src="${q.flag?flagURL(q.flag):swatch(q.col)}" alt=""><span>${i+1}. ${esc(q.name)}</span><em>%${Math.round(q.cells/g.m.land*100)} · ${kf(q.troops)}</em></div>`).join("");
+ const lbE=$("#cpLb"),hb=$(".cp-hud");if(hb&&lbE)lbE.style.top=(hb.offsetHeight+4)+"px";lbE.innerHTML=top.slice(0,innerWidth<520?5:8).map((q,i)=>`<div class="${q===p?"me":""}"><img src="${q.flag?flagURL(q.flag):swatch(q.col)}" alt=""><span>${i+1}. ${esc(q.name)}</span><em>%${Math.round(q.cells/g.m.land*100)} · ${nf(q.troops)}</em></div>`).join("");
  if(V.popOpen)pop(V.popOpen)}
 const swc={};function swatch(c){if(swc[c])return swc[c];const k=document.createElement("canvas");k.width=6;k.height=4;const x=k.getContext("2d");x.fillStyle=c;x.fillRect(0,0,6,4);return swc[c]=k.toDataURL()}
 function quitAsk(){const g=G;if(!g||V.mode==="spawn"&&!V.room||g.over)return menu();
@@ -371,7 +371,7 @@ function quitAsk(){const g=G;if(!g||V.mode==="spawn"&&!V.room||g.over)return men
  $("#cpQy",l).onclick=()=>{closeLayer("cpq");if(V.room)leaveRoom();menu()}}
 function showOver(){V.overShown=true;const g=G,p=g.pl[V.me],w=g.pl[g.over.w]||null;const win=w&&w.i===V.me;const el=document.createElement("div");el.className="cp-over";
  el.innerHTML=`<div><img src="${w&&w.flag?flagURL(w.flag):swatch(w?w.col:"#888")}" alt="" style="width:72px;height:48px;border-radius:5px;margin:0 auto"><h2>${win?"Zafer!":"Savaş bitti"}</h2><p style="margin:0;color:#9fb6ae">${g.over.lim?"25 dakika doldu. ":""}${win?"Haritanın büyük kısmı artık senin.":`${esc(w?w.name:"?")} kazandı.`}</p>
- <p style="margin:0;font:600 .82rem var(--f-mono)">Toprak %${Math.round((p?p.cells:0)/g.m.land*100)} · kaybedilen asker ${kf(p?p.lost:0)}</p><button class="btn block" data-cpmenu>Ana menü</button><button class="btn sec block" data-cpwatch>Haritaya bak</button></div>`;
+ <p style="margin:0;font:600 .82rem var(--f-mono)">Toprak %${Math.round((p?p.cells:0)/g.m.land*100)} · kaybedilen asker ${nf(p?p.lost:0)}</p><button class="btn block" data-cpmenu>Ana menü</button><button class="btn sec block" data-cpwatch>Haritaya bak</button></div>`;
  V.root.appendChild(el);el.onclick=e=>{if(e.target.closest("[data-cpmenu]")){if(V.room)leaveRoom();menu()}if(e.target.closest("[data-cpwatch]"))el.remove()};vib&&vib(win?[40,60,40]:80)}
 
 /* ---------- komutlar (yerelde uygula ya da kurucuya gönder) ---------- */
@@ -416,9 +416,12 @@ function terrLayer(){const g=G,m=g.m;if(!V.tw){V.tw=document.createElement("canv
  tgx.putImageData(img,0,0);
  const w=V.tw.getContext("2d");w.clearRect(0,0,V.tw.width,V.tw.height);w.imageSmoothingEnabled=false;
  const tm=V.tm.getContext("2d"),tt=V.tt.getContext("2d");tt.imageSmoothingEnabled=false;
- for(const o of flagP){const p=g.pl[o];if(!p.alive)continue;const mi=tm.createImageData(m.W,m.H),md=mi.data;for(let i=0;i<m.N;i++)if(own[i]===o)md[i*4+3]=255;tm.putImageData(mi,0,0);
-  tt.globalCompositeOperation="source-over";tt.clearRect(0,0,V.tt.width,V.tt.height);tt.drawImage(V.tm,0,0,V.tt.width,V.tt.height);tt.globalCompositeOperation="source-in";
-  const fc=flagCanvas(p.flag,60,40);const pat=tt.createPattern(fc,"repeat");tt.fillStyle=pat;tt.globalAlpha=.88;tt.fillRect(0,0,V.tt.width,V.tt.height);tt.globalAlpha=1;tt.globalCompositeOperation="source-over";w.drawImage(V.tt,0,0)}
+ /* 5.8.1: toprağın üstünde tek, büyük bayrak (toprağı kaplayacak kadar büyütülür, toprağın dışı kesilir) */
+ for(const o of flagP){const p=g.pl[o];if(!p.alive)continue;const mi=tm.createImageData(m.W,m.H),md=mi.data;let x0=1e9,y0=1e9,x1=-1,y1=-1;
+  for(let i=0;i<m.N;i++)if(own[i]===o){md[i*4+3]=255;const x=i%m.W,y=(i/m.W)|0;if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}if(x1<0)continue;tm.putImageData(mi,0,0);
+  tt.globalCompositeOperation="source-over";tt.clearRect(0,0,V.tt.width,V.tt.height);tt.imageSmoothingEnabled=false;tt.drawImage(V.tm,0,0,V.tt.width,V.tt.height);tt.globalCompositeOperation="source-in";
+  const bw=(x1-x0+1)*BS,bh=(y1-y0+1)*BS,sc=Math.max(bw/3,bh/2),fw=sc*3,fh=sc*2;tt.imageSmoothingEnabled=true;tt.globalAlpha=.92;tt.drawImage(flagCanvas(p.flag,450,300),x0*BS+(bw-fw)/2,y0*BS+(bh-fh)/2,fw,fh);
+  tt.globalAlpha=1;tt.globalCompositeOperation="source-over";w.drawImage(V.tt,0,0)}
  w.drawImage(V.tg,0,0,V.tw.width,V.tw.height)}
 function loop(){if(!V)return;cancelAnimationFrame(V.raf);let lastT=0,lastTerr=0,lastHud=0;
  const f=ts=>{if(!V||!G){return}V.raf=requestAnimationFrame(f);if(ts-lastT<33)return;lastT=ts;
@@ -437,15 +440,15 @@ function draw(ts){const g=G,m=g.m,x=V.cx,dpr=V.dpr;x.setTransform(dpr,0,0,dpr,0,
  x.textAlign="center";x.textBaseline="middle";
  for(const p of g.pl){if(!p.alive||!p.cells)continue;const cxw=p.sx/p.cells+.5,cyw=p.sy/p.cells+.5;const [px,py]=w2s(cxw,cyw);const fs=clamp(Math.sqrt(p.cells)*s*.22,10,30);if(fs<10.5&&p.i!==V.me)continue;
   x.font=`700 ${fs}px Figtree, sans-serif`;x.lineWidth=3;x.strokeStyle="rgba(0,0,0,.65)";x.fillStyle="#fff";x.strokeText(p.name,px,py-fs*.45);x.fillText(p.name,px,py-fs*.45);
-  x.font=`600 ${fs*.8}px "JetBrains Mono", monospace`;const tx=kf(p.troops)+(p.lvl>1?" · G"+p.lvl:"");x.strokeText(tx,px,py+fs*.5);x.fillStyle=p.i===V.me?"#5eead4":"#e5f0ec";x.fillText(tx,px,py+fs*.5)}
+  x.font=`600 ${fs*.8}px "JetBrains Mono", monospace`;const tx=nf(p.troops)+(p.lvl>1?" · G"+p.lvl:"");x.strokeText(tx,px,py+fs*.5);x.fillStyle=p.i===V.me?"#5eead4":"#e5f0ec";x.fillText(tx,px,py+fs*.5)}
  /* saldırı cepheleri */
  x.font=`700 12px "JetBrains Mono", monospace`;
- for(const a of g.att){if(a.lx==null)continue;const [ax,ay]=w2s(a.lx+.5,a.ly+.5);const p=g.pl[a.o];const t=kf(a.n);const w=x.measureText(t).width+18;
+ for(const a of g.att){if(a.lx==null)continue;const [ax,ay]=w2s(a.lx+.5,a.ly+.5);const p=g.pl[a.o];const t=nf(a.n);const w=x.measureText(t).width+18;
   x.fillStyle="rgba(4,12,20,.82)";x.strokeStyle=p?p.col:"#fff";x.lineWidth=1.5;rrect(x,ax-w/2,ay-10,w,20,10);x.fill();x.stroke();x.fillStyle="#fff";x.fillText(t,ax+5,ay+1);x.fillStyle=p?p.col:"#fff";x.beginPath();x.arc(ax-w/2+8,ay,3.5+Math.sin(ts/120)*1,0,7);x.fill()}
  /* gemiler */
  for(const b of g.boats){const k=Math.min(b.path.length-1,Math.floor(b.pi)),f=b.pi-k,a=b.path[k],c=b.path[Math.min(b.path.length-1,k+1)];const wx=a[0]+(c[0]-a[0])*f+.5,wy=a[1]+(c[1]-a[1])*f+.5;const [bx,by]=w2s(wx,wy);const p=g.pl[b.o];
   x.save();x.translate(bx,by);x.rotate(Math.atan2(c[1]-a[1],c[0]-a[0]));x.fillStyle=p?p.col:"#fff";x.strokeStyle="#fff";x.lineWidth=1.5;x.beginPath();x.moveTo(9,0);x.lineTo(-7,-5);x.lineTo(-7,5);x.closePath();x.fill();x.stroke();x.restore();
-  x.fillStyle="#fff";x.font=`700 11px "JetBrains Mono", monospace`;x.strokeStyle="rgba(0,0,0,.7)";x.lineWidth=3;x.strokeText(kf(b.n),bx,by-12);x.fillText(kf(b.n),bx,by-12)}
+  x.fillStyle="#fff";x.font=`700 11px "JetBrains Mono", monospace`;x.strokeStyle="rgba(0,0,0,.7)";x.lineWidth=3;x.strokeText(nf(b.n),bx,by-12);x.fillText(nf(b.n),bx,by-12)}
  /* füzeler */
  const now=V.room&&!V.host&&g.snapAt?g.t+(performance.now()-g.snapAt):g.t;
  for(const mi of g.mis){const pr=clamp((now-mi.t0)/mi.dur,0,1);const [x0,y0]=w2s(mi.from%m.W+.5,((mi.from/m.W)|0)+.5),[x1,y1]=w2s(mi.to%m.W+.5,((mi.to/m.W)|0)+.5);const h=Math.hypot(x1-x0,y1-y0)*.35+40;
