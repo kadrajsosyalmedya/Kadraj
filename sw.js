@@ -5,6 +5,9 @@ const ICON="icon-192.png",BADGE="badge-96.png";
 self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./badge-96.png"])).catch(()=>{}))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=="kadraj-open").map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;const u=new URL(r.url);if(u.origin!==location.origin)return;
+ /* 5.7.4: hazır fotoğraflar (img/, reels/*.jpg) hiç değişmez: önce önbellekten. Videolara (mp4) karışılmaz, tarayıcı parça parça (Range) kendisi indirir. */
+ if(/\/(img|reels)\/[^/]+\.mp4$/i.test(u.pathname))return;
+ if(/\/(img|reels)\/[^/]+\.(jpe?g|png|webp)$/i.test(u.pathname)){e.respondWith(caches.match(r).then(m=>m||fetch(r).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(C).then(c=>c.put(r,cp)).catch(()=>{})}return res})));return}
  /* 5.1.7: sayfa açılışı GitHub'ın 10 dakikalık sunucu önbelleğine (CDN) takılmasın diye benzersiz adresle istenir;
     yoksa eski sürüm açılıp hemen yeniden yükleniyordu. Çevrimdışıyken önbellekteki index.html açılır. */
  if(r.mode==="navigate"){const fresh=new URL("./index.html",self.registration.scope);fresh.searchParams.set("_k",Date.now().toString(36));
