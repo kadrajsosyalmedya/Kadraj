@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50600">
+<meta name="kadraj-version" content="50601">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -2985,12 +2985,15 @@ html.reduce-motion #msgs .mn-ty.gl-in,html.reduce-motion .kpop svg.i,html.reduce
 .hllist .opt img{width:2.4rem;height:2.4rem;border-radius:50%;object-fit:cover;flex:none}
 /*}@css:550*/
 /*@css:560{*/
-/* 5.6.0 alt menüde Klaket: altı düğme */
-.dock nav{grid-template-columns:repeat(6,1fr)}
-:root[data-ui="vizor"] .dock nav{grid-template-columns:1fr 1fr 4.4rem 1fr 1fr 1fr}
-.dock nav>button{min-width:0;overflow:hidden}
-.dock nav>button[data-act="create"]{overflow:visible}
-@media (max-width:360px){.dock .create{width:2.9rem;height:2.9rem;border-radius:17px}:root[data-ui="vizor"] .dock nav>button{letter-spacing:.04em;font-size:.56rem}.dock nav>button{font-size:.64rem}}
+/* 5.6.1 alt menü yedi düğme, + ortada: Akış, Keşfet, Klaket, +, Sohbet, Bildirim, Ben (yazılar .dl içinde) */
+.dock nav{grid-template-columns:repeat(3,minmax(0,1fr)) 3.6rem repeat(3,minmax(0,1fr));padding-inline:2px}
+:root[data-ui="vizor"] .dock nav{grid-template-columns:repeat(3,minmax(0,1fr)) 4rem repeat(3,minmax(0,1fr))}
+.dock nav>button{min-width:0}
+.dock nav>button .dl{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dock nav>button{font-size:.66rem}
+:root[data-ui="vizor"] .dock nav>button{font-size:.54rem;letter-spacing:.05em}
+.dock .create{width:3.2rem;height:3.2rem}
+@media (max-width:370px){.dock nav>button .dl{display:none}.dock nav>button{padding:9px 0}.dock nav{grid-template-columns:repeat(3,minmax(0,1fr)) 3.2rem repeat(3,minmax(0,1fr))}:root[data-ui="vizor"] .dock nav{grid-template-columns:repeat(3,minmax(0,1fr)) 3.6rem repeat(3,minmax(0,1fr))}.dock .create{width:2.9rem;height:2.9rem;border-radius:17px}:root[data-ui="vizor"] .dock .create{width:3rem;height:3rem}}
 /*}@css:560*/
 
 
@@ -3032,7 +3035,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50600,APP_VER="5.6.0";
+const APP_V=50601,APP_VER="5.6.1";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3407,12 +3410,12 @@ function render(full){const m=main();const st=m.scrollTop;const r=S.route;
  m.innerHTML=html;m.scrollTop=full?0:st;if(full&&!["reels","chat","chessgame"].includes(r.name)){m.classList.add("enter");clearTimeout(m._et);m._et=setTimeout(()=>m.classList.remove("enter"),700)}afterRender()}
 function renderTop(){if(!S.authed)return;const r=S.route.name;const t=$("#top");let h="";const backBtn=`<button class="ib plain" data-act="back" aria-label="Geri">${I("back")}</button>`;
  const themeBtn=`<button class="ib" data-act="theme" aria-label="Temayı değiştir">${I(isDark()?"sun":"moon")}</button>`;
- if(r==="feed"){const a=newActivity();h=`<div class="brand">${VF}<span class="wordmark">kadraj</span></div><div class="acts"><button class="ib" data-go="chess" aria-label="Satranç">${I("knight")}${myTurnGames()?'<i class="dot"></i>':""}</button>${themeBtn}<button class="ib" data-go="activity" aria-label="Bildirimler">${I("bell")}${a?'<i class="dot"></i>':""}</button></div>`}
+ if(r==="feed"){const a=newActivity();h=`<div class="brand">${VF}<span class="wordmark">kadraj</span></div><div class="acts"><button class="ib" data-go="chess" aria-label="Satranç">${I("knight")}${myTurnGames()?'<i class="dot"></i>':""}</button>${themeBtn}</div>`}
  else if(r==="explore")h=`<h1>Keşfet</h1>${themeBtn}`;
  else if(r==="chats")h=`<h1>Sohbet</h1><div class="acts"><button class="ib" data-act="invite" aria-label="Arkadaş davet et">${I("link")}</button><button class="ib" data-act="newgroup" aria-label="Grup kur">${I("users")}</button><button class="ib" data-act="newchat" aria-label="Yeni sohbet">${I("edit")}</button></div>`;
  else if(r==="profile"){const p=P(S.route.params.uid);const own=p.uid===S.uid;h=(S.stack.length?backBtn:"")+`<h1>${esc(p.username)}${badge(p.uid)}</h1>`+(own?`<div class="acts">${S.mode==="cloud"?`<button class="ib" data-act="posta" aria-label="Kadraj Posta">${I("mail")}${postaUnread()?'<i class="dot"></i>':""}</button>`:""}<button class="ib" data-go="settings" aria-label="Ayarlar">${I("gear")}</button></div>`:`<button class="ib" data-act="profmenu" data-uid="${esc(p.uid)}" aria-label="Diğer">${I("more")}</button>`)}
  else if(r==="post")h=backBtn+`<h1>Paylaşım</h1>`;
- else if(r==="activity")h=backBtn+`<h1>Bildirimler</h1>`;
+ else if(r==="activity")h=(S.stack.length?backBtn:"")+`<h1>Bildirimler</h1>`;
  else if(r==="chat")h=backBtn+chatHead(S.route.params.key)+`<button class="ib" data-act="wallpaper" aria-label="Sohbet teması">${I("palette")}</button>`;
  else if(r==="settings")h=backBtn+`<h1>Ayarlar</h1>`;
  else if(r==="edit")h=backBtn+`<h1>Profili düzenle</h1>`;
@@ -3422,8 +3425,8 @@ function renderTop(){if(!S.authed)return;const r=S.route.name;const t=$("#top");
  else if(r==="chess")h=(S.stack.length?backBtn:"")+`<h1>Satranç</h1>`;
  else if(r==="chessgame")h=backBtn+`<h1>${CH?(CH.mode==="bot"?"Rota · "+CLEVELS[CH.level].n:CH.mode==="local"?"İki kişilik oyun":"@"+esc(P(oppOf(CH.doc||{})).username)):"Satranç"}</h1>`;
  t.innerHTML=h}
-function renderDock(){if(!S.authed)return;const r=S.route.name;const isCur=n=>r===n||(n==="profile"&&r==="profile"&&S.route.params.uid===S.uid)||(n==="chats"&&r==="chat");const curTab=["feed","explore","chats","profile"].find(isCur)||"";const pop=S._dockCur!==curTab;S._dockCur=curTab;const cur=n=>isCur(n)?(pop?'class="pop" ':"")+'aria-current="page"':"";const u=unreadCount();
- $("#dock").innerHTML=`<nav aria-label="Ana menü"><button data-tab="feed" ${cur("feed")}>${I("home")}Akış</button><button data-tab="explore" ${cur("explore")}>${I("search")}Keşfet</button><button data-act="create" aria-label="Oluştur"><span class="create">${I("add")}</span></button><button data-go="reels">${I("reels")}Klaket</button><button data-tab="chats" ${cur("chats")}>${I("chat")}Sohbet${u?`<span class="cnt-badge">${u}</span>`:""}</button><button data-tab="profile" ${cur("profile")}><span class="me"><img src="${esc(me().avatar)}" alt="" style="width:100%;height:100%;object-fit:cover"></span>Ben</button></nav>`}
+function renderDock(){if(!S.authed)return;const r=S.route.name;const isCur=n=>r===n||(n==="profile"&&r==="profile"&&S.route.params.uid===S.uid)||(n==="chats"&&r==="chat");const curTab=["feed","explore","chats","activity","profile"].find(isCur)||"";const na=newActivity();const pop=S._dockCur!==curTab;S._dockCur=curTab;const cur=n=>isCur(n)?(pop?'class="pop" ':"")+'aria-current="page"':"";const u=unreadCount();
+ $("#dock").innerHTML=`<nav aria-label="Ana menü"><button data-tab="feed" ${cur("feed")}>${I("home")}<span class="dl">Akış</span></button><button data-tab="explore" ${cur("explore")}>${I("search")}<span class="dl">Keşfet</span></button><button data-go="reels">${I("reels")}<span class="dl">Klaket</span></button><button data-act="create" aria-label="Oluştur"><span class="create">${I("add")}</span></button><button data-tab="chats" ${cur("chats")}>${I("chat")}<span class="dl">Sohbet</span>${u?`<span class="cnt-badge">${u}</span>`:""}</button><button data-tab="activity" ${cur("activity")}>${I("bell")}<span class="dl">Bildirim</span>${na?`<span class="cnt-badge">${na>99?"99+":na}</span>`:""}</button><button data-tab="profile" ${cur("profile")}><span class="me"><img src="${esc(me().avatar)}" alt="" style="width:100%;height:100%;object-fit:cover"></span><span class="dl">Ben</span></button></nav>`}
 
 /* --- Akış --- */
 function vFeed(){const fol=followingOf(S.uid);
@@ -5073,7 +5076,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.4 gelen arama: bildirim izni verildiyse Kadraj açıkken de gelen aramada cihazın kendi bildirim sesi çalar (5 saniyede bir yinelenir, yanıtlanınca kapanır); izin yoksa Kadraj'ın zil sesi çalar. Sohbet yeni mesajda ya da biri yazmaya başlayınca zıplamaz, yavaşça kayar.
 - 5.5 öne çıkan hikâyeler: kendi hikâyeni açıp "Öne çıkar"a bas, var olan bir öne çıkanı seç ya da ad verip yenisini oluştur (Tatil, Okul...). Profilde ad ve paylaşım sayılarının altında yuvarlaklar olarak durur, 24 saat sonra silinmez. Profilindeki "Yeni" yuvarlağıyla son 24 saatteki hikâyelerinden ya da telefondan fotoğraf seçerek de oluşturulur. Bir öne çıkanda en fazla 8 kare olur. Açınca kendi öne çıkanında Ekle, Kaldır ve Düzenle (ad değiştir, sil) düğmeleri var. Gizli hesabın öne çıkanlarını yalnızca takipçiler görür.
 - 5.5 Rota fotoğrafa bakar: Rota sohbetinde + ile fotoğraf gönderilebilir; Rota fotoğrafa bakıp yanıt verir ("Bu ne?", "Bu soruyu çöz", "Hangisi daha güzel?"). Fotoğrafı göremezse bunu söyler, uydurmaz.
-- 5.6: Alt menüde Klaket düğmesi var (Akış, Keşfet, +, Klaket, Sohbet, Ben); dokununca Klaketler açılır. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
+- 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -5128,7 +5131,7 @@ async function runTest(){if(!guard())return;const add=t=>{const msgs=[...(S.botc
  const mine=Object.values(S.posts).filter(p=>p.uid===S.uid).sort((a,b)=>b.at-a.at)[0];const t=now();
  if(mine)await setMeta(mine.id,{likes:{"bot:rota":t},comments:{[rid()]:{uid:"bot:rota",text:"Çok güzel olmuş! Bu bir test yorumu.",at:t+1}}});
  await write(()=>DB.update("profiles/"+S.uid,{botFollowers:{"bot:rota":t+2}}));
- add(mine?`Test verisi hazır:\n- Son paylaşımını beğendim ve yorum yaptım\n- Seni takip ettim\n\nAkış'taki **zil** bildirimleri gösterir. Bir de satranç oynamak istersen “Satranç oynayalım” yaz.`:`Henüz paylaşımın olmadığı için beğeni ve yorum ekleyemedim. Yine de seni takip ettim; zil simgesinde görünür.\n\n+ ile bir şey paylaşıp tekrar dene.`);
+ add(mine?`Test verisi hazır:\n- Son paylaşımını beğendim ve yorum yaptım\n- Seni takip ettim\n\nAlttaki **Bildirim** düğmesi bildirimleri gösterir. Bir de satranç oynamak istersen “Satranç oynayalım” yaz.`:`Henüz paylaşımın olmadığı için beğeni ve yorum ekleyemedim. Yine de seni takip ettim; zil simgesinde görünür.\n\n+ ile bir şey paylaşıp tekrar dene.`);
  scheduleRefresh()}
 
 
