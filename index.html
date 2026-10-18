@@ -3299,6 +3299,11 @@ html.reduce-motion .reel .rdisc img{animation:none}
 :root[data-ui] .tile:active{transform:scale(.96)}
 :root[data-ui] .vz-ph{display:none!important}
 @media (hover:hover){:root[data-ui] .tile:hover img{transform:scale(1.05)}}
+/* Keşfet: mozaik ızgara (18 karede bir solda ve sağda 2x2 büyük kare) */
+:root[data-ui] #shell[data-r="explore"] .grid{grid-auto-flow:row dense}
+:root[data-ui] #shell[data-r="explore"] .grid>.tile:nth-child(18n+1){grid-column:span 2;grid-row:span 2}
+:root[data-ui] #shell[data-r="explore"] .grid>.tile:nth-child(18n+11){grid-column:2/span 2;grid-row:span 2}
+:root[data-ui] #shell[data-r="explore"] .grid>.tile:is(:nth-child(18n+1),:nth-child(18n+11)) .c{left:12px;bottom:10px;font-size:.8rem}
 
 /* --- resimler: yüklenirken ışıltı, sonra yumuşak belirme (k6Img) --- */
 :root[data-ui] .media img,:root[data-ui] .tile img,:root[data-ui] .sr-fl img{transition:opacity .4s ease,transform .5s var(--k6-ease)}
@@ -3316,9 +3321,12 @@ html.reduce-motion .reel .rdisc img{animation:none}
 .k6-skb{display:grid;gap:9px;padding:14px 16px 18px}
 
 /* --- Sohbet listesi --- */
-:root[data-ui] .notes{gap:8px;padding:6px 12px 14px}
-:root[data-ui] .nb{padding:7px 10px;border:1px solid var(--k6-hair);border-radius:16px;box-shadow:var(--k6-e2);font:600 .72rem/1.25 var(--f-body)}
-:root[data-ui] .nb.add{color:var(--muted);border-style:dashed}
+:root[data-ui] .notes{gap:10px;padding:6px 12px 14px}
+/* not balonu: dikey boşluk saydam kenarlıkta (taşan üçüncü satır görünmesin), çizgi gölgeyle */
+:root[data-ui] .nb{max-width:100px;padding:0 9px;border:6px solid transparent;border-inline-width:0;border-radius:16px;background-clip:border-box;box-shadow:0 0 0 1px var(--k6-hair),var(--k6-e2);font:600 .7rem/1.25 var(--f-body)}
+:root[data-ui] .nb::after{bottom:-12px;border:0;box-shadow:0 0 0 1px var(--k6-hair)}
+:root[data-ui] .nb.add{color:var(--muted);box-shadow:var(--k6-e1);outline:1.5px dashed color-mix(in srgb,var(--fg) 26%,transparent);outline-offset:-1.5px}
+:root[data-ui] .nb.add::after{box-shadow:none;outline:1.5px dashed color-mix(in srgb,var(--fg) 26%,transparent);outline-offset:-1.5px}
 :root[data-ui] .quick{display:flex;gap:8px;padding:0 12px 14px}
 :root[data-ui] .quick button{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:7px;height:2.8rem;padding:0 8px;border-radius:999px;background:var(--surface);border:1px solid var(--k6-hair);box-shadow:var(--k6-e1);font:600 .84rem/1 var(--f-body);white-space:nowrap;overflow:hidden}
 :root[data-ui] .quick svg.i{width:1.15rem;height:1.15rem;flex:none;color:var(--accent)}
@@ -3350,6 +3358,15 @@ html.reduce-motion .reel .rdisc img{animation:none}
 /* --- Profil --- */
 :root[data-ui] .prof{position:relative;isolation:isolate;gap:12px;padding:10px 16px 6px}
 :root[data-ui] .prof::before{content:"";position:absolute;z-index:-1;left:0;right:0;top:-150px;height:320px;pointer-events:none;background:radial-gradient(48% 52% at 22% 56%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 72%),radial-gradient(38% 46% at 80% 40%,color-mix(in srgb,var(--sun) 15%,transparent),transparent 72%)}
+/* kapak şeridi: kişinin fotoğrafı bulanık, altı zemine kaybolur; fotoğraf şeridin altına taşar */
+.k6-cover{position:absolute;z-index:-1;left:12px;right:12px;top:4px;height:96px;overflow:hidden;border-radius:26px;background:var(--surface-2);pointer-events:none}
+.k6-cover img{position:absolute;left:-25%;top:-60%;width:150%;height:220%;max-width:none;object-fit:cover;filter:blur(24px) saturate(1.5);opacity:.85}
+.k6-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 14%,transparent),transparent 55%,color-mix(in srgb,var(--bg) 55%,transparent))}
+:root[data-ui] .prof.k6-hasc{padding-top:52px}
+:root[data-ui] .prof.k6-hasc::before{top:40px}
+:root[data-ui] .prof.k6-hasc .prof-top{align-items:flex-end}
+:root[data-ui] .prof.k6-hasc .prof-top>.av img{box-shadow:0 0 0 4px var(--bg),var(--k6-e2)}
+:root[data-ui] .prof.k6-hasc .prof-top>.av.ring::before{inset:calc(var(--s,44px) * -.085 - 4px)}
 :root[data-ui] .prof-top{gap:18px}
 :root[data-ui] .prof-top>.av{--s:88px!important}
 :root[data-ui] .stats{gap:2px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
@@ -11560,7 +11577,10 @@ document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest
      değişince eski yerinden yenisine kayar (FLIP, WAAPI, yalnızca transform). Keşfet sekmeleri yerinde yenilendiği için srPaint sarıldı (srPaintBase60).
    - Klasik dokta da kayan sekme göstergesi: 50UI'ın .vz-focus öğesi ve vzFocusPlace kullanılır (renderDock sarıldı → renderDockBase60).
    - Klasik'te pencere kapanış animasyonu: 50UI'ın vzGhost'u (closeLayer sarıldı → closeLayerBase60). Üst çubuk kayınca alt çizgi alır (#top.k6-sc).
-   - Vizör üst çubuk alt başlıkları (vzMeta) büyük harfli HUD değil, sade cümle; Ayarlar › Arayüz açıklaması (vzUiRow) yeni anlamına göre.
+   - Vizör üst çubuk alt başlıkları (vzMeta) büyük harfli HUD değil, sade cümle (Akış'ta saate göre selam: "Günaydın, Bilal");
+     Ayarlar › Arayüz açıklaması (vzUiRow) yeni anlamına göre.
+   - Profil: kişinin fotoğrafından bulanık kapak şeridi (vProfile sarıldı → vProfileBase60; .prof'a k6-hasc ve ilk çocuk .k6-cover).
+   - Keşfet ızgarası mozaik (yalnızca CSS: #shell[data-r="explore"] .grid, 18 karede bir iki büyük kare).
    - Resimler (paylaşım, ızgara, Klaket karesi): yüklenene kadar ışıltı (.k6-ld, en fazla 3 tur), yüklenince yumuşak belirme (k6Img).
    - Yükleniyor iskeletleri: Sohbet listesi ilk sohbet verisi gelene kadar (S._chatsIn; vChats sarıldı → vChatsBase60), Akış bulutta paylaşımlar gelene kadar
      (K6.postsIn; subscribeShared sarıldı, DB.watchCol yalnızca o çağrı süresince "posts" için sarılır; vFeed sarıldı → vFeedBase60). İskelet ışıltısı sınırlı tur atar.
@@ -11615,6 +11635,7 @@ document.addEventListener("scroll",e=>{const m=e.target;if(!m||m.id!=="main"||vz
 
 /* --- Vizör alt başlıkları: sade cümle --- */
 vzMeta=function(r){const pr=S.route.params||{};try{
+ if(r==="feed"){const h=new Date().getHours();const g=h<5||h>=22?"İyi geceler":h<11?"Günaydın":h<17?"İyi günler":"İyi akşamlar";const n=String(me().name||"").trim().split(/\s+/)[0];return n?`${g}, ${n}`:g}
  if(r==="explore")return"Kişiler, etiketler ve paylaşımlar";
  if(r==="chats"){const u=+unreadCount()||0;const a=activeUsers().length;return(u?`${u} okunmamış sohbet`:"Hepsi okundu")+(a?` · ${a} kişi aktif`:"")}
  if(r==="profile")return pr.uid===S.uid?"Senin kadrajın":activeLabel(pr.uid)||"";
@@ -11628,6 +11649,11 @@ vzMeta=function(r){const pr=S.route.params||{};try{
 vzUiRow=function(){const cur=vzMode();const k=esc(kbFold("arayüz görünüm vizör klasik tasarım stil yeni eski dok menü alt çubuk cam"));
  const mk=v=>`<span class="vz-mk ${v}" aria-hidden="true"><i class="c1"></i><i class="c2"></i><i class="bar"></i><i class="sh"></i></span>`;
  return`<div class="srow sblk vz-uirow" data-k="${k}"><div class="sbh"><span class="sic" style="--c:#FF8A4C">${I("aperture")}</span><span class="t">Arayüz<small>Vizör: menüler içeriğin üstünde cam gibi yüzer. Klasik: üst çubuk ve alt menü sabit durur.</small></span><span class="val">${cur==="vizor"?"Vizör":"Klasik"}</span></div><div class="vz-uic" role="group" aria-label="Arayüz">${[["vizor","Vizör"],["klasik","Klasik"]].map(([v,l])=>`<button data-act="uiset" data-v="${v}" aria-pressed="${cur===v}">${mk(v)}<span>${l}</span></button>`).join("")}</div></div>`};
+
+/* --- profil: kişinin fotoğrafından bulanık kapak şeridi (.k6-cover; Clawd'ın profil odası .prof-top/.stats/.btns'e bakar, onlara dokunulmaz) --- */
+const vProfileBase60=vProfile;
+vProfile=function(uid,...a){const h=vProfileBase60.call(this,uid,...a);try{const av=P(uid||S.uid).avatar;const o='<div class="prof">';const i=h.indexOf(o);if(i<0||!av)return h;
+ return h.slice(0,i)+`<div class="prof k6-hasc"><div class="k6-cover" aria-hidden="true"><img src="${esc(av)}" alt=""></div>`+h.slice(i+o.length)}catch(e){console.warn("k6",e);return h}};
 
 /* --- yükleniyor iskeletleri --- */
 const K6_SKROW=`<div class="row k6-skr"><i class="k6-sk k6-ska"></i><span class="t"><i class="k6-sk" style="width:46%"></i><i class="k6-sk" style="width:74%"></i></span></div>`;
