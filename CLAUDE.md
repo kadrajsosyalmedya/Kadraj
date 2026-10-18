@@ -6,12 +6,13 @@ Bu dosya, `index.html` okunarak çıkarılmış ayrıntılı bir haritadır. Yen
 - Küçük ve hedefli değişiklik yap. **Yedek `xxxOld` kopyası bırakma** (5.2.4'te sahibiyle kararlaştırıldı): bir fonksiyon değişecekse yerine doğrudan yenisini yaz; eski hal GitHub geçmişinde ve yönetici panelindeki Sürüm arşivinde durur. Mevcut sarmalama zincirlerini (`…Base`/`…Old`) toptan sökme; dokunduğun fonksiyonu o sırada tek parça hale getir. Yayınlamadan önce testleri (scratchpad betikleri, sohbet için `jit3.js`) çalıştır.
 - Sürüm numarası ana.ara.yama: hata düzeltme ya da küçük ekleme → yama artar (4.1.0 → 4.1.1); büyük güncelleme → ara artar (4.1.x → 4.2.0). Her değişiklikte `APP_V` (ana*10000+ara*100+yama), `APP_VER` ve `<meta name="kadraj-version">` birlikte güncellenir. "İki sürüm geride" engeli yalnızca ara sürüm farkıyla çalışır; Neler yeni yalnızca ara/ana sürümde otomatik açılır (`WN_ITEMS` başına yenilerini ekle).
 - Sahibine yalnızca güncel `index.html` gönderilir. Dosya adı `index.html` kalmalı.
-- `const ASSETS={...}` satırına **dokunma** (yaklaşık 1,95 MB base64, tek satır). Kodu okurken bu satırı atla, örneğin `awk 'length($0)<100000'`.
+- 5.7.4'ten beri `const ASSETS={}` boş: Kadraj galerisinin 10 fotoğrafı ve Rota'nın örnek Klaketleri (video + kapak) `img/` ve `reels/` klasörlerinde ayrı dosyalar. Kodun içine yeniden base64 resim/video gömme; yeni hazır dosya gerekirse bu klasörlere koy.
 - Yayın: GitHub Pages, `main` dalı. https://kadrajsosyalmedya.github.io/Kadraj/
 - Arayüz metinleri Türkçe. Emoji yok; ikonlar SVG.
 
 ## Dosyalar
-- `index.html`: Uygulamanın tamamı (HTML, CSS ve JS). Saf JS, kütüphane yok, `"use strict"`.
+- `index.html`: Uygulamanın tamamı (HTML, CSS ve JS; ~1,4 MB). Saf JS, kütüphane yok, `"use strict"`.
+- `img/*.jpg` (Kadraj galerisi, `GALLERY`) ve `reels/*.mp4|jpg` (Rota'nın örnek Klaketleri, `BOT_POSTS`): uygulamanın hazır dosyaları; yollar (`img/kahve.jpg`) Firestore'daki eski paylaşımlarda da geçer, adlarını değiştirme.
 - `sw.js`: Service worker. Önce ağdan çeker, ağ yoksa önbellekten açar (önbellek adı `kadraj-v44`; `kadraj-open` önbelleği bildirim hedefini taşır). Önce ağ denendiği için sürüm değişince önbellek adını değiştirmek zorunlu değil.
 - `manifest.webmanifest`, `icon-192.png`, `icon-512.png` ve `icon-maskable-512.png`: PWA dosyaları. 4.4.2'den beri simge: yeşil degrade, vizör köşeleri içinde K ve turuncu nokta (`<link rel=icon>` `?v=` ile önbellek kırılır).
 
@@ -26,7 +27,7 @@ Bu dosya, `index.html` okunarak çıkarılmış ayrıntılı bir haritadır. Yen
 - `hash32`, `sha`, `richText` (#etiket ve @bahsetme), `vib(ms)`.
 - İkonlar: `IP` nesnesi (ad → SVG path), `I(ad)` → `<svg class="i">`. Yeni ikon için `IP`'ye satır ekle. Mevcut adlar: home search add reels pin heart comment send chat bookmark gear back close more moon sun auto image camera check spark vol mute lock logout trash edit grid music bell users info play link key pen type poll globe hand paste undo eraser film eye reply phone video camoff mic micoff flip hangup pause copy knight rotate bulb flag trophy prev next. Marka işareti için `VF` kullanılır.
 - `ROTA_AV`, `MEYDAN_AV`, `initialsAv(ad, tohum)` (baş harfli SVG avatar), `PALETTE`, `NOTE_BG` (6 degrade), `GALLERY` (10 hazır foto).
-- `R(yol)`: ASSETS'ten data URL döndürür. `RV(yol)`: video için blob URL üretir.
+- `R(yol)` / `RV(yol)`: eskiden ASSETS'ten data/blob URL üretirdi; 5.7.4'ten beri ASSETS boş olduğu için yolu olduğu gibi döndürür (dosya aynı siteden gelir).
 
 ## Durum ve ayarlar
 - `S` globaldir. Önemli alanlar: `mode` ("local" ya da "cloud"), `uid`, `authed`, `guest`, `admin`, `profiles`, `posts`, `meta`, `stories`, `chats`, `botchats`, `saved`, `hidden`, `meydan`, `online` (Set), `typing`, `route` ({name, params}), `stack`, `feedSeg`, `msgs` (açık sohbetin mesajları), `games`, `adm` (admin koleksiyonu), `caps` (`room`, `sample` = yapay zekâ), `replyTo`, `cmp` (oluştur taslağı).
@@ -129,7 +130,7 @@ Bu dosya, `index.html` okunarak çıkarılmış ayrıntılı bir haritadır. Yen
 - Tepki bildirimi yok (`notifyChats` yalnızca son mesajı izler).
 
 ## 4.0'da eklenenler (kısa)
-- Sürüm (şu an 5.7.3): `APP_V=50703`, `APP_VER="5.7.3"` ve `<head>`'deki `<meta name="kadraj-version" content="50703">` birlikte artırılmalı; eski biçim (40) `verNorm` ile çevrilir (sürüm denetimi bu etiketi okur; `meta/_surum` belgesi en yüksek sürümü tutar; iki sürüm geride kalan istemci kapanır).
+- Sürüm (şu an 5.7.4): `APP_V=50704`, `APP_VER="5.7.4"` ve `<head>`'deki `<meta name="kadraj-version" content="50704">` birlikte artırılmalı; eski biçim (40) `verNorm` ile çevrilir (sürüm denetimi bu etiketi okur; `meta/_surum` belgesi en yüksek sürümü tutar; iki sürüm geride kalan istemci kapanır).
 - Kancalar: `ACT` (data-act eylemleri), `HOOKS.after/enter/profiles/boot` + `runHooks`. Aktiflik: `isActive`, `activeLabel`, `activeUsers`, `lastSeenAt`.
 - Blok A (`/*@js:A{*/`): `#intro` açılış animasyonu, karşılama ekranı (`welScreen`), sürüm denetimi (`verWatch`, `fetchRemoteVersion`, `hardReload`, `showVersionBlock`), `showWhatsNew` (`WN_ITEMS`).
 - Blok B: vurgu renkleri (`applyAccent`, `effAccent`), `themeSwitch`, tema eşitleme (`profiles.prefs`), yönetici ortak teması (`admin/tema`), ortak sohbet temaları (`chats/{cid}.theme`, `KB_THEMES`, yeni `applyWp`/`wallpaperMenu`), yeni `vSettings` (`data-set` anahtarları).
@@ -182,3 +183,4 @@ Bu dosya, `index.html` okunarak çıkarılmış ayrıntılı bir haritadır. Yen
 - 5.7.1 (bölge 570 CSS): Klaket alt bilgisi: profil fotoğrafı yuvarlak (yalnızca Klaket'te; uygulamanın geri kalanında avatarlar köşeli yuvarlak kalır), en solda (12 px); adın yanında "Takip et" (`.fbtn`, ad uzunsa ad kısalır); ses satırı (`.aud`) gizli; ses plağı `.rdisc` yuvarlak. Yan düğme/yazıların videonun yanına kayması artık yalnızca `@container (min-aspect-ratio:4/5)` (yatay tablet, bilgisayar); dikey tablet ve telefonda kenarlarda. Test: `scratchpad/v53/rshot2.js`.
 - 5.7.2: Sahibinin isteğiyle Klaket videosu **hiç kırpılmaz**: 5.7.0'daki `rfillFit`/`.rfill` (dikey videoyu ekrana doldurma) silindi, `.reel video{object-fit:contain!important}`; boşluklar siyah. Klaket videosunu kırpan bir şey ekleme.
 - 5.7.3: Sahibinin isteğiyle Akış üst çubuğunda satranç (at) ve tema (ay/güneş) düğmesi yok; Keşfet'te de tema düğmesi yok (`renderTop` içindeki `themeBtn` silindi). Tema Ayarlar › Görünüm'de, satranç Keşfet'teki kartta. APP_GUIDE/FAQ buna göre.
+- 5.7.4 (sahibinin onayıyla, hafifletme): ASSETS'teki 26 dosya (10 galeri fotoğrafı, 8 Klaket videosu + 8 kapak) koddan çıkarılıp `img/` ve `reels/` klasörlerine kondu; `index.html` 3,4 MB → 1,44 MB (uygulama her açılışta index.html'i yeniden indirdiği için açılış hızlandı). `const ASSETS={}` kaldı, `R`/`RV` yolu döndürür; aynı site olduğu için tuvale çizim (composer, hikâye) sorunsuz. sw.js: `img/` ve `reels/` resimleri önce önbellekten, mp4'e karışmaz (Range istekleri tarayıcıda). `archPrep` arşivdeki yeni sürümler için `<base href>` ve CSP'de sitenin kendisine img/media izni ekler. Cloudinary'ye taşıma denendi ama bu ortamdan api.cloudinary.com engelli; sahibi GitHub'ı seçti. Test: `scratchpad/v53/assets.js`.
