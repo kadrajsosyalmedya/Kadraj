@@ -94,7 +94,14 @@ function san(m,x){if(m.ca)return m.ca===CASTLE[m.k][0]?"O-O":"O-O-O";const t=m.p
 /* ---------- bot ---------- */
 const CEN=s=>{const r=(s/N)|0,c=s%N;return Math.abs(r-6.5)+Math.abs(c-6.5)};
 function hangValue(G,k){let v=0;const en=enemyOf(k),me=j=>j===k;for(let s=0;s<SQ;s++){const p=G.b[s];if(!p||(p>>3)!==k||(p&7)===6)continue;const a=att(G,s,en);if(!a)continue;const val=VAL[p&7];v+=att(G,s,me)?Math.max(0,val-a):val}return v}
-function botPick(G,k,lvl){const ms=legal(G,k);if(!ms.length)return null;const noise=[1.5,.45,.12][lvl]??.45;const early=G.ply<48;const hb=hangValue(G,k);let best=ms[0],bv=-1e9;
+/* s'deki taşın tehdit ettiği kareler */
+function hits(G,s){const b=G.b,p=b[s],t=p&7,k=p>>3,r=(s/N)|0,c=s%N,out=[];
+ if(t===1){const[dr,dc]=FWD[k];for(const[pr,pc]of PERP[k]){const q=at(r+dr+pr,c+dc+pc);if(q>=0)out.push(q)}return out}
+ if(t===2||t===6){for(const[a,d]of t===2?KN:KG){const q=at(r+a,c+d);if(q>=0)out.push(q)}return out}
+ for(const[a,d]of t===3?DIAG:t===4?ORTH:[...DIAG,...ORTH]){let R=r+a,C=c+d,q;while((q=at(R,C))>=0){out.push(q);if(b[q])break;R+=a;C+=d}}return out}
+const kdist=(a,b)=>Math.max(Math.abs(((a/N)|0)-((b/N)|0)),Math.abs(a%N-b%N));
+function botPick(G,k,lvl){const ms=legal(G,k);if(!ms.length)return null;const noise=[1.5,.45,.12][lvl]??.45;const early=G.ply<48,late=G.ply>140;const hb=hangValue(G,k);let best=ms[0],bv=-1e9;
+ let tk=-1,tv=1e9;if(late)for(let j=0;j<4;j++)if(j!==k&&G.alive[j]){const v=material(G,j);if(v<tv){tv=v;tk=j}}
  for(const m of ms){let v=0;const x=m.x;const t=m.p&7;
   if(x)v+=((x>>3)===DEAD?.35:1)*VAL[x&7]*1.05;
   if(m.pr)v+=7.5;if(m.ca)v+=.7;
@@ -102,10 +109,12 @@ function botPick(G,k,lvl){const ms=legal(G,k);if(!ms.length)return null;const no
   const nt=m.pr?5:t;const a=att(G,m.t,enemyOf(k));if(a){const def=att(G,m.t,j=>j===k);v-=def?Math.max(0,VAL[nt]-a)*.9:VAL[nt]*.95}
   if(lvl>0){const ha=hangValue(G,k)-(a?(att(G,m.t,j=>j===k)?Math.max(0,VAL[nt]-a):VAL[nt]):0);v-=Math.max(0,ha-hb)*.6;if(hb>ha)v+=(hb-ha)*.5}
   for(let j=0;j<4;j++){if(j===k||!G.alive[j])continue;if(att(G,G.king[j],i=>i===k)){v+=.35;if(lvl>0&&!legal(G,j).length)v+=8}}
+  if(!a||att(G,m.t,j=>j===k)){for(const q of hits(G,m.t)){const y=G.b[q];if(!y||(y&7)===6)continue;const j=y>>3;if(j===k||(j<4&&!G.alive[j]))continue;const yv=VAL[y&7]*(j===DEAD?.35:1);if(j===DEAD||!att(G,q,i=>i===j))v+=yv*.28;else if(yv>VAL[nt])v+=(yv-VAL[nt])*.18}}
   unmake(G);
+  if(tk>=0&&(t===4||t===5||t===2))v+=(kdist(m.f,G.king[tk])-kdist(m.t,G.king[tk]))*.06;
   if(t===2||t===3||t===5)v+=(CEN(m.f)-CEN(m.t))*(t===5&&early?.02:.07);
   if((t===2||t===3)&&REL[k][m.f]===13)v+=.3;
-  if(t===1){v+=(REL[k][m.f]-REL[k][m.t])*.05;const c0=rot((4-k)%4,(m.f/N)|0,m.f%N)[1];if(early&&(c0===6||c0===7))v+=.12}
+  if(t===1){v+=(REL[k][m.f]-REL[k][m.t])*(early?.05:.14);const c0=rot((4-k)%4,(m.f/N)|0,m.f%N)[1];if(early&&(c0===6||c0===7))v+=.12}
   if(t===6&&!m.ca)v-=early?.5:.1;
   if(t===5&&early)v-=.15;
   v+=(Math.random()-.5)*2*noise;
@@ -302,4 +311,5 @@ X.open=function(){if(!S.admin)return;css();if(st.layer&&document.body.contains(s
  const l=openLayer("s4",`<div class="s4" id="s4"></div>`,{noScrim:true,onClose:()=>{st.shown=false;clearTimeout(st.tm);removeEventListener("resize",fit);st.layer=null}});
  st.layer=l;st.root=$("#s4",l);st.shown=true;shell();addEventListener("resize",fit);requestAnimationFrame(fit);start(false)};
 X.state=()=>st;
+X._t={endCard,ui,drawPieces,schedule};
 })();
