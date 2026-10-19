@@ -3412,11 +3412,11 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
  const seenAt={};
  if(k.type==="dm"||k.type==="group"){const c=S.chats[k.cid]||{};const rd=c.reads||{};const others=k.type==="dm"?[k.uid]:(c.members||[]).filter(u=>u!==S.uid);
   for(const u of others){const t=rd[u]||0;if(!t||(c.noSeen||{})[u])continue;let idx=-1;
-   if(k.type==="dm"){let lm=-1;for(let i=msgs.length-1;i>=0;i--)if(msgs[i].from===S.uid){lm=i;break}if(lm<0||msgs[lm].at>t)continue;let later=false;for(let i=lm+1;i<msgs.length;i++)if(msgs[i].from===u){later=true;break}if(later)continue;idx=lm}
+   if(k.type==="dm"){/* 6.0: görüldü, gördüğü son mesajımın altında durur (yenisini görmediyse de) */let lm=-1;for(let i=msgs.length-1;i>=0;i--)if(msgs[i].from===S.uid&&!msgs[i].sys&&msgs[i].at<=t){lm=i;break}if(lm<0)continue;let later=false;for(let i=lm+1;i<msgs.length;i++)if(msgs[i].from===u){later=true;break}if(later)continue;idx=lm}
    else{for(let i=msgs.length-1;i>=0;i--)if(msgs[i].at<=t){idx=i;break}if(idx<0||msgs[idx].from===u)continue;let later=false;for(let i=idx+1;i<msgs.length;i++)if(msgs[i].from===u){later=true;break}if(later)continue}
    (seenAt[idx]=seenAt[idx]||[]).push([u,t])}}
  let lastAt=0;const multi=k.type==="group"||k.type==="meydan";
- msgs.forEach((m,idx)=>{if(m.sys){h+=`<div class="stamp sysn">${esc(m.text||"")}</div>`;lastAt=m.at;S.knownMids.add(m.id||String(m.at));return}const gap=m.at-lastAt;if(gap>30*60e3)h+=`<div class="stamp">${new Date(m.at).toLocaleString("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>`;const prev=msgs[idx-1];const showSender=multi&&m.from!==S.uid&&(!prev||prev.from!==m.from||gap>5*60e3);lastAt=m.at;
+ msgs.forEach((m,idx)=>{if(m.sys){h+=`<div class="stamp sysn" data-k="${esc(m.id||String(m.at))}">${esc(m.text||"")}</div>`;lastAt=m.at;S.knownMids.add(m.id||String(m.at));return}const gap=m.at-lastAt;if(gap>30*60e3)h+=`<div class="stamp" data-k="t-${esc(m.id||String(m.at))}">${new Date(m.at).toLocaleString("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>`;const prev=msgs[idx-1];const showSender=multi&&m.from!==S.uid&&(!prev||prev.from!==m.from||gap>5*60e3);lastAt=m.at;
   const mine=m.from===S.uid;let body="";const isAI=m.from==="bot:rota";const mk=m.id||String(m.at);const isNew=!fresh&&!S.knownMids.has(mk);
   if(m.del)body="Bu mesaj silindi";else{if(m.fwd)body+=`<span class="fwd">${I("send")}İletildi</span>`;
    if(m.reply)body+=`<button class="quote" data-jump="${esc(m.reply.mid)}">${esc(P(m.reply.from).username)}: ${esc(m.reply.text||"")}</button>`;
@@ -3428,7 +3428,7 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
    if(m.text)body+=isAI&&!mine?md(m.text):esc(m.text);
    if(m.edited)body+=`<span class="edl">düzenlendi</span>`}
   const hearts=Object.keys(msgReacts(m)).length;
-  h+=`<div class="mrow ${mine?"me":""} ${hearts?"has-react":""} ${isNew?"nw":""}">${multi&&!mine?(showSender?`<button class="avb" data-prof="${esc(m.from)}" aria-label="${esc(P(m.from).name)} profili">${avatar(m.from,32,{click:false,ring:false,online:false})}</button>`:'<span style="width:32px;flex:none"></span>'):""}<div class="mcol">${showSender?`<button class="sender" data-prof="${esc(m.from)}">${esc(P(m.from).name||P(m.from).username)}${BOT[m.from]?badge(m.from):""} <span class="muted">@${esc(P(m.from).username)}</span></button>`:""}<div class="msg ${isAI&&!mine?"ai":""} ${m.del?"del":""}" ${m.id&&k.type!=="bot"?`data-mid="${esc(m.id)}" id="m-${esc(m.id)}"`:""}>${body}${hearts?reactChip(m):""}</div></div></div>`;
+  h+=`<div class="mrow ${mine?"me":""} ${hearts?"has-react":""} ${isNew?"nw":""}" data-k="${esc(mk)}">${multi&&!mine?(showSender?`<button class="avb" data-prof="${esc(m.from)}" aria-label="${esc(P(m.from).name)} profili">${avatar(m.from,32,{click:false,ring:false,online:false})}</button>`:'<span style="width:32px;flex:none"></span>'):""}<div class="mcol">${showSender?`<button class="sender" data-prof="${esc(m.from)}">${esc(P(m.from).name||P(m.from).username)}${BOT[m.from]?badge(m.from):""} <span class="muted">@${esc(P(m.from).username)}</span></button>`:""}<div class="msg ${isAI&&!mine?"ai":""} ${m.del?"del":""}" ${m.id&&k.type!=="bot"?`data-mid="${esc(m.id)}" id="m-${esc(m.id)}"`:""}>${body}${hearts?reactChip(m):""}</div></div></div>`;
   if(seenAt[idx])h+=`<div class="seenrow">${seenAt[idx].slice(0,8).map(([u,t])=>`<button class="seenav ${S.seenKeys&&!S.seenKeys.has(u+":"+(m.id||m.at))&&!fresh?"nw":""}" data-seen="${esc(u)}" data-t="${t}" aria-label="${esc(P(u).username)} gördü"><img src="${esc(P(u).avatar)}" alt=""></button>`).join("")}</div>`;
   if(seenAt[idx]){S.seenKeys=S.seenKeys||new Set();seenAt[idx].forEach(([u])=>S.seenKeys.add(u+":"+(m.id||m.at)))}
   S.knownMids.add(mk)});
@@ -4159,12 +4159,12 @@ function notifyNewPosts(m){if(!notifReady||!settings.notify||settings.nPost===fa
 
 /* ============ Mesaj gönderme ============ */
 function wireComposer(){const f=$("#composer"),inp=$("#msgIn");if(!f)return;const key=S.route.params.key;const k=keyInfo(key);const btn=$("#sendBtn");const voice=k.type!=="bot";
- const grow=()=>{inp.style.height="auto";inp.style.height=Math.min(128,inp.scrollHeight)+"px"};
+ const grow=()=>cfGrow(inp);/* 6.0: yükseklik görünmez bir kopyada ölçülür, kutu yumuşakça büyür (bölge 60CHAT) */
  const icon=()=>{if(btn&&voice){const has=!!inp.value.trim();btn.innerHTML=I(has?"send":"mic");btn.setAttribute("aria-label",has?"Gönder":"Sesli mesaj kaydet")}};
  inp.addEventListener("input",()=>{grow();icon();typingPing(key)});
  inp.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&settings.enterSend!==false){e.preventDefault();if(inp.value.trim())f.requestSubmit()}});
  f.onsubmit=async e=>{e.preventDefault();const v=inp.value.trim();if(!v){if(voice)startRec();return}inp.value="";grow();icon();typingStop();S.forceBottom=true;const extra=S.replyTo?{reply:S.replyTo}:{};S.replyTo=null;drawReply();try{inp.focus({preventScroll:true})}catch{inp.focus()}await sendMessage(key,{text:v,...extra});try{inp.focus({preventScroll:true})}catch{}};
- drawReply()}
+ drawReply();grow()}
 function drawReply(){const b=$("#replyBar");if(!b)return;const r=S.replyTo;b.innerHTML=r?`<div class="replybar">${I("reply")}<span class="t"><b>${esc(P(r.from).username)}</b> · ${esc(r.text)}</span><button class="ib plain" data-act="noreply" aria-label="Yanıtı iptal et" style="width:2.2rem;height:2.2rem">${I("close")}</button></div>`:""}
 /* ---- sesli mesaj ---- */
 const mmss=x=>{x=Math.max(0,Math.round(x||0));return`${Math.floor(x/60)}:${String(x%60).padStart(2,"0")}`};
@@ -5071,7 +5071,7 @@ function draftOf(key){return(LS.get(draftKey(),{})||{})[key]||""}
 function draftSet(key,v){const d=LS.get(draftKey(),{})||{};v=(v||"").slice(0,2000);if(v.trim())d[key]=v;else delete d[key];LS.set(draftKey(),d)}
 const wireComposerBase=wireComposer;
 wireComposer=function(){wireComposerBase();const f=$("#composer"),inp=$("#msgIn");if(!f||!inp)return;const key=S.route.params.key;
- const dv=draftOf(key);if(dv&&!inp.value){inp.value=dv;inp.style.height="auto";inp.style.height=Math.min(128,inp.scrollHeight)+"px";const btn=$("#sendBtn");if(btn&&keyInfo(key).type!=="bot"){btn.innerHTML=I("send");btn.setAttribute("aria-label","Gönder")}}
+ const dv=draftOf(key);if(dv&&!inp.value){inp.value=dv;cfGrow(inp,true);const btn=$("#sendBtn");if(btn&&keyInfo(key).type!=="bot"){btn.innerHTML=I("send");btn.setAttribute("aria-label","Gönder")}}
  let t=0;inp.addEventListener("input",()=>{clearTimeout(t);t=setTimeout(()=>draftSet(key,inp.value),300)});
  const os=f.onsubmit;f.onsubmit=async e=>{e.preventDefault();clearTimeout(t);const v=inp.value.trim();if(!v)return os&&os.call(f,e);
   const rp=S.replyTo;const p=sendMessage;let ok;sendMessage=async(...a)=>(ok=await p(...a));try{await os.call(f,e)}finally{sendMessage=p}
