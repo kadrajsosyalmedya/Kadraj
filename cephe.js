@@ -917,7 +917,7 @@ function help(){sheet("cphelp","Cephe nasıl oynanır",`<div class="cp-help">
  <p><b>Kuşatma:</b> düşmanın küçük bir parçasını tamamen çevirirsen teslim olur, senin olur.</p>
  <p><b>İşgal ve asimilasyon:</b> aldığın düşman toprağı bir süre çizgili görünür ve az nüfus verir; zamanla ülkene katılır. Şehir ve hastane bunu hızlandırır.</p>
  <p><b>Ekonomi:</b> Şehir nüfusu ve asker üretimini, Kışla asker üretimini, Hastane nüfusu, Fabrika ve Liman altını artırır. Ordu sekmesinde Eğitim (asker gücü 1-10), General (+%8 güç) ve Kalkınma (altın ve nüfus artışı) var.</p>
- <p><b>Diplomasi:</b> Barış teklif et (3 dakika saldırı yok) ya da zayıf bir ülkeden vasalın olmasını iste: vasal sana gelirinin dörtte birini öder ve sana saldıramaz; toprakları dünya hakimiyetine sayılır.</p>
+ <p><b>Diplomasi:</b> Barış teklif et (3 dakika saldırı yok) ya da zayıf bir ülkeden vasalın olmasını iste: vasal sana gelirinin dörtte birini öder ve sana saldıramaz; toprakları dünya hakimiyetine sayılır. Vasal olduysan Vasal aracıyla efendine dokun: gücün onunkinin en az %80'iyse bağımsızlığını ilan edersin.</p>
  <p><b>Bombalar:</b> Atom, Nükleer, Hidrojen. Patlama yeri bir dakika radyasyonlu kalır. SAM bombayı havada vurur.</p>
  <p><b>Kazanmak:</b> dünyanın %80'ine (vasallarınla birlikte) hükmet ya da son ülke sen kal. 35 dakika dolarsa en büyük kazanır. Sol üstteki hız düğmesiyle oyunu 2-3 kat hızlandırabilirsin.</p>
  <p><b>Kısayollar:</b> 1-6 seçili sekmedeki yuvalar, Tab sekme değiştir, Q/E yüzde, Esc vazgeç, boşluk konumuna git. Bilgisayarda bir ülkenin üstüne gelince, telefonda basılı tutunca bilgisi çıkar.</p></div>`,{tall:true})}
