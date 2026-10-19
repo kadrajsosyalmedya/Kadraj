@@ -12051,7 +12051,7 @@ async function tbSend(p){if(S.guest)return guard();const c=tbChat();const ms=c.m
 function tbDecor(box){const ms=tbChat().msgs||[];let si=-1,lastMine=-1;
  for(let i=ms.length-1;i>=0;i--){const m=ms[i];if(m.from===TB_UID)break;if(m.from===S.uid){if(lastMine<0)lastMine=i;if(m.sn&&si<0)si=i}}
  const rowOf=m=>m&&box.querySelector(`:scope>.mrow[data-k="${CSS.escape(String(m.id||m.at))}"]`);
- const hs=box.querySelector(":scope>.hero>span");if(hs)hs.textContent="Sohbet hareketlerini dene: yaz, seri, gör, görme, bekle, vazgeç, uzun, fotoğraf, bildirim. Hepsi için \"yardım\".";
+ const hs=box.querySelector(":scope>.hero>span:last-child:not(.av)");if(hs)hs.textContent="Sohbet hareketlerini dene: yaz, seri, gör, görme, bekle, vazgeç, uzun, fotoğraf, bildirim. Hepsi için \"yardım\".";
  if(si>=0){const r=rowOf(ms[si]);if(r)r.insertAdjacentHTML("afterend",`<div class="seenrow"><button class="seenav" data-seen="${TB_UID}" data-t="${ms[si].sn}" aria-label="Test botu gördü"><img src="${esc(TB_AV)}" alt=""></button></div>`)}
  else if(lastMine>=0){const r=rowOf(ms[lastMine]);if(r)r.insertAdjacentHTML("afterend",'<div class="seenrow sr-ph" aria-hidden="true"><span class="seenav" style="visibility:hidden;box-shadow:none"></span></div>')}}
 const sendToBotBase60=sendToBot;
