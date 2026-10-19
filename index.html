@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60000">
+<meta name="kadraj-version" content="60001">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -453,7 +453,7 @@ main.chatmode:has(textarea:focus) .cchips{display:none}
 .sv .tap{position:absolute;top:80px;bottom:90px;width:35%;z-index:1}
 .sv .tap.l{left:0}.sv .tap.r{right:0;width:65%}
 .sv .ft{margin-top:auto;position:relative;z-index:2;display:flex;gap:10px;padding:12px 12px calc(14px + env(safe-area-inset-bottom,0px))}
-.sv .ft input{flex:1;min-height:2.9rem;border-radius:16px;border:1.5px solid rgba(255,255,255,.6);background:rgba(0,0,0,.25);color:#fff;padding:0 16px;outline:none}
+.sv .ft input{flex:1;min-width:0;min-height:2.9rem;border-radius:16px;border:1.5px solid rgba(255,255,255,.6);background:rgba(0,0,0,.25);color:#fff;padding:0 16px;outline:none}
 .sv .ft input::placeholder{color:rgba(255,255,255,.75)}
 .sv .ib{background:rgba(0,0,0,.35);border:0;color:#fff}
 
@@ -501,7 +501,7 @@ main.chatmode:has(textarea:focus) .cchips{display:none}
 .msg.flash{animation:flash 1.2s ease}
 .fwd{display:flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;opacity:.75;margin-bottom:3px}.fwd svg.i{width:.85rem;height:.85rem}
 .pinic{display:inline-flex;margin-left:6px;color:var(--muted);vertical-align:-2px}.pinic svg.i{width:.9rem;height:.9rem}
-.svrx{display:flex;gap:2px;flex:none}.svrx button{width:2.1rem;height:2.1rem;display:grid;place-items:center;border-radius:50%}.svrx svg{width:1.5rem;height:1.5rem}
+.svrx{display:flex;gap:2px;flex:none}.sv .ft .ib{flex:none}.sv .ft:focus-within .svrx{display:none}.svrx button{width:2.1rem;height:2.1rem;display:grid;place-items:center;border-radius:50%}.svrx svg{width:1.5rem;height:1.5rem}
 .arate{margin-left:6px;font:700 .72rem/1 var(--f-body);padding:4px 7px;border-radius:999px;background:rgba(127,127,127,.18);flex:none}
 .csr-in{margin:4px 16px 8px;width:calc(100% - 32px);box-sizing:border-box}.csr-list .opt{padding:10px 20px;text-align:left;gap:12px}.csr-list{display:grid;max-height:55vh;overflow-y:auto;padding-bottom:8px}.csr-list .opt small{display:block;font-weight:500;color:var(--muted);font-size:.76rem}.csr-list mark{background:var(--accent-soft);color:inherit;border-radius:3px}
 @keyframes flash{30%{box-shadow:0 0 0 4px var(--sun)}}
@@ -2990,6 +2990,7 @@ main.chessmode{padding:0 0 calc(8px + env(safe-area-inset-bottom,0px))}
  .c6 .crvbar{order:1}.c6 .chwbar{order:2}.c6 .cctl{order:3;margin-top:0}.c6 .cchat{order:4}
  .c6 .cch-list{max-height:min(32vh,260px)}
 }
+@media (min-width:900px) and (max-height:560px){.c6 .cbfr{width:min(calc(100dvh - 24px),700px,calc(100vw - 340px))}}
 /* lobi */
 .c6lob{display:grid;gap:12px;margin:0 0 16px}
 .c6lob .box{margin:0 12px}
@@ -3696,7 +3697,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60000,APP_VER="6.0.0";
+const APP_V=60001,APP_VER="6.0.1";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3994,7 +3995,7 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
  const seenAt={};
  if(k.type==="dm"||k.type==="group"){const c=S.chats[k.cid]||{};const rd=c.reads||{};const others=k.type==="dm"?[k.uid]:(c.members||[]).filter(u=>u!==S.uid);
   for(const u of others){const t=rd[u]||0;if(!t||(c.noSeen||{})[u])continue;let idx=-1;
-   if(k.type==="dm"){/* 6.0: görüldü, gördüğü son mesajımın altında durur (yenisini görmediyse de) */let lm=-1;for(let i=msgs.length-1;i>=0;i--)if(msgs[i].from===S.uid&&!msgs[i].sys&&msgs[i].at<=t){lm=i;break}if(lm<0)continue;let later=false;for(let i=lm+1;i<msgs.length;i++)if(msgs[i].from===u){later=true;break}if(later)continue;idx=lm}
+   if(k.type==="dm"){/* 6.0.1: görüldü, gördüğü son mesajımın altında durur; karşı taraf yazarken ya da yanıt verince de yeri değişmez */let lm=-1;for(let i=msgs.length-1;i>=0;i--)if(msgs[i].from===S.uid&&!msgs[i].sys&&msgs[i].at<=t){lm=i;break}if(lm<0)continue;idx=lm}
    else{for(let i=msgs.length-1;i>=0;i--)if(msgs[i].at<=t){idx=i;break}if(idx<0||msgs[idx].from===u)continue;let later=false;for(let i=idx+1;i<msgs.length;i++)if(msgs[i].from===u){later=true;break}if(later)continue}
    (seenAt[idx]=seenAt[idx]||[]).push([u,t])}}
  let lastAt=0;const multi=k.type==="group"||k.type==="meydan";
@@ -4722,7 +4723,7 @@ function subscribeShared(){admSubscribe();
  DB.watchDoc("chats/meydan",d=>{const o=S.meydan;S.meydan=d;if(d&&d.last&&notifReady&&settings.notify&&settings.nMsg!==false&&S.authed&&!isChild(S.uid)&&d.last.from!==S.uid&&d.last.at>(S.bootAt||Infinity)&&d.last.at>(LS.get("kadraj_meydan_"+S.uid,0)||0)&&(!o||!o.last||o.last.at<d.last.at)&&!(S.route.name==="chat"&&S.route.params.key==="meydan"))notifyMeydan(d);scheduleRefresh()})}
 let userUnsub=[];
 function subscribeUser(){teardownUser();const u=S.uid;if(S.mode==="cloud"&&FB)userUnsub.push(listenCalls());
- userUnsub.push(DB.watchCol("chats",docs=>{const m={};for(const d of docs)m[d.id]=d;notifyChats(m);S.chats=m;S._chatsIn=1;if(S.route.name==="chat"&&chatKey&&m[chatKey])markRead(chatKey);scheduleRefresh()},{where:["members","array-contains",u],limit:200}));
+ userUnsub.push(DB.watchCol("chats",docs=>{const m={};for(const d of docs)m[d.id]=d;notifyChats(m);S.chats=m;S._chatsIn=1;if(S.route.name==="chat"&&chatKey&&m[chatKey])markRead(chatKey);scheduleRefresh()},{where:["members","array-contains",u],limit:200,onError:()=>{S._chatsIn=1;scheduleRefresh()}}));
  userUnsub.push(DB.watchCol("games",docs=>{const m={};for(const d of docs){m[d.id]=d;if(d.status==="over"&&now()-(d.updatedAt||d.at||0)>2*24*H&&(d.players||[])[0]===S.uid)DB.del("games/"+d.id).catch(()=>{})}notifyGames(m);S.games=m;chRateMissed(m);S.gamesDenied=false;if(CH&&CH.mode==="online"&&m[CH.gid])chSync(m[CH.gid]);scheduleRefresh()},{where:["players","array-contains",u],limit:60,onError:e=>{if(e&&e.code==="permission-denied"){S.gamesDenied=true;scheduleRefresh()}}}));
  userUnsub.push(DB.watchDoc(`data/users/${u}/hidden`,d=>{S.hidden=d||{msgs:{},chats:{}};scheduleRefresh()}));
  userUnsub.push(DB.watchDoc(`data/users/${u}/saved`,d=>{S.saved=(d&&d.ids)||{};scheduleRefresh()}));
@@ -5269,7 +5270,7 @@ async function chOver(){if(!CH||!CH.over)return;const o=CH.over;const res=o.resu
   else if(CH.mode==="online"){const done=LS.get("kadraj_cg_rated",{})||{};if(!done[CH.gid]&&!(((CH.doc||{}).rated||{})[S.uid])){done[CH.gid]=1;LS.set("kadraj_cg_rated",done);const gid=CH.gid;write(()=>DB.update("games/"+gid,{rated:{[S.uid]:1}}),{quiet:true});delta=await chRate(chessStats(oppOf(CH.doc||{})).r,score)}}
   chSave();if(CH.mode==="bot"){LS.del("kadraj_chess_bot_"+S.uid)}if(CH.mode==="local")LS.del("kadraj_chess_local_"+S.uid)}
  if(CH.mode==="bot"){if(draw){chMood("");chBubble("Berabere! Güzel mücadeleydi.",6000)}else if(myWin){chMood("sad");chBubble(pick(["Tebrikler, beni yendin!","İyi oyundu, bu sefer sen kazandın."]),6000)}else{chMood("happy");chBubble(pick(["İyi oyundu! Rövanş?","Bu sefer ben kazandım. Bir daha?"]),6000)}}
- CSND.play(myWin||draw||CH.mode==="local"?"end":"lose");if(myWin)confetti();
+ if((CH.over||{}).reason!=="iptal")CSND.play(draw?"draw":myWin||CH.mode==="local"?"end":"lose");if(myWin)confetti();
  const ov=$("#cOv");if(!ov)return;
  ov.innerHTML=`<div class="cend"><div class="ct">${myWin?I("trophy"):I("knight")}</div><b>${title}</b><span>${esc(REASON[o.reason]||o.reason||"")}${delta!=null&&delta!==0?` · puan ${delta>0?"+":""}${delta}`:""}</span><div class="cbtns"><button class="btn" data-chs="${CH.mode==="online"?"rematch":"again"}">${I("rotate")}${CH.mode==="online"?"Rövanş iste":"Yeni oyun"}</button><button class="btn sec" data-chs="share">${I("send")}Akışta paylaş</button><button class="btn ghost" data-chs="review">Tahtaya bak</button></div></div>`;ov.classList.add("on");chUI()}
 function confetti(){const host=$("#cBoard");if(!host)return;const cols=["#ffcf4d","#3fd3ab","#e23e57","#1d4ed8","#f97316"];for(let i=0;i<40;i++){const c=document.createElement("i");c.className="conf";c.style.cssText=`left:${Math.random()*100}%;background:${cols[i%5]};animation-delay:${Math.random()*.4}s;animation-duration:${1.4+Math.random()}s;transform:rotate(${Math.random()*360}deg)`;host.appendChild(c);setTimeout(()=>c.remove(),2600)}}
@@ -5748,7 +5749,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.5 Rota fotoğrafa bakar: Rota sohbetinde + ile fotoğraf gönderilebilir; Rota fotoğrafa bakıp yanıt verir ("Bu ne?", "Bu soruyu çöz", "Hangisi daha güzel?"). Fotoğrafı göremezse bunu söyler, uydurmaz.
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
-- 6.0 sohbet: gönderdiğin mesaj alttan büyüyerek girer, sohbet zıplamadan kayar; karşı taraf yazarken yazıyor balonu yavaşça yükselir ve mesaj gelince aynı yerde o mesaja dönüşür. Görüldü fotoğrafı (Instagram gibi) gördüğü son mesajının altında durur, yenisini görünce aşağı kayar; yer açmaz. Sohbet listesinde Rota'nın altındaki "Test botu" ile bunları deneyebilirsin: mesajını görür, yazar, hazır yanıt verir; "yardım" yazınca komutları (yaz, seri, gör, görme, bekle, vazgeç, uzun, fotoğraf, bildirim) gösterir. "bildirim" yazıp sohbetten çıkarsan 5 saniye sonra bildirim gelir.
+- 6.0 sohbet: gönderdiğin mesaj alttan büyüyerek girer, sohbet zıplamadan kayar; karşı taraf yazarken yazıyor balonu yavaşça yükselir ve mesaj gelince aynı yerde o mesaja dönüşür. Görüldü fotoğrafı (Instagram gibi) gördüğü son mesajının altında durur, yenisini görünce aşağı kayar; yer açmaz, karşı taraf yazarken ya da yanıt verince de yerinde kalır. Sohbet listesinde Rota'nın altındaki "Test botu" ile bunları deneyebilirsin: mesajını görür, yazar, hazır yanıt verir; "yardım" yazınca komutları (yaz, seri, gör, görme, bekle, vazgeç, uzun, fotoğraf, bildirim) gösterir. "bildirim" yazıp sohbetten çıkarsan 5 saniye sonra bildirim gelir.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
 - 6.0 görünüm: arayüz yenilendi (Vizör ve Klasik ikisinde de): daha ferah kartlar, sayfa geçişleri yönlü (ileri sağdan, geri soldan, sekme alttan), alttan açılan pencerelerde seçenekler sırayla gelir. Profilde kişinin fotoğrafından bulanık kapak şeridi, Keşfet'te ara ara büyük karelerle mozaik ızgara, Bildirimler'de her satırda beğeni/yorum/takip rozeti, Ayarlar'da renkli ikonlar, yüklenirken iskelet ve ışıltı. Hareket azaltılmışsa animasyonlar kapanır.
 - 6.0 satranç: varsayılan taş seti Modern, tahta yeşil Turnuva (lobideki Görünüm'den değişir; daha önce seçim yapan kendi seçimini korur). Lobi: Botlara karşı, Arkadaşınla, Bulmacalar, Aynı telefonda. Oyun ekranı: telefonda hamleler üstte, tahta geniş, düğmeler altta; bilgisayarda hamle tablosu sağda. Ön hamle: rakip düşünürken taşını oynarsın, sıra gelince yapılır (kırmızı). Sağ tık kareyi işaretler, sağ tıkla sürükleyince ok çizer (shift yeşil, ctrl/alt mavi). Arkadaşınla çevrim içi oyunda da oyun incelemesi çalışır: Kitap, En iyi, Hata rozetleri, canlı doğruluk, değerlendirme çubuğu (satranç menüsünde Oyun incelemesi: canlı, oyun bitince ya da kapalı). Oyun sonunda yeni sonuç kartı.
@@ -7783,11 +7784,11 @@ const renderTopBase50CHS=renderTop;
 renderTop=function(){renderTopBase50CHS();try{const r=S.route.name;if(r!=="chessgame"&&r!=="chess")return;const h=$("#top h1");if(!h)return;
  if(r==="chessgame"&&CH&&CH.mode==="puzzle")h.textContent=`Bulmaca ${CH.pz.i+1}/${PUZZLES.length}`;
  if(typeof vzOn==="function"&&vzOn()){const m=chMeta(r);if(m)h.setAttribute("data-meta",m)}}catch(e){console.warn("chs",e)}};
-function chMeta(r){const up=s=>String(s).toLocaleUpperCase("tr");
+function chMeta(r){const up=s=>String(s);
  if(r==="chess")return up(`${chessStats(S.uid).r} puan · ${pzSolvedN()}/${PUZZLES.length} bulmaca`);
  if(!CH)return"";const tc=CH.tc?CH.tc.k:"süresiz";
  if(CH.mode==="puzzle"){const z=PUZZLES[CH.pz.i];return up(`${z.n} hamlede mat · ${CH.my?"siyah":"beyaz"} oynar`)}
- if(CH.mode==="bot")return up(`Rota'ya karşı · ${tc}`);if(CH.mode==="local")return up(`Aynı telefonda · ${tc}`);return"ÇEVRİM İÇİ OYUN"}
+ if(CH.mode==="bot")return up(`Rota'ya karşı · ${tc}`);if(CH.mode==="local")return up(`Aynı telefonda · ${tc}`);return"Çevrim içi oyun"}
 
 /* --- lobi: süre, bulmaca kartı, görünüm kartı --- */
 function chMini(fen,flip){const g=CC.fromFen(fen);const th=CTHEMES[chThKey()];let h="";for(let i=0;i<64;i++){const x=i&7,y=i>>3,p=g.b[flip?63-i:i];h+=`<i class="${(x+y)%2?"d":"l"}"${p?` data-p="${p}"`:""}></i>`}
@@ -9462,7 +9463,7 @@ const renderTopBase51CHS=renderTop;
 renderTop=function(){renderTopBase51CHS();try{if(S.route.name!=="chessgame"||!CH)return;const h=$("#top h1");if(!h)return;
  if(chcOn())h.textContent="Clawd · "+(CHC_LV[CH.level]||CHC_LV[1]).n;else if(chwOn())h.textContent="Clawd – Rota"}catch(e){console.warn("chs51",e)}};
 const chMetaBase51=chMeta;
-chMeta=function(r){if(r==="chessgame"&&CH){const up=s=>String(s).toLocaleUpperCase("tr");
+chMeta=function(r){if(r==="chessgame"&&CH){const up=s=>String(s);
  if(chcOn())return up(`Clawd'a karşı · ${CH.tc?CH.tc.k:"süresiz"}`);if(chwOn()){const s=chwScore();return up(`İzleme · Clawd ${s.c} – ${s.r} Rota`)}}return chMetaBase51(r)};
 const toastBase51CHS=toast;
 toast=function(t,...a){if(t==="Rota düşünüyor…"&&chcOn())t="Clawd düşünüyor…";return toastBase51CHS(t,...a)};
@@ -11836,7 +11837,9 @@ HOOKS.after.push(()=>{const k=kPopAt;if(!k)return;const dt=performance.now()-k.t
         mesajın kutusuna, yazı sonradan belirir); mesajsız biterse solar (#cfGhost, eski düğüm). Karşı tarafın yazıyor bilgisi (S.typing)
         kısa kesintilerde 1,5 sn tutulur (cfTypers) ki mesaj gelince dönüşebilsin; mesaj gelince 0,9 sn yeniden gösterilmez.
       Kaydırma ya da tekerlek yayı bırakır. Hareket azaltılmışsa (kbReduce) hiçbiri yok, konumlar doğrudan.
-   2) Görüldü (Instagram gibi): DM'de fotoğraf gördüğü son mesajımın altında durur, yenisini görünce aşağı kayar (renderMsgs'teki DM kuralı).
+   2) Görüldü (Instagram gibi): DM'de ve Test botunda fotoğraf gördüğü son mesajımın altında durur, yenisini görünce aşağı kayar
+      (renderMsgs'teki DM kuralı, tbDecor). 6.0.1: karşı taraf yazarken yazıyor satırına uçmaz, yanıt verince de kaybolmaz; yeri yalnızca
+      daha yeni bir mesajımı görünce değişir.
       Sonda tek yer ayrılır: son karşı taraf mesajından sonra gerçek görüldü satırı varsa .sr-ph yer tutucusu kaldırılır (cfDecor);
       görülünce liste itilmez, aradaki mesajlar en fazla bir satır yukarı kalkar.
    3) Yazma kutusu: yükseklik görünmez bir kopyada (CF.mir) ölçülür; "height:auto" ile ölçüm yapılmadığı için kutu CSS geçişiyle
@@ -11862,17 +11865,15 @@ function cfKey(el,pk){const c=el.classList;if(!c)return null;
  if(c.contains("mrow")){if(el.querySelector(":scope>.typing"))return"ty";if(el.querySelector(".msg.ai"))return"stream"}
  if(c.contains("empty"))return"empty";return null}
 const cfBub=el=>el.classList.contains("typing")?el:el.querySelector(".msg,.typing");
-function cfRows(box,st,top,tyU){const rows=new Map(),order=[];let pk=null;
+function cfRows(box,st,top){const rows=new Map(),order=[];let pk=null;
  for(const el of box.children){const k=cfKey(el,pk);if(!k||rows.has(k))continue;if(k[0]==="r")pk=k;const r=el.getBoundingClientRect();const b=cfBub(el);const q=b&&b.getBoundingClientRect();
   const o={el,bel:b,x:r.left,w:r.width,y:r.top-top+st,h:r.height,b:q&&q.width?{x:q.left,y:q.top-top+st,w:q.width,h:q.height}:null};
   if(k==="ty"){const a=el.querySelector(":scope>.av,:scope>.mn-avs");const ar=a&&a.getBoundingClientRect();if(ar&&ar.width)o.a={el:a,x:ar.left,y:ar.top-top+st,w:ar.width}}
   rows.set(k,o);order.push(k)}
  const avs=new Map();for(const a of box.querySelectorAll(".seenrow:not(.sr-ph) .seenav[data-seen]")){const r=a.getBoundingClientRect();avs.set(a.dataset.seen,{el:a,x:r.left,y:r.top-top+st,w:r.width})}
  /* birebirde yazıyor satırındaki fotoğraf, görüldü fotoğrafıyla aynı kişi: biri öbürüne kayar */
- const ta=tyU&&!avs.has(tyU)&&box.querySelector(":scope>.mn-ty:not(.mn-rt)>.av");if(ta){const r=ta.getBoundingClientRect();if(r.width)avs.set(tyU,{el:ta,x:r.left,y:r.top-top+st,w:r.width,ty:1})}
  return{rows,order,avs}}
-const cfTyU=k=>k&&(k.type==="dm"||k.type==="bot")?k.uid:null;
-function cfTake(box,k){const br=box.getBoundingClientRect(),st=box.scrollTop;return{st,top:br.top,...cfRows(box,st,br.top,cfTyU(k))}}
+function cfTake(box,k){const br=box.getBoundingClientRect(),st=box.scrollTop;return{st,top:br.top,...cfRows(box,st,br.top)}}
 function cfGrow(inp,instant){if(!inp)return;let m=CF.mir;
  if(!m||!m.isConnected){m=CF.mir=document.createElement("textarea");m.rows=1;m.tabIndex=-1;m.setAttribute("aria-hidden","true");
   Object.assign(m.style,{position:"fixed",left:"-9999px",top:"0",height:"0",minHeight:"0",visibility:"hidden",overflow:"hidden",pointerEvents:"none",resize:"none"});document.body.appendChild(m)}
@@ -11909,9 +11910,7 @@ function cfDecor(box,key,k){
  if(k.type==="dm"||k.type==="group"||k.type==="bot"){const rows=[...box.children];let li=-1;
   for(let i=rows.length-1;i>=0;i--){const x=rows[i];if(x.classList.contains("mrow")&&!x.classList.contains("me")&&!x.classList.contains("mn-ty")&&x.querySelector(".msg")){li=i;break}}
   let real=false;for(let i=li+1;i<rows.length;i++)if(rows[i].classList.contains("seenrow")&&!rows[i].classList.contains("sr-ph")){real=true;break}
-  if(real)box.querySelectorAll(":scope>.seenrow.sr-ph").forEach(x=>x.remove());
-  /* karşı taraf yazarken (birebir, bot) görüldü fotoğrafı yazıyor satırına geçer: sonda tek satır, liste itilmez */
-  if(k.type!=="group"&&box.querySelector(":scope>.mn-ty:not(.mn-rt)"))for(let i=li+1;i<rows.length;i++){const x=rows[i];if(x.classList.contains("seenrow")&&(x.classList.contains("sr-ph")||x.querySelector(`[data-seen="${CSS.escape(k.uid)}"]`)))x.remove()}}}
+  if(real)box.querySelectorAll(":scope>.seenrow.sr-ph").forEach(x=>x.remove())}}
 
 /* --- renderMsgs: en dış sarmalayıcı --- */
 const renderMsgsBase60=renderMsgs;
@@ -11933,7 +11932,7 @@ function cfAfter(box,key,k,old,pinned,fresh){
  /* ilk çizim ya da mesajlar ilk kez geldi (sohbet açılınca liste boş başlar): kayma yok, en altta açılır */
  const bulk=!!old&&!old.order.some(x=>x[0]==="r")&&currentMsgs().length>2;
  if(fresh||!old||bulk){cfStop();CF.en.clear();if(fresh)cfNewHide();CF.key=key;box._cfKey=key;if(pinned){box.scrollTop=box.scrollHeight;box._pin=true}cfMeas(box);return}
- const br=box.getBoundingClientRect(),st1=box.scrollTop;const N=cfRows(box,st1,br.top,cfTyU(k));const cur=N.rows;
+ const br=box.getBoundingClientRect(),st1=box.scrollTop;const N=cfRows(box,st1,br.top);const cur=N.rows;
  /* çapa: eskiden görünen ilk ortak satır yerinde kalır */
  let U=0;for(const kk of old.order){if(kk==="ph"||kk==="ty"||kk==="stream"||kk.startsWith("sr:"))continue;const o=old.rows.get(kk),n=cur.get(kk);if(!n)continue;if(o.y+o.h-old.st>0){U=n.y-o.y;break}}
  const stS=old.st+U+(br.top-old.top);const max1=box.scrollHeight-box.clientHeight;
@@ -11945,7 +11944,7 @@ function cfAfter(box,key,k,old,pinned,fresh){
   if(tg&&oT.b){const n=cur.get(tg);cfMoEnd();mo=CF.mo={key:tg,el:n.bel,dx:oT.b.x-n.b.x,dy:vis(oT.b,1)-vis(n.b,0),sx:oT.b.w/n.b.w,sy:oT.b.h/n.b.h,p:1,v:0,c:getComputedStyle(n.bel).color};
    if(oT.a)cfGhost(oT.a.el,{left:oT.a.x,top:vis(oT.a,1),width:oT.a.w},box,[{opacity:1,transform:"none"},{opacity:0,transform:"scale(.6)"}],200);
    CF.en.set("fx:"+tg,{t0:performance.now(),kind:"fx"})}
-  else if(cfOn()){const tu=cfTyU(k);if(oT.a&&tu&&N.avs.has(tu))oT.a.el.style.visibility="hidden";cfGhost(oT.el,{left:oT.x,top:vis(oT,1),width:oT.w},box,[{opacity:1,transform:"none",transformOrigin:"0 100%"},{opacity:0,transform:"scale(.8)",transformOrigin:"0 100%"}],220)}}
+  else if(cfOn()){cfGhost(oT.el,{left:oT.x,top:vis(oT,1),width:oT.w},box,[{opacity:1,transform:"none",transformOrigin:"0 100%"},{opacity:0,transform:"scale(.8)",transformOrigin:"0 100%"}],220)}}
  if(CF.mo&&!mo){const n=cur.get(CF.mo.key);if(n&&n.bel)CF.mo.el=n.bel;else cfMoEnd()}
  /* girişler */
  const t0=performance.now();
@@ -11961,7 +11960,6 @@ function cfAfter(box,key,k,old,pinned,fresh){
   if(Math.abs(dy)>.5||(it&&Math.abs(it.vy)>8))items.set(kk,{el:n.el,x:0,y:dy,vx:0,vy:it?cfNoOver(dy,it.vy):0})}
  for(const[u,a]of N.avs){const o=old.avs.get(u);if(!o){if(!CF.en.has("av:"+u))CF.en.set("av:"+u,{t0,kind:"av"});continue}
   const dx=o.x-a.x,dy=vis(o,1)-vis(a,0),ds=(o.w&&a.w?o.w/a.w:1)-1;const it=CF.items.get("av:"+u);
-  if(a.ty&&!o.ty){const e=CF.en.get("ty");if(e)e.noAv=1}
   if(Math.abs(dx)>.5||Math.abs(dy)>.5||Math.abs(ds)>.01||(it&&Math.abs(it.vy)>8))items.set("av:"+u,{el:a.el,av:1,x:dx,y:dy,s:ds,vx:it?cfNoOver(dx,it.vx):0,vy:it?cfNoOver(dy,it.vy):0,vs:0})}
  CF.items=items;CF.els=cur;CF.avEls=N.avs;
  if(pinned){const was=CF.bottom&&CF.raf;CF.bottom=true;CF.off=max1-stS;CF.v=was?cfNoOver(CF.off,CF.v):0;cfNewHide()}
@@ -12002,7 +12000,7 @@ function cfPlayEn(){const t=performance.now();
   const n=CF.els.get(key);if(!n)continue;
   if(e.kind==="st"){go(n.el,[{opacity:0},{opacity:1}]);continue}
   if(e.kind==="ty"){go(n.el.querySelector(".typing"),[{transform:"scale(.35)",opacity:0,transformOrigin:"0 100%"},{transform:"none",opacity:1,transformOrigin:"0 100%"}]);
-   for(const x of n.el.querySelectorAll(e.noAv?":scope>small":":scope>.av,:scope>.mn-avs,:scope>small"))go(x,[{opacity:0},{opacity:1}],{dur:360,ease:"ease-out"});continue}
+   for(const x of n.el.querySelectorAll(":scope>.av,:scope>.mn-avs,:scope>small"))go(x,[{opacity:0},{opacity:1}],{dur:360,ease:"ease-out"});continue}
   const org=e.kind==="me"?"100% 100%":"0 100%";go(n.bel,[{transform:"scale(.8)",opacity:.15,transformOrigin:org},{transform:"none",opacity:1,transformOrigin:org}])}}
 /* giden öğe yerinde solar (eski, ayrılmış düğüm; #msgs dışında, onun alanına kırpılı) */
 function cfGhost(el,r,box,kf,dur){try{let g=document.getElementById("cfGhost");if(!g){g=document.createElement("div");g.id="cfGhost";g.setAttribute("aria-hidden","true");document.body.appendChild(g)}
@@ -12085,11 +12083,11 @@ async function tbSend(p){if(S.guest)return guard();const c=tbChat();const ms=c.m
  const run=++TBQ.run;try{await tbReact(mine,run)}catch(e){console.warn("test botu",e)}finally{if(TBQ.run===run&&S.botTyping===TB_UID){S.botTyping=null;tbPaint()}}return true}
 /* görüldü: gördüğü son mesajımın altında; son mesaj benimse sonda tek yer */
 function tbDecor(box){const ms=tbChat().msgs||[];let si=-1,lastMine=-1;
- for(let i=ms.length-1;i>=0;i--){const m=ms[i];if(m.from===TB_UID)break;if(m.from===S.uid){if(lastMine<0)lastMine=i;if(m.sn&&si<0)si=i}}
+ for(let i=ms.length-1;i>=0;i--){const m=ms[i];if(m.from===S.uid){if(lastMine<0)lastMine=i;if(m.sn&&si<0){si=i;break}}}
  const rowOf=m=>m&&box.querySelector(`:scope>.mrow[data-k="${CSS.escape(String(m.id||m.at))}"]`);
  const hs=box.querySelector(":scope>.hero>span:last-child:not(.av)");if(hs)hs.textContent="Sohbet hareketlerini dene: yaz, seri, gör, görme, bekle, vazgeç, uzun, fotoğraf, bildirim. Hepsi için \"yardım\".";
  if(si>=0){const r=rowOf(ms[si]);if(r)r.insertAdjacentHTML("afterend",`<div class="seenrow"><button class="seenav" data-seen="${TB_UID}" data-t="${ms[si].sn}" aria-label="Test botu gördü"><img src="${esc(TB_AV)}" alt=""></button></div>`)}
- else if(lastMine>=0){const r=rowOf(ms[lastMine]);if(r)r.insertAdjacentHTML("afterend",'<div class="seenrow sr-ph" aria-hidden="true"><span class="seenav" style="visibility:hidden;box-shadow:none"></span></div>')}}
+ if(lastMine>=0&&lastMine!==si){const r=rowOf(ms[lastMine]);if(r)r.insertAdjacentHTML("afterend",'<div class="seenrow sr-ph" aria-hidden="true"><span class="seenav" style="visibility:hidden;box-shadow:none"></span></div>')}}
 const sendToBotBase60=sendToBot;
 sendToBot=async function(uid,payload,...a){if(uid===TB_UID)return tbSend(payload||{});return sendToBotBase60.call(this,uid,payload,...a)};
 const knSeenBase60=knSeen;
