@@ -3166,6 +3166,15 @@ main.chatmode{position:relative}
 .pinbar .px{flex:none;width:2rem;height:2rem;border-radius:10px;display:grid;place-items:center;background:none;border:0;color:var(--muted)}
 .pinbar .px svg.i{width:1rem;height:1rem}
 .pinbar .pdots{display:grid;gap:2px;flex:none}.pinbar .pdots i{width:3px;height:8px;border-radius:2px;background:var(--line)}.pinbar .pdots i.on{background:var(--accent)}
+/* tek seferlik fotoğraf */
+.once{display:flex;align-items:center;gap:10px;padding:2px 2px;background:none;border:0;color:inherit;text-align:left;font:inherit}
+.once .oi{width:2.3rem;height:2.3rem;border-radius:50%;display:grid;place-items:center;flex:none;border:2px dashed currentColor;opacity:.9}
+.once .oi svg.i{width:1.1rem;height:1.1rem}.once span{display:grid}.once small{font-size:.74rem;opacity:.75}
+.once.off .oi{border-style:solid;opacity:.5}
+.oncev{position:fixed;inset:0;z-index:60;background:#000;display:grid;place-items:center}
+.oncev img{max-width:100%;max-height:100%;object-fit:contain;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;pointer-events:none}
+.oncev .ot{position:absolute;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));text-align:center;color:#fff;font-size:.82rem;opacity:.8}
+.oncev button{position:absolute;right:12px;top:calc(8px + env(safe-area-inset-top,0px));width:2.6rem;height:2.6rem;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center}
 /*}@css:61CHAT*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
@@ -3973,7 +3982,7 @@ const isActive=uid=>settings.showActive!==false&&!!uid&&!BOT[uid]&&S.online.has(
 function activeLabel(uid){if(settings.showActive===false||!uid||BOT[uid])return"";if(S.online.has(uid))return"Şu an aktif";const t=lastSeenAt(uid);if(!t)return"";const m=(now()-t)/60e3;if(m<1)return"Az önce aktifti";if(m<60)return`${Math.round(m)} dk önce aktifti`;if(m<1440)return`${Math.round(m/60)} sa önce aktifti`;if(m<10080)return`${Math.round(m/1440)} gün önce aktifti`;return""}
 const activeUsers=()=>humans().filter(isActive);
 function seenText(uid){if(settings.showActive===false)return"";if(S.online.has(uid))return"Çevrimiçi";const t=(S.lastSeen||{})[uid];if(!t)return"Çevrimdışı";const a=ago(t);return"Son görülme "+(a==="şimdi"?"az önce":a+" önce")}
-const msgPreview=m=>m?(m.text||(m.post?"Bir paylaşım gönderdi":m.img?"Fotoğraf":m.video?"Video":m.audio?"Sesli mesaj":m.call?"Arama":m.game?"Satranç daveti":"")):"";
+const msgPreview=m=>m?(m.text||(m.once?"Tek seferlik fotoğraf":m.post?"Bir paylaşım gönderdi":m.img?"Fotoğraf":m.video?"Video":m.audio?"Sesli mesaj":m.call?"Arama":m.game?"Satranç daveti":"")):"";
 const noteOf=u=>{const n=S.profiles[u]&&S.profiles[u].note;return n&&n.text&&n.at>now()-24*H?n.text:""};
 function saveHidden(){const h=S.hidden||{};return write(()=>DB.set(`data/users/${S.uid}/hidden`,{msgs:h.msgs||{},chats:h.chats||{}}),{quiet:true})}
 function chatHead(key){const k=keyInfo(key);
@@ -4020,7 +4029,7 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
    if(m.call)body+=`<button class="callmsg" data-call="${esc(mine?(keyInfo(key).uid||""):m.from)}" data-v="${m.call.video?1:0}">${I(m.call.video?"video":"phone")}<span>${esc(callLabel(m.call,mine))}</span></button>`;
    if(m.post){const p0=postById(m.post);const p=p0&&canSee(p0)?p0:null;body+=p?`<button class="mp" data-open="${esc(p.id)}">${postThumb(p)?`<img src="${esc(postThumb(p))}" alt="">`:`<div class="note" style="margin:0;min-height:6rem;font-size:.85rem;border-radius:0;background:${p.kind==="poll"?"#0c7a63":NOTE_BG[p.bg||0]}">${esc(p.text||p.question||"")}</div>`}<span>@${esc(P(p.uid).username)}</span></button>`:"<i>Paylaşım kaldırılmış</i>"}
    if(m.game)body+=gameMsgHtml(m);
-   if(m.img)body+=`<img class="att" src="${esc(m.img)}" alt="Fotoğraf" data-view="1">`;
+   if(m.once)body+=onceHtml(m);else if(m.img)body+=`<img class="att" src="${esc(m.img)}" alt="Fotoğraf" data-view="1">`;
    if(m.text)body+=isAI&&!mine?md(m.text):esc(m.text);
    if(m.edited)body+=`<span class="edl">düzenlendi</span>`}
   const hearts=Object.keys(msgReacts(m)).length;
@@ -4871,7 +4880,7 @@ async function sendMessage(key,payload){const k=keyInfo(key);if(k.type==="dm"&&!
  const at=now();const mid=at.toString(36)+Math.random().toString(36).slice(2,6);const msg={from:S.uid,at,...payload};if(!msg.text)delete msg.text;
  if(S.route.name==="chat"&&chatKey===k.cid){S.msgs=[...S.msgs,{id:mid,...msg}];renderMsgs()}
  if(!await write(()=>DB.set(`chats/${k.cid}/msgs/${mid}`,msg))){if(S.msgs.some(x=>x.id===mid)){S.msgs=S.msgs.filter(x=>x.id!==mid);renderMsgs()}return false}
- const preview=payload.text||(payload.post?"Bir paylaşım gönderdi":payload.img?"Fotoğraf":payload.video?"Video":payload.audio?"Sesli mesaj":payload.call?callLabel(payload.call,false):"");
+ const preview=payload.text||(payload.once?"Tek seferlik fotoğraf":payload.post?"Bir paylaşım gönderdi":payload.img?"Fotoğraf":payload.video?"Video":payload.audio?"Sesli mesaj":payload.call?callLabel(payload.call,false):"");
  if(k.type==="meydan")await write(()=>DB.set("chats/meydan",{last:{text:preview,from:S.uid,at},updatedAt:at}),{quiet:true});
  else if(k.type==="group")await write(()=>DB.update("chats/"+k.cid,{last:{text:preview,from:S.uid,at},updatedAt:at,reads:{[S.uid]:at}}),{quiet:true});
  else{const meta={members:[S.uid,k.uid].sort(),last:{text:preview,from:S.uid,at},updatedAt:at,reads:{[S.uid]:at}};await write(()=>S.chats[k.cid]?DB.update("chats/"+k.cid,meta):DB.set("chats/"+k.cid,meta),{quiet:true})}
@@ -12164,11 +12173,37 @@ document.addEventListener("click",e=>{const j=e.target.closest&&e.target.closest
  const p=mpinsOf(k);if(p.length>1){pinIx=(pinIx+1)%p.length;pinPaint()}},true);
 const msgMenuBase61=msgMenu;
 msgMenu=function(mid,...a){const r=msgMenuBase61.call(this,mid,...a);try{const k=pinKey();const l=$('#overlay [data-layer="menu"]');const m=S.msgs.find(x=>x.id===mid);
+  if(l&&m&&m.once){const f=l.querySelector("#mmF");if(f)f.remove()}
   if(k&&l&&m&&!m.sys){const on=((S.chats[k.cid]||{}).pins||[]).includes(mid);const cancel=l.querySelector('.opt[data-act="close"]');
    const b=document.createElement("button");b.className="opt";b.innerHTML=`${I("pin")}${on?"Sabitlemeyi kaldır":"Sabitle"}`;b.onclick=()=>{closeLayer("menu");pinSet(k,mid,!on)};if(cancel)cancel.before(b)}}catch(e){console.warn(e)}return r};
 const renderMsgsBase61=renderMsgs;
 renderMsgs=function(...a){const r=renderMsgsBase61.apply(this,a);try{pinPaint()}catch(e){console.warn(e)}return r};
-HOOKS.after.push(()=>{pinIx=0;try{pinPaint()}catch{}});
+HOOKS.after.push(()=>{pinIx=0;try{pinPaint()}catch{}try{onceSweep()}catch{}});
+/* Tek seferlik fotoğraf: + menüsünde "Tek seferlik fotoğraf" (DM ve grup). Mesaj {img, once:1}; alıcı dokununca tam ekranda bir kez açar, kapatınca
+   opened.{uid}=zaman yazılır ve DM'de resim silinir (img:null); grupta herkes açınca ya da 24 saat sonra silinir. Gönderen resmi görmez.
+   İlet, kopyala, sohbet ayrıntılarındaki Medya listesi bu mesajda yok; özet "Tek seferlik fotoğraf". Ekran görüntüsü web'de engellenemez. */
+const ONCE_T=24*H;
+function onceOthers(k,m){if(k.type==="dm")return[k.uid];const c=S.chats[k.cid]||{};return(c.members||[]).filter(u=>u!==m.from)}
+function onceHtml(m){const op=m.opened||{};const mine=m.from===S.uid;let k=null;try{k=keyInfo(S.route.params.key)}catch{}
+ const seenBy=k?onceOthers(k,m).filter(u=>op[u]).length:0;
+ if(mine)return`<span class="once${m.img?"":" off"}"><span class="oi">${I("eye")}</span><span><b>Fotoğraf</b><small>Bir kez · ${seenBy?(k&&k.type==="group"?`${seenBy} kişi açtı`:"Açıldı"):"Gönderildi"}</small></span></span>`;
+ if(op[S.uid]||!m.img)return`<span class="once off"><span class="oi">${I("eye")}</span><span><b>Fotoğraf</b><small>Açıldı</small></span></span>`;
+ return`<button type="button" class="once" data-once="${esc(m.id)}"><span class="oi">${I("eye")}</span><span><b>Fotoğraf</b><small>Bir kez görüntülenir · dokun</small></span></button>`}
+async function onceSend(){const key=S.route.params.key;const r=await pickImage({title:"Tek seferlik fotoğraf"});if(!r||!r.img)return;const iw=r.img.naturalWidth||r.img.width,ih=r.img.naturalHeight||r.img.height;
+ const sc=Math.min(1,900/Math.max(iw,ih));const c=document.createElement("canvas");c.width=Math.round(iw*sc);c.height=Math.round(ih*sc);c.getContext("2d").drawImage(r.img,0,0,c.width,c.height);
+ S.forceBottom=true;await sendMessage(key,{img:encode(c,150000),once:1,text:""})}
+function onceOpen(mid){const k=keyInfo(S.route.params.key);const m=S.msgs.find(x=>x.id===mid);if(!m||!m.img||m.from===S.uid||(m.opened||{})[S.uid])return;
+ const l=openLayer("oncev",`<div class="oncev" role="dialog" aria-label="Tek seferlik fotoğraf"><img src="${esc(m.img)}" alt="Fotoğraf"><span class="ot">Bir kez görüntülenir</span><button type="button" data-act="close" aria-label="Kapat">${I("close")}</button></div>`,{noScrim:true,onClose:()=>onceDone(k,mid)});
+ l.addEventListener("contextmenu",e=>e.preventDefault())}
+async function onceDone(k,mid){const m=S.msgs.find(x=>x.id===mid);if(!m)return;const at=now();const op={...(m.opened||{}),[S.uid]:at};
+ const all=onceOthers(k,m).every(u=>op[u]);const patch={opened:{[S.uid]:at}};if(all||k.type==="dm")patch.img=null;
+ S.msgs=S.msgs.map(x=>x.id===mid?{...x,opened:op,...(patch.img===null?{img:null}:{})}:x);renderMsgs();await write(()=>DB.update(`chats/${k.cid}/msgs/${mid}`,patch),{quiet:true})}
+/* gönderen: 24 saati geçen açılmamış tek seferlik fotoğrafı siler */
+function onceSweep(){const k=pinKey();if(!k)return;for(const m of S.msgs)if(m.once&&m.img&&m.from===S.uid&&now()-m.at>ONCE_T)write(()=>DB.update(`chats/${k.cid}/msgs/${m.id}`,{img:null}),{quiet:true})}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-once]");if(!b)return;e.preventDefault();e.stopPropagation();onceOpen(b.dataset.once)},true);
+const plusMenuBase61=plusMenu;
+plusMenu=function(...a){const r=plusMenuBase61.apply(this,a);try{const k=pinKey();const l=$('#overlay [data-layer="plus"]');const box=l&&l.querySelector(".srcs");const ph=box&&box.querySelector("#pph");
+  if(k&&ph){const b=document.createElement("button");b.className="src";b.id="pon";b.innerHTML=`<span class="ic">${I("eye")}</span><span><b>Tek seferlik fotoğraf</b><small>Bir kez açılır, sonra kaybolur</small></span>`;b.onclick=()=>{closeLayer("plus");onceSend()};ph.after(b)}}catch(e){console.warn(e)}return r};
 /*}@js:61CHAT*/
 /*@js:550{*/
 /* 5.5.0
@@ -12292,7 +12327,7 @@ function chatInfo(key){key=key||(S.route.params&&S.route.params.key);if(!key)ret
   const row=(id,ic,col,t,sub,extra)=>`<button class="ci-row" data-ci="${id}"><span class="ic" style="background:${col}">${I(ic)}</span><span class="t"><b>${t}</b>${sub?`<small>${sub}</small>`:""}</span>${extra||I("next")}</button>`;
   const rows=`<div class="ci-list">${row("theme","palette","linear-gradient(135deg,#7c3aed,#ec4899)","Tema","Sohbet rengi ve duvar kağıdı: "+esc(th))}${row("nick","type","#0C7A63","Takma adlar",nicks?nicks+" takma ad":"Bu sohbette kime ne denileceğini seç")}${dm?row("priv","lock","#1d4ed8","Gizlilik ve güvenlik",iBlocked(uid)?"Engelledin":"Engelle, görüldü bilgisi"):""}${dm?row("group","add","#d97706","Grup sohbeti oluştur","@"+esc(p.username)+" ile birlikte"):""}</div>`;
   const hid=(S.hidden&&S.hidden.msgs)||{};const msgs=(S.msgs||[]).filter(m=>m&&!m.del&&!m.sys&&!(m.id&&hid[m.id]));
-  const media=msgs.filter(m=>m.img||m.video).reverse(),posts=msgs.filter(m=>m.post&&postById(m.post)&&canSee(postById(m.post))).reverse();
+  const media=msgs.filter(m=>!m.once&&(m.img||m.video)).reverse(),posts=msgs.filter(m=>m.post&&postById(m.post)&&canSee(postById(m.post))).reverse();
   const links=[];for(const m of msgs.slice().reverse())for(const u of String(m.text||"").match(/https?:\/\/[^\s<>"']+/gi)||[])if(links.length<60)links.push({u,m});
   const tabs=`<div class="ci-tabs" role="tablist">${[["media","image","Medya",media.length],["posts","grid","Paylaşımlar",posts.length],["links","link","Bağlantılar",links.length]].map(([id,ic,lb,n])=>`<button data-cit="${id}" aria-pressed="${tab===id}">${I(ic)}${lb}${n?` (${n})`:""}</button>`).join("")}</div>`;
   let body="";
