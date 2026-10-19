@@ -221,7 +221,7 @@ function shell(){const r=st.root;r.innerHTML=`<div class="s4-hd"><button class="
  <div class="s4-body"><div class="s4-bw" id="s4Bw"><div class="s4-b" id="s4B">${squaresHtml()}<div class="s4-mk" id="s4Mk"></div><div class="s4-pcs" id="s4Pcs"></div>${[0,1,2,3].map(k=>`<div class="s4-cn" id="s4C${k}" style="left:${CORNER[k][0]*100/14}%;top:${CORNER[k][1]*100/14}%"></div>`).join("")}</div></div>
  <div class="s4-ft"><div class="s4-log" id="s4Log" aria-live="polite"></div><div class="s4-ctl" id="s4Ctl"></div></div></div><div class="s4-ov" id="s4Ov"></div>`;
  r.onclick=onClick;wire();fit()}
-function fit(){const bw=$("#s4Bw"),b=$("#s4B");if(!bw||!b||!st.root)return;const wide=innerWidth>=900;const w=wide?st.root.clientWidth-300-48:bw.clientWidth,h=bw.clientHeight;const s=Math.max(240,Math.floor(Math.min(w,h,820)/14)*14);b.style.setProperty("--s4",s+"px");st.root.style.setProperty("--s4",s+"px")}
+function fit(){const bw=$("#s4Bw"),b=$("#s4B");if(!bw||!b||!st.root)return;const wide=innerWidth>=900;const w=wide?st.root.clientWidth-300-48:bw.clientWidth,h=bw.clientHeight;const s=Math.max(168,Math.floor(Math.min(w,h,820)/14)*14);b.style.setProperty("--s4",s+"px");st.root.style.setProperty("--s4",s+"px")}
 function drawPieces(){const G=st.G,pc=$("#s4Pcs");if(!pc)return;const im=imgs();pc.innerHTML="";st.el={};
  for(let s=0;s<SQ;s++){const p=G.b[s];if(!p)continue;const d=document.createElement("div");d.className="s4-p";d.style.transform=tf(s);d.innerHTML=`<img src="${im[p]}" alt="" draggable="false">`;pc.appendChild(d);st.el[s]=d}}
 function marks(){const mk=$("#s4Mk");if(!mk)return;const G=st.G;let h="";

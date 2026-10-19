@@ -453,7 +453,7 @@ main.chatmode:has(textarea:focus) .cchips{display:none}
 .sv .tap{position:absolute;top:80px;bottom:90px;width:35%;z-index:1}
 .sv .tap.l{left:0}.sv .tap.r{right:0;width:65%}
 .sv .ft{margin-top:auto;position:relative;z-index:2;display:flex;gap:10px;padding:12px 12px calc(14px + env(safe-area-inset-bottom,0px))}
-.sv .ft input{flex:1;min-height:2.9rem;border-radius:16px;border:1.5px solid rgba(255,255,255,.6);background:rgba(0,0,0,.25);color:#fff;padding:0 16px;outline:none}
+.sv .ft input{flex:1;min-width:0;min-height:2.9rem;border-radius:16px;border:1.5px solid rgba(255,255,255,.6);background:rgba(0,0,0,.25);color:#fff;padding:0 16px;outline:none}
 .sv .ft input::placeholder{color:rgba(255,255,255,.75)}
 .sv .ib{background:rgba(0,0,0,.35);border:0;color:#fff}
 
@@ -501,7 +501,7 @@ main.chatmode:has(textarea:focus) .cchips{display:none}
 .msg.flash{animation:flash 1.2s ease}
 .fwd{display:flex;align-items:center;gap:4px;font-size:.72rem;font-weight:600;opacity:.75;margin-bottom:3px}.fwd svg.i{width:.85rem;height:.85rem}
 .pinic{display:inline-flex;margin-left:6px;color:var(--muted);vertical-align:-2px}.pinic svg.i{width:.9rem;height:.9rem}
-.svrx{display:flex;gap:2px;flex:none}.svrx button{width:2.1rem;height:2.1rem;display:grid;place-items:center;border-radius:50%}.svrx svg{width:1.5rem;height:1.5rem}
+.svrx{display:flex;gap:2px;flex:none}.sv .ft .ib{flex:none}.sv .ft:focus-within .svrx{display:none}.svrx button{width:2.1rem;height:2.1rem;display:grid;place-items:center;border-radius:50%}.svrx svg{width:1.5rem;height:1.5rem}
 .arate{margin-left:6px;font:700 .72rem/1 var(--f-body);padding:4px 7px;border-radius:999px;background:rgba(127,127,127,.18);flex:none}
 .csr-in{margin:4px 16px 8px;width:calc(100% - 32px);box-sizing:border-box}.csr-list .opt{padding:10px 20px;text-align:left;gap:12px}.csr-list{display:grid;max-height:55vh;overflow-y:auto;padding-bottom:8px}.csr-list .opt small{display:block;font-weight:500;color:var(--muted);font-size:.76rem}.csr-list mark{background:var(--accent-soft);color:inherit;border-radius:3px}
 @keyframes flash{30%{box-shadow:0 0 0 4px var(--sun)}}
@@ -2990,6 +2990,7 @@ main.chessmode{padding:0 0 calc(8px + env(safe-area-inset-bottom,0px))}
  .c6 .crvbar{order:1}.c6 .chwbar{order:2}.c6 .cctl{order:3;margin-top:0}.c6 .cchat{order:4}
  .c6 .cch-list{max-height:min(32vh,260px)}
 }
+@media (min-width:900px) and (max-height:560px){.c6 .cbfr{width:min(calc(100dvh - 24px),700px,calc(100vw - 340px))}}
 /* lobi */
 .c6lob{display:grid;gap:12px;margin:0 0 16px}
 .c6lob .box{margin:0 12px}
@@ -4722,7 +4723,7 @@ function subscribeShared(){admSubscribe();
  DB.watchDoc("chats/meydan",d=>{const o=S.meydan;S.meydan=d;if(d&&d.last&&notifReady&&settings.notify&&settings.nMsg!==false&&S.authed&&!isChild(S.uid)&&d.last.from!==S.uid&&d.last.at>(S.bootAt||Infinity)&&d.last.at>(LS.get("kadraj_meydan_"+S.uid,0)||0)&&(!o||!o.last||o.last.at<d.last.at)&&!(S.route.name==="chat"&&S.route.params.key==="meydan"))notifyMeydan(d);scheduleRefresh()})}
 let userUnsub=[];
 function subscribeUser(){teardownUser();const u=S.uid;if(S.mode==="cloud"&&FB)userUnsub.push(listenCalls());
- userUnsub.push(DB.watchCol("chats",docs=>{const m={};for(const d of docs)m[d.id]=d;notifyChats(m);S.chats=m;S._chatsIn=1;if(S.route.name==="chat"&&chatKey&&m[chatKey])markRead(chatKey);scheduleRefresh()},{where:["members","array-contains",u],limit:200}));
+ userUnsub.push(DB.watchCol("chats",docs=>{const m={};for(const d of docs)m[d.id]=d;notifyChats(m);S.chats=m;S._chatsIn=1;if(S.route.name==="chat"&&chatKey&&m[chatKey])markRead(chatKey);scheduleRefresh()},{where:["members","array-contains",u],limit:200,onError:()=>{S._chatsIn=1;scheduleRefresh()}}));
  userUnsub.push(DB.watchCol("games",docs=>{const m={};for(const d of docs){m[d.id]=d;if(d.status==="over"&&now()-(d.updatedAt||d.at||0)>2*24*H&&(d.players||[])[0]===S.uid)DB.del("games/"+d.id).catch(()=>{})}notifyGames(m);S.games=m;chRateMissed(m);S.gamesDenied=false;if(CH&&CH.mode==="online"&&m[CH.gid])chSync(m[CH.gid]);scheduleRefresh()},{where:["players","array-contains",u],limit:60,onError:e=>{if(e&&e.code==="permission-denied"){S.gamesDenied=true;scheduleRefresh()}}}));
  userUnsub.push(DB.watchDoc(`data/users/${u}/hidden`,d=>{S.hidden=d||{msgs:{},chats:{}};scheduleRefresh()}));
  userUnsub.push(DB.watchDoc(`data/users/${u}/saved`,d=>{S.saved=(d&&d.ids)||{};scheduleRefresh()}));
@@ -5269,7 +5270,7 @@ async function chOver(){if(!CH||!CH.over)return;const o=CH.over;const res=o.resu
   else if(CH.mode==="online"){const done=LS.get("kadraj_cg_rated",{})||{};if(!done[CH.gid]&&!(((CH.doc||{}).rated||{})[S.uid])){done[CH.gid]=1;LS.set("kadraj_cg_rated",done);const gid=CH.gid;write(()=>DB.update("games/"+gid,{rated:{[S.uid]:1}}),{quiet:true});delta=await chRate(chessStats(oppOf(CH.doc||{})).r,score)}}
   chSave();if(CH.mode==="bot"){LS.del("kadraj_chess_bot_"+S.uid)}if(CH.mode==="local")LS.del("kadraj_chess_local_"+S.uid)}
  if(CH.mode==="bot"){if(draw){chMood("");chBubble("Berabere! Güzel mücadeleydi.",6000)}else if(myWin){chMood("sad");chBubble(pick(["Tebrikler, beni yendin!","İyi oyundu, bu sefer sen kazandın."]),6000)}else{chMood("happy");chBubble(pick(["İyi oyundu! Rövanş?","Bu sefer ben kazandım. Bir daha?"]),6000)}}
- CSND.play(myWin||draw||CH.mode==="local"?"end":"lose");if(myWin)confetti();
+ if((CH.over||{}).reason!=="iptal")CSND.play(draw?"draw":myWin||CH.mode==="local"?"end":"lose");if(myWin)confetti();
  const ov=$("#cOv");if(!ov)return;
  ov.innerHTML=`<div class="cend"><div class="ct">${myWin?I("trophy"):I("knight")}</div><b>${title}</b><span>${esc(REASON[o.reason]||o.reason||"")}${delta!=null&&delta!==0?` · puan ${delta>0?"+":""}${delta}`:""}</span><div class="cbtns"><button class="btn" data-chs="${CH.mode==="online"?"rematch":"again"}">${I("rotate")}${CH.mode==="online"?"Rövanş iste":"Yeni oyun"}</button><button class="btn sec" data-chs="share">${I("send")}Akışta paylaş</button><button class="btn ghost" data-chs="review">Tahtaya bak</button></div></div>`;ov.classList.add("on");chUI()}
 function confetti(){const host=$("#cBoard");if(!host)return;const cols=["#ffcf4d","#3fd3ab","#e23e57","#1d4ed8","#f97316"];for(let i=0;i<40;i++){const c=document.createElement("i");c.className="conf";c.style.cssText=`left:${Math.random()*100}%;background:${cols[i%5]};animation-delay:${Math.random()*.4}s;animation-duration:${1.4+Math.random()}s;transform:rotate(${Math.random()*360}deg)`;host.appendChild(c);setTimeout(()=>c.remove(),2600)}}
@@ -7783,11 +7784,11 @@ const renderTopBase50CHS=renderTop;
 renderTop=function(){renderTopBase50CHS();try{const r=S.route.name;if(r!=="chessgame"&&r!=="chess")return;const h=$("#top h1");if(!h)return;
  if(r==="chessgame"&&CH&&CH.mode==="puzzle")h.textContent=`Bulmaca ${CH.pz.i+1}/${PUZZLES.length}`;
  if(typeof vzOn==="function"&&vzOn()){const m=chMeta(r);if(m)h.setAttribute("data-meta",m)}}catch(e){console.warn("chs",e)}};
-function chMeta(r){const up=s=>String(s).toLocaleUpperCase("tr");
+function chMeta(r){const up=s=>String(s);
  if(r==="chess")return up(`${chessStats(S.uid).r} puan · ${pzSolvedN()}/${PUZZLES.length} bulmaca`);
  if(!CH)return"";const tc=CH.tc?CH.tc.k:"süresiz";
  if(CH.mode==="puzzle"){const z=PUZZLES[CH.pz.i];return up(`${z.n} hamlede mat · ${CH.my?"siyah":"beyaz"} oynar`)}
- if(CH.mode==="bot")return up(`Rota'ya karşı · ${tc}`);if(CH.mode==="local")return up(`Aynı telefonda · ${tc}`);return"ÇEVRİM İÇİ OYUN"}
+ if(CH.mode==="bot")return up(`Rota'ya karşı · ${tc}`);if(CH.mode==="local")return up(`Aynı telefonda · ${tc}`);return"Çevrim içi oyun"}
 
 /* --- lobi: süre, bulmaca kartı, görünüm kartı --- */
 function chMini(fen,flip){const g=CC.fromFen(fen);const th=CTHEMES[chThKey()];let h="";for(let i=0;i<64;i++){const x=i&7,y=i>>3,p=g.b[flip?63-i:i];h+=`<i class="${(x+y)%2?"d":"l"}"${p?` data-p="${p}"`:""}></i>`}
@@ -9462,7 +9463,7 @@ const renderTopBase51CHS=renderTop;
 renderTop=function(){renderTopBase51CHS();try{if(S.route.name!=="chessgame"||!CH)return;const h=$("#top h1");if(!h)return;
  if(chcOn())h.textContent="Clawd · "+(CHC_LV[CH.level]||CHC_LV[1]).n;else if(chwOn())h.textContent="Clawd – Rota"}catch(e){console.warn("chs51",e)}};
 const chMetaBase51=chMeta;
-chMeta=function(r){if(r==="chessgame"&&CH){const up=s=>String(s).toLocaleUpperCase("tr");
+chMeta=function(r){if(r==="chessgame"&&CH){const up=s=>String(s);
  if(chcOn())return up(`Clawd'a karşı · ${CH.tc?CH.tc.k:"süresiz"}`);if(chwOn()){const s=chwScore();return up(`İzleme · Clawd ${s.c} – ${s.r} Rota`)}}return chMetaBase51(r)};
 const toastBase51CHS=toast;
 toast=function(t,...a){if(t==="Rota düşünüyor…"&&chcOn())t="Clawd düşünüyor…";return toastBase51CHS(t,...a)};
