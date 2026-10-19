@@ -11829,6 +11829,8 @@ function cfSpH(b){const s=b&&b.querySelector(":scope>.cf-sp");return s?s.offsetH
 /* kritik sönümlü yay (x konum, v hız, w sertlik, dt sn); büyük farklarda hız sınırlı */
 function cfStep(x,v,w,dt){const e=Math.exp(-w*dt),c=v+w*x;let x1=(x+c*dt)*e,v1=(v-w*c*dt)*e;const vm=Math.max(1600,Math.abs(x)*3),mx=vm*dt;
  if(Math.abs(x1-x)>mx){x1=x+Math.sign(x1-x)*mx;v1=Math.sign(v1||x1-x)*Math.min(Math.abs(v1),vm)}return[x1,v1]}
+/* taşmasın: yay yeni hedefe giderken eldeki hız onu öbür yana geçirmeyecek kadar kırpılır */
+function cfNoOver(x,v){const l=-CF.w*x;return x>0?Math.max(v,l):x<0?Math.min(v,l):0}
 function cfKey(el,pk){const c=el.classList;if(!c)return null;
  if(el.dataset.k)return(c.contains("stamp")?"s:":"r:")+el.dataset.k;
  if(c.contains("mn-ty")||c.contains("typing"))return"ty";
@@ -11837,14 +11839,17 @@ function cfKey(el,pk){const c=el.classList;if(!c)return null;
  if(c.contains("mrow")){if(el.querySelector(":scope>.typing"))return"ty";if(el.querySelector(".msg.ai"))return"stream"}
  if(c.contains("empty"))return"empty";return null}
 const cfBub=el=>el.classList.contains("typing")?el:el.querySelector(".msg,.typing");
-function cfRows(box,st,top){const rows=new Map(),order=[];let pk=null;
+function cfRows(box,st,top,tyU){const rows=new Map(),order=[];let pk=null;
  for(const el of box.children){const k=cfKey(el,pk);if(!k||rows.has(k))continue;if(k[0]==="r")pk=k;const r=el.getBoundingClientRect();const b=cfBub(el);const q=b&&b.getBoundingClientRect();
   const o={el,bel:b,x:r.left,w:r.width,y:r.top-top+st,h:r.height,b:q&&q.width?{x:q.left,y:q.top-top+st,w:q.width,h:q.height}:null};
   if(k==="ty"){const a=el.querySelector(":scope>.av,:scope>.mn-avs");const ar=a&&a.getBoundingClientRect();if(ar&&ar.width)o.a={el:a,x:ar.left,y:ar.top-top+st,w:ar.width}}
   rows.set(k,o);order.push(k)}
- const avs=new Map();for(const a of box.querySelectorAll(".seenrow:not(.sr-ph) .seenav[data-seen]")){const r=a.getBoundingClientRect();avs.set(a.dataset.seen,{el:a,x:r.left,y:r.top-top+st})}
+ const avs=new Map();for(const a of box.querySelectorAll(".seenrow:not(.sr-ph) .seenav[data-seen]")){const r=a.getBoundingClientRect();avs.set(a.dataset.seen,{el:a,x:r.left,y:r.top-top+st,w:r.width})}
+ /* birebirde yazıyor satırındaki fotoğraf, görüldü fotoğrafıyla aynı kişi: biri öbürüne kayar */
+ const ta=tyU&&!avs.has(tyU)&&box.querySelector(":scope>.mn-ty:not(.mn-rt)>.av");if(ta){const r=ta.getBoundingClientRect();if(r.width)avs.set(tyU,{el:ta,x:r.left,y:r.top-top+st,w:r.width,ty:1})}
  return{rows,order,avs}}
-function cfTake(box){const br=box.getBoundingClientRect(),st=box.scrollTop;return{st,top:br.top,...cfRows(box,st,br.top)}}
+const cfTyU=k=>k&&(k.type==="dm"||k.type==="bot")?k.uid:null;
+function cfTake(box,k){const br=box.getBoundingClientRect(),st=box.scrollTop;return{st,top:br.top,...cfRows(box,st,br.top,cfTyU(k))}}
 function cfGrow(inp,instant){if(!inp)return;let m=CF.mir;
  if(!m||!m.isConnected){m=CF.mir=document.createElement("textarea");m.rows=1;m.tabIndex=-1;m.setAttribute("aria-hidden","true");
   Object.assign(m.style,{position:"fixed",left:"-9999px",top:"0",height:"0",minHeight:"0",visibility:"hidden",overflow:"hidden",pointerEvents:"none",resize:"none"});document.body.appendChild(m)}
@@ -11855,7 +11860,7 @@ function cfGrow(inp,instant){if(!inp)return;let m=CF.mir;
  else if(inp.style.height!==h+"px")inp.style.height=h+"px"}
 /* gönderimden hemen önce ölç: yazma kutusu ve yanıt çubuğu küçülmeden önceki görüntü, ilk çizimde eski konum sayılır */
 document.addEventListener("submit",e=>{if(!e.target||e.target.id!=="composer"||!cfOn())return;const b=$("#msgs");if(!b||b._cfKey!==CF.key)return;
- try{CF.pre=cfTake(b);CF.pre.box=b;requestAnimationFrame(()=>{CF.pre=null})}catch{}},true);
+ try{let k=null;try{k=keyInfo(S.route.params.key)}catch{}CF.pre=cfTake(b,k);CF.pre.box=b;requestAnimationFrame(()=>{CF.pre=null})}catch{}},true);
 /* gönder düğmesi odağı almaz: telefonda klavye kapanıp yeniden açılmaz, sohbet zıplamaz */
 document.addEventListener("pointerdown",e=>{const b=e.target.closest&&e.target.closest("#sendBtn");const a=document.activeElement;if(b&&a&&a.id==="msgIn")e.preventDefault()},true);
 
@@ -11881,7 +11886,9 @@ function cfDecor(box,key,k){
  if(k.type==="dm"||k.type==="group"||k.type==="bot"){const rows=[...box.children];let li=-1;
   for(let i=rows.length-1;i>=0;i--){const x=rows[i];if(x.classList.contains("mrow")&&!x.classList.contains("me")&&!x.classList.contains("mn-ty")&&x.querySelector(".msg")){li=i;break}}
   let real=false;for(let i=li+1;i<rows.length;i++)if(rows[i].classList.contains("seenrow")&&!rows[i].classList.contains("sr-ph")){real=true;break}
-  if(real)box.querySelectorAll(":scope>.seenrow.sr-ph").forEach(x=>x.remove())}}
+  if(real)box.querySelectorAll(":scope>.seenrow.sr-ph").forEach(x=>x.remove());
+  /* karşı taraf yazarken (birebir, bot) görüldü fotoğrafı yazıyor satırına geçer: sonda tek satır, liste itilmez */
+  if(k.type!=="group"&&box.querySelector(":scope>.mn-ty:not(.mn-rt)"))for(let i=li+1;i<rows.length;i++){const x=rows[i];if(x.classList.contains("seenrow")&&(x.classList.contains("sr-ph")||x.querySelector(`[data-seen="${CSS.escape(k.uid)}"]`)))x.remove()}}}
 
 /* --- renderMsgs: en dış sarmalayıcı --- */
 const renderMsgsBase60=renderMsgs;
@@ -11889,7 +11896,7 @@ renderMsgs=function(...a){const b0=$("#msgs");const key=S.route.name==="chat"&&S
  if(b0&&key)try{k=keyInfo(key)}catch{}
  if(!k)return renderMsgsBase60.apply(this,a);
  const fresh=CF.key!==key||b0._cfKey!==key;const force=!!S.forceBottom;
- let old=null;if(!fresh&&cfOn())try{old=CF.pre&&CF.pre.box===b0?CF.pre:cfTake(b0)}catch(e){console.warn("cf",e)}CF.pre=null;
+ let old=null;if(!fresh&&cfOn())try{old=CF.pre&&CF.pre.box===b0?CF.pre:cfTake(b0,k)}catch(e){console.warn("cf",e)}CF.pre=null;
  const pinned=fresh||force||(CF.bottom&&!!CF.raf)||b0.scrollHeight-b0.scrollTop-b0.clientHeight<120||b0._pin===true;
  const ty=cfTypers(key,k);const sv=S.typing;if(ty)S.typing=ty.map;
  let r;try{r=renderMsgsBase60.apply(this,a)}finally{if(ty)S.typing=sv}
@@ -11901,7 +11908,7 @@ function cfAfter(box,key,k,old,pinned,fresh){
  box.style.setProperty("--cf-tp",(-Math.round((performance.now()-CF.tp0)%1000))+"ms");
  cfDecor(box,key,k);
  if(fresh||!old){cfStop();CF.en.clear();CF.key=key;box._cfKey=key;if(pinned){box.scrollTop=box.scrollHeight;box._pin=true}cfMeas(box);return}
- const br=box.getBoundingClientRect(),st1=box.scrollTop;const N=cfRows(box,st1,br.top);const cur=N.rows;
+ const br=box.getBoundingClientRect(),st1=box.scrollTop;const N=cfRows(box,st1,br.top,cfTyU(k));const cur=N.rows;
  /* çapa: eskiden görünen ilk ortak satır yerinde kalır */
  let U=0;for(const kk of old.order){if(kk==="ph"||kk==="ty"||kk==="stream"||kk.startsWith("sr:"))continue;const o=old.rows.get(kk),n=cur.get(kk);if(!n)continue;if(o.y+o.h-old.st>0){U=n.y-o.y;break}}
  const stS=old.st+U+(br.top-old.top);const max1=box.scrollHeight-box.clientHeight;
@@ -11913,34 +11920,37 @@ function cfAfter(box,key,k,old,pinned,fresh){
   if(tg&&oT.b){const n=cur.get(tg);cfMoEnd();mo=CF.mo={key:tg,el:n.bel,dx:oT.b.x-n.b.x,dy:vis(oT.b,1)-vis(n.b,0),sx:oT.b.w/n.b.w,sy:oT.b.h/n.b.h,p:1,v:0,c:getComputedStyle(n.bel).color};
    if(oT.a)cfGhost(oT.a.el,{left:oT.a.x,top:vis(oT.a,1),width:oT.a.w},box,[{opacity:1,transform:"none"},{opacity:0,transform:"scale(.6)"}],200);
    CF.en.set("fx:"+tg,{t0:performance.now(),kind:"fx"})}
-  else if(cfOn())cfGhost(oT.el,{left:oT.x,top:vis(oT,1),width:oT.w},box,[{opacity:1,transform:"none",transformOrigin:"0 100%"},{opacity:0,transform:"scale(.8)",transformOrigin:"0 100%"}],220)}
+  else if(cfOn()){const tu=cfTyU(k);if(oT.a&&tu&&N.avs.has(tu))oT.a.el.style.visibility="hidden";cfGhost(oT.el,{left:oT.x,top:vis(oT,1),width:oT.w},box,[{opacity:1,transform:"none",transformOrigin:"0 100%"},{opacity:0,transform:"scale(.8)",transformOrigin:"0 100%"}],220)}}
  if(CF.mo&&!mo){const n=cur.get(CF.mo.key);if(n&&n.bel)CF.mo.el=n.bel;else cfMoEnd()}
  /* girişler */
  const t0=performance.now();
  for(const x of added){if(CF.mo&&x===CF.mo.key)continue;const n=cur.get(x);const kind=x==="ty"?"ty":x[0]==="r"||x==="stream"?(n.el.classList.contains("me")?"me":"in"):x[0]==="s"||x==="hero"||x==="empty"?"st":null;if(kind&&!CF.en.has(x))CF.en.set(x,{t0,kind})}
- /* kayan satırlar ve görüldü fotoğrafları */
- const items=new Map();
- for(const[kk,n]of cur){if(kk==="ph"||kk.startsWith("sr:"))continue;const o=old.rows.get(kk);if(!o)continue;const dy=vis(o,1)-vis(n,0);const it=CF.items.get(kk);
-  if(Math.abs(dy)>.5||(it&&Math.abs(it.vy)>8))items.set(kk,{el:n.el,x:0,y:dy,vx:0,vy:it?it.vy:0})}
- for(const[u,a]of N.avs){const o=old.avs.get(u);if(!o){if(!CF.en.has("av:"+u))CF.en.set("av:"+u,{t0,kind:"av"});continue}
-  const dx=o.x-a.x,dy=vis(o,1)-vis(a,0);const it=CF.items.get("av:"+u);if(Math.abs(dx)>.5||Math.abs(dy)>.5||(it&&Math.abs(it.vy)>8))items.set("av:"+u,{el:a.el,av:1,x:dx,y:dy,vx:it?it.vx:0,vy:it?it.vy:0})}
- CF.items=items;CF.els=cur;CF.avEls=N.avs;
  /* sertlik: kendi mesajın hızlı, yazıyor yavaş */
  const has=f=>added.some(x=>{const n=cur.get(x);return n&&f(x,n)});
  const meNew=has((x,n)=>x[0]==="r"&&n.el.classList.contains("me")),inNew=has((x,n)=>(x[0]==="r"||x==="stream")&&!n.el.classList.contains("me"));
  CF.w=meNew?18:mo?11:inNew?13:added.includes("ty")?7.5:tk&&!cur.has(tk)?9:(CF.raf?CF.w:14);
- if(pinned){const was=CF.bottom&&CF.raf;CF.bottom=true;CF.off=max1-stS;if(!was)CF.v=0}
+ /* kayan satırlar ve görüldü fotoğrafları */
+ const items=new Map();
+ for(const[kk,n]of cur){if(kk==="ph"||kk.startsWith("sr:"))continue;const o=old.rows.get(kk);if(!o)continue;const dy=vis(o,1)-vis(n,0);const it=CF.items.get(kk);
+  if(Math.abs(dy)>.5||(it&&Math.abs(it.vy)>8))items.set(kk,{el:n.el,x:0,y:dy,vx:0,vy:it?cfNoOver(dy,it.vy):0})}
+ for(const[u,a]of N.avs){const o=old.avs.get(u);if(!o){if(!CF.en.has("av:"+u))CF.en.set("av:"+u,{t0,kind:"av"});continue}
+  const dx=o.x-a.x,dy=vis(o,1)-vis(a,0),ds=(o.w&&a.w?o.w/a.w:1)-1;const it=CF.items.get("av:"+u);
+  if(a.ty&&!o.ty){const e=CF.en.get("ty");if(e)e.noAv=1}
+  if(Math.abs(dx)>.5||Math.abs(dy)>.5||Math.abs(ds)>.01||(it&&Math.abs(it.vy)>8))items.set("av:"+u,{el:a.el,av:1,x:dx,y:dy,s:ds,vx:it?cfNoOver(dx,it.vx):0,vy:it?cfNoOver(dy,it.vy):0,vs:0})}
+ CF.items=items;CF.els=cur;CF.avEls=N.avs;
+ if(pinned){const was=CF.bottom&&CF.raf;CF.bottom=true;CF.off=max1-stS;CF.v=was?cfNoOver(CF.off,CF.v):0}
  else{CF.bottom=false;CF.off=0;CF.v=0;const s=Math.max(0,Math.min(max1,stS));if(Math.abs(box.scrollTop-s)>.5)box.scrollTop=s}
- box._cfKey=key;CF.ch=box.clientHeight;cfDraw(box);cfPlayEn();cfKick()}
+ box._cfKey=key;cfMeas(box);cfDraw(box);cfPlayEn();cfKick()}
 /* şu anki durumu çiz (kaydırma, satırlar, dönüşüm) */
 function cfDraw(box){if(CF.bottom)cfApply(box);for(const it of CF.items.values())cfPut(it);if(CF.mo)cfMoPut();cfMeas(box)}
 function cfMeas(box){CF.H=box.scrollHeight-cfSpH(box);CF.ch=box.clientHeight}
-function cfApply(box){/* kayarken kutu büyürse (yazma kutusu küçüldü, klavye kapandı) içerik yerinde kalır, kalan yol kayarak gidilir */
- const ch=box.clientHeight;if(CF.bottom&&CF.ch&&ch>CF.ch)CF.off-=ch-CF.ch;CF.ch=ch;
+function cfApply(box){/* kayarken kutu büyürse (yazma kutusu küçüldü, klavye kapandı) ya da içerik büyürse (resim yüklendi) görüntü yerinde kalır, kalan yol kayarak gidilir */
+ const ch=box.clientHeight,H=box.scrollHeight-cfSpH(box);
+ if(CF.bottom){if(CF.ch&&ch>CF.ch)CF.off-=ch-CF.ch;else if(CF.H&&ch===CF.ch&&H>CF.H+1&&H-CF.H<2000)CF.off+=H-CF.H}CF.ch=ch;CF.H=H;
  let sp=box.querySelector(":scope>.cf-sp");const o=CF.bottom?CF.off:0;
  if(o<-.5){if(!sp){sp=document.createElement("div");sp.className="cf-sp";sp.setAttribute("aria-hidden","true");sp.style.marginTop=-(parseFloat(getComputedStyle(box).rowGap)||0)+"px"}if(box.lastElementChild!==sp)box.appendChild(sp);sp.style.height=(-o).toFixed(1)+"px"}else if(sp)sp.remove();
  box.scrollTop=box.scrollHeight-box.clientHeight-Math.max(0,o)}
-function cfPut(it){const el=it.el;if(!el||!el.isConnected||el.classList.contains("swp"))return;el.style.transform=it.av?`translate(${it.x.toFixed(2)}px,${it.y.toFixed(2)}px)`:`translateY(${it.y.toFixed(2)}px)`}
+function cfPut(it){const el=it.el;if(!el||!el.isConnected||el.classList.contains("swp"))return;if(it.av){el.style.transformOrigin="0 0";el.style.transform=`translate(${it.x.toFixed(2)}px,${it.y.toFixed(2)}px)`+(it.s?` scale(${(1+it.s).toFixed(4)})`:"")}else el.style.transform=`translateY(${it.y.toFixed(2)}px)`}
 function cfMoPut(){const m=CF.mo,el=m&&m.el;if(!el)return;const p=m.p;el.classList.add("cf-mo");el.style.setProperty("--cf-c",m.c);
  el.style.transform=`translate(${(m.dx*p).toFixed(2)}px,${(m.dy*p).toFixed(2)}px) scale(${(1+(m.sx-1)*p).toFixed(4)},${(1+(m.sy-1)*p).toFixed(4)})`;
  el.style.setProperty("--cf-a",Math.max(0,Math.min(1,(1-p-.2)/.5)).toFixed(3))}
@@ -11951,10 +11961,10 @@ function cfKick(){if(!CF.raf&&(CF.bottom||CF.items.size||CF.mo)){CF.t=performanc
 function cfFrame(){CF.raf=0;const box=$("#msgs");if(!box||S.route.name!=="chat"){cfStop();return}
  const t=performance.now();const dt=Math.min(.05,Math.max(.001,(t-CF.t)/1000));CF.t=t;let live=false;
  if(CF.bottom){[CF.off,CF.v]=cfStep(CF.off,CF.v,CF.w,dt);if(Math.abs(CF.off)<.4&&Math.abs(CF.v)<10){CF.off=0;CF.v=0;cfApply(box);CF.bottom=false}else{live=true;cfApply(box)}}
- for(const[kk,it]of CF.items){[it.y,it.vy]=cfStep(it.y,it.vy,CF.w,dt);if(it.x||it.vx)[it.x,it.vx]=cfStep(it.x,it.vx,CF.w,dt);
-  if(Math.abs(it.y)<.3&&Math.abs(it.vy)<8&&Math.abs(it.x)<.3&&Math.abs(it.vx)<8){CF.items.delete(kk);if(it.el&&!it.el.classList.contains("swp"))it.el.style.transform=""}else{live=true;cfPut(it)}}
+ for(const[kk,it]of CF.items){[it.y,it.vy]=cfStep(it.y,it.vy,CF.w,dt);if(it.x||it.vx)[it.x,it.vx]=cfStep(it.x,it.vx,CF.w,dt);if(it.s||it.vs)[it.s,it.vs]=cfStep(it.s,it.vs,CF.w,dt);
+  if(Math.abs(it.y)<.3&&Math.abs(it.vy)<8&&Math.abs(it.x)<.3&&Math.abs(it.vx)<8&&Math.abs(it.s||0)<.003){CF.items.delete(kk);if(it.el&&!it.el.classList.contains("swp"))it.el.style.transform=""}else{live=true;cfPut(it)}}
  if(CF.mo){const m=CF.mo;[m.p,m.v]=cfStep(m.p,m.v,CF.w,dt);if(Math.abs(m.p)<.002&&Math.abs(m.v)<.02)cfMoEnd();else{live=true;cfMoPut()}}
- cfMeas(box);if(live)CF.raf=requestAnimationFrame(cfFrame)}
+ if(live)CF.raf=requestAnimationFrame(cfFrame)}
 /* girişler: zamanı tutulur, yeniden çizimde kaldığı yerden sürer */
 function cfPlayEn(){const t=performance.now();
  for(const[key,e]of CF.en){const[dur,ease]=CF_EN[e.kind]||CF_EN.st;const el0=t-e.t0;if(el0>=dur){CF.en.delete(key);continue}
@@ -11964,7 +11974,7 @@ function cfPlayEn(){const t=performance.now();
   const n=CF.els.get(key);if(!n)continue;
   if(e.kind==="st"){go(n.el,[{opacity:0},{opacity:1}]);continue}
   if(e.kind==="ty"){go(n.el.querySelector(".typing"),[{transform:"scale(.35)",opacity:0,transformOrigin:"0 100%"},{transform:"none",opacity:1,transformOrigin:"0 100%"}]);
-   for(const x of n.el.querySelectorAll(":scope>.av,:scope>.mn-avs,:scope>small"))go(x,[{opacity:0},{opacity:1}],{dur:360,ease:"ease-out"});continue}
+   for(const x of n.el.querySelectorAll(e.noAv?":scope>small":":scope>.av,:scope>.mn-avs,:scope>small"))go(x,[{opacity:0},{opacity:1}],{dur:360,ease:"ease-out"});continue}
   const org=e.kind==="me"?"100% 100%":"0 100%";go(n.bel,[{transform:"scale(.8)",opacity:.15,transformOrigin:org},{transform:"none",opacity:1,transformOrigin:org}])}}
 /* giden öğe yerinde solar (eski, ayrılmış düğüm; #msgs dışında, onun alanına kırpılı) */
 function cfGhost(el,r,box,kf,dur){try{let g=document.getElementById("cfGhost");if(!g){g=document.createElement("div");g.id="cfGhost";g.setAttribute("aria-hidden","true");document.body.appendChild(g)}
@@ -11974,9 +11984,10 @@ function cfGhost(el,r,box,kf,dur){try{let g=document.getElementById("cfGhost");i
 /* 5.4.0 GL kayması CF'ye geçti */
 glAfter=function(){};
 msgsPin=function(b){if(!b)return;if(b!==$("#msgs")||!cfOn()){b.scrollTop=b.scrollHeight;return}
- if(CF.bottom&&CF.raf){cfApply(b);cfMeas(b);return}
+ if(CF.bottom&&CF.raf){cfApply(b);return}
+ /* kutu aynı, içerik büyüdü (resim yüklendi): görüntü yerinde kalır, aradaki yol kayarak gidilir */
  const H=b.scrollHeight-cfSpH(b),ch=b.clientHeight;
- if(CF.H&&ch===CF.ch&&H>CF.H+1&&H-CF.H<2000){CF.bottom=true;CF.off=Math.max(0,b.scrollHeight-b.clientHeight-b.scrollTop);CF.v=0;CF.w=14;cfApply(b);cfMeas(b);cfKick();return}
+ if(CF.H&&ch===CF.ch&&H>CF.H+1&&H-CF.H<2000){CF.bottom=true;CF.off=Math.max(0,b.scrollHeight-b.clientHeight-b.scrollTop);CF.v=0;CF.w=14;CF.H=H;cfApply(b);cfKick();return}
  b.scrollTop=b.scrollHeight;cfMeas(b)};
 ["touchmove","wheel"].forEach(ev=>document.addEventListener(ev,e=>{if(CF.bottom&&e.target&&e.target.closest&&e.target.closest("#msgs")){CF.bottom=false;CF.off=0;CF.v=0}},{capture:true,passive:true}));
 HOOKS.after.push(r=>{if(r!=="chat"){cfStop();CF.key=null;CF.en.clear()}});
