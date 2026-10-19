@@ -3144,6 +3144,12 @@ html.reduce-motion #composer #msgIn{transition:border-color .2s,box-shadow .2s}
 #msgs.cf .typing i:nth-child(3){animation-delay:calc(var(--cf-tp,0s) + .3s)}
 #cfGhost{position:fixed;pointer-events:none;overflow:hidden;z-index:4}
 #cfGhost .typing i{animation:none;opacity:.6}
+/* yukarıdayken gelen mesajlar için "N yeni mesaj" düğmesi (cfNewShow) */
+.cf-new{position:fixed;z-index:25;transform:translate(-50%,-100%);display:flex;align-items:center;gap:6px;padding:8px 14px 8px 11px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--fg);font:600 .82rem/1 var(--f-body);box-shadow:0 10px 26px -12px rgba(0,0,0,.4);cursor:pointer;animation:cfNewIn .3s cubic-bezier(.2,1.3,.4,1) both}
+.cf-new svg.i{width:1rem;height:1rem;transform:rotate(90deg);color:var(--accent)}
+@keyframes cfNewIn{from{opacity:0;transform:translate(-50%,-40%) scale(.92)}}
+html.reduce-motion .cf-new{animation:none}
+@media (prefers-reduced-motion:reduce){.cf-new{animation:none}}
 /*}@css:60CHAT*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
@@ -11905,12 +11911,12 @@ renderMsgs=function(...a){const b0=$("#msgs");const key=S.route.name==="chat"&&S
  return r};
 function cfAfter(box,key,k,old,pinned,fresh){
  box.classList.add("cf");
- if(!box._cfw){box._cfw=1;box.addEventListener("scroll",()=>{if(CF.bottom&&CF.raf)box._pin=true},{passive:true})}
+ if(!box._cfw){box._cfw=1;box.addEventListener("scroll",()=>{if(CF.bottom&&CF.raf)box._pin=true;if(CFN.n&&box.scrollHeight-box.scrollTop-box.clientHeight<90)cfNewHide();else if(CFN.n)cfNewPos()},{passive:true})}
  box.style.setProperty("--cf-tp",(-Math.round((performance.now()-CF.tp0)%1000))+"ms");
  cfDecor(box,key,k);
  /* ilk çizim ya da mesajlar ilk kez geldi (sohbet açılınca liste boş başlar): kayma yok, en altta açılır */
  const bulk=!!old&&!old.order.some(x=>x[0]==="r")&&currentMsgs().length>2;
- if(fresh||!old||bulk){cfStop();CF.en.clear();CF.key=key;box._cfKey=key;if(pinned){box.scrollTop=box.scrollHeight;box._pin=true}cfMeas(box);return}
+ if(fresh||!old||bulk){cfStop();CF.en.clear();if(fresh)cfNewHide();CF.key=key;box._cfKey=key;if(pinned){box.scrollTop=box.scrollHeight;box._pin=true}cfMeas(box);return}
  const br=box.getBoundingClientRect(),st1=box.scrollTop;const N=cfRows(box,st1,br.top,cfTyU(k));const cur=N.rows;
  /* çapa: eskiden görünen ilk ortak satır yerinde kalır */
  let U=0;for(const kk of old.order){if(kk==="ph"||kk==="ty"||kk==="stream"||kk.startsWith("sr:"))continue;const o=old.rows.get(kk),n=cur.get(kk);if(!n)continue;if(o.y+o.h-old.st>0){U=n.y-o.y;break}}
@@ -11942,8 +11948,10 @@ function cfAfter(box,key,k,old,pinned,fresh){
   if(a.ty&&!o.ty){const e=CF.en.get("ty");if(e)e.noAv=1}
   if(Math.abs(dx)>.5||Math.abs(dy)>.5||Math.abs(ds)>.01||(it&&Math.abs(it.vy)>8))items.set("av:"+u,{el:a.el,av:1,x:dx,y:dy,s:ds,vx:it?cfNoOver(dx,it.vx):0,vy:it?cfNoOver(dy,it.vy):0,vs:0})}
  CF.items=items;CF.els=cur;CF.avEls=N.avs;
- if(pinned){const was=CF.bottom&&CF.raf;CF.bottom=true;CF.off=max1-stS;CF.v=was?cfNoOver(CF.off,CF.v):0}
- else{CF.bottom=false;CF.off=0;CF.v=0;const s=Math.max(0,Math.min(max1,stS));if(Math.abs(box.scrollTop-s)>.5)box.scrollTop=s}
+ if(pinned){const was=CF.bottom&&CF.raf;CF.bottom=true;CF.off=max1-stS;CF.v=was?cfNoOver(CF.off,CF.v):0;cfNewHide()}
+ else{CF.bottom=false;CF.off=0;CF.v=0;const s=Math.max(0,Math.min(max1,stS));if(Math.abs(box.scrollTop-s)>.5)box.scrollTop=s;
+  /* yukarıdayken yeni mesaj gelirse "yeni mesaj" düğmesi */
+  const nIn=added.filter(x=>{const n=cur.get(x);return(x[0]==="r"||x==="stream")&&n&&!n.el.classList.contains("me")}).length;if(nIn)cfNewShow(CFN.n+nIn)}
  box._cfKey=key;cfMeas(box);cfDraw(box);cfPlayEn();cfKick()}
 /* şu anki durumu çiz (kaydırma, satırlar, dönüşüm) */
 function cfDraw(box){if(CF.bottom)cfApply(box);for(const it of CF.items.values())cfPut(it);if(CF.mo)cfMoPut();cfMeas(box)}
@@ -11994,7 +12002,15 @@ msgsPin=function(b){if(!b)return;if(b!==$("#msgs")||!cfOn()){b.scrollTop=b.scrol
  if(CF.H&&ch===CF.ch&&H>CF.H+1&&H-CF.H<2000){CF.bottom=true;CF.off=Math.max(0,b.scrollHeight-b.clientHeight-b.scrollTop);CF.v=0;CF.w=14;CF.H=H;cfApply(b);cfKick();return}
  b.scrollTop=b.scrollHeight;cfMeas(b)};
 ["touchmove","wheel"].forEach(ev=>document.addEventListener(ev,e=>{if(CF.bottom&&e.target&&e.target.closest&&e.target.closest("#msgs")){CF.bottom=false;CF.off=0;CF.v=0}},{capture:true,passive:true}));
-HOOKS.after.push(r=>{if(r!=="chat"){cfStop();CF.key=null;CF.en.clear()}});
+HOOKS.after.push(r=>{if(r!=="chat"){cfStop();CF.key=null;CF.en.clear();cfNewHide()}});
+/* yukarıdayken gelen mesajlar: sohbetin altında "N yeni mesaj" düğmesi; dokununca kayarak en alta iner */
+const CFN={n:0,el:null};
+function cfNewPos(){const el=CFN.el,b=$("#msgs");if(!el||!b)return;const r=b.getBoundingClientRect();el.style.left=Math.round(r.left+r.width/2)+"px";el.style.top=Math.round(r.bottom-12)+"px"}
+function cfNewShow(n){CFN.n=n;let el=CFN.el;if(!el||!el.isConnected){el=CFN.el=document.createElement("button");el.type="button";el.className="cf-new";
+  el.onclick=()=>{const b=$("#msgs");cfNewHide();if(!b)return;b._pin=true;if(!cfOn()){b.scrollTop=b.scrollHeight;return}CF.bottom=true;CF.off=b.scrollHeight-b.clientHeight-b.scrollTop;CF.v=0;CF.w=12;cfApply(b);cfKick()};document.body.appendChild(el)}
+ el.innerHTML=`${I("next")}<span>${n===1?"1 yeni mesaj":n+" yeni mesaj"}</span>`;el.setAttribute("aria-label",n+" yeni mesaj, en alta in");cfNewPos()}
+function cfNewHide(){CFN.n=0;if(CFN.el){CFN.el.remove();CFN.el=null}}
+addEventListener("resize",()=>{if(CFN.n)cfNewPos()});
 
 /* ===== Test botu ===== */
 const TB_UID="bot:test",TB_KEY="u:bot:test";
