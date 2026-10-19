@@ -3154,6 +3154,19 @@ html.reduce-motion #composer #msgIn{transition:border-color .2s,box-shadow .2s}
 html.reduce-motion .cf-new{animation:none}
 @media (prefers-reduced-motion:reduce){.cf-new{animation:none}}
 /*}@css:60CHAT*/
+/*@css:61CHAT{*/
+/* 6.1 sabit mesaj şeridi: sohbetin üstünde, mesajların üstüne biner (liste yüksekliği değişmez, sohbet zıplamaz) */
+main.chatmode{position:relative}
+.pinbar{position:absolute;left:10px;right:10px;top:8px;z-index:4;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 10px;border-radius:14px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.pinbar .pj{flex:1;min-width:0;display:flex;align-items:center;gap:8px;text-align:left;background:none;border:0;padding:2px 0;color:inherit}
+.pinbar .pj svg.i{flex:none;width:1.05rem;height:1.05rem;color:var(--accent)}
+.pinbar .pj span{min-width:0;display:grid}
+.pinbar .pj b{font-size:.72rem;color:var(--accent)}
+.pinbar .pj em{font-style:normal;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinbar .px{flex:none;width:2rem;height:2rem;border-radius:10px;display:grid;place-items:center;background:none;border:0;color:var(--muted)}
+.pinbar .px svg.i{width:1rem;height:1rem}
+.pinbar .pdots{display:grid;gap:2px;flex:none}.pinbar .pdots i{width:3px;height:8px;border-radius:2px;background:var(--line)}.pinbar .pdots i.on{background:var(--accent)}
+/*}@css:61CHAT*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
 .hlr{display:flex;gap:14px;overflow-x:auto;padding:4px 16px 14px;scrollbar-width:none}
@@ -12127,6 +12140,36 @@ vChats=function(...a){const h=vChatsBase60C.apply(this,a);const c=S.botchats.tes
  const row=`<div class="box tb-box"><button class="row" data-msg="${TB_UID}" data-crow="${TB_KEY}">${avatar(TB_UID,50,{click:false})}<div class="t"><div><b>${esc(TB_BOT.name)}</b></div><div class="s">Sohbet hareketlerini, görüldüyü ve bildirimleri dene</div></div></button></div>`;
  const i=h.indexOf('data-crow="u:bot:rota"');const j=i<0?-1:h.indexOf("</button></div>",i);return j<0?h+row:h.slice(0,j+15)+row+h.slice(j+15)};
 /*}@js:60CHAT*/
+/*@js:61CHAT{*/
+/* ===== 6.1 sohbet (61CHAT) =====
+   Sabit mesaj: mesaj menüsünde Sabitle/Sabitlemeyi kaldır (DM ve grup; en fazla PIN_MAX, en yenisi başta). Kayıt chats/{cid}.pins=[mid],
+   sabitlenince sohbete sys notu düşer. Şerit .pinbar main.chatmode'un üstüne biner (liste yüksekliği değişmez); dokununca o mesaja gider ve
+   sıradaki sabite geçer, (x) kaldırır. Meydan belgesi her mesajda baştan yazıldığı için (DB.set) Meydan'da sabit mesaj yok. */
+const PIN_MAX=3;let pinIx=0;
+const pinKey=()=>{if(S.route.name!=="chat")return null;const k=keyInfo(S.route.params.key);return k.type==="dm"||k.type==="group"?k:null};
+const mpinsOf=k=>((S.chats[k.cid]||{}).pins||[]).filter(mid=>S.msgs.some(m=>m.id===mid&&!m.del));
+async function pinSet(k,mid,on){if(!guard())return;const c=S.chats[k.cid]||{};let p=(c.pins||[]).filter(x=>x!==mid);if(on)p=[mid,...p].slice(0,PIN_MAX);
+ S.chats={...S.chats,[k.cid]:{...c,pins:p}};pinIx=0;pinPaint();
+ if(await write(()=>DB.update("chats/"+k.cid,{pins:p}))&&on){const at=now();await write(()=>DB.set(`chats/${k.cid}/msgs/${rid()}`,{from:S.uid,at,sys:"pin",text:`${me().name||me().username} bir mesajı sabitledi`}),{quiet:true})}
+ toast(on?"Mesaj sabitlendi":"Sabitleme kaldırıldı")}
+function pinPaint(){const main=$("#main");let bar=main&&main.querySelector(":scope>.pinbar");const k=pinKey();const p=k?mpinsOf(k):[];
+ if(!p.length){if(bar)bar.remove();return}if(pinIx>=p.length)pinIx=0;const m=S.msgs.find(x=>x.id===p[pinIx]);
+ const h=`<button type="button" class="pj" data-pinj="${esc(m.id)}">${I("pin")}<span><b>Sabit mesaj${p.length>1?` ${pinIx+1}/${p.length}`:""}</b><em>${esc(msgPreview(m).slice(0,90))}</em></span></button>${p.length>1?`<span class="pdots">${p.map((_,i)=>`<i class="${i===pinIx?"on":""}"></i>`).join("")}</span>`:""}<button type="button" class="px" data-pinx="${esc(m.id)}" aria-label="Sabitlemeyi kaldır">${I("close")}</button>`;
+ if(!bar){bar=document.createElement("div");bar.className="pinbar";main.prepend(bar)}if(bar._h!==h){bar.innerHTML=h;bar._h=h}
+ /* Vizör'de üst çubuk sohbetin üstüne biner: şerit mesaj kutusunun görünen üst kenarına oturur */
+ const box=$("#msgs");if(box){const t=Math.max(0,Math.round(box.getBoundingClientRect().top-main.getBoundingClientRect().top))+8;const hd=$("#top");const hb=hd?hd.getBoundingClientRect().bottom-main.getBoundingClientRect().top+8:0;bar.style.top=Math.max(t,hb)+"px"}}
+document.addEventListener("click",e=>{const j=e.target.closest&&e.target.closest("[data-pinj],[data-pinx]");if(!j)return;const k=pinKey();if(!k)return;e.preventDefault();e.stopPropagation();
+ if(j.dataset.pinx)return pinSet(k,j.dataset.pinx,false);
+ const el=document.getElementById("m-"+j.dataset.pinj);if(el){try{cfRelease()}catch{}el.scrollIntoView({block:"center",behavior:kbReduce()?"auto":"smooth"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}
+ const p=mpinsOf(k);if(p.length>1){pinIx=(pinIx+1)%p.length;pinPaint()}},true);
+const msgMenuBase61=msgMenu;
+msgMenu=function(mid,...a){const r=msgMenuBase61.call(this,mid,...a);try{const k=pinKey();const l=$('#overlay [data-layer="menu"]');const m=S.msgs.find(x=>x.id===mid);
+  if(k&&l&&m&&!m.sys){const on=((S.chats[k.cid]||{}).pins||[]).includes(mid);const cancel=l.querySelector('.opt[data-act="close"]');
+   const b=document.createElement("button");b.className="opt";b.innerHTML=`${I("pin")}${on?"Sabitlemeyi kaldır":"Sabitle"}`;b.onclick=()=>{closeLayer("menu");pinSet(k,mid,!on)};if(cancel)cancel.before(b)}}catch(e){console.warn(e)}return r};
+const renderMsgsBase61=renderMsgs;
+renderMsgs=function(...a){const r=renderMsgsBase61.apply(this,a);try{pinPaint()}catch(e){console.warn(e)}return r};
+HOOKS.after.push(()=>{pinIx=0;try{pinPaint()}catch{}});
+/*}@js:61CHAT*/
 /*@js:550{*/
 /* 5.5.0
    Rota fotoğrafa bakar: Rota sohbetinde fotoğraf gönderilebilir (sendToBot artık `img` taşır; `botImg` 640 px / 60000 karaktere küçültür,
