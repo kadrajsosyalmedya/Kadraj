@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60001">
+<meta name="kadraj-version" content="60002">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3697,7 +3697,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60001,APP_VER="6.0.1";
+const APP_V=60002,APP_VER="6.0.2";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -4016,7 +4016,7 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
   if(seenAt[idx]){S.seenKeys=S.seenKeys||new Set();seenAt[idx].forEach(([u])=>S.seenKeys.add(u+":"+(m.id||m.at)))}
   S.knownMids.add(mk)});
  const typer=k.type==="dm"?(S.typing[k.uid]===k.cid?k.uid:null):(multi?Object.keys(S.typing).find(u=>S.typing[u]===k.cid):null);
- if((k.type==="bot"&&S.botTyping===k.uid)||typer||(multi&&S.botTyping==="bot:rota@"+key))h+=multi&&typer?`<div class="mrow">${avatar(typer,32,{click:false,ring:false,online:false})}<div class="typing" aria-label="${esc(P(typer).username)} yazıyor"><i></i><i></i><i></i></div></div>`:`<div class="typing" aria-label="yazıyor"><i></i><i></i><i></i></div>`;
+ if((k.type==="bot"&&(S.botTyping===k.uid||S.tbTyping===k.uid))||typer||(multi&&S.botTyping==="bot:rota@"+key))h+=multi&&typer?`<div class="mrow">${avatar(typer,32,{click:false,ring:false,online:false})}<div class="typing" aria-label="${esc(P(typer).username)} yazıyor"><i></i><i></i><i></i></div></div>`:`<div class="typing" aria-label="yazıyor"><i></i><i></i><i></i></div>`;
  if(S.stream&&S.stream.key===key&&S.stream.text)h+=`<div class="mrow"><div class="mcol"><div class="msg ai">${md(S.stream.text)}</div></div></div>`;/* 5.1.1: boş "…" balonu yazıyor noktalarıyla çift görünüyordu */
  if(!msgs.length&&k.type!=="bot")h+=`<div class="empty" style="padding:10px"><span>İlk mesajı sen yaz.</span></div>`;
  box.innerHTML=h;if(atBottom||S.forceBottom){box.scrollTop=box.scrollHeight;box._pin=true;S.forceBottom=false}
@@ -11846,7 +11846,7 @@ HOOKS.after.push(()=>{const k=kPopAt;if(!k)return;const dt=performance.now()-k.t
       yumuşakça büyür/küçülür, ölçüm sırasında sohbet bir an kaymaz (cfGrow). Gönder düğmesine basınca odak kutuda kalır (klavye kapanıp açılmaz).
    4) Test botu (bot:test, anahtar u:bot:test): sohbet hareketlerini denemek için. BOT'a kayıtlı ama BOTS'ta değil (aramada/önerilerde çıkmaz);
       konuşma data/users/{uid}/bot-test (kurallar değişmez), S.botchats.test. Mesajını görür (benim mesajlarımda sn: görülme zamanı),
-      yazıyor gösterir (S.botTyping), hazır yanıt verir; sohbet açık değilse knNotify (uygulama içi kart / telefon bildirimi).
+      yazıyor gösterir (S.tbTyping; Rota'nın S.botTyping'iyle çakışmasın diye ayrı), hazır yanıt verir; sohbet açık değilse knNotify (uygulama içi kart / telefon bildirimi).
       Komutlar TB_CMDS: yardım, yaz, seri, gör, görme, bekle, vazgeç, uzun, fotoğraf, bildirim. Sohbet listesinde Rota'nın altında satır. */
 const CF={raf:0,t:0,off:0,v:0,w:15,bottom:false,items:new Map(),mo:null,en:new Map(),els:new Map(),avEls:new Map(),key:null,H:0,ch:0,mir:null,tp0:performance.now()};
 const CF_EN={me:[320,"cubic-bezier(.2,1.2,.35,1)"],in:[340,"cubic-bezier(.2,1.2,.35,1)"],ty:[560,"cubic-bezier(.2,1.1,.3,1)"],av:[420,"cubic-bezier(.2,1.6,.4,1)"],st:[260,"ease-out"],fx:[300,"ease-out"]};
@@ -11878,8 +11878,9 @@ function cfGrow(inp,instant){if(!inp)return;let m=CF.mir;
  if(!m||!m.isConnected){m=CF.mir=document.createElement("textarea");m.rows=1;m.tabIndex=-1;m.setAttribute("aria-hidden","true");
   Object.assign(m.style,{position:"fixed",left:"-9999px",top:"0",height:"0",minHeight:"0",visibility:"hidden",overflow:"hidden",pointerEvents:"none",resize:"none"});document.body.appendChild(m)}
  const cs=getComputedStyle(inp);for(const p of["fontFamily","fontSize","fontWeight","fontStyle","letterSpacing","wordSpacing","lineHeight","textTransform","paddingTop","paddingBottom","paddingLeft","paddingRight","borderLeftWidth","borderRightWidth","boxSizing","whiteSpace","wordBreak","overflowWrap","tabSize"])m.style[p]=cs[p];
- m.style.width=inp.offsetWidth+"px";m.value=inp.value||" ";const h=Math.min(128,m.scrollHeight);
- inp.style.overflowY=m.scrollHeight>128?"auto":"hidden";
+ m.style.width=inp.offsetWidth+"px";m.value=inp.value||" ";
+ const bb=cs.boxSizing==="border-box",pad=bb?(parseFloat(cs.borderTopWidth)||0)+(parseFloat(cs.borderBottomWidth)||0):-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0);
+ const sh=m.scrollHeight+pad,h=Math.min(128,sh);inp.style.overflowY=sh>128?"auto":"hidden";
  if(instant||!inp.value){/* gönderince (kutu boşalınca) hemen küçülür; sohbet bunu gönderimden önceki ölçümle (CF.pre) karşılar */const t=inp.style.transition;inp.style.transition="none";inp.style.height=h+"px";void inp.offsetHeight;inp.style.transition=t}
  else if(inp.style.height!==h+"px")inp.style.height=h+"px"}
 /* gönderimden hemen önce ölç: yazma kutusu ve yanıt çubuğu küçülmeden önceki görüntü, ilk çizimde eski konum sayılır */
@@ -11910,7 +11911,7 @@ function cfDecor(box,key,k){
  if(k.type==="dm"||k.type==="group"||k.type==="bot"){const rows=[...box.children];let li=-1;
   for(let i=rows.length-1;i>=0;i--){const x=rows[i];if(x.classList.contains("mrow")&&!x.classList.contains("me")&&!x.classList.contains("mn-ty")&&x.querySelector(".msg")){li=i;break}}
   let real=false;for(let i=li+1;i<rows.length;i++)if(rows[i].classList.contains("seenrow")&&!rows[i].classList.contains("sr-ph")){real=true;break}
-  if(real)box.querySelectorAll(":scope>.seenrow.sr-ph").forEach(x=>x.remove())}}
+  if(real&&k.type!=="group")box.querySelectorAll(":scope>.seenrow.sr-ph").forEach(x=>x.remove())}}
 
 /* --- renderMsgs: en dış sarmalayıcı --- */
 const renderMsgsBase60=renderMsgs;
@@ -11918,7 +11919,7 @@ renderMsgs=function(...a){const b0=$("#msgs");const key=S.route.name==="chat"&&S
  if(b0&&key)try{k=keyInfo(key)}catch{}
  if(!k)return renderMsgsBase60.apply(this,a);
  const fresh=CF.key!==key||b0._cfKey!==key;const force=!!S.forceBottom;
- let old=null;if(!fresh&&cfOn())try{old=CF.pre&&CF.pre.box===b0?CF.pre:cfTake(b0,k)}catch(e){console.warn("cf",e)}CF.pre=null;
+ let old=null;if(!fresh)try{old=CF.pre&&CF.pre.box===b0?CF.pre:cfTake(b0,k)}catch(e){console.warn("cf",e)}CF.pre=null;
  const pinned=fresh||force||(CF.bottom&&!!CF.raf)||b0.scrollHeight-b0.scrollTop-b0.clientHeight<120||b0._pin===true;
  const ty=cfTypers(key,k);const sv=S.typing;if(ty)S.typing=ty.map;
  let r;try{r=renderMsgsBase60.apply(this,a)}finally{if(ty)S.typing=sv}
@@ -11931,13 +11932,19 @@ function cfAfter(box,key,k,old,pinned,fresh){
  cfDecor(box,key,k);
  /* ilk çizim ya da mesajlar ilk kez geldi (sohbet açılınca liste boş başlar): kayma yok, en altta açılır */
  const bulk=!!old&&!old.order.some(x=>x[0]==="r")&&currentMsgs().length>2;
- if(fresh||!old||bulk){cfStop();CF.en.clear();if(fresh)cfNewHide();CF.key=key;box._cfKey=key;if(pinned){box.scrollTop=box.scrollHeight;box._pin=true}cfMeas(box);return}
+ if(fresh||!old||bulk){cfStop();CF.en.clear();CF.openAt=performance.now();if(fresh)cfNewHide();CF.key=key;box._cfKey=key;if(pinned){box.scrollTop=box.scrollHeight;box._pin=true}cfMeas(box);return}
  const br=box.getBoundingClientRect(),st1=box.scrollTop;const N=cfRows(box,st1,br.top);const cur=N.rows;
  /* çapa: eskiden görünen ilk ortak satır yerinde kalır */
  let U=0;for(const kk of old.order){if(kk==="ph"||kk==="ty"||kk==="stream"||kk.startsWith("sr:"))continue;const o=old.rows.get(kk),n=cur.get(kk);if(!n)continue;if(o.y+o.h-old.st>0){U=n.y-o.y;break}}
  const stS=old.st+U+(br.top-old.top);const max1=box.scrollHeight-box.clientHeight;
  const vis=(o,isOld)=>isOld?o.y-old.st+old.top:o.y-stS+br.top;
  const added=old.order.length?[...cur.keys()].filter(x=>!old.rows.has(x)):[];
+ /* yukarıdayken gelen karşı taraf mesajı sayısı; Rota'nın akış satırı kalıcı mesaja dönünce ikinci kez sayılmaz */
+ const newIn=()=>{let n=added.filter(x=>{const c=cur.get(x);return(x[0]==="r"||x==="stream")&&c&&!c.el.classList.contains("me")}).length;if(n&&old.rows.has("stream")&&!cur.has("stream")&&!added.includes("stream"))n--;return n};
+ /* hareket azaltılmışsa: kayma yok, ama okunan yer korunur ve hap çıkar */
+ if(!cfOn()){cfStop();CF.els=cur;CF.avEls=N.avs;box._cfKey=key;
+  if(pinned){box.scrollTop=box.scrollHeight;cfNewHide()}else{const s=Math.max(0,Math.min(max1,stS));if(Math.abs(box.scrollTop-s)>.5)box.scrollTop=s;const n=newIn();if(n)cfNewShow(CFN.n+n)}
+  cfMeas(box);return}
  /* yazıyor (ya da Rota'nın akışı) gitti, yerine karşı taraftan yeni mesaj geldiyse: dönüşüm */
  const tk=old.rows.has("ty")?"ty":old.rows.has("stream")?"stream":null;let mo=null;
  if(tk&&!cur.has(tk)){const oT=old.rows.get(tk);const tg=added.find(x=>{const n=cur.get(x);return n.b&&(x==="stream"||(x[0]==="r"&&!n.el.classList.contains("me")))});
@@ -11965,7 +11972,7 @@ function cfAfter(box,key,k,old,pinned,fresh){
  if(pinned){const was=CF.bottom&&CF.raf;CF.bottom=true;CF.off=max1-stS;CF.v=was?cfNoOver(CF.off,CF.v):0;cfNewHide()}
  else{CF.bottom=false;CF.off=0;CF.v=0;const s=Math.max(0,Math.min(max1,stS));if(Math.abs(box.scrollTop-s)>.5)box.scrollTop=s;
   /* yukarıdayken yeni mesaj gelirse "yeni mesaj" düğmesi */
-  const nIn=added.filter(x=>{const n=cur.get(x);return(x[0]==="r"||x==="stream")&&n&&!n.el.classList.contains("me")}).length;if(nIn)cfNewShow(CFN.n+nIn)}
+  const nIn=newIn();if(nIn)cfNewShow(CFN.n+nIn)}
  box._cfKey=key;cfMeas(box);cfDraw(box);cfPlayEn();cfKick()}
 /* şu anki durumu çiz (kaydırma, satırlar, dönüşüm) */
 function cfDraw(box){if(CF.bottom)cfApply(box);for(const it of CF.items.values())cfPut(it);if(CF.mo)cfMoPut();cfMeas(box)}
@@ -12010,20 +12017,25 @@ function cfGhost(el,r,box,kf,dur){try{let g=document.getElementById("cfGhost");i
 /* 5.4.0 GL kayması CF'ye geçti */
 glAfter=function(){};
 msgsPin=function(b){if(!b)return;if(b!==$("#msgs")||!cfOn()){b.scrollTop=b.scrollHeight;return}
+ /* açılıştan sonraki ilk saniyelerde resim yüklenirse kaymadan en alta oturur (yay sürüyorsa büyüme ona eklenmez) */
+ if(performance.now()-(CF.openAt||0)<3000){if(CF.bottom&&CF.raf){CF.H=b.scrollHeight-cfSpH(b);CF.ch=b.clientHeight;cfApply(b)}else{b.scrollTop=b.scrollHeight;cfMeas(b)}return}
  if(CF.bottom&&CF.raf){cfApply(b);return}
  /* kutu aynı, içerik büyüdü (resim yüklendi): görüntü yerinde kalır, aradaki yol kayarak gidilir */
  const H=b.scrollHeight-cfSpH(b),ch=b.clientHeight;
  if(CF.H&&ch===CF.ch&&H>CF.H+1&&H-CF.H<2000){CF.bottom=true;CF.off=Math.max(0,b.scrollHeight-b.clientHeight-b.scrollTop);CF.v=0;CF.w=14;CF.H=H;cfApply(b);cfKick();return}
  b.scrollTop=b.scrollHeight;cfMeas(b)};
-["touchmove","wheel"].forEach(ev=>document.addEventListener(ev,e=>{if(CF.bottom&&e.target&&e.target.closest&&e.target.closest("#msgs")){CF.bottom=false;CF.off=0;CF.v=0}},{capture:true,passive:true}));
+function cfRelease(){CF.bottom=false;CF.off=0;CF.v=0;const b=$("#msgs");if(!b)return;b._pin=false;const sp=b.querySelector(":scope>.cf-sp");if(sp)sp.remove();cfMeas(b)}
+["touchmove","wheel"].forEach(ev=>document.addEventListener(ev,e=>{if(e.target&&e.target.closest&&e.target.closest("#msgs")&&(CF.bottom||$("#msgs .cf-sp")))cfRelease()},{capture:true,passive:true}));
+document.addEventListener("click",e=>{if(S.route.name==="chat"&&e.target&&e.target.closest&&e.target.closest("[data-jump],[data-csr],[data-cij]"))cfRelease()},true);
 HOOKS.after.push(r=>{if(r!=="chat"){cfStop();CF.key=null;CF.en.clear();cfNewHide()}});
 /* yukarıdayken gelen mesajlar: sohbetin altında "N yeni mesaj" düğmesi; dokununca kayarak en alta iner */
 const CFN={n:0,el:null};
 function cfNewPos(){const el=CFN.el,b=$("#msgs");if(!el||!b)return;const r=b.getBoundingClientRect();el.style.left=Math.round(r.left+r.width/2)+"px";el.style.top=Math.round(r.bottom-12)+"px"}
 function cfNewShow(n){CFN.n=n;let el=CFN.el;if(!el||!el.isConnected){el=CFN.el=document.createElement("button");el.type="button";el.className="cf-new";
   el.onclick=()=>{const b=$("#msgs");cfNewHide();if(!b)return;b._pin=true;if(!cfOn()){b.scrollTop=b.scrollHeight;return}CF.bottom=true;CF.off=b.scrollHeight-b.clientHeight-b.scrollTop;CF.v=0;CF.w=12;cfApply(b);cfKick()};document.body.appendChild(el)}
- el.innerHTML=`${I("next")}<span>${n===1?"1 yeni mesaj":n+" yeni mesaj"}</span>`;el.setAttribute("aria-label",n+" yeni mesaj, en alta in");cfNewPos()}
-function cfNewHide(){CFN.n=0;if(CFN.el){CFN.el.remove();CFN.el=null}}
+ el.innerHTML=`${I("next")}<span>${n===1?"1 yeni mesaj":n+" yeni mesaj"}</span>`;el.setAttribute("aria-label",n+" yeni mesaj, en alta in");cfNewPos();
+ const b=$("#msgs");if(b&&window.ResizeObserver){if(!CFN.ro)CFN.ro=new ResizeObserver(()=>{if(CFN.n)cfNewPos()});CFN.ro.disconnect();CFN.ro.observe(b)}}
+function cfNewHide(){CFN.n=0;if(CFN.ro)CFN.ro.disconnect();if(CFN.el){CFN.el.remove();CFN.el=null}}
 addEventListener("resize",()=>{if(CFN.n)cfNewPos()});
 
 /* ===== Test botu ===== */
@@ -12035,7 +12047,7 @@ const setCustomBotsBase60=setCustomBots;
 setCustomBots=function(...a){const r=setCustomBotsBase60.apply(this,a);tbReg();return r};
 const watchBotChatsBase60=watchBotChats;
 watchBotChats=function(...a){const r=watchBotChatsBase60.apply(this,a);
- if(S.uid&&!botWatch.test){botWatch.test=DB.watchDoc(`data/users/${S.uid}/bot-test`,d=>{const c=S.botchats.test;if(d&&c&&(d.v||0)<(c.v||0))return;S.botchats={...S.botchats,test:d||{msgs:[]}};scheduleRefresh()});userUnsub.push(botWatch.test)}return r};
+ if(S.uid&&!botWatch.test){botWatch.test=DB.watchDoc(`data/users/${S.uid}/bot-test`,d=>{if(!d){TBQ.run++;S.tbTyping=null}const c=S.botchats.test;if(d&&c&&(d.v||0)<(c.v||0))return;S.botchats={...S.botchats,test:d||{msgs:[]}};scheduleRefresh()});userUnsub.push(botWatch.test)}return r};
 const TB_HELP="Komutlar:\n- yaz: uzun süre yazar, sonra yanıt verir\n- seri: art arda üç mesaj\n- gör: görür, yanıt vermez\n- görme: hiç görmez\n- bekle: 5 sn sonra görüp yanıtlar\n- vazgeç: yazar, sonra göndermeden vazgeçer\n- uzun: uzun bir mesaj\n- fotoğraf: fotoğraf gönderir\n- bildirim: 5 sn sonra yazar; sohbetten çık, bildirim gelsin\nBaşka bir şey yazarsan hazır yanıtlarla konuşurum.";
 const TB_SAY={
  greet:["Selam! Ben Test botu. Komutları görmek için \"yardım\" yaz.","Merhaba! Yazıyor balonunu, görüldüyü ve bildirimleri benimle deneyebilirsin.","Selam, hoş geldin. Bir şey yaz, görüp yanıtlayayım."],
@@ -12055,11 +12067,11 @@ const tbChat=()=>S.botchats.test||{msgs:[]};
 const tbOpen=()=>S.route.name==="chat"&&S.route.params.key===TB_KEY&&document.visibilityState!=="hidden";
 function tbPut(c){c={...c,v:Date.now()};S.botchats={...S.botchats,test:c};if(!S.guest&&S.uid)DB.set(`data/users/${S.uid}/bot-test`,{msgs:botSlim((c.msgs||[]).slice(-80)),readAt:c.readAt||0,v:c.v}).catch(()=>{})}
 function tbPaint(){if(S.route.name==="chat"&&S.route.params.key===TB_KEY){renderMsgs();try{renderTop()}catch{}}else scheduleRefresh()}
-function tbTyping(on){if(on)S.botTyping=TB_UID;else if(S.botTyping===TB_UID)S.botTyping=null;tbPaint()}
+function tbTyping(on){S.tbTyping=on?TB_UID:null;tbPaint()}
 function tbSee(at){const c=tbChat();const t=now();let ch=false;const msgs=(c.msgs||[]).map(m=>m.from===S.uid&&!m.sn&&m.at<=at?(ch=true,{...m,sn:t}):m);if(ch){tbPut({...c,msgs});tbPaint()}}
 function tbSay(s){const c=tbChat();const ms=c.msgs||[];const at=Math.max(now(),((ms[ms.length-1]||{}).at||0)+1);const m={from:TB_UID,text:s.say||"",at};if(s.img)m.img=s.img;const open=tbOpen();
- if(S.botTyping===TB_UID)S.botTyping=null;tbPut({...c,msgs:[...ms,m].slice(-80),readAt:open?at:(c.readAt||0)});tbPaint();
- if(!open)try{knNotify({kind:"msg",uid:TB_UID,title:TB_BOT.name,sub:"",text:m.text||"Fotoğraf",key:TB_KEY,cid:"",at,group:false,tag:"m-testbot",sys:true})}catch(e){console.warn(e)}}
+ S.tbTyping=null;tbPut({...c,msgs:[...ms,m].slice(-80),readAt:open?at:(c.readAt||0)});tbPaint();
+ if(!open&&settings.nMsg!==false)try{knNotify({kind:"msg",uid:TB_UID,title:TB_BOT.name,sub:"",text:m.text||"Fotoğraf",key:TB_KEY,cid:"",at,group:false,tag:"m-testbot",sys:true})}catch(e){console.warn(e)}}
 function tbPlan(cmd,q,mine){const typ=t=>Math.max(800,Math.min(3000,500+String(t).length*28));const say=t=>[{type:typ(t)},{say:t}];
  if(cmd==="yardım")return[{type:1100},{say:TB_HELP}];
  if(cmd==="yaz")return[{type:4800},{say:"Uzun uzun düşündüm, sonunda yazdım. Yazıyor balonu bu mesaja dönüştü mü?"}];
@@ -12080,7 +12092,7 @@ async function tbReact(mine,run){const ok=()=>TBQ.run===run;const q=String(mine.
 async function tbSend(p){if(S.guest)return guard();const c=tbChat();const ms=c.msgs||[];const at=Math.max(now(),((ms[ms.length-1]||{}).at||0)+1);
  const mine={from:S.uid,text:String(p.text||""),at};if(p.post)mine.post=p.post;if(p.img){try{mine.img=await botImg(p.img)}catch{mine.img=p.img}}
  tbPut({...c,msgs:[...ms,mine].slice(-80),readAt:at});tbPaint();
- const run=++TBQ.run;try{await tbReact(mine,run)}catch(e){console.warn("test botu",e)}finally{if(TBQ.run===run&&S.botTyping===TB_UID){S.botTyping=null;tbPaint()}}return true}
+ const run=++TBQ.run;try{await tbReact(mine,run)}catch(e){console.warn("test botu",e)}finally{if(TBQ.run===run&&S.tbTyping){S.tbTyping=null;tbPaint()}}return true}
 /* görüldü: gördüğü son mesajımın altında; son mesaj benimse sonda tek yer */
 function tbDecor(box){const ms=tbChat().msgs||[];let si=-1,lastMine=-1;
  for(let i=ms.length-1;i>=0;i--){const m=ms[i];if(m.from===S.uid){if(lastMine<0)lastMine=i;if(m.sn&&si<0){si=i;break}}}
@@ -12093,9 +12105,17 @@ sendToBot=async function(uid,payload,...a){if(uid===TB_UID)return tbSend(payload
 const knSeenBase60=knSeen;
 knSeen=async function(o,...a){if(o&&o.key===TB_KEY){await markBotRead(TB_UID);return true}return knSeenBase60.call(this,o,...a)};
 const knHeartBase60=knHeart;
-knHeart=async function(o,...a){if(o&&o.key===TB_KEY){vib(15);return true}return knHeartBase60.call(this,o,...a)};
+knHeart=async function(o,...a){if(o&&o.key===TB_KEY){/* botun son mesajına kalp */const c=tbChat();const ms=(c.msgs||[]).slice();
+  for(let i=ms.length-1;i>=0;i--)if(ms[i].from===TB_UID){ms[i]={...ms[i],likes:{...(ms[i].likes||{}),[S.uid]:now()},reacts:{...(ms[i].reacts||{}),[S.uid]:"heart"}};break}
+  tbPut({...c,msgs:ms});tbPaint();vib(15);return true}return knHeartBase60.call(this,o,...a)};
+/* Test botu sohbeti açıkken sekme arka plandan dönünce gelen yanıt okunur; sohbet açılınca telefon bildirimi kapanır */
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&S.route.name==="chat"&&S.route.params&&S.route.params.key===TB_KEY)markBotRead(TB_UID)});
+HOOKS.after.push(r=>{if(r==="chat"&&S.route.params&&S.route.params.key===TB_KEY)clearChatNotes("testbot")});
+/* çıkışta bekleyen yanıt iptal (başka hesaba düşmesin) */
+const teardownUserBase60C=teardownUser;
+teardownUser=function(...a){TBQ.run++;S.tbTyping=null;return teardownUserBase60C.apply(this,a)};
 const chatHeadBase60=chatHead;
-chatHead=function(key,...a){const h=chatHeadBase60.call(this,key,...a);return key===TB_KEY?h.replace("Bot · otomatik yanıt",S.botTyping===TB_UID?"yazıyor…":"Test botu · her zaman açık"):h};
+chatHead=function(key,...a){const h=chatHeadBase60.call(this,key,...a);return key===TB_KEY?h.replace("Bot · otomatik yanıt",S.tbTyping===TB_UID?"yazıyor…":"Test botu · her zaman açık"):h};
 const vChatBase60=vChat;
 vChat=function(key,...a){const h=vChatBase60.call(this,key,...a);if(key!==TB_KEY)return h;
  return h.replace(/<div class="cchips">[\s\S]*?<\/div>/,`<div class="cchips">${["yardım","yaz","seri","gör","uzun","fotoğraf","vazgeç","bildirim"].map(c=>`<button data-chip="${esc(c)}">${esc(c)}</button>`).join("")}</div>`).replace('placeholder="Mesaj yaz…"','placeholder="Test botuna yaz…"')};
