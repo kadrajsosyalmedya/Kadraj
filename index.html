@@ -2873,6 +2873,8 @@ main.chessmode{padding:0 0 calc(8px + env(safe-area-inset-bottom,0px))}
 .c6 .crvbar{order:-1}
 .c6 .cmain{gap:4px;padding:0 6px}
 .c6 .cbfr{max-width:calc(100dvh - 292px);container-type:inline-size}
+/* yatay telefon: tahta çok küçülmesin (sayfa kayar) */
+@media (orientation:landscape) and (max-height:560px){.c6 .cbfr{max-width:min(calc(100dvh - 24px),calc(100vw - 24px))}}
 .c6 .cboard{border-radius:5px;box-shadow:0 3px 14px rgba(0,0,0,.2)}
 /* koordinatlar karenin içinde, tahtayla büyür */
 .c6 .csq em{font:700 max(8.5px,2.35cqw)/1 var(--f-body)}
@@ -2977,7 +2979,7 @@ main.chessmode{padding:0 0 calc(8px + env(safe-area-inset-bottom,0px))}
  .c6>.cpl{margin:0}
  .c6 #cplT{grid-area:t}.c6 #cplB{grid-area:b}
  .c6 .cmain{grid-area:m;padding:0}
- .c6 .cbfr{width:min(calc(100dvh - 232px),700px);max-width:none;flex:none}
+ .c6 .cbfr{width:min(calc(100dvh - 232px),700px,calc(100vw - 340px));max-width:none;flex:none}
  .c6 .c6side{grid-area:s;display:flex;flex-direction:column;gap:8px;align-self:stretch;min-height:0;max-height:calc(100dvh - 92px)}
  .c6 .c6side>*{margin:0}
  .c6 #cMoves{order:0;flex:1 1 auto;display:grid;grid-template-columns:3em 1fr 1fr;align-content:start;align-items:center;overflow-y:auto;overflow-x:hidden;min-height:140px;padding:6px;gap:2px}
@@ -3644,6 +3646,9 @@ html.reduce-motion .reel .rdisc img{animation:none}
  :root[data-ui] #shell:not([data-r="chat"]):not([data-r="chessgame"]) .hd{padding-left:max(16px,calc((100% - var(--k6-w)) / 2 + 16px));padding-right:max(16px,calc((100% - var(--k6-w)) / 2 + 16px))}
  :root[data-ui]:not([data-ui="vizor"]) .dock nav{max-width:600px}
 }
+/* hareket azaltılmışsa (sistem ya da Ayarlar): sözde öğe animasyonları ve sıralı belirme gecikmeleri de kapanır */
+@media (prefers-reduced-motion:reduce){:root[data-ui] *::before,:root[data-ui] *::after{animation:none!important}:root[data-ui] *{animation-delay:0s!important}}
+html.reduce-motion *{animation-delay:0s!important}
 /*}@css:60UI*/
 /*@css:580{*/
 /* 5.8.0 Cephe kartı ve sohbetteki savaşa katıl düğmesi */
@@ -5324,7 +5329,9 @@ function chOnlineOverlay(){const ov=$("#cOv");if(!ov||!CH||CH.mode!=="online")re
    else{await write(()=>DB.update("games/"+CH.gid,{status:"over",result:"1/2",reason:"iptal",updatedAt:now()}));CH.rated=true;LS.set("kadraj_cg_rated",{...(LS.get("kadraj_cg_rated",{})||{}),[CH.gid]:1});back()}});return}
  if(d.status==="over"&&CH.over)return chOver();ov.classList.remove("on");if(!ov.querySelector(".cpromo"))ov.innerHTML=""}
 function chPush(){const patch={moves:CH.moves.map(x=>x.u),updatedAt:now(),lastBy:S.uid,drawOffer:null};if(CH.over){patch.status="over";patch.result=CH.over.result;patch.reason=CH.over.reason}CH.doc={...CH.doc,...patch};S.games={...S.games,[CH.gid]:{...S.games[CH.gid],...patch}};write(()=>DB.update("games/"+CH.gid,patch))}
-async function chFinishOnline(result,reason){if(!CH||CH.mode!=="online")return;const patch={status:"over",result,reason,updatedAt:now(),lastBy:S.uid,drawOffer:null};if(await write(()=>DB.update("games/"+CH.gid,patch))){CH.doc={...CH.doc,...patch};CH.over={over:true,result,reason};chOver()}}
+async function chFinishOnline(result,reason){if(!CH||CH.mode!=="online")return;const patch={status:"over",result,reason,updatedAt:now(),lastBy:S.uid,drawOffer:null};
+ /* CH.over yazmadan önce kurulur: yazım sırasında gelen chSync ikinci bir chOver planlamasın (ses ve kart iki kez çıkıyordu) */const was=CH.over;CH.over={over:true,result,reason};
+ if(await write(()=>DB.update("games/"+CH.gid,patch))){CH.doc={...CH.doc,...patch};chOver()}else if(CH)CH.over=was}
 function chSync(d){if(!CH||CH.mode!=="online"||CH.gid!==d.id)return;const prev=CH.doc||{};const wasOver=!!CH.over;CH.doc=d;const list=d.moves||[];const n=CH.moves.length;
  const same=CH.moves.every((x,i)=>x.u===list[i]);
  if(same&&list.length===n+1){const m=CC.fromUci(CH.g,list[n]);if(m){if(CH.view!=null){CH.view=null;chDraw()}const st=chApply(m);chAnim(m);chSoundFor(m,st);chMarks();vib(15)}}
@@ -5613,7 +5620,7 @@ sendToBot=async function(uid,payload){const t=String((payload&&payload.text)||""
 function chRateMissed(m){if(S.guest||!S.canWrite||!S.uid)return;const done=LS.get("kadraj_cg_rated",{})||{};let ch=false;
  for(const d of Object.values(m||{})){if(!d||d.status!=="over"||d.reason==="iptal"||!d.result||!(d.players||[]).includes(S.uid))continue;if(CH&&CH.mode==="online"&&CH.gid===d.id)continue;
   if(done[d.id]||(d.rated||{})[S.uid]||now()-(d.updatedAt||d.at||0)>2*24*H)continue;done[d.id]=1;ch=true;const score=d.result==="1/2"?.5:((d.result==="1-0")===(d.w===S.uid)?1:0);
-  chRate(chessStats(oppOf(d)).r,score);write(()=>DB.update("games/"+d.id,{rated:{[S.uid]:1}}),{quiet:true})}
+  /* arka planda biten oyun: açık oyunun sonuç kartındaki puan farkını (CH._d60) ezmesin diye sarmalayıcısız */(typeof chRateBase60==="function"?chRateBase60:chRate)(chessStats(oppOf(d)).r,score);write(()=>DB.update("games/"+d.id,{rated:{[S.uid]:1}}),{quiet:true})}
  if(ch)LS.set("kadraj_cg_rated",done)}
 /* ===== 4.8 ===== */
 /* açık Klaket değişince yakındaki parçalı videolar indirilir; "bitince sonrakine geç" */
@@ -12323,6 +12330,8 @@ function k6Img(){for(const img of document.querySelectorAll("#main .media img,#m
  const box=img.closest(".media,.tile,.sr-fl");if(!box)continue;box.classList.add("k6-ld");const done=()=>box.classList.remove("k6-ld");
  img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true})}}
 HOOKS.after.push(()=>{k6Seg();k6Img()});
+/* pencere boyu/yönü değişince gösterge yeni yerine animasyonsuz oturur */
+let k6RzT=0;addEventListener("resize",()=>{clearTimeout(k6RzT);k6RzT=setTimeout(()=>{K6.ind={};try{k6Seg()}catch{}},120)});
 const srPaintBase60=srPaint;
 srPaint=function(...a){const r=srPaintBase60.apply(this,a);try{k6Seg();k6Img()}catch(e){console.warn("k6",e)}return r};
 

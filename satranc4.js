@@ -84,7 +84,7 @@ function material(G,k){let v=0;for(let s=0;s<SQ;s++){const p=G.b[s];if(p&&(p>>3)
 function play(G,m){const ev=[];const x=G.b[m.t];make(G,m);G.hist.length=0;G.ply++;if(x&&(x>>3)<4)G.cap[m.k]+=VAL[x&7];
  G.log.push({k:m.k,f:m.f,t:m.t,p:m.p,x,pr:m.pr,ca:!!m.ca,s:san(m,x)});G.turn=nextAlive(G,m.k);settle(G,ev);return ev}
 function settle(G,ev){while(!G.over){if(aliveN(G)<=1){G.over={win:G.alive.indexOf(1),why:"son"};break}
- if(G.half>=200){let w=-1,bv=-1;for(let k=0;k<4;k++)if(G.alive[k]){const v=material(G,k);if(v>bv){bv=v;w=k}}G.over={win:w,why:"uzun"};break}
+ if(G.half>=200){let w=-1,bv=-1;for(let k=0;k<4;k++)if(G.alive[k]){const v=material(G,k);if(v>bv||(v===bv&&G.cap[k]>G.cap[w])){bv=v;w=k}}G.over={win:w,why:"uzun"};break}
  const k=G.turn;if(legal(G,k).length)break;const why=inCheck(G,k)?"mat":"pat";eliminate(G,k,why);ev.push({e:"elim",k,why});G.turn=nextAlive(G,k)}
  if(G.over)ev.push({e:"over"});
  for(let k=0;k<4;k++)if(G.alive[k]&&inCheck(G,k))ev.push({e:"check",k})}
@@ -292,7 +292,9 @@ function menu(){const ov=$("#s4Ov");ov.innerHTML=`<div class="s4-card" role="dia
  <div class="btns"><button class="btn" data-s4="ovx">Tamam</button></div></div>`;ov.classList.add("on")}
 function outCard(e){const ov=$("#s4Ov");if(!ov||st.G.over)return;ov.innerHTML=`<div class="s4-card" style="--c:${CHEX[0]}"><span class="ic">${I("flag")}</span><b>Elendin</b><span>${esc(WHY[e&&e.why]||"")}. Botlar aralarında oynamaya devam ediyor.</span><div class="btns"><button class="btn" data-s4="watch">İzlemeye devam</button><button class="btn sec" data-s4="again">${I("rotate")}Yeni oyun</button></div></div>`;ov.classList.add("on")}
 function endCard(){const G=st.G;if(!G||!G.over)return;const ov=$("#s4Ov");if(!ov)return;const w=G.over.win;const me=w===0;
- const order=[w,...G.elim.slice().reverse().map(e=>e.k)].filter((k,i,a)=>k>=0&&a.indexOf(k)===i);for(let k=0;k<4;k++)if(!order.includes(k))order.push(k);
+ /* sıra: kazanan, sonra hayatta kalanlar (taş değerine göre), sonra elenenler (son elenen önce) */
+ const live=[0,1,2,3].filter(k=>k!==w&&G.alive[k]).sort((a,b)=>material(G,b)-material(G,a));
+ const order=[w,...live,...G.elim.slice().reverse().map(e=>e.k)].filter((k,i,a)=>k>=0&&a.indexOf(k)===i);for(let k=0;k<4;k++)if(!order.includes(k))order.push(k);
  ov.innerHTML=`<div class="s4-card" style="--c:${me?"#81b64c":CHEX[w]||"#9aa39e"}"><span class="ic">${I(me?"trophy":"knight")}</span><b>${me?"Kazandın!":w>=0?`${esc(NAMES[w])} kazandı`:"Oyun bitti"}</b><span>${esc(WHY[G.over.why]||"")} · ${Math.floor(G.ply/4)+1} tur</span>
  <div class="s4-rank">${order.map((k,i)=>{const e=G.elim.find(x=>x.k===k);return`<div style="--c:${CHEX[k]}"><b>${i+1}.</b><i></i><span>${esc(k===0?"Sen":NAMES[k])}</span><small>${k===w?"Kazanan":esc(WHY[e&&e.why]||"")} · ${G.cap[k]} puan</small></div>`}).join("")}</div>
  <div class="btns"><button class="btn" data-s4="again">${I("rotate")}Yeni oyun</button><button class="btn ghost" data-s4="ovx">Tahtaya bak</button></div></div>`;ov.classList.add("on");
