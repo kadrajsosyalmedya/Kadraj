@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="50901">
+<meta name="kadraj-version" content="60000">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -2858,6 +2858,172 @@ html.reduce-motion .k51pt,html.reduce-motion .rzchip{transition:none!important}
 :root[data-ui="vizor"] .rv-acc>div{border:1px solid var(--vz-hair,var(--line))}
 @media (prefers-reduced-motion:reduce){.crv .rvbd.pop{animation:none}.rv-pg i{transition:none}}
 /*}@css:51REV*/
+/*@css:60CHS{*/
+/* ===== 6.0 · Satranç yenilendi (chess.com benzeri) =====
+   Oyun ekranı .chess.c6: telefonda hamle şeridi üstte (.c6side display:contents + order), tahta neredeyse kenardan kenara, altta düz
+   düğme çubuğu; ≥900px'te tahta solda, sağda hamle tablosu, inceleme satırı, düğmeler ve sohbet (grid alanları t/m/b/s).
+   Vurgular: Turnuva tahtasında son hamle ve seçili kare sarımsı; yasal hamle noktası ve alma halkası; sürüklerken alttaki kare çerçeveli
+   (.c6hov); ön hamle kırmızımsı (.pre/.psel/.pdot); sağ tık kareleri (.ann) ve oklar (#cAnn). Sonuç kartı .c6end, lobi .c6lob. */
+main.chessmode{padding:0 0 calc(8px + env(safe-area-inset-bottom,0px))}
+.chess.c6{gap:5px;padding:2px 0 6px;min-height:100%}
+.c6 .cchat{order:3}.c6 .cctl{order:4;margin-top:auto}
+.c6 .c6side{display:contents}
+.c6>.cpl,.c6 .c6side>*{margin-left:10px;margin-right:10px}
+.c6 #cMoves{order:-2}
+.c6 .crvbar{order:-1}
+.c6 .cmain{gap:4px;padding:0 6px}
+.c6 .cbfr{max-width:calc(100dvh - 292px);container-type:inline-size}
+.c6 .cboard{border-radius:5px;box-shadow:0 3px 14px rgba(0,0,0,.2)}
+/* koordinatlar karenin içinde, tahtayla büyür */
+.c6 .csq em{font:700 max(8.5px,2.35cqw)/1 var(--f-body)}
+.c6 .csq .rk{left:max(2px,.5cqw);top:max(2px,.4cqw)}.c6 .csq .fl{right:max(2px,.5cqw);bottom:max(1px,.3cqw)}
+/* işaretler */
+.c6 .cmk .dot::after{inset:34.5%;background:rgba(0,0,0,.15)}
+.c6 .cmk .cap::after{inset:0;border:0;border-radius:50%;background:radial-gradient(circle,transparent 0 62%,rgba(0,0,0,.15) 63%)}
+.c6[data-cth="turnuva"] .cmk .lm,.c6[data-cth="yesil"] .cmk .lm,.c6[data-cth="ahsap"] .cmk .lm{background:rgba(255,255,51,.5)}
+.c6[data-cth="turnuva"] .cmk .sel,.c6[data-cth="yesil"] .cmk .sel,.c6[data-cth="ahsap"] .cmk .sel{background:rgba(255,255,51,.5)}
+.c6[data-cth="turnuva"] .cmk .hint{background:rgba(255,140,0,.38)}
+.c6 .cmk .pre{background:rgba(232,52,60,.55)}
+.c6 .cmk .psel{background:rgba(232,52,60,.38)}
+.c6 .cmk .pdot::after{content:"";position:absolute;inset:39%;border-radius:50%;background:rgba(232,52,60,.42)}
+.c6 .cmk .ann{opacity:.82}.c6 .cmk .ann.a-r{background:#eb6150}.c6 .cmk .ann.a-g{background:#7fb446}.c6 .cmk .ann.a-b{background:#3c96dc}
+.c6hov{position:absolute;left:0;top:0;width:12.5%;height:12.5%;box-shadow:inset 0 0 0 max(3px,.55cqw) rgba(255,255,255,.75);pointer-events:none}
+.c6hov[hidden]{display:none}
+.c6ann{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+.c6 .pc.drag img{filter:drop-shadow(0 10px 8px rgba(0,0,0,.32))}
+.c6 .pc.drag{transition:none}
+/* oyuncu çubukları */
+.c6 .cpl-in{min-height:50px;gap:9px;padding:4px 6px;border-radius:12px}
+.c6 .cpl-in.turn{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+.c6 .cpl-in .av{--s:40px!important}
+.c6 .cpl-in .av img{border-radius:8px}
+.c6 .cpl-in .rbot{--s:42px!important}
+.c6 .cpl-in .cwav{width:44px;height:40px}
+.c6 .cpl-in .cside{width:40px;height:40px;border-radius:8px}
+.c6 .cwho{gap:2px}
+.c6 .cwho>div{gap:6px;font-size:.93rem}
+.c6 .crt{font:600 .78rem/1 var(--f-mono);color:var(--muted)}
+.c6acc{flex:none;font:700 .68rem/1 var(--f-mono);padding:3px 6px;border-radius:6px;background:var(--surface-2);color:var(--fg);letter-spacing:-.02em}
+.c6 .ctray .ctg img{width:18px;height:18px;margin-right:-9px}
+.c6 .ctray .cadv{background:none;padding:0 2px;color:var(--muted);font-size:.72rem}
+.c6 .cclk{min-width:5.4em;justify-content:flex-end;padding:8px 10px;border-radius:7px;font-size:1.2rem}
+/* hamle şeridi */
+.c6 .cmoves{min-height:36px;padding:3px 5px;border-radius:12px;gap:0}
+.c6 .cn{font:600 .74rem/1 var(--f-mono);padding:0 2px 0 8px}
+.c6 .cmv{padding:5px 7px;border-radius:6px;font-size:.88rem;font-weight:700;align-items:center}
+.c6 .cmv.cur{background:color-mix(in srgb,var(--fg) 13%,transparent);color:var(--fg)}
+.c6 .cmv.cur em{color:inherit}
+/* düğme çubuğu */
+.c6 .cctl{display:flex;gap:2px;padding:4px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.c6 .cctl button{flex:1 1 0;min-width:0;background:none;border:0;border-radius:12px;padding:7px 0 6px;font-size:.64rem;color:var(--muted)}
+.c6 .cctl button svg.i{width:1.4rem;height:1.4rem;color:var(--fg)}
+.c6 .cctl button[aria-pressed="true"],.c6 .cctl button[aria-pressed="true"] svg.i{color:var(--accent)}
+.c6 .cctl button:not(:disabled):active{background:var(--surface-2)}
+@media (hover:hover){.c6 .cctl button:not(:disabled):hover{background:var(--surface-2);color:var(--fg)}}
+/* değerlendirme çubuğu */
+.c6 .cevalbar{width:13px;border-radius:4px;background:#403e3b;box-shadow:inset 0 0 0 1px rgba(0,0,0,.14)}
+.c6 .cevalbar i{background:#f6f6f2}
+.c6 .cevalbar span{font-size:.47rem}
+/* terfi seçici */
+.c6 .cpromo{top:0;padding:0;gap:0;border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.c6 .cpromo button{border-radius:0;background:#fff}
+.c6 .cpromo button:hover{background:#e8e8e3}
+.c6 .cpromo .x{background:#f1f1ec;color:#555}
+/* sonuç kartı */
+.c6 .cov{background:rgba(10,14,12,.42)}
+.c6end{position:relative;width:min(92%,348px);max-height:calc(100% - 12px);overflow:auto;padding:0 0 14px;gap:10px;scrollbar-width:none}
+.c6e-x{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--muted);z-index:1}
+.c6e-x svg.i{width:1.1rem;height:1.1rem}
+.c6e-hd{width:100%;display:grid;justify-items:center;gap:6px;padding:20px 44px 10px;background:linear-gradient(180deg,var(--c6e,#8e9994) -60%,var(--surface) 92%);text-align:center}
+.c6end.win{--c6e:#81b64c}.c6end.loss{--c6e:#e0604c}.c6end.draw{--c6e:#9aa39e}
+.c6e-ic{width:50px;height:50px;border-radius:16px;display:grid;place-items:center;background:var(--c6e);color:#fff;box-shadow:0 4px 14px color-mix(in srgb,var(--c6e) 45%,transparent);flex:none}
+.c6e-ic svg.i{width:1.6rem;height:1.6rem}
+.c6e-tt{display:grid;gap:3px;min-width:0}
+.c6e-tt b{font:600 1.35rem/1.2 var(--f-display)}
+.c6e-tt small{color:var(--muted);font-size:.85rem}
+.c6e-vs{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:start;gap:8px;width:100%;padding:0 14px}
+.c6e-p{display:grid;justify-items:center;gap:3px;min-width:0}
+.c6e-av{display:grid;place-items:center;border-radius:12px;padding:2px}
+.c6e-av .av{--s:48px!important}.c6e-av .cside{width:48px;height:48px}
+.c6e-p.won .c6e-av{box-shadow:0 0 0 2.5px var(--c6e,#81b64c)}
+.c6e-p b{font-size:.86rem;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c6e-p small{font:600 .74rem/1 var(--f-mono);color:var(--muted)}
+.c6e-a{display:grid;justify-items:center;gap:1px;margin-top:3px;padding:5px 10px;border-radius:10px;background:var(--surface-2)}
+.c6e-a[hidden]{display:none}
+.c6e-a b{font:700 1rem/1.1 var(--f-mono)}.c6e-a small{font:700 .58rem/1 var(--f-body);text-transform:uppercase;letter-spacing:.06em}
+.c6e-sc{align-self:center;margin-top:-18px;font:700 1.1rem/1 var(--f-mono);color:var(--muted);white-space:nowrap}
+.c6e-rt{font-size:.86rem;color:var(--muted)}.c6e-rt b{color:var(--fg);font-family:var(--f-mono)}.c6e-rt em{font-style:normal;font-weight:800;font-family:var(--f-mono)}
+.c6e-rt em.up{color:#5d9b2f}.c6e-rt em.dn{color:#d2453a}
+.c6e-w{color:var(--muted);font-size:.76rem;font-weight:600}
+.c6e-w[hidden]{display:none}
+.c6end .cbtns{padding:0 14px;margin-top:2px}
+.c6e-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.c6e-2 .btn{padding:0 8px}
+.c6end .btn .rvi{width:1.25rem;height:1.25rem;flex:none}
+/* küçük tahtada (telefon) sıkı kart: başlık yatay, avatarlar küçük, "Tahtaya bak" yalnızca çarpı */
+.c6end.sm{gap:7px;padding-bottom:10px;width:min(94%,340px)}
+.c6end.sm .c6e-hd{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;gap:10px;padding:12px 44px 8px 14px;text-align:left}
+.c6end.sm .c6e-ic{width:38px;height:38px;border-radius:12px}.c6end.sm .c6e-ic svg.i{width:1.25rem;height:1.25rem}
+.c6end.sm .c6e-tt b{font-size:1.12rem}.c6end.sm .c6e-tt small{font-size:.78rem}
+.c6end.sm .c6e-av .av{--s:38px!important}.c6end.sm .c6e-av .cside{width:38px;height:38px}
+.c6end.sm .c6e-av .rbot{--s:40px!important}.c6end.sm .c6e-av .cwav{width:42px;height:38px}
+.c6end.sm .c6e-a{padding:3px 8px}.c6end.sm .c6e-a b{font-size:.9rem}
+.c6end.sm .btn{min-height:2.55rem}
+.c6end.sm .cbtns{gap:5px}
+/* geniş ekran: tahta solda, yan panel sağda */
+@media (min-width:900px){
+ main.chessmode:not(.snap),:root[data-ui="vizor"] main.chessmode:not(.snap){padding-left:max(12px,calc((100% - 1140px)/2));padding-right:max(12px,calc((100% - 1140px)/2))}
+ .chess.c6{min-height:0;display:grid;grid-template-columns:auto minmax(270px,400px);grid-template-rows:auto auto auto 1fr;grid-template-areas:"t s" "m s" "b s" ". s";justify-content:center;column-gap:18px;row-gap:6px;align-items:start;padding:6px 0 10px}
+ .c6>.cpl{margin:0}
+ .c6 #cplT{grid-area:t}.c6 #cplB{grid-area:b}
+ .c6 .cmain{grid-area:m;padding:0}
+ .c6 .cbfr{width:min(calc(100dvh - 232px),700px);max-width:none;flex:none}
+ .c6 .c6side{grid-area:s;display:flex;flex-direction:column;gap:8px;align-self:stretch;min-height:0;max-height:calc(100dvh - 92px)}
+ .c6 .c6side>*{margin:0}
+ .c6 #cMoves{order:0;flex:1 1 auto;display:grid;grid-template-columns:3em 1fr 1fr;align-content:start;align-items:center;overflow-y:auto;overflow-x:hidden;min-height:140px;padding:6px;gap:2px}
+ .c6 #cMoves>.muted{grid-column:1/-1;padding:10px 6px}
+ .c6 .cn{padding:0 6px 0 0;text-align:right}
+ .c6 .cmv{justify-content:flex-start;padding:6px 8px}
+ .c6[data-cm="puzzle"] #cMoves{display:flex;flex-wrap:wrap;align-content:flex-start}
+ .c6 .crvbar{order:1}.c6 .chwbar{order:2}.c6 .cctl{order:3;margin-top:0}.c6 .cchat{order:4}
+ .c6 .cch-list{max-height:min(32vh,260px)}
+}
+/* lobi */
+.c6lob{display:grid;gap:12px;margin:0 0 16px}
+.c6lob .box{margin:0 12px}
+.c6me{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.c6me .av{--s:52px!important}
+.c6me .t{min-width:0;flex:1;display:grid;gap:3px}
+.c6me .t b{font:600 1.05rem/1.2 var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c6me .t small{color:var(--muted);font-size:.78rem}
+.c6me .rt{display:grid;justify-items:end;gap:3px;flex:none}
+.c6me .rt b{font:700 1.7rem/1 var(--f-mono);letter-spacing:-.03em}
+.c6me .rt small{color:var(--muted);font-size:.66rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.c6play{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 12px}
+.c6tile{position:relative;display:flex;align-items:center;gap:11px;padding:13px 12px;border-radius:18px;background:var(--surface);border:1px solid var(--line);text-align:left;min-height:74px;min-width:0;color:var(--fg)}
+.c6tile .ic{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);flex:none}
+.c6tile .ic svg.i{width:1.4rem;height:1.4rem}
+.c6tile .tx{min-width:0;display:grid;gap:2px}
+.c6tile b{font-size:.93rem;line-height:1.2}
+.c6tile small{color:var(--muted);font-size:.74rem;line-height:1.25}
+.c6tile.pri{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.c6tile.pri .ic{background:rgba(255,255,255,.18);color:inherit}
+.c6tile.pri small{color:inherit;opacity:.82}
+.c6dot{position:absolute;top:8px;right:8px;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--heart);color:#fff;font:700 .7rem/20px var(--f-mono);font-style:normal;text-align:center}
+.c6tile:active{transform:scale(.97)}
+.c6bot .c6say{display:flex;align-items:center;gap:12px;margin-bottom:2px}
+.c6bf{display:grid;place-items:center;width:64px;height:64px;flex:none}
+.c6bf.cw{width:70px}
+.c6sb{position:relative;flex:1;min-width:0;padding:9px 12px;border-radius:14px;background:var(--surface-2);font-size:.86rem;font-weight:600;line-height:1.35}
+.c6sb::before{content:"";position:absolute;left:-6px;top:calc(50% - 6px);width:12px;height:12px;background:inherit;transform:rotate(45deg);border-radius:2px}
+.c6cst{margin:4px 0 0}
+#c6bots{scroll-margin-top:calc(var(--vz-th,62px) + 8px)}
+@media (min-width:640px){.c6play{grid-template-columns:repeat(4,1fr)}.c6tile{flex-direction:column;align-items:flex-start;min-height:118px}}
+:root[data-ui="vizor"] .c6tile,:root[data-ui="vizor"] .c6sb{border-radius:20px}
+:root[data-ui="vizor"] .c6 .cboard{border-radius:3px}
+:root[data-ui="vizor"] .c6acc{border-radius:999px}
+html.reduce-motion .c6tile:active{transform:none}
+/*}@css:60CHS*/
 /*@css:511{*/
 .ak5{margin-top:14px;display:grid;gap:10px}
 .ak5 .ak5-st{font-size:.86rem;line-height:1.5;color:var(--muted)}
@@ -3068,6 +3234,392 @@ html.reduce-motion .reel .rdisc img{animation:none}
 .ci-links a small{display:block;color:var(--muted);font-size:.74rem}
 .ci-empty{padding:28px 16px 36px;text-align:center;color:var(--muted);font-size:.88rem}
 /*}@css:570*/
+/*@css:60UI{*/
+/* ===== 6.0 · Yeni arayüz =====
+   Ortak kurallar :root[data-ui] altında (Vizör ve Klasik ikisinde de geçerli), Vizör'e özel olanlar :root[data-ui="vizor"],
+   Klasik'e özel olanlar :root[data-ui]:not([data-ui="vizor"]) altında. Özgüllük 50UI'daki Vizör kurallarıyla aynı; bu bölge sonra geldiği için kazanır.
+   Tasarım: kalın çerçeve yerine ince çizgi + yumuşak gölge (--k6-e1..3), hap biçimli düğme ve çipler, başlıklarda Unbounded, metinde Figtree;
+   eşbiçimli yazı yalnızca sayılarda ve EXIF'te. Hikâye halkası degrade (--k6-ring). Kareli avatarlar (squircle) Kadraj'ın imzası olarak kaldı.
+   Hareket: yalnızca transform ve opacity. Sayfa girişinde yönlü geçiş ve sıralı belirme (main.enter + k6-fwd/k6-back/k6-tab), yaylı pencereler,
+   kayan sekme göstergesi (.k6-ind, .vz-focus), beğenide parçacık halkası. Sonsuz animasyon yok; ışıltılar sınırlı tur atar.
+   Klaket oynatıcı kurallarına dokunulmadı (video hiç kırpılmaz). */
+:root{--k6-ease:cubic-bezier(.22,.8,.24,1);--k6-spring:cubic-bezier(.32,1.4,.56,1);--k6-soft:cubic-bezier(.16,1,.3,1);
+ --k6-e1:0 1px 2px rgba(15,35,28,.05),0 3px 10px -4px rgba(15,35,28,.10);
+ --k6-e2:0 1px 2px rgba(15,35,28,.05),0 12px 28px -14px rgba(15,35,28,.28);
+ --k6-e3:0 2px 6px rgba(15,35,28,.08),0 26px 56px -20px rgba(15,35,28,.42);
+ --k6-ring:conic-gradient(from 210deg,var(--accent),#2BC8A4,var(--sun),#FF8A4C,var(--heart),#9B5CF6,var(--accent))}
+:root[data-mode="dark"]{
+ --k6-e1:0 1px 2px rgba(0,0,0,.3),0 4px 12px -4px rgba(0,0,0,.42);
+ --k6-e2:0 1px 2px rgba(0,0,0,.35),0 14px 30px -14px rgba(0,0,0,.7);
+ --k6-e3:0 2px 8px rgba(0,0,0,.4),0 28px 60px -20px rgba(0,0,0,.85)}
+/* çizgi tonu bulunduğu yerin temasından (sohbet teması #shell'e kendi renklerini yazar) */
+:root[data-ui],:root[data-ui] .shell{--k6-hair:color-mix(in srgb,var(--line) 78%,transparent)}
+:root[data-ui][data-mode="dark"],:root[data-ui][data-mode="dark"] .shell,:root[data-ui] .shell[data-cdk]{--k6-hair:color-mix(in srgb,var(--line) 94%,transparent)}
+@keyframes k6Up{from{opacity:0;transform:translateY(12px)}}
+@keyframes k6InR{from{opacity:0;transform:translateX(24px)}}
+@keyframes k6InL{from{opacity:0;transform:translateX(-24px)}}
+@keyframes k6Item{from{opacity:0;transform:translateY(10px) scale(.985)}}
+@keyframes k6Tile{from{opacity:0;transform:scale(.9)}}
+@keyframes k6Pop{from{opacity:0;transform:scale(.7)}}
+@keyframes k6Fade{from{opacity:0}}
+@keyframes k6Shim{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+
+/* --- zemin: Vizör'de film greni yerine yumuşak ışık --- */
+:root[data-ui="vizor"] .shell{background:radial-gradient(110% 50% at 105% -8%,color-mix(in srgb,var(--accent) 12%,transparent),transparent 60%),radial-gradient(80% 40% at -10% 105%,color-mix(in srgb,var(--sun) 9%,transparent),transparent 60%),var(--bg)}
+:root[data-ui="vizor"] .shell[data-ct]{background:var(--bg)}
+
+/* --- üst çubuk --- */
+:root[data-ui] .hd{gap:8px;min-height:60px;padding:8px 14px 8px 16px}
+:root[data-ui] .hd h1{font:600 1.3rem/1.15 var(--f-display);letter-spacing:-.022em}
+:root[data-ui] .hd .brand{gap:9px}
+:root[data-ui] .hd .wordmark{font:700 1.42rem/1 var(--f-display);letter-spacing:-.04em}
+:root[data-ui] .hd .brand .vfmark{width:1.6rem;height:1.6rem}
+:root[data-ui] .hd .ib{width:2.5rem;height:2.5rem;border-radius:50%;background:var(--surface);border:1px solid var(--k6-hair);box-shadow:var(--k6-e1);transition:transform .3s var(--k6-spring),background-color .2s}
+:root[data-ui] .hd .ib.plain{background:transparent;border-color:transparent;box-shadow:none}
+:root[data-ui] .hd .ib:active{transform:scale(.88);transition-duration:.1s}
+:root[data-ui] .hd .ib .dot{background:var(--heart)}
+:root[data-ui="vizor"] .hd h1[data-meta]::after,:root[data-ui="vizor"] .hd .wordmark[data-meta]::after{margin-top:4px;font:500 .74rem/1.2 var(--f-body);letter-spacing:0;text-transform:none;color:var(--muted)}
+:root[data-ui]:not([data-ui="vizor"]) #top{border-bottom:1px solid transparent;transition:border-color .25s,box-shadow .25s}
+:root[data-ui]:not([data-ui="vizor"]) #top.k6-sc{border-bottom-color:var(--k6-hair);box-shadow:0 8px 20px -18px rgba(0,0,0,.4)}
+
+/* --- dok: sade yazılar, kayan sekme göstergesi (Vizör'de odak köşeleriyle) --- */
+:root[data-ui] .dock nav{position:relative}
+:root[data-ui] .dock nav>button{z-index:1;gap:4px;padding:8px 0 7px;font:600 .62rem/1 var(--f-body);letter-spacing:.005em;text-transform:none;color:var(--muted);transition:color .25s}
+:root[data-ui] .dock nav>button svg.i{width:1.5rem;height:1.5rem;stroke-width:1.75;transition:transform .35s var(--k6-spring)}
+:root[data-ui] .dock nav>button .me{transition:transform .35s var(--k6-spring)}
+:root[data-ui] .dock nav>button:active svg.i,:root[data-ui] .dock nav>button:active .me{transform:scale(.84);transition-duration:.1s}
+:root[data-ui] .dock nav>button[aria-current="page"]{color:var(--fg)}
+:root[data-ui] .dock nav>button[aria-current="page"] svg.i{color:var(--accent);stroke-width:2.2}
+:root[data-ui] .dock .cnt-badge{top:2px;right:calc(50% - 22px);min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--heart);border:2px solid var(--surface);font:700 .62rem/14px var(--f-body)}
+:root[data-ui] .vz-focus{position:absolute;left:0;top:5px;bottom:5px;width:var(--w,60px);translate:var(--x,0px) 0;z-index:0;pointer-events:none;color:var(--accent);transition:translate .55s var(--k6-spring),width .3s var(--k6-ease),opacity .2s}
+:root[data-ui] .vz-focus::after{content:"";position:absolute;inset:0 5px;border-radius:18px;background:color-mix(in srgb,var(--accent) 12%,transparent)}
+:root[data-ui] .vz-focus.nt{transition:none}
+:root[data-ui] .vz-focus.off{opacity:0}
+:root[data-ui="vizor"] .vz-focus{top:6px;bottom:6px}
+:root[data-ui="vizor"] .vz-focus::after{inset:0 4px;border-radius:999px}
+:root[data-ui="vizor"] .vz-focus::before{inset:1px 3px;opacity:.7;z-index:1}
+:root[data-ui="vizor"] .dock nav{border-color:var(--k6-hair);box-shadow:var(--k6-e3),inset 0 1px 0 var(--vz-hi)}
+:root[data-ui="vizor"] .dock nav>button{gap:4px;padding:8px 0 7px}
+:root[data-ui]:not([data-ui="vizor"]) .dock nav{border-radius:26px;border-color:var(--k6-hair);box-shadow:var(--k6-e2);padding:6px 4px}
+:root[data-ui]:not([data-ui="vizor"]) .dock .create{border-radius:20px;background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 78%,#fff),var(--accent) 60%);box-shadow:0 10px 22px -6px color-mix(in srgb,var(--accent) 62%,transparent),inset 0 1px 0 rgba(255,255,255,.25);transition:transform .3s var(--k6-spring)}
+:root[data-ui]:not([data-ui="vizor"]) .dock .create svg.i{transition:transform .35s var(--k6-spring)}
+:root[data-ui]:not([data-ui="vizor"]) .dock [data-act="create"]:active .create{transform:scale(.9)}
+:root[data-ui]:not([data-ui="vizor"]) .dock [data-act="create"]:active .create svg.i{transform:rotate(90deg)}
+:root[data-ui]:not([data-ui="vizor"]) .dock nav>button[data-act="create"]:active svg.i{transform:rotate(90deg) scale(1)}
+
+/* --- sayfa girişi: yönlü geçiş ve sıralı belirme (yalnızca tam çizimde) --- */
+:root[data-ui] main.enter{animation:none}
+:root[data-ui] main.enter>*{animation:k6Up .42s var(--k6-ease) both}
+:root[data-ui] main.enter.k6-fwd>*{animation-name:k6InR}
+:root[data-ui] main.enter.k6-back>*{animation-name:k6InL}
+:root[data-ui] main.enter>*:nth-child(1){animation-delay:0s}:root[data-ui] main.enter>*:nth-child(2){animation-delay:.03s}:root[data-ui] main.enter>*:nth-child(3){animation-delay:.06s}:root[data-ui] main.enter>*:nth-child(4){animation-delay:.09s}:root[data-ui] main.enter>*:nth-child(5){animation-delay:.12s}:root[data-ui] main.enter>*:nth-child(6){animation-delay:.15s}:root[data-ui] main.enter>*:nth-child(n+7){animation-delay:.18s}
+:root[data-ui] main.enter>.sr-body{animation:none}
+:root[data-ui] main.enter>.sr-body>*{animation:k6Up .42s var(--k6-ease) both;animation-delay:calc(.05s + var(--k6i,0) * .035s)}
+:root[data-ui] main.enter :is(.box>.row,.hrow>*,.notes>.nt,.hlr>*,.sr-flg>*,.sr-flr>*):nth-child(-n+12){animation:k6Item .46s var(--k6-ease) both;animation-delay:calc(.07s + var(--k6i,0) * .03s)}
+:root[data-ui] main.enter .grid>.tile:nth-child(-n+15){animation:k6Tile .44s var(--k6-ease) both;animation-delay:calc(.08s + var(--k6i,0) * .022s)}
+:root[data-ui] main.enter .stories>.story:nth-child(-n+10){animation:k6Pop .5s var(--k6-spring) both;animation-delay:calc(.06s + var(--k6i,0) * .04s)}
+:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(2){--k6i:1}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(3){--k6i:2}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(4){--k6i:3}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(5){--k6i:4}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(6){--k6i:5}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(7){--k6i:6}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(8){--k6i:7}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(9){--k6i:8}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(10){--k6i:9}:root[data-ui] main.enter :is(.stories,.hrow,.grid,.box,.notes,.hlr,.sr-flg,.sr-flr,.sr-body)>:nth-child(n+11){--k6i:10}
+
+/* --- düğmeler, girişler, anahtarlar, bölmeli seçim --- */
+:root[data-ui] .btn{border-radius:999px;letter-spacing:-.005em}
+:root[data-ui] .btn.sec{background:var(--surface-2);border:1px solid var(--k6-hair);box-shadow:none}
+:root[data-ui] .btn.line{border-color:var(--k6-hair)}
+:root[data-ui] .in{border-radius:16px;border:1.5px solid var(--k6-hair);background-color:var(--surface);transition:border-color .2s,box-shadow .2s}
+:root[data-ui] .in:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+:root[data-ui] .sw span{background:color-mix(in srgb,var(--fg) 16%,transparent);transition:background-color .25s}
+:root[data-ui] .sw span::after{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.24),0 3px 8px -3px rgba(0,0,0,.2);transition:transform .34s var(--k6-spring)}
+:root[data-ui] .sw input:checked+span{background:var(--accent)}
+:root[data-ui] .sw input:checked+span::after{background:#fff}
+:root[data-ui] .seg{border-radius:999px;padding:4px;background:var(--surface-2);border:1px solid var(--k6-hair)}
+:root[data-ui] .seg button{border-radius:999px;transition:background-color .2s,color .2s,box-shadow .2s,transform .2s var(--k6-spring)}
+:root[data-ui] .seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:var(--k6-e1)}
+:root[data-ui] .tag{border-radius:999px;padding:3px 7px}
+:root[data-ui] .box{border-radius:22px;border-color:var(--k6-hair);box-shadow:var(--k6-e1)}
+:root[data-ui] .box .row+.row{border-top-color:var(--k6-hair)}
+:root[data-ui] .row{transition:background-color .15s}
+:root[data-ui] .row .t>div:first-child{font-size:.97rem}
+:root[data-ui] .row .t .s{font-size:.85rem;color:var(--muted)}
+:root[data-ui] .row.unread .t .s{color:var(--fg);font-weight:600}
+:root[data-ui] .box .row.unread::before{content:none}
+:root[data-ui] .udot{width:10px;height:10px;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent)}
+@media (hover:hover){:root[data-ui] .box .row:hover{background:color-mix(in srgb,var(--surface-2) 60%,transparent)}}
+
+/* --- bölüm başlıkları --- */
+:root[data-ui] .sec-h{margin:20px 16px 10px;font:600 1rem/1.2 var(--f-display);letter-spacing:-.012em;text-transform:none;color:var(--fg)}
+:root[data-ui] .sec-h>span:first-child{min-width:0}
+:root[data-ui] .sec-h .btn.ghost{font:700 .86rem/1 var(--f-body);letter-spacing:0;min-height:2rem}
+:root[data-ui] .sec-h .muted{font:500 .78rem/1.2 var(--f-body)!important;letter-spacing:0;text-transform:none}
+
+/* --- süzgeç çipleri ve kayan gösterge --- */
+:root[data-ui] .chips{gap:6px;padding:4px 16px 12px}
+:root[data-ui] .chips .chip{min-height:2.3rem;padding:0 1rem;border-radius:999px;background:var(--surface);border:1px solid var(--k6-hair);box-shadow:var(--k6-e1);color:var(--muted);font:600 .86rem/1 var(--f-body);letter-spacing:0;text-transform:none;transition:color .25s,background-color .25s,transform .25s var(--k6-spring)}
+:root[data-ui] .chips .chip svg.i{width:1.05rem;height:1.05rem}
+:root[data-ui] .chips .chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:transparent;box-shadow:var(--k6-e2)}
+:root[data-ui] .chips .chip[aria-pressed="true"]::before{content:none}
+:root[data-ui] .chips .chip[data-go]{margin-left:auto;color:var(--fg);letter-spacing:0;text-transform:none}
+:root[data-ui] .sr-tabs .chip{padding:0 .85rem}
+:root[data-ui] .sr-tabs .chip[aria-pressed="true"] .sr-cn{opacity:.8}
+:root[data-ui] .k6-seg{position:relative;isolation:isolate}
+:root[data-ui] .k6-seg>.chip{position:relative;z-index:1}
+:root[data-ui] .k6-seg>.chip[aria-pressed="true"]{background:transparent;border-color:transparent;box-shadow:none}
+.k6-ind{position:absolute;left:0;top:0;z-index:0;display:block;border-radius:999px;background:var(--fg);box-shadow:var(--k6-e2);transform-origin:0 50%;pointer-events:none}
+
+/* --- hikâye şeridi ve hikâye halkası --- */
+:root[data-ui] .stories{gap:14px;padding:6px 16px 16px}
+:root[data-ui] .story{gap:7px;width:4.6rem}
+:root[data-ui] .story .n{font:600 .72rem/1.2 var(--f-body)}
+:root[data-ui] .story .plus{width:24px;height:24px;border-radius:50%;border:2.5px solid var(--bg);background:var(--accent);box-shadow:0 4px 10px -4px color-mix(in srgb,var(--accent) 80%,transparent)}
+:root[data-ui] .av.ring img,:root[data-ui] .av.ring.seen img{box-shadow:none}
+:root[data-ui] .av.ring::before{content:"";position:absolute;inset:calc(var(--s,44px) * -.085);border-radius:36%;padding:max(2px,calc(var(--s,44px) * .042));background:var(--k6-ring);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);pointer-events:none;animation:none}
+:root[data-ui] .av.ring.seen::before{background:var(--line);padding:max(1.5px,calc(var(--s,44px) * .024))}
+:root[data-ui] .stories .av.ring:not(.seen)::before{animation:none}
+:root[data-ui] .stories .av.ring:not(.seen)::after{content:none;animation:none}
+:root[data-ui] button.av{transition:transform .3s var(--k6-spring)}
+:root[data-ui] button.av:active{transform:scale(.92)}
+
+/* --- paylaşım kartı: üstte kişi, ortada görsel, altta yalın eylemler --- */
+:root[data-ui] .card{display:flex;flex-direction:column;margin:0 12px 14px;border:1px solid var(--k6-hair);border-radius:24px;background:var(--surface);box-shadow:var(--k6-e1)}
+:root[data-ui] .card>.media,:root[data-ui] .card>.note,:root[data-ui] .card>.poll{order:0;margin-top:0}
+:root[data-ui] .card-h{gap:11px;padding:12px 6px 10px 14px}
+:root[data-ui] .card-h .who{line-height:1.25}
+:root[data-ui] .card-h .uname{font-size:.95rem}
+:root[data-ui] .card-h .who .sub{margin-top:1px;font:500 .76rem/1.4 var(--f-body);letter-spacing:0;color:var(--muted)}
+:root[data-ui] .card-h .ib.plain{border-radius:50%;color:var(--muted)}
+:root[data-ui] .follow-link{padding:2px 0;font-weight:700}
+:root[data-ui] .media{margin:0 8px;border-radius:18px;max-width:calc(100% - 16px)}
+:root[data-ui] .media::after{content:none}
+:root[data-ui] .media .badge-k{left:12px;top:12px;padding:6px 10px;border-radius:999px;font:600 .74rem/1 var(--f-body);letter-spacing:0;background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+:root[data-ui] .media .playbig span{width:3.8rem;height:3.8rem;border-radius:50%;background:rgba(0,0,0,.34);box-shadow:0 0 0 1.5px rgba(255,255,255,.7);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:transform .3s var(--k6-spring)}
+:root[data-ui] .media:active .playbig span{transform:scale(.9)}
+:root[data-ui] .phc-n{top:12px;right:12px;padding:5px 9px;font-size:.66rem;background:rgba(0,0,0,.42);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+:root[data-ui] .phc-d{bottom:12px}
+/* Vizör: odak köşeleri yalnızca dokununca ve çift dokunup beğenince (odak kilidi) */
+:root[data-ui="vizor"] .card .media::before,:root[data-ui="vizor"] .card .note::before{opacity:0;transform:scale(1.06)}
+:root[data-ui="vizor"] .card .media:has(.burst)::before{animation:k6Lock .75s var(--k6-ease) both}
+@keyframes k6Lock{0%{opacity:0;transform:scale(1.12)}35%{opacity:1;transform:scale(.95)}60%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1)}}
+:root[data-ui] .card .note{margin:0 8px;border-radius:18px;min-height:13rem;padding:32px 24px;font:600 1.24rem/1.36 var(--f-display);letter-spacing:-.012em;overflow:hidden}
+:root[data-ui] .card .note::after{content:"\201C";position:absolute;left:16px;top:4px;font:700 4.4rem/1 var(--f-display);opacity:.2;pointer-events:none}
+:root[data-ui] .card .poll{margin:0 8px;border-radius:18px;padding:16px;gap:8px;background:var(--surface-2)}
+:root[data-ui] .poll .q{font-size:1.05rem}
+:root[data-ui] .popt{min-height:2.9rem;border-radius:14px;border:1.5px solid var(--k6-hair);background:var(--surface);transition:border-color .2s,transform .25s var(--k6-spring)}
+:root[data-ui] .popt:active{transform:scale(.98)}
+:root[data-ui] .popt .bar{background:color-mix(in srgb,var(--accent) 17%,transparent)}
+:root[data-ui] .popt.mine{border-color:var(--accent)}
+:root[data-ui] .pills{gap:2px;padding:6px 8px 0}
+:root[data-ui] .pill{position:relative;gap:6px;min-height:2.6rem;padding:0 .7rem;border:0;border-radius:999px;background:transparent;color:var(--fg);font:600 .9rem/1 var(--f-body);transition:background-color .2s,color .2s,transform .25s var(--k6-spring)}
+:root[data-ui] .pill svg.i{width:1.45rem;height:1.45rem;stroke-width:1.8}
+:root[data-ui] .pill:active{background:var(--surface-2);transform:scale(.94)}
+@media (hover:hover){:root[data-ui] .pill:hover{background:var(--surface-2)}}
+:root[data-ui] .pill.liked{background:transparent;color:var(--heart)}
+:root[data-ui] .pill.saved{color:var(--accent)}
+/* beğenide parçacık halkası (.kpop, 540) */
+:root[data-ui] .pill[data-like]::after{content:"";position:absolute;left:calc(1.425rem - 26px);top:50%;width:52px;height:52px;margin-top:-26px;border-radius:50%;pointer-events:none;opacity:0;
+ background:radial-gradient(circle,var(--heart) 2.4px,transparent 3px) 50% 0/8px 8px no-repeat,radial-gradient(circle,var(--sun) 2.4px,transparent 3px) 100% 50%/8px 8px no-repeat,radial-gradient(circle,var(--heart) 2.4px,transparent 3px) 50% 100%/8px 8px no-repeat,radial-gradient(circle,var(--accent) 2.4px,transparent 3px) 0 50%/8px 8px no-repeat,radial-gradient(circle,#FF8A4C 2px,transparent 2.6px) 85% 15%/7px 7px no-repeat,radial-gradient(circle,var(--accent) 2px,transparent 2.6px) 85% 85%/7px 7px no-repeat,radial-gradient(circle,var(--sun) 2px,transparent 2.6px) 15% 85%/7px 7px no-repeat,radial-gradient(circle,#9B5CF6 2px,transparent 2.6px) 15% 15%/7px 7px no-repeat}
+:root[data-ui] .pill.kpop[data-like]::after{animation:k6Burst .6s var(--k6-ease) both}
+@keyframes k6Burst{0%{opacity:1;transform:scale(.35)}55%{opacity:1}100%{opacity:0;transform:scale(1.3)}}
+:root[data-ui] .burst::before{content:"";position:absolute;inset:-28%;border-radius:50%;border:3px solid rgba(255,255,255,.9);animation:vzRing .7s var(--k6-ease) forwards}
+:root[data-ui] .card-b{gap:6px;padding:4px 16px 16px;font-size:.94rem;line-height:1.45}
+:root[data-ui] .card-b .more{font-weight:600;font-size:.86rem}
+:root[data-ui] .meta-line.mono{display:inline-flex;align-items:center;gap:6px;width:fit-content;margin-top:2px;padding:5px 10px;border-radius:999px;background:var(--surface-2);font:500 .68rem/1 var(--f-mono);letter-spacing:.02em;text-transform:none;color:var(--muted)}
+:root[data-ui] .meta-line.mono::before{content:"";width:13px;height:13px;flex:none;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z'/%3E%3Ccircle cx='12' cy='13' r='3.5'/%3E%3C/svg%3E") center/contain no-repeat}
+:root[data-ui] .pinlbl{margin:0 18px 6px;font:700 .76rem/1 var(--f-body);letter-spacing:0;text-transform:none}
+
+/* --- öneriler, kişi kartları, duyuru ve ipucu şeritleri --- */
+:root[data-ui] .hrow{gap:10px;padding:2px 16px 8px}
+:root[data-ui] .pcard{width:9.4rem;gap:5px;padding:16px 10px 12px;border-radius:22px;background:var(--surface);border:1px solid var(--k6-hair);box-shadow:var(--k6-e1)}
+:root[data-ui] .pcard .n{font-size:.84rem}
+:root[data-ui] .pcard .btn{margin-top:4px}
+:root[data-ui] .banner{gap:12px;align-items:center;margin:2px 12px 12px;padding:12px;border-radius:20px;background:var(--surface);border:1px solid var(--k6-hair);box-shadow:var(--k6-e1);font-size:.88rem;line-height:1.4}
+:root[data-ui] .banner>svg.i:first-child{width:2.5rem;height:2.5rem;margin:0;padding:.62rem;border-radius:14px;background:var(--accent-soft);color:var(--accent);flex:none}
+:root[data-ui] .banner.ann{background:linear-gradient(135deg,#fff4d6,#ffe6a8);border-color:rgba(180,120,0,.22)}
+:root[data-ui] .banner.ann>svg.i:first-child{background:rgba(255,255,255,.55);color:#9a6a00}
+:root[data-ui] .banner.inst .btn{flex:none}
+
+/* --- boş durumlar --- */
+:root[data-ui] .empty{gap:10px;padding:44px 28px;font-size:.92rem;line-height:1.45}
+:root[data-ui] .empty .ic{position:relative;width:4.2rem;height:4.2rem;margin-bottom:8px;border:0;border-radius:24px;background:var(--accent-soft);color:var(--accent);box-shadow:0 0 0 8px color-mix(in srgb,var(--accent-soft) 45%,transparent)}
+:root[data-ui] .empty .ic::before,:root[data-ui] .empty .ic::after{content:none}
+:root[data-ui] .empty .ic svg.i{width:1.8rem;height:1.8rem}
+:root[data-ui] .empty b{font:600 1.08rem/1.25 var(--f-display);color:var(--fg)}
+:root[data-ui] .empty>svg.i:first-child{width:2.5rem;height:2.5rem;padding:.6rem;border-radius:50%;background:var(--accent-soft);color:var(--accent)}
+:root[data-ui] main.enter .empty .ic{animation:k6Pop .55s var(--k6-spring) .12s both}
+
+/* --- Keşfet: arama, oyun kartları, ızgara --- */
+:root[data-ui] .search{padding:2px 16px 12px}
+:root[data-ui] .search .in{min-height:2.95rem;padding-left:46px;border-radius:999px;border:1px solid var(--k6-hair);background-color:var(--surface);box-shadow:var(--k6-e1);font-size:.95rem}
+:root[data-ui] .search .in:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 16%,transparent)}
+:root[data-ui] .square{position:relative;isolation:isolate;overflow:hidden;gap:14px;width:calc(100% - 24px);margin:0 12px 12px;padding:16px;border-radius:24px;box-shadow:0 16px 32px -20px rgba(4,30,22,.6),inset 0 1px 0 rgba(255,255,255,.14);transition:transform .3s var(--k6-spring)}
+:root[data-ui] .square:active{transform:scale(.98)}
+:root[data-ui] .square::before{content:"";position:absolute;z-index:-1;right:-40px;top:-70px;width:190px;height:190px;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.22),transparent);pointer-events:none}
+:root[data-ui] .square::after{content:none}
+:root[data-ui] .square .ic{width:3rem;height:3rem;border-radius:16px;background:rgba(255,255,255,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.24)}
+:root[data-ui] .square .ic svg.i{width:1.45rem;height:1.45rem}
+:root[data-ui] .square b{font:600 1.08rem/1.2 var(--f-display);letter-spacing:-.01em}
+:root[data-ui] .square small{font-size:.83rem;line-height:1.35;opacity:.9}
+:root[data-ui] .square .live{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.2);font:700 .64rem/1 var(--f-body);letter-spacing:.06em}
+:root[data-ui] .square .live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:none}
+:root[data-ui] .grid{gap:3px;margin:0 0 16px;padding:0 12px;background:none;border:0;border-radius:0;box-shadow:none}
+:root[data-ui] .tile{border-radius:10px;background:var(--surface-2)}
+:root[data-ui] .tile::before{content:"";position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(transparent,rgba(0,0,0,.36));pointer-events:none}
+:root[data-ui] .tile::after{content:none}
+:root[data-ui] .tile:active{transform:scale(.96)}
+:root[data-ui] .vz-ph{display:none!important}
+@media (hover:hover){:root[data-ui] .tile:hover img{transform:scale(1.05)}}
+/* Keşfet: mozaik ızgara (18 karede bir solda ve sağda 2x2 büyük kare) */
+:root[data-ui] #shell[data-r="explore"] .grid{grid-auto-flow:row dense}
+:root[data-ui] #shell[data-r="explore"] .grid>.tile:nth-child(18n+1){grid-column:span 2;grid-row:span 2}
+:root[data-ui] #shell[data-r="explore"] .grid>.tile:nth-child(18n+11){grid-column:2/span 2;grid-row:span 2}
+:root[data-ui] #shell[data-r="explore"] .grid>.tile:is(:nth-child(18n+1),:nth-child(18n+11)) .c{left:12px;bottom:10px;font-size:.8rem}
+
+/* --- resimler: yüklenirken ışıltı, sonra yumuşak belirme (k6Img) --- */
+:root[data-ui] .media img,:root[data-ui] .tile img,:root[data-ui] .sr-fl img{transition:opacity .4s ease,transform .5s var(--k6-ease)}
+:root[data-ui] .k6-ld img{opacity:0}
+:root[data-ui] .k6-ld::after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(100deg,transparent 25%,color-mix(in srgb,var(--fg) 8%,transparent) 50%,transparent 75%);animation:k6Shim 1.3s ease-in-out 3}
+/* yükleniyor iskeletleri (ışıltı sınırlı tur) */
+.k6-sk{display:block;position:relative;overflow:hidden;height:11px;border-radius:6px;background:var(--surface-2)}
+.k6-sk::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--fg) 7%,transparent),transparent);animation:k6Shim 1.4s ease-in-out 8}
+.k6-ska{width:50px;height:50px;border-radius:32%;flex:none}
+.k6-skr{pointer-events:none}
+.k6-skr .t,.k6-skc .card-h .t{flex:1;display:grid;gap:9px}
+.k6-skc{pointer-events:none}
+.k6-skc .k6-ska{width:40px;height:40px}
+.k6-skm{height:auto;aspect-ratio:1;margin:0 8px;border-radius:18px}
+.k6-skb{display:grid;gap:9px;padding:14px 16px 18px}
+
+/* --- Sohbet listesi --- */
+:root[data-ui] .notes{gap:10px;padding:6px 12px 14px}
+/* not balonu: dikey boşluk saydam kenarlıkta (taşan üçüncü satır görünmesin), çizgi gölgeyle */
+:root[data-ui] .nb{max-width:100px;padding:0 9px;border:6px solid transparent;border-inline-width:0;border-radius:16px;background-clip:border-box;box-shadow:0 0 0 1px var(--k6-hair),var(--k6-e2);font:600 .7rem/1.25 var(--f-body)}
+:root[data-ui] .nb::after{bottom:-12px;border:0;box-shadow:0 0 0 1px var(--k6-hair)}
+:root[data-ui] .nb.add{color:var(--muted);box-shadow:var(--k6-e1);outline:1.5px dashed color-mix(in srgb,var(--fg) 26%,transparent);outline-offset:-1.5px}
+:root[data-ui] .nb.add::after{box-shadow:none;outline:1.5px dashed color-mix(in srgb,var(--fg) 26%,transparent);outline-offset:-1.5px}
+:root[data-ui] .quick{display:flex;gap:8px;padding:0 12px 14px}
+:root[data-ui] .quick button{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:7px;height:2.8rem;padding:0 8px;border-radius:999px;background:var(--surface);border:1px solid var(--k6-hair);box-shadow:var(--k6-e1);font:600 .84rem/1 var(--f-body);white-space:nowrap;overflow:hidden}
+:root[data-ui] .quick svg.i{width:1.15rem;height:1.15rem;flex:none;color:var(--accent)}
+:root[data-ui] .quick button:active{transform:scale(.95)}
+@media (max-width:389px){:root[data-ui] .quick button{gap:5px;padding:0 6px;font-size:.78rem}:root[data-ui] .quick svg.i{width:1rem;height:1rem}}
+:root[data-ui] #shell[data-r="chats"] main>.box:has(>.row[data-msg="bot:rota"]){background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 11%,var(--surface)),var(--surface) 62%);border-color:color-mix(in srgb,var(--accent) 22%,var(--k6-hair))}
+:root[data-ui] #shell[data-r="chats"] main>.box:not(:has(>.row[data-msg="bot:rota"])){margin:0 4px 10px;overflow:visible;background:transparent;border:0;border-radius:0;box-shadow:none}
+:root[data-ui] #shell[data-r="chats"] main>.box:not(:has(>.row[data-msg="bot:rota"]))>.row{gap:13px;padding:10px 12px;border-radius:18px}
+:root[data-ui] #shell[data-r="chats"] main>.box>.row+.row{border-top:0}
+:root[data-ui] #shell[data-r="chats"] main>.box>.row:active{background:var(--surface-2)}
+
+/* --- Sohbet ekranı: yalnızca görünüm (kaydırma, yazıyor, görüldü davranışı değişmez) --- */
+:root[data-ui] .chat-head .t div:first-child{font-size:1rem}
+:root[data-ui] .chat-head .t div:last-child{margin-top:1px;font-size:.76rem}
+:root[data-ui] .msg{border-radius:20px 20px 20px 6px;border-color:var(--k6-hair);box-shadow:0 1px 2px rgba(15,35,28,.05)}
+:root[data-ui] .mrow.me .msg{border-radius:20px 20px 6px 20px}
+:root[data-ui] #msgs .mrow:not(.me)+.mrow:not(.me):not(:has(.sender)) .msg{border-top-left-radius:6px}
+:root[data-ui] #msgs .mrow.me+.mrow.me .msg{border-top-right-radius:6px}
+:root[data-ui] .msgs:not([data-bub]) .mrow.me .msg{background:linear-gradient(165deg,color-mix(in srgb,var(--accent) 84%,#fff),var(--accent) 72%);border-color:transparent;box-shadow:0 6px 16px -10px color-mix(in srgb,var(--accent) 85%,transparent)}
+:root[data-ui] .react{border-radius:999px;border-color:var(--k6-hair);box-shadow:var(--k6-e1)}
+:root[data-ui] .composer textarea{border-radius:22px;border:1px solid var(--k6-hair);background:var(--surface);box-shadow:var(--k6-e1);transition:border-color .2s,box-shadow .2s}
+:root[data-ui] .composer:not([data-bub]) textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 14%,transparent)}
+:root[data-ui] .composer .send,:root[data-ui] .composer .cplus{border-radius:50%;transition:transform .3s var(--k6-spring)}
+:root[data-ui] .composer .send:active,:root[data-ui] .composer .cplus:active{transform:scale(.88)}
+:root[data-ui] .composer:not([data-bub]) .send{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 80%,#fff),var(--accent) 65%);box-shadow:0 8px 18px -8px color-mix(in srgb,var(--accent) 80%,transparent)}
+:root[data-ui] .replybar{border-radius:18px;border-color:var(--k6-hair);box-shadow:var(--k6-e1)}
+:root[data-ui] .cchips button{border-radius:999px;border-color:var(--k6-hair)}
+
+/* --- Profil --- */
+:root[data-ui] .prof{position:relative;isolation:isolate;gap:12px;padding:10px 16px 6px}
+:root[data-ui] .prof::before{content:"";position:absolute;z-index:-1;left:0;right:0;top:-150px;height:320px;pointer-events:none;background:radial-gradient(48% 52% at 22% 56%,color-mix(in srgb,var(--accent) 20%,transparent),transparent 72%),radial-gradient(38% 46% at 80% 40%,color-mix(in srgb,var(--sun) 15%,transparent),transparent 72%)}
+/* kapak şeridi: kişinin fotoğrafı bulanık, altı zemine kaybolur; fotoğraf şeridin altına taşar */
+.k6-cover{position:absolute;z-index:-1;left:12px;right:12px;top:4px;height:84px;overflow:hidden;border-radius:26px;background:var(--surface-2);pointer-events:none}
+.k6-cover img{position:absolute;left:-25%;top:-60%;width:150%;height:220%;max-width:none;object-fit:cover;filter:blur(24px) saturate(1.5);opacity:.85}
+.k6-cover::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 14%,transparent),transparent 55%,color-mix(in srgb,var(--bg) 55%,transparent))}
+:root[data-mode="dark"] .k6-cover img{opacity:.5}
+:root[data-mode="dark"] .k6-cover::after{background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 12%,transparent),transparent 45%,color-mix(in srgb,var(--bg) 75%,transparent))}
+:root[data-ui] .prof.k6-hasc{padding-top:52px}
+:root[data-ui] .prof.k6-hasc::before{content:none}
+:root[data-ui] .prof.k6-hasc .prof-top{align-items:flex-end;padding-left:8px}
+:root[data-ui] .prof.k6-hasc .prof-top>.av img{box-shadow:0 0 0 4px var(--bg),var(--k6-e2)}
+:root[data-ui] .prof.k6-hasc .prof-top>.av.ring::before{inset:calc(var(--s,44px) * -.085 - 4px)}
+:root[data-ui] .prof-top{gap:18px}
+:root[data-ui] .prof-top>.av{--s:88px!important}
+:root[data-ui] .stats{gap:2px;background:transparent;border:0;border-radius:0;box-shadow:none;overflow:visible}
+:root[data-ui] .stats>*{padding:8px 2px;border:0;border-radius:16px;background:transparent;transition:background-color .2s,transform .25s var(--k6-spring)}
+:root[data-ui] .stats>*+*{border-left:0}
+:root[data-ui] .stats>button:active{background:var(--surface-2);transform:scale(.95)}
+:root[data-ui] .stats b{font:600 1.24rem/1.15 var(--f-display);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+:root[data-ui] .stats span{margin-top:3px;font:500 .76rem/1.2 var(--f-body);letter-spacing:0;text-transform:none;color:var(--muted)}
+:root[data-ui] .prof>div>b[style]{font-size:1.2rem!important;letter-spacing:-.015em}
+:root[data-ui] .prof .bio{font-size:.93rem;line-height:1.5}
+:root[data-ui] .pnote{padding:7px 12px;border-radius:999px;background:var(--surface);border:1px solid var(--k6-hair);box-shadow:var(--k6-e1)}
+:root[data-ui] .prof .btns{gap:8px}
+:root[data-ui] .prof .btns .btn{min-height:2.65rem;font-size:.9rem}
+:root[data-ui] .hlr{gap:14px;padding:6px 16px 14px}
+:root[data-ui] .hlc .hav{box-shadow:0 0 0 1.5px var(--k6-hair),var(--k6-e1)}
+:root[data-ui] .hlc.new .hav{border:1.5px dashed color-mix(in srgb,var(--fg) 28%,transparent);box-shadow:none}
+:root[data-ui] .ptabs{position:relative;gap:4px;margin:2px 16px 12px;padding:4px;border-radius:999px;background:var(--surface-2);border:1px solid var(--k6-hair)}
+:root[data-ui] .ptabs .chip{min-height:2.3rem;border:0;border-radius:999px;background:transparent;box-shadow:none;color:var(--muted);font:600 .84rem/1 var(--f-body);transition:color .25s}
+:root[data-ui] .ptabs .chip svg.i{width:1.05rem;height:1.05rem}
+:root[data-ui] .ptabs .chip[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:var(--k6-e1)}
+:root[data-ui] .ptabs .chip[aria-pressed="true"] svg.i{color:var(--accent)}
+:root[data-ui] .ptabs.k6-seg>.chip[aria-pressed="true"]{background:transparent;box-shadow:none}
+:root[data-ui] .ptabs>.k6-ind{background:var(--surface);box-shadow:var(--k6-e1)}
+@media (max-width:389px){:root[data-ui] .ptabs .chip{gap:0;padding-inline:.3rem;font-size:.8rem}:root[data-ui] .ptabs .chip svg.i{display:none}}
+
+/* --- Bildirimler: tür rozeti --- */
+.act-av{position:relative;display:inline-flex;flex:none}
+.act-ic{position:absolute;right:-5px;bottom:-5px;z-index:1;width:21px;height:21px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;box-shadow:0 0 0 2.5px var(--surface)}
+.act-ic svg.i{width:11px;height:11px;stroke-width:2.6}
+.act-row[data-t="like"] .act-ic{background:var(--heart)}
+.act-row[data-t="like"] .act-ic svg.i{fill:#fff}
+.act-row[data-t="follow"] .act-ic{background:#3B82F6}
+.act-q{display:block;width:fit-content;max-width:100%;margin-top:5px;padding:6px 11px;border-radius:4px 14px 14px 14px;background:var(--surface-2);color:var(--fg);font-size:.86rem;overflow-wrap:anywhere}
+.act-th{display:grid;place-items:center;width:46px;height:46px;flex:none;overflow:hidden;border-radius:12px;background:var(--surface-2);color:var(--muted)}
+.act-th img{width:100%;height:100%;object-fit:cover;display:block}
+:root[data-ui] .act-row{align-items:flex-start;padding:12px 14px}
+:root[data-ui] .act-row>.btn{align-self:center}
+:root[data-ui] .act-row .t{padding-top:2px;font-size:.92rem;line-height:1.4}
+
+/* --- Ayarlar --- */
+:root[data-ui] .setprof{border-color:var(--k6-hair);border-radius:24px;box-shadow:var(--k6-e1)}
+:root[data-ui] .set,:root[data-ui] .sxs .set{border-color:var(--k6-hair);border-radius:22px;box-shadow:var(--k6-e1)}
+:root[data-ui] .sxh{margin:22px 28px 8px;font:700 .8rem/1 var(--f-body);letter-spacing:.005em;text-transform:none;color:var(--muted)}
+:root[data-ui][data-mode] .sic{width:32px;height:32px;border-radius:10px;background:linear-gradient(160deg,color-mix(in srgb,var(--c,var(--accent)) 76%,#fff),var(--c,var(--accent)) 70%);color:#fff;box-shadow:0 3px 8px -4px var(--c,var(--accent))}
+:root[data-ui] .sxs .srow::after{left:58px;background:var(--k6-hair)}
+:root[data-ui] .ctile,:root[data-ui] .src{border-color:var(--k6-hair);box-shadow:var(--k6-e1)}
+:root[data-ui] .ctile{border-radius:22px}
+:root[data-ui] .ctile .ic{border-radius:16px;background:linear-gradient(150deg,color-mix(in srgb,var(--c,var(--accent)) 74%,#fff),var(--c,var(--accent)) 70%);box-shadow:0 8px 16px -8px var(--c,var(--accent))}
+:root[data-ui] .src .ic{border-radius:14px}
+
+/* --- katmanlar: alttan yaylı pencere, ortada yaylı onay, üstte bildirim balonu --- */
+@keyframes k6Sheet{from{transform:translateY(100%)}}
+@keyframes k6SheetOut{to{transform:translateY(100%)}}
+@keyframes k6Opt{from{opacity:0;transform:translateY(12px)}}
+@keyframes k6Dlg{from{opacity:0;scale:.88}}
+@keyframes k6Full{from{opacity:0;transform:translateY(28px)}}
+@keyframes k6Toast{from{opacity:0;transform:translateY(-18px) scale(.92)}}
+:root[data-ui] .scrim{animation:k6Fade .28s ease both}
+:root[data-ui] .sheet{border-radius:28px 28px 0 0;box-shadow:var(--k6-e3);animation:k6Sheet .5s var(--k6-soft) both}
+:root[data-ui] .sheet .grab{width:40px;height:5px;margin:10px auto 6px;border-radius:3px;background:var(--line)}
+:root[data-ui] .sheet h4{margin:6px 18px 10px;font:600 1.05rem/1.2 var(--f-display);letter-spacing:-.01em}
+:root[data-ui] .opt{gap:14px;width:calc(100% - 16px);margin:0 8px;padding:10px 12px;border-radius:16px;font-weight:600}
+:root[data-ui] .opt>svg.i:first-child{width:2.35rem;height:2.35rem;padding:.55rem;border-radius:13px;background:var(--surface-2);color:var(--fg);flex:none}
+:root[data-ui] .opt.red>svg.i:first-child{background:color-mix(in srgb,var(--heart) 13%,transparent);color:var(--heart)}
+:root[data-ui] #overlay .sheet .body>.opt{animation:k6Opt .4s var(--k6-ease) both}
+:root[data-ui] #overlay .sheet .body>.opt:nth-child(2){animation-delay:.03s}:root[data-ui] #overlay .sheet .body>.opt:nth-child(3){animation-delay:.06s}:root[data-ui] #overlay .sheet .body>.opt:nth-child(4){animation-delay:.09s}:root[data-ui] #overlay .sheet .body>.opt:nth-child(5){animation-delay:.12s}:root[data-ui] #overlay .sheet .body>.opt:nth-child(n+6){animation-delay:.15s}
+:root[data-ui] .dialog{padding:24px 18px 14px;border-radius:28px;background:var(--surface);border:1px solid var(--k6-hair);box-shadow:var(--k6-e3);animation:k6Dlg .42s var(--k6-spring) both}
+:root[data-ui] .dialog .btn.sec{background:var(--surface-2)}
+:root[data-ui] .full{animation:k6Full .42s var(--k6-soft) both}
+:root[data-ui] #vzGhosts .scrim{animation:vzOut .22s ease forwards}
+:root[data-ui] #vzGhosts .sheet{animation:k6SheetOut .26s cubic-bezier(.4,0,1,1) forwards}
+:root[data-ui] #vzGhosts .dialog{animation:vzDlgOut .2s ease forwards}
+:root[data-ui] .toast{gap:10px;padding:10px 16px 10px 12px;border-radius:20px;font-weight:600;box-shadow:var(--k6-e3);animation:k6Toast .5s var(--k6-spring) both}
+:root[data-ui] .toast:not(:has(.av))::before{content:"";flex:none;width:8px;height:8px;margin-left:4px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 30%,transparent)}
+
+/* --- geniş ekran: sayfaya göre sütun genişliği (Akış dar, Keşfet ve profil geniş) --- */
+@media (min-width:900px){
+ :root[data-ui] #shell{--k6-w:720px}
+ :root[data-ui] #shell[data-r="feed"],:root[data-ui] #shell[data-r="post"]{--k6-w:660px}
+ :root[data-ui] #shell:is([data-r="explore"],[data-r="profile"],[data-r="admin"],[data-r="chess"]){--k6-w:800px}
+ :root[data-ui] #shell:not([data-r="chat"]):not([data-r="chessgame"]) main:not(.snap){padding-left:calc((100% - var(--k6-w)) / 2);padding-right:calc((100% - var(--k6-w)) / 2)}
+ :root[data-ui] #shell:not([data-r="chat"]):not([data-r="chessgame"]) .hd{padding-left:max(16px,calc((100% - var(--k6-w)) / 2 + 16px));padding-right:max(16px,calc((100% - var(--k6-w)) / 2 + 16px))}
+ :root[data-ui]:not([data-ui="vizor"]) .dock nav{max-width:600px}
+}
+/*}@css:60UI*/
 /*@css:580{*/
 /* 5.8.0 Cephe kartı ve sohbetteki savaşa katıl düğmesi */
 .square.cpcard{background:linear-gradient(135deg,#7f1d1d,#0c7a63 70%,#0a5a8a)}
@@ -3114,7 +3666,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=50901,APP_VER="5.9.1";
+const APP_V=60000,APP_VER="6.0.0";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3554,7 +4106,7 @@ function vExplore(){const q=(S.q||"").trim().toLocaleLowerCase("tr");
   if(!people.length&&!tagPosts.length)h+=`<div class="empty"><b>Sonuç yok</b>“${esc(q)}” için bir şey bulamadık. Kullanıcı adının bir kısmını dene.</div>`;
   return h}
  const ppl=[...humans(),...BOTS.map(b=>b.uid)];const mt=myTurnGames();
- h+=`<button class="square cpcard" data-act="cephe"><span class="ic">${I("flag")}</span><span style="min-width:0"><b>Cephe</b><small>Piksel savaşı: toprak kap, şehir kur, füze at. Botlarla ya da arkadaşınla</small></span><span class="live">SAVAŞ</span></button>`;
+ h+=`<button class="square cpcard" data-act="cephe"><span class="ic">${I("flag")}</span><span style="min-width:0"><b>Cephe</b><small>Piksel savaşı: cephede ordular, generaller, barış ve vasallar. Botlarla ya da arkadaşınla</small></span><span class="live">SAVAŞ</span></button>`;
  h+=`<button class="square chesscard" data-go="chess"><span class="ic">${I("knight")}</span><span style="min-width:0"><b>Satranç</b><small>Rota'ya karşı oyna ya da arkadaşını davet et</small></span><span class="live">${mt?mt+" SIRA SENDE":"OYNA"}</span></button>`;
  h+=`<h3 class="sec-h"><span>Kişiler</span></h3><div class="hrow" style="margin-bottom:16px">${ppl.map(u=>{const p=P(u);return`<div class="pcard"><button data-prof="${esc(u)}">${avatar(u,56,{click:false})}</button><div class="n"><b>${esc(p.username)}</b></div>${u===S.uid||S.guest?"":`<button class="btn sm block ${isFollowing(S.uid,u)?"sec":""}" data-follow="${esc(u)}">${isFollowing(S.uid,u)?"Takiptesin":"Takip et"}</button>`}</div>`}).join("")}</div>`;
  const ps=allPosts().filter(canSee).sort((a,b)=>hash32(a.id,9).localeCompare(hash32(b.id,9)));
@@ -3600,8 +4152,10 @@ function vPost(id){const p=postById(id);if(!p)return`<div class="empty"><b>Payla
 /* --- Bildirimler --- */
 function vActivity(){const list=activity();const seen=LS.get("kadraj_act_"+S.uid,0);LS.set("kadraj_act_"+S.uid,now());
  if(!list.length)return`<div class="empty"><span class="ic">${I("bell")}</span><b>Henüz bildirim yok</b>Biri paylaşımını beğendiğinde, yorum yaptığında ya da seni takip ettiğinde burada görünür.<button class="btn sm" data-msg="bot:rota">Rota ile test bildirimi oluştur</button></div>`;
- const row=a=>{const p=P(a.uid);const post=a.pid&&postById(a.pid);const txt=a.t==="like"?"paylaşımını beğendi.":a.t==="comment"?`yorum yaptı: ${a.text}`:"seni takip etmeye başladı.";const th=post&&postThumb(post);
-  return`<div class="row">${avatar(a.uid,44)}<div class="t" style="white-space:normal"><button data-prof="${esc(a.uid)}"><b>${esc(p.username)}</b></button> ${esc(txt)} <span class="muted">${ago(a.at)}</span></div>${post?`<button data-open="${esc(post.id)}" style="width:46px;height:46px;flex:none;border-radius:12px;overflow:hidden;background:var(--surface-2);display:grid;place-items:center">${th?`<img src="${esc(th)}" alt="" style="width:100%;height:100%;object-fit:cover">`:I(post.kind==="poll"?"poll":"type")}</button>`:a.t==="follow"&&!isFollowing(S.uid,a.uid)?`<button class="btn sm" data-follow="${esc(a.uid)}">Takip et</button>`:""}</div>`};
+ /* 6.0: satırda bildirim türü rozeti (kalp, yorum, takip), yorum metni ayrı satırda */
+ const KIND={like:["heart","paylaşımını beğendi."],comment:["comment","yorum yaptı."],follow:["users","seni takip etmeye başladı."]};
+ const row=a=>{const p=P(a.uid);const post=a.pid&&postById(a.pid);const[ic,txt]=KIND[a.t]||KIND.like;const th=post&&postThumb(post);
+  return`<div class="row act-row" data-t="${esc(a.t)}"><span class="act-av">${avatar(a.uid,44)}<i class="act-ic" aria-hidden="true">${I(ic)}</i></span><div class="t" style="white-space:normal"><button data-prof="${esc(a.uid)}"><b>${esc(p.username)}</b></button> ${esc(txt)} <span class="muted">${ago(a.at)}</span>${a.t==="comment"&&a.text?`<span class="act-q">${esc(a.text)}</span>`:""}</div>${post?`<button class="act-th" data-open="${esc(post.id)}" aria-label="Paylaşımı aç">${th?`<img src="${esc(th)}" alt="">`:I(post.kind==="poll"?"poll":"type")}</button>`:a.t==="follow"&&!isFollowing(S.uid,a.uid)?`<button class="btn sm" data-follow="${esc(a.uid)}">Takip et</button>`:""}</div>`};
  const nw=list.filter(a=>a.at>seen),old=list.filter(a=>a.at<=seen);
  return(nw.length?`<h3 class="sec-h">Yeni</h3><div class="box">${nw.map(row).join("")}</div>`:"")+(old.length?`<h3 class="sec-h">Daha önce</h3><div class="box">${old.map(row).join("")}</div>`:"")}
 
@@ -5162,7 +5716,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
-- 5.9 Cephe (piksel savaşı, 5.9'da baştan yenilendi): Keşfet'teki Cephe kartından açılır. Harita gerçek arazili ve canlı renkli: yeşil ovalar, kum çöller, beyaz dağlar ve buzullar, mavi deniz. Ana menüde harita (Avrasya, Dünya, Avrupa, Asya, Kurtuluş Savaşı 1919, Kore Savaşı 1950, 1. Dünya Savaşı 1914, 2. Dünya Savaşı 1939) ve oyun türü seçilir: "Hazır ülke seç" (5.9.1: gerçek sınırlarla her ülke ayrı devlet; haritada Türkiye, Rusya, ABD gibi bir ülkeye dokunup o ülke olursun; tarihî haritalarda Osmanlı, Sovyetler gibi ülkeler o dönemin topraklarıyla; diğer ülkeler bot ya da boş toprak) ya da "Yeni devlet kur" (boş haritada küçük bir yerden başlarsın; ülke botu sayısı (Botsuz, 4, 8, 12, 16), küçük kabileler (Yok, Az, Çok) ve bayrak seçilir). Bot zorluğu Kolay/Normal/Zor. "Oyna", "Oda kur, arkadaşını çağır" (5 harfli oda kodu; sohbette davet gelir, "Savaşa katıl" düğmesi; botsuz seçilirse yalnızca arkadaşlarla) ve "Odaya katıl". Başlarken haritada yerine dokunursun (arazi türü ve yakındaki oyuncu sayısı görünür), 5 saniye sonra savaş başlar; ilk 25 saniye barış, yalnızca boş topraklara yayılınır. Topraklar açık renkle boyanır, sınırları koyu; ülke adının yanında bayrak ve altında asker sayısı yazar. Saldırmak için haritaya dokun: boş toprağa, komşuya ya da denizin karşısına (gemiyle, en fazla 3 gemi). Alttaki yüzde (%10-%100) kaç asker gideceğini seçer; Saldırılar panelinden geri çekilir. Arazi zorluğu: ova kolay, yayla/çöl/tundra orta, dağ ve buzul en zor. Alt panel: nüfus, altın, asker/sınır ve saniyelik artış; 1-0 tuşlu yuvalar: Şehir (asker sınırı), Liman (kıyıda, altın), Fabrika (altın), Savunma (çevresini almak iki kat zor), Füze deposu, SAM (bombaları vurur), Atom, Nükleer, Hidrojen bombası, Güç (asker gücü 1-10, her seviye +10: 2. seviyede 15.000 asker 1. seviyede 30.000'e denk). Üstte Dünya hakimiyeti çubuğu (sen, lider, %80 hedefi) ve süre, sağ üstte sıra, sol üstte çık, sıralama, konumuma git ve nasıl oynanır. Bilgisayarda ülkenin üstüne gelince, telefonda basılı tutunca bilgisi çıkar. Ülke saldırılarına harekât adı verilir (ör. Yıldırım Harekâtı); haritada saldırandan cepheye kalın ok ve ucunda asker sayısı görünür. Sesler: saldırı, çatışma, inşaat, gemi, füze, siren, patlama, zafer ve arka planda savaş davulu; sol üstteki ses düğmesi ses+müzik, yalnız ses ve kapalı arasında geçer. Dünyanın %80'ini alan ya da son kalan ülke kazanır; 30 dakika dolarsa en büyük kazanır.
+- 6.0 Cephe (piksel savaşı, Age of History tarzı; 6.0'da savaş baştan yenilendi): Keşfet'teki Cephe kartından açılır. Harita gerçek arazili ve canlı renkli. Ana menüde harita (Avrasya, Dünya, Avrupa, Asya, Kurtuluş Savaşı 1919, Kore Savaşı 1950, 1. Dünya Savaşı 1914, 2. Dünya Savaşı 1939) ve oyun türü seçilir: "Hazır ülke seç" (gerçek sınırlarla her ülke ayrı devlet; bir ülkeye dokunup o ülke olursun) ya da "Yeni devlet kur" (boş haritada küçük bir yerden başlarsın; ülke botu sayısı Botsuz/4/8/12/16, kabileler Yok/Az/Çok, bayrak). Bot zorluğu Kolay/Normal/Zor. Tek başına oyna, oda kurup arkadaşını çağır (5 harfli kod, sohbette "Savaşa katıl") ya da odaya katıl. Saldırmak için haritada bir yere dokun: askerler oraya doğru ilerler, her yöne değil; denizin ötesindeki boş toprağa dokununca gemiyle giderler (en fazla 3 gemi). Alttaki yüzde kaç asker gideceğini seçer. Cephede iki ordu kendi bayraklarıyla karşı karşıya durur (her bayrak bir grup asker); en çok askeri olan değil, güçlü olan kazanır: güç = asker × eğitim seviyesi × generaller (× savunmada sur ve dağ). Örneğin 2. seviye 40.000 asker 1. seviye 50.000 askeri geri iter. Ne kadar çok asker gönderirsen cephe o kadar hızlı ilerler. Cepheler panelinde bizim ve onların asker sayısı, geri çek düğmesi. Düşmanın küçük bir parçasını tamamen çevirirsen teslim olur (kuşatma). Alınan düşman toprağı çizgili görünür (işgal), zamanla ülkeye katılır (asimilasyon). Alt panel sekmeleri: İnşa (Şehir nüfus ve asker üretimi, Fabrika ve Liman altın, Kışla asker üretimi ve sınırı, Hastane nüfus, Sur savunma), Ordu (Eğitim 1-10, General en fazla 5 tane +%8 güç, Kalkınma altın ve nüfus artışı), Silah (Füze deposu, SAM, Atom, Nükleer, Hidrojen bombası), Diplomasi (barış teklif et: 3 dakika saldırı yok; vasal iste: vasal gelirinin dörtte birini öder, sana saldıramaz, toprağı hakimiyetine sayılır). Botlar da sana barış ya da vasallık teklif eder, kabul ya da ret edersin. Bomba patlayınca mantar bulutu, şok dalgası çıkar, yer bir dakika radyasyonlu kalır; SAM vurursa bomba havada patlar. Sesler: saldırı, çatışma, top, inşaat, gemi, siren, patlama, antlaşma, zafer ve arka planda davul (sol üstteki ses düğmesi). Sol üstteki hız düğmesi oyunu 1x/2x/3x yapar (oda kurucusu). Dünyanın %80'ini (vasallarla) alan ya da son kalan kazanır; 35 dakika dolarsa en büyük kazanır.
 - 5.0 Keşfet araması: ad, @kullanıcı adı, #etiket ya da kelime yazılır; ı/i, ş/s gibi harf farkları önemsizdir. Hepsi, Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; En yeni / En çok beğenilen sıralaması; son aramalar ve yazarken öneriler. Uygulamadaki her #etikete dokununca o etiketin sayfası açılır.
 - 5.0 satranç: lobideki Görünüm kartından taş seti (Kadraj ya da Klasik) ve tahta teması (Zümrüt, Gün batımı, Vizör dahil) seçilir. Süre: Süresiz, 3+2, 5+0, 10+0 (Rota'ya karşı ve aynı telefonda; süresi biten kaybeder). 24 mat bulmacası: yanlış hamle geri döner, İpucu önce taşı sonra hamleyi gösterir, Çözüm oynatır. Tahtanın üstünde alınan taşlar ve malzeme farkı görünür.
 - 5.0 yönetici paneli: bölümler başlığa dokununca açılıp kapanır; Sürüm arşivi kapalı durur, dokununca açılır; kullanıcılarda arama, sıralama ve süzgeçler var.
@@ -5453,67 +6007,17 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
 setTimeout(verTidyCache,9000);
 
 /* ---- A · Neler yeni ---- */
+/* Yalnızca şu anki ara sürümün maddeleri gösterilir (v: o sürümün APP_V'si); yeni sürümde eski maddeleri silip yenilerini yaz. */
 const WN_ITEMS=[
- {ic:"flag",g:"linear-gradient(135deg,#16a34a,#2563eb)",t:"Cephe baştan yenilendi",d:"Canlı renkli gerçek arazi haritası, ülke adları ve asker sayıları, Dünya hakimiyeti çubuğu, saldırı yüzdeleri, numaralı yapı ve bomba yuvaları, küçük kabileler, Kurtuluş Savaşı haritası ve botsuz oyun (yalnızca arkadaşınla)",go:"explore"},
- {ic:"flag",g:"linear-gradient(135deg,#b91c1c,#0c7a63)",t:"Cephe: piksel savaşı",d:"Keşfet'te. Haritada yerini seç, topraklarını büyüt; şehir, fabrika, liman, füze deposu ve SAM kur; atom, nükleer, hidrojen bombası at. Botlarla ya da arkadaşınla oyna, bayrağını seç",go:"explore"},
- {ic:"info",g:"linear-gradient(135deg,#1d4ed8,#7c3aed)",t:"Sohbet ayrıntıları",d:"Sohbetin başlığına dokun: tema, takma adlar, sessize al, gizlilik ve sohbette paylaşılan fotoğraflar, paylaşımlar, bağlantılar tek yerde",go:"chats"},
- {ic:"reels",g:"linear-gradient(135deg,#111,#db2777)",t:"Yeni Klaket ekranı",d:"Kenarlar artık düz siyah, düğmeler daha sade; sağ altta ses plağı dönüyor. Açıklamaya dokununca tamamı açılır",go:"reels"},
- {ic:"reels",g:"linear-gradient(135deg,#db2777,#7c3aed)",t:"Alt menüde Klaket",d:"Klaketlere artık alttaki menüden tek dokunuşla gidiyorsun. Videolar her girişte karışık sırayla geliyor",go:"reels"},
- {ic:"spark",g:"linear-gradient(135deg,#0c7a63,#d97706)",t:"Rota'dan sürüm paylaşımı",d:"Her güncellemede Rota Akış'a küçük ve her seferinde farklı bir paylaşım yapıyor: not, anket ya da fotoğraf",go:"feed"},
- {ic:"spark",g:"linear-gradient(135deg,#e23e57,#d97706)",t:"Öne çıkan hikâyeler",d:"Hikâyeni açıp \"Öne çıkar\"a bas; profilinde Tatil, Okul gibi yuvarlaklarda kalıcı durur. Profilindeki \"Yeni\" ile telefondan fotoğraf da ekleyebilirsin",go:"profile"},
- {ic:"image",g:"linear-gradient(135deg,#0c7a63,#2f6bff)",t:"Rota fotoğrafa bakar",d:"Rota sohbetinde + ile fotoğraf gönder: \"Bu ne?\", \"Bu soruyu çöz\", \"Hangisi daha güzel?\" diye sor",go:"chats"},
- {ic:"chat",g:"linear-gradient(135deg,#2f6bff,#0c7a63)",t:"Akıcı sohbet",d:"Biri yazmaya başlayınca ya da yeni mesaj gelince sohbet zıplamıyor, yavaşça kayıyor. Beğen ve kaydet düğmeleri de artık zıplıyor",go:"chats"},
- {ic:"spark",g:"linear-gradient(135deg,#d97706,#e23e57)",t:"Rota fotoğrafı görüyor",d:"\"Rota açıklama yazsın\" artık fotoğrafa bakıp ona uygun açıklama yazıyor",go:"feed"},
- {ic:"phone",g:"linear-gradient(135deg,#0c7a63,#5856d6)",t:"Arama sesi telefonundan",d:"Bildirim izni verdiysen gelen aramada telefonunun ya da tabletinin kendi bildirim sesi çalar",go:"chats"},
- {ic:"image",g:"linear-gradient(135deg,#0c7a63,#d97706)",t:"Çoklu fotoğraf",d:"Bir paylaşıma 10 fotoğrafa kadar ekle; akışta yana kaydırarak bakılır. Sırasını oluştur ekranındaki şeritten değiştirebilirsin",go:"feed"},
- {ic:"chat",g:"linear-gradient(135deg,#0c7a63,#2f6bff)",t:"@ ile bahset",d:"Mesajda @ yazınca öneriler çıkar. Birebir sohbette @rota yaz, Rota ikinize de katılsın; grupta arkadaşlarından bahset",go:"chats"},
- {ic:"reply",g:"linear-gradient(135deg,#5856d6,#0ea5e9)",t:"Kaydırarak yanıtla",d:"Kendi mesajını sola, karşı tarafınkini sağa kaydır; yanıt hazır",go:"chats"},
- {ic:"users",g:"linear-gradient(135deg,#ff8a3d,#e23e57)",t:"Grupta kim yazıyor",d:"Yazanlar fotoğraflarıyla görünür; iki kişi aynı anda yazarsa fotoğraflar üst üste biner",go:"chats"},
- {ic:"clawd",g:"linear-gradient(135deg,#D97757,#BE684D)",t:"Clawd'ın odası",d:"Clawd artık Akış, Keşfet, Sohbet ve profildeki boş köşelerde kendi piksel odasında yaşıyor: yatak, çekmece, ampul. Gece 00:00'da yatar, sabahları gitar çalar, yorumlarda dans eder",go:"feed"},
- {ic:"knight",g:"linear-gradient(135deg,#1baca6,#0C7A63)",t:"Oyun incelemesi",d:"Hamlelerin Muhteşem, En iyi, Kitap, Hata gibi rozetler alır; oyun sonunda doğruluk, grafik ve hamle hamle açıklama",go:"chess"},
- {ic:"trophy",g:"linear-gradient(135deg,#D97757,#0C7A63)",t:"Clawd'la satranç",d:"Clawd'a karşı oyna (Çaylak'tan Usta'ya, ayrı puan), Clawd ile Rota'nın maçını izle, çevrim içi oyunda sohbet et. Seviyeler artık gerçekten farklı",go:"chess"},
- {ic:"film",g:"linear-gradient(135deg,#f97316,#db2777)",t:"Flick'in yeni adı: Klaket",d:"Kısa videolar artık Klaket. Yeni Kadraj oynatıcı ve medya seçici; sohbette video da gönderebilirsin",go:"reels"},
- {ic:"spark",g:"linear-gradient(135deg,#ff8a3d,#e23e57)",t:"Seri ve kamp ateşi",d:"Birebir sohbette ikiniz de her gün yazınca ateş büyür. Gece yarısına az kala yağmur başlar; kaçırırsan kişi başı 3 Rüzgar hakkı seriyi korur",go:"chats"},
- {ic:"bell",g:"linear-gradient(135deg,#0c7a63,#0ea5e9)",t:"Yeni bildirimler",d:"Üstten gelen Kadraj kartı: saat, Görüldü, Kalp at, Yanıtla. Bildirim sesi var; kurulunca uygulama kapalıyken de gelir",go:"settings"},
- {ic:"lock",g:"linear-gradient(135deg,#475569,#1e293b)",t:"Engelleme",d:"Bir profilin üç nokta menüsünden engelle: birbirinizin paylaşımlarını, mesajlarını ve yorumlarını görmezsiniz. Ayarlar'dan listeyi yönet",go:"settings"},
- {ic:"flag",g:"linear-gradient(135deg,#5856d6,#0C7A63)",t:"Rozetler ve duyurular",d:"Kurucu, Onaylı, İlk kullanıcı, Destekleyen rozetleri; duyurular artık her ekranda üstte görünür",go:"feed"},
- {ic:"clawd",g:"linear-gradient(135deg,#D97757,#BE684D)",t:"Clawd geldi",d:"Ekranda yaşayan piksel arkadaşın: espri yapar, Kadraj'ı anlatır, bilmediğini dürüstçe söyler",go:"settings"},
- {ic:"aperture",g:"linear-gradient(135deg,#0c7a63,#ff8a4c)",t:"Kadraj 5.0: Vizör",d:"Yepyeni arayüz: yüzen alt çubuk, deklanşör düğmesi, odak köşeleri ve kare numaraları. İstersen Ayarlar › Görünüm'den Klasik'e dön",go:"feed"},
- {ic:"knight",g:"#0C7A63",t:"Kadraj Satrancı",d:"Yeni taşlar, kayan hamleler, kıvılcımlar, satranç saati ve 24 mat bulmacası",go:"chess"},
- {ic:"phone",g:"linear-gradient(135deg,#2f6bff,#6a4cff)",t:"Yeni arama ekranı",d:"Ekran paylaşımı (bilgisayarda), sesli aramada kamera, tepkiler, küçültüp gezinme ve bağlantı kalitesi",go:"chats"},
- {ic:"search",g:"#0C7A63",t:"Keşfet'te daha iyi arama",d:"Kişiler, Paylaşımlar, Klaket ve Etiketler süzgeçleri; harf farkı gözetmez, son aramaların burada. Her #etikete dokunabilirsin",go:"explore"},
- {ic:"grid",g:"linear-gradient(135deg,#1f2937,#0c7a63)",t:"Kontak baskı profil",d:"Paylaşımların numaralı karelerle bir kontak baskı gibi dizilir",go:"profile"},
- {ic:"check",g:"linear-gradient(135deg,#0c7a63,#34c759)",t:"Büyük hata temizliği",d:"Sohbet, Klaket, satranç ve hesaplarda 30'dan fazla hata düzeltildi",go:"feed"},
- {ic:"reels",g:"linear-gradient(135deg,#ff4f7b,#ff8a3d)",t:"Daha sağlam Klaket",d:"Video eklerken ya da aramadayken Klaket susar; yarım kaydırmada kaldığı yerden devam eder",go:"reels"},
- {ic:"next",g:"linear-gradient(135deg,#5856d6,#0ea5e9)",t:"Klaket bitince sonrakine geç",d:"Ayarlar › Medya: video bitince kendiliğinden sonraki Klakete kayar",go:"settings"},
- {ic:"edit",g:"linear-gradient(135deg,#ff8a3d,#ff4f7b)",t:"Sohbet taslağı",d:"Yazıp çıktığın mesaj kaybolmaz; listede \"Taslak\" olarak görünür",go:"chats"},
- {ic:"play",g:"linear-gradient(135deg,#ff4f7b,#6a4cff)",t:"Kenarda 2x hız",d:"Klakette ekranın sağ ya da sol kenarına basılı tut; dönünce video baştan başlar",go:"reels"},
- {ic:"more",g:"linear-gradient(135deg,#0c7a63,#0ea5e9)",t:"Klaket seçenekleri",d:"Klaketteki üç nokta: sil, sabitle, düzenle, şikayet et",go:"reels"},
- {ic:"search",g:"linear-gradient(135deg,#0c7a63,#19c79a)",t:"Sohbette ara",d:"+ menüsünden bir sohbetteki eski mesajları bul",go:"chats"},
- {ic:"send",g:"linear-gradient(135deg,#2f6bff,#6a4cff)",t:"Mesaj ilet",d:"Mesaja basılı tut › İlet: başka sohbete ya da Meydan'a gönder",go:"chats"},
- {ic:"pin",g:"linear-gradient(135deg,#f97316,#ffb25b)",t:"Sohbet sabitle",d:"Sohbete basılı tut; en fazla 3 sohbet en üstte durur",go:"chats"},
- {ic:"heart",g:"linear-gradient(135deg,#ff4f7b,#c2185b)",t:"Hikâyeye tepki",d:"Hikâye izlerken kalp, ateş, gülme ya da şaşırma gönder",go:"feed"},
- {ic:"reels",g:"linear-gradient(135deg,#6a4cff,#ff4f7b)",t:"Daha net Klaket",d:"Videolar kırpılmadan sığar, 1080p oynar; süre çubuğunu sürükleyerek ileri-geri sar",go:"reels"},
- {ic:"mic",g:"linear-gradient(135deg,#0ea5e9,#0c7a63)",t:"Sesli mesaj hızı",d:"Sesli mesajda 1x, 1,5x ya da 2x dinle",go:"chats"},
- {ic:"reels",g:"linear-gradient(135deg,#f97316,#db2777)",t:"Sahne'nin yeni adı: Flick",d:"Kısa videoların adı Flick oldu (5.1'den beri Klaket); + > Klaket ile paylaş",go:"reels"},
- {ic:"lock",g:"linear-gradient(135deg,#0ea5e9,#6366f1)",t:"Çocuk modundakiler göremez",d:"Paylaşırken aç; Çocuk Modu'ndaki kişiler o paylaşımı görmez",go:"profile"},
- {ic:"mail",g:"linear-gradient(135deg,#0c7a63,#14a06b)",t:"Kadraj Posta ve Kadraj Anahtarı",d:"Şifreni unutursan e-posta gerekmeden, anahtarınla Kadraj'da yenile",go:"profile"},
- {ic:"key",g:"linear-gradient(135deg,#0c7a63,#0ea5e9)",t:"Kullanıcı adıyla giriş",d:"E-posta yerine kullanıcı adınla gir; şifreni Kadraj'da yenile",go:"settings"},
- {ic:"bell",g:"linear-gradient(135deg,#7c3aed,#ec4899)",t:"Yeni bildirimler",d:"Fotoğraflı bildirim; dokununca doğrudan o sohbete ya da paylaşıma gider",go:"activity"},
- {ic:"music",g:"linear-gradient(135deg,#f97316,#e23e57)",t:"Klaketlerde ses düzeldi",d:"Duraklatınca müzik de durur, uygulamadan çıkınca susar",go:"reels"},
- {ic:"reels",g:"linear-gradient(135deg,#f97316,#db2777)",t:"Klaketler 2 dakikaya kadar",d:"Galeriden 2 dakikalık video, kamerayla 60 saniye çekim",go:"reels"},
- {ic:"grid",g:"linear-gradient(135deg,#0ea5e9,#6366f1)",t:"Tablette tam ekran",d:"Tablet ve bilgisayarda yanlarda boşluk kalmıyor",go:"feed"},
- {ic:"spark",g:"linear-gradient(135deg,#0c7a63,#18b38e)",t:"Yeni açılış ve görünüm",d:"Animasyonlu giriş, 7 vurgu rengi, yumuşak tema geçişi",go:"settings"},
- {ic:"k4pal",g:"linear-gradient(135deg,#7c3aed,#ec4899)",t:"Ortak sohbet temaları",d:"Seçtiğin tema sohbetteki herkes için aynı anda değişir",go:"chats"},
- {ic:"devices",g:"linear-gradient(135deg,#14a06b,#0e7490)",t:"Tema her yerde aynı",d:"Temanı tüm cihazlarında eşitle; yönetici herkese ortak tema seçebilir",go:"settings"},
- {ic:"gear",g:"linear-gradient(135deg,#334155,#64748b)",t:"Yenilenen Ayarlar",d:"Arama, gizlilik, bildirim türleri, veri tasarrufu",go:"settings"},
- {ic:"lock",g:"linear-gradient(135deg,#4338ca,#0ea5e9)",t:"Gizlilik senin elinde",d:"Aktiflik durumunu, okundu bilgisini ve beğeni sayılarını gizle",go:"settings"},
- {ic:"rotate",g:"linear-gradient(135deg,#b45309,#f5b921)",t:"Hep güncel",d:"Yeni sürüm çıkınca haber verir, tek dokunuşla güncellersin",go:"settings"}];
+ {v:60000,ic:"flag",g:"linear-gradient(135deg,#b91c1c,#1d4ed8)",t:"Cephe 6.0: gerçek cepheler",d:"İki ordu cephede kendi bayraklarıyla karşı karşıya; kalabalık ve güçlü olan ilerler. Ne kadar çok asker gönderirsen o kadar hızlı ilerlersin, saldırı dokunduğun yere doğru gider",go:"explore"},
+ {v:60000,ic:"users",g:"linear-gradient(135deg,#0c7a63,#d97706)",t:"Ekonomi, ordu ve generaller",d:"Şehirler asker, fabrikalar altın üretir; kışla, hastane, ordu eğitimi, kalkınma ve generaller. Oyunu 2x ya da 3x hızlandır",go:"explore"},
+ {v:60000,ic:"hand",g:"linear-gradient(135deg,#2563eb,#16a34a)",t:"Barış, vasal ve kuşatma",d:"Barış antlaşması imzala, küçük komşunu vasal yap; çevrelediğin düşman toprağı senin olur, işgal ettiğin yerler zamanla asimile olur",go:"explore"},
+ {v:60000,ic:"spark",g:"linear-gradient(135deg,#f97316,#7f1d1d)",t:"Gerçekçi bombalar ve sesler",d:"Mantar bulutu, şok dalgası, radyasyon; SAM vurursa bomba havada patlar. Denizin ötesindeki boş toprağa dokununca askerlerin gemiyle gider",go:"explore"}];
 const WN_MARK=`<svg class="wn-mark" viewBox="0 0 24 24" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path pathLength="1" d="M2.5 8V5a2.5 2.5 0 0 1 2.5-2.5h3"/><path pathLength="1" d="M16 2.5h3A2.5 2.5 0 0 1 21.5 5v3"/><path pathLength="1" d="M21.5 16v3a2.5 2.5 0 0 1-2.5 2.5h-3"/><path pathLength="1" d="M8 21.5H5A2.5 2.5 0 0 1 2.5 19v-3"/><circle cx="12" cy="12" r="3.4"/></svg>`;
 function showWhatsNew(force){if($('#overlay [data-layer="whatsnew"]'))return;if(!force&&verLvl(LS.get("kadraj_seen_ver",0)||0)>=verLvl(APP_V))return;
- const items=WN_ITEMS.map((x,i)=>`<button type="button" class="wn-item" data-act="wnGo" data-r="${x.go}" style="--i:${i};--g:${x.g}"><span class="wn-ic">${I(x.ic)}</span><span class="wn-t"><b>${esc(x.t)}</b><span>${esc(x.d)}</span></span>${I("next")}</button>`).join("");
+ const items=WN_ITEMS.filter(x=>verLvl(x.v)===verLvl(APP_V)).map((x,i)=>`<button type="button" class="wn-item" data-act="wnGo" data-r="${x.go}" style="--i:${i};--g:${x.g}"><span class="wn-ic">${I(x.ic)}</span><span class="wn-t"><b>${esc(x.t)}</b><span>${esc(x.d)}</span></span>${I("next")}</button>`).join("");
  openLayer("whatsnew",`<div class="full wn" role="dialog" aria-modal="true" aria-label="Kadraj ${esc(APP_VER)} ile gelenler"><button class="ib plain wn-x" data-act="close" aria-label="Kapat">${I("close")}</button>
- <div class="body"><div class="wn-hero"><i class="wn-blob b1"></i><i class="wn-blob b2"></i><i class="wn-blob b3"></i>${WN_MARK}<div class="wn-badge">Yeni sürüm</div><h2 class="wn-title">Kadraj ${esc(APP_VER)}</h2><p class="wn-sub">Son güncellemelerle gelenler:</p></div>
+ <div class="body"><div class="wn-hero"><i class="wn-blob b1"></i><i class="wn-blob b2"></i><i class="wn-blob b3"></i>${WN_MARK}<div class="wn-badge">Yeni sürüm</div><h2 class="wn-title">Kadraj ${esc(APP_VER)}</h2><p class="wn-sub">Bu sürümle gelenler:</p></div>
  <div class="wn-list">${items}</div></div>
  <div class="wn-foot"><button type="button" class="btn block" data-act="wnOk">Hadi başlayalım${I("next")}</button></div></div>`,{noScrim:true,onClose:()=>LS.set("kadraj_seen_ver",APP_V)})}
 ACT.wnOk=()=>{vib(12);closeLayer("whatsnew")};
@@ -7052,8 +7556,8 @@ admUserSheet=function(uid){admUserSheetOld(uid);const l=$('#overlay [data-layer=
    - Taş setleri: PSETS (kadraj = yeni geometrik set, varsayılan; klasik = eski PIMG'nin kopyası). Seçim settings.pieces.
      chPimg(p) seçili setin resmini verir. PIMG silinmedi: chDraw (chDrawBase50) ve chPromo (chPromoBase50) çizdikten sonra resimleri değiştirir,
      chShare (chShareBase50) paylaşım resmini çizerken PIMG'yi geçici olarak seçili setle doldurur. Küçük tahtalar (.cmini) CSS ile (#chPsCss).
-   - Animasyon: chAnim yeniden yazıldı (chAnimBase50 duruyor). Taş kayarak gider (WAAPI, yalnızca transform), rokta kale de kayar,
-     alınan taş patlar ve kıvılcım saçar (#cFx), terfide halka + kıvılcım, şah karesi nabız atar (CSS), matta tahta sarsılır (chOver sarıldı),
+   - Animasyon: chAnim yeniden yazıldı. Taş düz kayarak gider (WAAPI, yalnızca transform; 6.0'dan beri sıçramasız), rokta kale de kayar,
+     alınan taş söner (6.0'dan beri kıvılcımsız), terfide halka + kıvılcım (#cFx), şah karesi nabız atar (CSS), matta tahta sarsılır (chOver sarıldı),
      oyun açılınca kareler ve taşlar sırayla gelir (chOpen sarıldı → CHX.enter). kbReduce() ise hepsi anında.
    - Tahta temaları: CTHEMES'e zumrut, gunbatimi, vizor eklendi (.chess[data-cth] ile vurgu renkleri). Lobide "Görünüm" kartı: canlı önizleme (#cPrev),
      taş seti ve tahta seçimi. Ayarlar > Satranç'a "Taş seti" satırı (vSettings sarıldı).
@@ -7117,11 +7621,10 @@ chPromo=function(cands){chPromoBase50(cands);const ov=$("#cOv");if(!ov||!cands.l
 const chOpenBase50=chOpen;
 chOpen=function(){CHX.enter=true;return chOpenBase50()};
 function chFxLayer(){const bd=$("#cBoard");if(!bd)return null;let fx=$("#cFx");if(!fx){fx=document.createElement("div");fx.className="cfx";fx.id="cFx";bd.insertBefore(fx,$("#cOv")||null)}return fx}
-const chMid=(a,b,sc)=>{const[x1,y1]=sqXY(a),[x2,y2]=sqXY(b);return`translate(${(x1+x2)*50}%,${(y1+y2)*50}%) scale(${sc})`};
 /* taşı kaydır: satır içi transform hemen hedefe yazılır, WAAPI aradaki yolu oynatır */
 function chGlide(el,from,to,dur,o={}){el.style.transform=to;if(!dur||kbReduce()||!el.animate)return null;
  el.classList.add("cgl");el.style.zIndex=o.z||4;
- const a=el.animate(o.mid?[{transform:from},{transform:o.mid,offset:.5},{transform:to}]:[{transform:from},{transform:to}],{duration:dur,delay:o.delay||0,easing:o.ease||"cubic-bezier(.3,.75,.25,1)",fill:"backwards"});
+ const a=el.animate([{transform:from},{transform:to}],{duration:dur,delay:o.delay||0,easing:o.ease||"cubic-bezier(.25,.75,.3,1)",fill:"backwards"});
  const done=()=>{el.classList.remove("cgl");el.style.zIndex=""};a.onfinish=done;a.oncancel=done;return a}
 /* kıvılcım: kare merkezinden dışa */
 function chBurst(s,cols,n,delay,big){const fx=chFxLayer(),bd=$("#cBoard");if(!fx||!bd||kbReduce())return;const[x,y]=sqXY(s);const z=bd.offsetWidth/8||40;
@@ -7129,22 +7632,22 @@ function chBurst(s,cols,n,delay,big){const fx=chFxLayer(),bd=$("#cBoard");if(!fx
   const ang=(i/n)*Math.PI*2+Math.random()*.7,d=z*(big?.75+Math.random()*.85:.42+Math.random()*.38),dx=Math.cos(ang)*d,dy=Math.sin(ang)*d,sc=(.6+Math.random()*.8).toFixed(2),rt=Math.round(Math.random()*240-120);
   const a=p.animate([{transform:"translate(0,0) scale(.3)",opacity:1},{transform:`translate(${dx*.72}px,${dy*.72}px) scale(${sc}) rotate(${rt}deg)`,opacity:1,offset:.55},{transform:`translate(${dx}px,${dy+z*.15}px) scale(0) rotate(${rt*2}deg)`,opacity:0}],{duration:big?950:560,delay:delay||0,easing:"cubic-bezier(.2,.7,.3,1)",fill:"both"});
   a.onfinish=()=>p.remove();a.oncancel=()=>p.remove()}}
-const CH_SPARK={0:["#ffffff","#d9e4dd","#12a07c","#3fd3ab"],8:["#3d4d46","#ff8a4c","#222d29","#ffb27d"]};
-function chCapFx(c,s,col,delay){if(kbReduce()||!c.animate){c.remove();return}const base=tf(s);c.style.zIndex=3;
- const a=c.animate([{transform:base,opacity:1},{transform:base+" scale(1.18)",opacity:1,offset:.3},{transform:base+" scale(.2) rotate(-14deg)",opacity:0}],{duration:340,delay,easing:"cubic-bezier(.3,.6,.35,1)",fill:"both"});
- a.onfinish=()=>c.remove();a.oncancel=()=>c.remove();chBurst(s,CH_SPARK[col]||CH_SPARK[0],10,delay+40,false)}
+/* alınan taş: saldıran taş varınca hafifçe küçülüp söner */
+function chCapFx(c,s,delay){if(kbReduce()||!c.animate){c.remove();return}const base=tf(s);c.style.zIndex=1;
+ const a=c.animate([{transform:base,opacity:1},{transform:base+" scale(.82)",opacity:0}],{duration:200,delay,easing:"ease-out",fill:"both"});
+ a.onfinish=()=>c.remove();a.oncancel=()=>c.remove()}
 function chPromoFx(el,s){if(kbReduce())return;const im=el.firstElementChild;if(im&&im.animate)im.animate([{transform:"scale(1)"},{transform:"scale(1.3) rotate(-6deg)",offset:.35},{transform:"scale(1)"}],{duration:560,easing:"cubic-bezier(.3,1.4,.5,1)"});
  const fx=chFxLayer();if(fx){const r=document.createElement("i");r.className="cring";const[x,y]=sqXY(s);r.style.left=x*12.5+"%";r.style.top=y*12.5+"%";fx.appendChild(r);const a=r.animate([{transform:"scale(.3)",opacity:1},{transform:"scale(1.9)",opacity:0}],{duration:680,easing:"cubic-bezier(.2,.7,.3,1)",fill:"both"});a.onfinish=()=>r.remove();a.oncancel=()=>r.remove()}
  chBurst(s,["#ffcf4d","#ff8a4c","#3fd3ab","#ffffff"],14,60,true)}
 chAnim=function(m){if(!$("#cBoard")||!CH)return;const pcs=CHEL,mover=m.p&8,rm=kbReduce();
  const capSq=m.fl&1?m.t+(mover?-8:8):(pcs[m.t]?m.t:-1);const el=pcs[m.f];const drag=!!(el&&el.classList.contains("drag"));
  const[fx,fy]=sqXY(m.f),[tx,ty]=sqXY(m.t);const dist=Math.hypot(tx-fx,ty-fy);
- const dur=rm?0:drag?120:Math.round(Math.min(380,170+dist*30));
- if(capSq>=0&&pcs[capSq]&&pcs[capSq]!==el){const c=pcs[capSq];delete pcs[capSq];chCapFx(c,capSq,mover^8,rm?0:Math.max(0,dur-80))}
+ const dur=rm?0:drag?110:Math.round(Math.min(290,150+dist*22));
+ if(capSq>=0&&pcs[capSq]&&pcs[capSq]!==el){const c=pcs[capSq];delete pcs[capSq];chCapFx(c,capSq,rm?0:Math.max(0,dur-60))}
  if(el){delete pcs[m.f];const from=drag?el.style.transform:tf(m.f);el.classList.remove("drag");pcs[m.t]=el;
-  chGlide(el,from,tf(m.t),dur,{mid:!drag&&dist>0?chMid(m.f,m.t,1.1):null,z:5});
+  chGlide(el,from,tf(m.t),dur,{z:5});
   if(m.pr){const swap=()=>{const im=el.firstElementChild;if(im)im.src=chPimg(m.pr);chPromoFx(el,m.t)};if(rm)swap();else setTimeout(swap,dur)}}
- if(m.fl&2){const rf=m.t>m.f?m.t+1:m.t-2,rt=m.t>m.f?m.t-1:m.t+1;const r=pcs[rf];if(r){delete pcs[rf];pcs[rt]=r;chGlide(r,tf(rf),tf(rt),rm?0:Math.round(dur*.95),{delay:rm?0:Math.round(dur*.4),mid:chMid(rf,rt,1.08)})}}};
+ if(m.fl&2){const rf=m.t>m.f?m.t+1:m.t-2,rt=m.t>m.f?m.t-1:m.t+1;const r=pcs[rf];if(r){delete pcs[rf];pcs[rt]=r;chGlide(r,tf(rf),tf(rt),rm?0:Math.round(dur*.95),{delay:rm?0:Math.round(dur*.35)})}}};
 /* oyun açılınca: kareler köşeden yayılır, taşlar dış sıralardan içe düşer */
 function chCascade(){if(kbReduce())return;const sq=$$("#cSq>i");if(!sq.length||!sq[0].animate)return;
  sq.forEach((el,i)=>{const x=i&7,y=i>>3;el.animate([{transform:"scale(.4)",opacity:0},{transform:"none",opacity:1}],{duration:420,delay:(x+y)*16,easing:"cubic-bezier(.2,.8,.2,1)",fill:"backwards"})});
@@ -10455,7 +10958,8 @@ HOOKS.after.push(r=>{if(r!=="settings"||S.guest)return;const m=$("#main");if(!m|
      + sonrası kaybetmiyor + zaten ezici önde değil. Harika: tek iyi hamle (ikinci en iyi ≥.20 kötü), geri alma/kaçma/bedava alma değil.
      Kaçırılan: rakip az önce Hata/Büyük hata yaptı ve bu hamle fırsatı geri verdi. Kitap: RV_BOOK (yaklaşık 170 açılış çizgisi,
      önek sıkıştırmalı UCI; konum anahtarıyla, aktarım sayılır).
-   - Gösterim: settings.chessReview "live" (varsayılan) | "end" (oyun bitince) | "off". Çevrim içi oyunda her zaman yalnızca oyun bitince.
+   - Gösterim: settings.chessReview "live" (varsayılan) | "end" (oyun bitince) | "off". 6.0'dan beri çevrim içi oyunda da aynı ayar geçerli
+     (önce oyun bitene kadar gizliydi); her oyuncu kendi cihazında görür.
      Tahtada son (ya da geçmişte bakılan) hamlenin hedef karesinde rozet (#cRv), hamle listesinde renkli simge.
      Oyun sonu kartında ve oyun menüsünde "Oyun incelemesi" (rvOpen): doğruluk (hamle başına 103.17·e^(-4.354·kayıp)-3.17,
      aritmetik ve harmonik ortalamanın ortası), sınıf sayıları, değerlendirme grafiği (dokununca o hamleye gider), "Hamleleri incele"
@@ -10574,7 +11078,7 @@ async function rvStep(){if(RVS.busy||!rvActive())return;let P;try{P=rvPos()}catc
  if(CH===tok)rvRefresh();rvKick()}
 
 /* --- gösterim --- */
-function rvShow(){if(!CH||CH.mode==="puzzle")return false;if(CH.mode==="online"&&!CH.over)return false;if(CH._rvForce)return true;const md=rvMode();if(md==="off")return false;return md==="live"||!!CH.over}
+function rvShow(){if(!CH||CH.mode==="puzzle")return false;if(CH._rvForce)return true;const md=rvMode();if(md==="off")return false;return md==="live"||!!CH.over}
 function rvRefresh(){if(!CH||!$("#cBoard"))return;try{rvClassAll();rvPaintUI();rvSheetPaint();rvReact()}catch(e){console.warn("rv",e)}}
 function rvPaintUI(){if(!CH||CH.mode==="puzzle")return;const P=rvClassAll();rvList(P);rvBadge(P);rvBar(P)}
 function rvList(P){const mv=$("#cMoves");if(!mv||!rvShow())return;
@@ -10634,7 +11138,7 @@ function rvSheetPaint(){const body=$("#rvBody");if(!body||!CH)return;const P=rvP
  <button class="btn block" data-act="rvstep">${I("play")}Hamleleri incele</button><small class="rv-nt">Değerlendirme cihazında, hızlı bir analizle yapılır; yaklaşık sonuç verir.</small>`;
  if(body._h===h)return;body._h=h;body.innerHTML=h;
  const gr=$("#rvGr",body);if(gr)gr.onclick=e=>{const r=gr.getBoundingClientRect();if(!r.width)return;rvJump(Math.round((e.clientX-r.left)/r.width*n))}}
-function rvOpen(){if(!CH||CH.mode==="puzzle")return;if(CH.mode==="online"&&!CH.over)return toast("Çevrim içi oyun bitince incelenebilir");if(!CH.moves.length)return toast("Henüz hamle yok");
+function rvOpen(){if(!CH||CH.mode==="puzzle")return;if(!CH.moves.length)return toast("Henüz hamle yok");
  CH._rvForce=true;closeLayer("cmenu");sheet("rvsheet","Oyun incelemesi",`<div class="rv" id="rvBody"></div>`,{tall:true});rvClassAll();rvSheetPaint();rvKick();rvPaintUI()}
 function rvCloseOv(){const ov=$("#cOv");if(ov&&ov.classList.contains("on")){ov.classList.remove("on");ov.innerHTML=""}}
 function rvJump(k){if(!CH)return;const n=CH.moves.length;k=Math.max(0,Math.min(n,k|0));CH._rvForce=true;CH._rvStep=true;closeLayer("rvsheet");rvCloseOv();CH.view=k>=n?null:k;CH.sel=-1;CH.targets=[];chDraw()}
@@ -10659,8 +11163,8 @@ const chwCardBase51R=chwCard;
 chwCard=function(...a){const r=chwCardBase51R.apply(this,a);try{rvEndBtn()}catch{}return r};
 const chMenuBase51R=chMenu;
 chMenu=function(...a){const r=chMenuBase51R.apply(this,a);try{const l=$('#overlay [data-layer="cmenu"]');if(l&&CH&&CH.mode!=="puzzle"){const md=rvMode();
-  const x=l.querySelector('.opt[data-act="close"]');const can=CH.moves.length&&(CH.mode!=="online"||CH.over);
-  const h=`<div class="set rv-set" style="margin:0 0 6px"><h3>Hamle değerlendirmesi</h3><div class="seg rv-seg" role="group" aria-label="Hamle değerlendirmesi">${[["live","Canlı"],["end","Oyun sonunda"],["off","Kapalı"]].map(([v,t])=>`<button data-act="rvmode" data-v="${v}" aria-pressed="${md===v}">${t}</button>`).join("")}</div><small class="rv-hint">Hamlelere Muhteşem, En iyi, Hata gibi rozetler verir. Çevrim içi oyunlarda yalnızca oyun bitince görünür.</small></div>${can?`<button class="opt" data-act="rvopen">${rvIcon("be","rvo")}Oyun incelemesi</button>`:""}`;
+  const x=l.querySelector('.opt[data-act="close"]');const can=CH.moves.length;
+  const h=`<div class="set rv-set" style="margin:0 0 6px"><h3>Hamle değerlendirmesi</h3><div class="seg rv-seg" role="group" aria-label="Hamle değerlendirmesi">${[["live","Canlı"],["end","Oyun sonunda"],["off","Kapalı"]].map(([v,t])=>`<button data-act="rvmode" data-v="${v}" aria-pressed="${md===v}">${t}</button>`).join("")}</div><small class="rv-hint">Hamlelere Kitap, Muhteşem, En iyi, Hata gibi rozetler verir, doğruluğu hesaplar. Arkadaşınla oynarken de çalışır; yalnızca senin cihazında görünür.</small></div>${can?`<button class="opt" data-act="rvopen">${rvIcon("be","rvo")}Oyun incelemesi</button>`:""}`;
   if(x)x.insertAdjacentHTML("beforebegin",h);else l.querySelector(".body")?.insertAdjacentHTML("beforeend",h)}}catch(e){console.warn("rv",e)}return r};
 ACT.rvopen=()=>rvOpen();
 ACT.rvmode=(t,d)=>{if(!["live","end","off"].includes(d.v))return;settings.chessReview=d.v;saveSettings();vib(6);$$('[data-act="rvmode"]').forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.v===d.v)));if(CH){rvKick();chUI()}};
@@ -10668,6 +11172,266 @@ ACT.rvstep=()=>{if(!CH)return;rvJump(CH.moves.length?1:0)};
 ACT.rvstepx=()=>{if(!CH)return;CH._rvStep=false;const b=$("#cRvBar");if(b)b.remove();CH.view=null;chDraw()};
 HOOKS.after.push(r=>{if(r==="chessgame"&&CH&&CH.mode!=="puzzle")rvKick()});
 /*}@js:51REV*/
+/*@js:60CHS{*/
+/* ===== 6.0 · Satranç yenilendi: chess.com benzeri görünüm ve his, çevrim içi inceleme, ön hamle, 4 kişilik satranç yükleyicisi =====
+   ChessCore değişmedi. Bu bölgedeki her şey sarma ile (…Base60); başka bölgelerde yalnızca küçük, yerinde düzeltmeler var (aşağıda C ve E).
+   A. Modern taş seti ve Turnuva tahtası. ch60Shapes/ch60PieceSvg: özgün SVG çizimler (tombul gövde, soldan ışık sağa gölge, koyu kontur);
+      renkler CH60_PAL (beyaz/siyah). satranc4.js aynı çizimleri kendi dört rengiyle kullanır. PSETS.modern ve CTHEMES.turnuva (#eeeed2/#769656)
+      listelerin başına eklenir. Taş seti ya da tahta seçmemiş herkes için varsayılandır (settings.pieces/board boşsa bellekte atanır);
+      seçim yapmış olan kendi seçimini korur.
+   B. Oyun ekranı (vChessGame yeniden yazıldı, .chess.c6; kimlikler aynı: cplT, cBoard, cplB, cMoves, cCtl, cChat, chwBar):
+      telefonda hamle şeridi en üstte, tahta neredeyse kenardan kenara, altta düz düğme çubuğu; ≥900px'te tahta solda, sağda dikey hamle tablosu,
+      inceleme satırı, düğmeler ve sohbet (main.chessmode genişler). Oyuncu çubuklarına canlı doğruluk (%…, .c6acc) eklenir.
+      Değerlendirme çubuğu artık aynı telefonda ve çevrim içi oyunda da görünür: inceleme analizinden (RVS.cache) okunur (ch60EvalCp),
+      canlı inceleme ve settings.evalBar açıksa. Oyun menüsünde her modda "Değerlendirme çubuğu" anahtarı.
+   C. Çevrim içi inceleme (sahibinin şikayeti: arkadaşla oynarken doğruluk, kitap hamlesi vb. görünmüyordu). Kök neden: 51REV çevrim içi
+      oyunu bilerek dışlıyordu: rvShow() oyun bitmeden false dönüyordu, rvOpen() "oyun bitince" deyip açmıyordu, menüdeki düğme gizliydi.
+      51REV'de bu üç yer yerinde düzeltildi: artık settings.chessReview (canlı/oyun sonunda/kapalı) her iki oyuncunun kendi cihazında geçerli.
+   D. Sonuç kartı (chOver sarıldı → ch60End, .c6end): sonuç, iki oyuncu (beyaz solda), puan değişimi (chRate sarıldı → CH._d60),
+      doğruluk (analiz sürerken "Analiz ediliyor…", bitince güncellenir: rvPaintUI sarıldı), Oyun incelemesi / Yeni oyun ya da Rövanş /
+      Paylaş / Tahtaya bak. İzleme ve bulmaca kendi kartlarını kullanır.
+   E. Ses ve hareket: CSND.play yeniden yazıldı (Web Audio, dosya yok): move, capture, castle, check, promote, start, end, lose, draw, bad,
+      premove, low (süre 10 sn altına inince bir kez). chSoundFor sarıldı (terfi sesi; oyun sonu sesini chOver çalar). 50CHS'de taşlar artık
+      düz kayar (sıçrama yok) ve alınan taş kıvılcımsız söner (chAnim/chCapFx yerinde sadeleşti; chMid ve CH_SPARK kalktı).
+   F. Tahta etkileşimi (chWire sarıldı; dinleyiciler yakalama aşamasında, tahta başına bir kez):
+      - sürüklerken parmağın/farenin altındaki kare çerçevelenir (#c6Hov); dokunmatikte taş büyür ve parmağın üstüne kalkar;
+      - ön hamle: Rota/Clawd düşünürken ya da çevrim içi oyunda rakibin sırasındayken kendi taşına dokun/sürükle → CH.pre {f,t,pr};
+        sıra gelince yasalsa oynanır (chApply sarıldı → ch60PreRun), değilse sessizce düşer. Hedefler geniş (ışınlar engel saymaz).
+      - sağ tık: karede kırmızı işaret, sağ sürükle: ok (atta L); shift yeşil, ctrl/alt mavi. CH.ann {a: oklar, h: kareler}; sol tık ya da
+        bir hamle temizler. Oklar #cAnn (svg), kareler #cMk içinde.
+   G. Lobi (vChess yeniden yazıldı → ch60Lobby, .c6lob): profil kartı (puan), dört büyük kutu (Botlara karşı, Arkadaşınla, Bulmacalar,
+      Aynı telefonda), oyunların, bot kutusu (#c6bots: rakip, seviye, renk, süre, oyna/devam), bulmaca kartı, Clawd–Rota, sıralama, Görünüm.
+      Eski parçalar ve işleyicileri aynen kullanılır (data-clvl, data-ccol, chopp, chclvl, chtc, botnew, cwnew, pzgo…).
+   H. 4 kişilik satranç: satranc4.js (window.SATRANC4) ilk kullanımda yüklenir (s4Load/s4Go, cephe.js'in kalıbı). Tek giriş Yönetici paneli
+      (ADM_EXTRA "s4", yalnızca S.admin açabilir). Sahibi açana kadar sürpriz: Keşfet'te, lobide, Neler yeni'de ve Rota'nın bilgisinde yok. */
+
+/* --- A. Modern taş seti ve Turnuva tahtası --- */
+const CH60_PAL={w:{lit:"#ffffff",mid:"#f3f1ec",sh:"#c8c4bb",st:"#383632",ln:"#5b5852",hi:"#ffffff",base:"#e4e1da"},
+ b:{lit:"#716d68",mid:"#504d49",sh:"#2b2927",st:"#141312",ln:"#bdb9b2",hi:"#a29e97",base:"#3d3b38"}};
+/* t: 1 piyon 2 at 3 fil 4 kale 5 vezir 6 şah; 100x96'lık alanda, taban y≈91 */
+function ch60Shapes(t){
+ const base='<path class="bs" d="M23 79.5h54a5 5 0 0 1 5 5v2.8a3.7 3.7 0 0 1-3.7 3.7H21.7a3.7 3.7 0 0 1-3.7-3.7v-2.8a5 5 0 0 1 5-5z"/>';
+ const skirt='<path d="M31 73.5h38l4.6 7H26.4z"/><rect x="27.5" y="64.5" width="45" height="9" rx="4.5"/>';
+ return({
+  1:'<path d="M38.5 48.5C38 61 33 71 24.5 80h51c-8.5-9-13.5-19-14-31.5z"/><rect x="32.5" y="39.5" width="35" height="9" rx="4.5"/><circle cx="50" cy="25.5" r="14.5"/>'+base+'<path class="hl" d="M42.5 20.2a8.4 8.4 0 0 1 6-4M38 70.5c2-4 3.4-9 4.1-15"/>',
+  4:'<path d="M30 37.5h40l2.8 37H27.2z"/><path d="M23 11h11.5v8h8v-8h15v8h8v-8H77v20.5l-5.5 6h-43L23 31.5z"/><rect x="24" y="72.5" width="52" height="8.5" rx="3.5"/>'+base+'<path class="ln" d="M28.6 31.5h42.8"/><path class="hl" d="M35.6 44l-1.4 24"/>',
+  3:'<path d="M38.5 68c-.9 6-5 10-13 12.5h49c-8-2.5-12.1-6.5-13-12.5z"/><path d="M50 17.5C34 28 28.5 43 33.5 55c2.5 6 8.5 8.8 16.5 8.8s14-2.8 16.5-8.8C71.5 43 66 28 50 17.5z"/><rect x="32.5" y="60" width="35" height="8.5" rx="4.25"/><circle cx="50" cy="11.5" r="6.5"/>'+base+'<path class="ln" d="M60.2 30.3 47.8 44.6"/><path class="hl" d="M39.6 37c1.1-4.3 3.5-8.2 6.8-11.4"/>',
+  5:'<path d="M16 32l13.5 35h41L84 32 67 48.5 64 22.5 50 44 36 22.5l-3 26z"/><circle cx="14.5" cy="28.5" r="6"/><circle cx="31.5" cy="18" r="6"/><circle cx="50" cy="13" r="6.5"/><circle cx="68.5" cy="18" r="6"/><circle cx="85.5" cy="28.5" r="6"/>'+skirt+base+'<path class="ln" d="M32.5 58.8c11.3-3.6 23.7-3.6 35 0"/><path class="hl" d="M29 40.5l5 13.2"/>',
+  6:'<path d="M45.5 3h9v7.5H62v8.8h-7.5V28h-9v-8.7H38v-8.8h7.5z"/><path d="M50 30.5c-5.8-6.8-27.2-10.5-31.4 3.6C15.5 44.7 23.2 55 29.3 67.5h41.4C76.8 55 84.5 44.7 81.4 34.1 77.2 20 55.8 23.7 50 30.5z"/>'+skirt+base+'<path class="ln" d="M50 31v27.5M32.5 58.8c11.3-3.6 23.7-3.6 35 0"/><path class="hl" d="M24.6 37c.9-3.8 3.3-6.2 7-7.2"/>',
+  2:'<g transform="matrix(1.1 0 0 1.08 -5.5 -6.4)"><path d="M28.5 80c-.6-9.8 1.9-17.3 7.6-23.4l6.4-6.8-6.8 1.9c-4.2 4.6-9.7 7.3-14.1 6.4-4.1-.9-6.6-4.3-5.6-8.6l1.6-6.1c1.4-5.1 4.5-8.9 8.7-12.5l6.8-6.4 2.5-9.8 5.5 5.8 1.4-8.1 6.4 7.3C70 21.4 81.6 34.2 81.6 54.6c0 9.6-2.4 17.8-5.3 25.4z"/><path class="ln" d="M52.5 22.3c10.6 4.4 17.6 15.4 18.6 30.6M24.8 51.8l3.6-1.4"/><ellipse class="ey" cx="37.4" cy="35.3" rx="2.9" ry="3.6" transform="rotate(28 37.4 35.3)"/><path class="hl" d="M58 30c5 4.5 7.6 10.6 8.2 17.6"/></g>'+base})[t]||""}
+/* P: {lit, mid, sh (gövde degradesi), st (kontur), ln (iç çizgi), hi (parlama), base (taban)} */
+function ch60PieceSvg(t,P){return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="2 0 96 96"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${P.lit}"/><stop offset=".5" stop-color="${P.mid}"/><stop offset="1" stop-color="${P.sh}"/></linearGradient></defs><style>.p *{fill:url(#g);stroke:${P.st};stroke-width:2.6;stroke-linejoin:round;stroke-linecap:round}.p .bs{fill:${P.base}}.p g{fill:none;stroke:none}.p .ln{fill:none;stroke:${P.ln};stroke-width:2.2}.p .hl{fill:none;stroke:${P.hi};stroke-width:2.4;opacity:.55}.p .ey{fill:${P.st};stroke:none}</style><g class="p">${ch60Shapes(t)}</g></svg>`}
+const ch60Uri=s=>"data:image/svg+xml,"+encodeURIComponent(s);
+function ch60Set(){const o={};for(const t of[1,2,3,4,5,6]){o[t]=ch60Uri(ch60PieceSvg(t,CH60_PAL.w));o[8|t]=ch60Uri(ch60PieceSvg(t,CH60_PAL.b))}return o}
+/* nesnenin başına anahtar ekle (seçim listeleri bu sırayla çizilir) */
+function ch60Front(obj,k,v){const keep={...obj};for(const x of Object.keys(obj))delete obj[x];obj[k]=v;Object.assign(obj,keep)}
+ch60Front(PSETS,"modern",{n:"Modern",s:"Tombul, yumuşak gölgeli",img:ch60Set()});
+ch60Front(CTHEMES,"turnuva",["#eeeed2","#769656","Turnuva"]);
+if(!PSETS[settings.pieces])settings.pieces="modern";
+if(!CTHEMES[settings.board])settings.board="turnuva";
+chPsCss();
+
+/* --- B. oyun ekranı --- */
+const vChessGameBase60=vChessGame;
+vChessGame=function(){if(!CH)return vChessGameBase60();try{const k=chThKey(),th=CTHEMES[k];
+ const side=`<div class="cmoves" id="cMoves"></div>${chwOn()?'<div class="chwbar" id="chwBar"></div>':""}<div class="cctl" id="cCtl"></div>${CH.mode==="online"?chmHtml():""}`;
+ return`<div class="chess c6" data-cth="${k}" data-ps="${chPsKey()}" data-cm="${esc(CH.mode)}" style="--cl:${th[0]};--cd:${th[1]}"><div class="cpl" id="cplT"></div><div class="cmain"><div class="cevalbar" id="cEval" hidden><i></i><span></span></div><div class="cbfr"><div class="cboard" id="cBoard"><div class="csq" id="cSq"></div><div class="cmk" id="cMk"></div><i class="c6hov" id="c6Hov" hidden></i><div class="cpcs" id="cPcs"></div><div class="cfx" id="cFx"></div><svg class="carrow" id="cArrow" viewBox="0 0 800 800"></svg><svg class="c6ann" id="cAnn" viewBox="0 0 800 800" aria-hidden="true"></svg><div class="cov" id="cOv"></div></div></div></div><div class="cpl" id="cplB"></div><div class="c6side">${side}</div></div>`}
+ catch(e){console.warn("chs60",e);return vChessGameBase60()}};
+/* değerlendirme: Rota/Clawd'a karşı motorun puanı (CH.eval), aynı telefonda ve çevrim içi oyunda inceleme analizi */
+function ch60EvalCp(){if(!CH||!(CH.mode==="local"||CH.mode==="online")||settings.evalBar===false||!rvShow())return null;const P=CH._rvP;if(!P)return CH._ev60??null;
+ const n=P.n,i=CH.view==null?n:Math.min(CH.view,n);
+ if(i===n&&CH.over&&CH.view==null){const o=CH.over;if(o.reason==="mat")return o.result==="1-0"?CC.MATE:-CC.MATE;if(o.result==="1/2"&&o.reason!=="iptal")return 0}
+ let v=null;const A=i<n?RVS.cache.get(P.k[i]):null;if(A&&A.length)v=P.sd[i]===0?A[0].s:-A[0].s;
+ else if(i>0){const B=RVS.cache.get(P.k[i-1]);const e=B&&B.find(x=>x.u===CH.moves[i-1].u);if(e)v=P.sd[i-1]===0?e.s:-e.s}
+ else v=20;
+ if(v==null)return CH._ev60??null;CH._ev60=v;return v}
+function ch60EvalPaint(){const ev=$("#cEval");if(!ev||!CH||!(CH.mode==="local"||CH.mode==="online"))return;const cp=ch60EvalCp();if(cp==null){ev.hidden=true;return}ev.hidden=false;
+ const mate=Math.abs(cp)>CC.MATE-1000;const w=mate?(cp>0?100:0):50+50*(2/(1+Math.exp(-cp/350))-1);
+ ev.classList.toggle("fl",CH.flip);ev.classList.toggle("bl",w<50);ev.querySelector("i").style.height=w+"%";
+ const end=CH.over&&CH.view==null&&CH.over.reason!=="iptal";ev.querySelector("span").textContent=end?(CH.over.result==="1/2"?"½":CH.over.result):mate?"M"+Math.max(1,Math.ceil((CC.MATE-Math.abs(cp))/2)):(Math.abs(cp)/100).toFixed(1)}
+/* canlı doğruluk: oyuncu çubuğunda adın yanında */
+function ch60Acc(){if(!CH||CH.mode==="puzzle"||!$("#cBoard"))return;let st=null;try{if(CH.moves.length&&rvShow()&&CH._rvP)st=rvStats(CH._rvP).st}catch{}
+ for(const[id,side]of[["#cplT",CH.flip?0:8],["#cplB",CH.flip?8:0]]){const host=$(id+" .cwho>div");if(!host)continue;let el=host.querySelector(".c6acc");const a=st&&st[side]?st[side].acc:null;
+  if(a==null){if(el)el.remove();continue}if(!el){el=document.createElement("span");el.className="c6acc";el.title="Doğruluk";host.appendChild(el)}const t="%"+rvPct(a);if(el.textContent!==t)el.textContent=t}}
+const rvPaintUIBase60=rvPaintUI;
+rvPaintUI=function(...a){const r=rvPaintUIBase60.apply(this,a);try{ch60Acc();ch60EvalPaint();ch60EndAcc()}catch(e){console.warn("chs60",e)}return r};
+/* menü: her modda değerlendirme çubuğu anahtarı */
+const chMenuBase60=chMenu;
+chMenu=function(...a){const r=chMenuBase60.apply(this,a);try{const l=$('#overlay [data-layer="cmenu"]');if(l&&CH&&CH.mode!=="puzzle"&&!$("#cmEv",l)){const snd=$("#cmSnd",l);const lab=snd&&snd.closest("label");
+ if(lab){lab.insertAdjacentHTML("afterend",`<label class="srow"><span class="t">Değerlendirme çubuğu<small>${CH.mode==="bot"||chwOn()?"Kimin önde olduğunu gösterir":"Canlı incelemenin analizinden gelir"}</small></span><span class="sw"><input type="checkbox" id="cmEv" ${settings.evalBar!==false?"checked":""}><span></span></span></label>`);
+  $("#cmEv",l).onchange=e=>{settings.evalBar=e.target.checked;saveSettings();chUI()}}}}catch(e){console.warn("chs60",e)}return r};
+
+/* --- D. sonuç kartı --- */
+const chRateBase60=chRate;
+chRate=async function(...a){const tok=CH;const d=await chRateBase60.apply(this,a);if(CH&&CH===tok)CH._d60=d;return d};
+function ch60Who(side){const cw=chcOn();
+ if(CH.mode==="bot"){if(side===CH.my)return{av:avatar(S.uid,48,{click:false,ring:false}),n:"Sen",r:(cw?chcStats(S.uid):chessStats(S.uid)).r};
+  if(cw){const L=CHC_LV[CH.level]||CHC_LV[1];return{av:`<span class="cbotav cwav">${chcFace(46,"","idle")}</span>`,n:"Clawd",r:L.r}}
+  const L=CLEVELS[CH.level]||CLEVELS[1];return{av:`<span class="cbotav">${botFace(48)}</span>`,n:"Rota",r:L.r}}
+ if(CH.mode==="online"){const uid=side===CH.my?S.uid:oppOf(CH.doc||{});return{av:avatar(uid,48,{click:false,ring:false}),n:uid===S.uid?"Sen":P(uid).name,r:chessStats(uid).r}}
+ return{av:`<span class="cside ${side?"b":"w"}"><img src="${chPimg(side|6)}" alt=""></span>`,n:side?"Siyah":"Beyaz",r:null}}
+function ch60End(){if(!CH||!CH.over||chwOn()||CH.mode==="puzzle")return;const ov=$("#cOv");if(!ov||!ov.classList.contains("on")||!ov.querySelector(".cend"))return;
+ const o=CH.over,res=o.result,draw=res==="1/2",ipt=o.reason==="iptal",loc=CH.mode==="local";const myWin=(res==="1-0"&&CH.my===0)||(res==="0-1"&&CH.my===8);
+ const title=ipt?"İptal edildi":draw?"Berabere":loc?(res==="1-0"?"Beyaz kazandı":"Siyah kazandı"):myWin?"Kazandın!":"Kaybettin";
+ const cls=ipt||draw?"draw":loc||myWin?"win":"loss";
+ const pl=side=>{const w=ch60Who(side);const won=!draw&&!ipt&&((res==="1-0")===(side===0));return`<div class="c6e-p${won?" won":""}"><span class="c6e-av">${w.av}</span><b>${esc(w.n)}</b>${w.r!=null?`<small>${w.r}</small>`:""}<span class="c6e-a" data-acc="${side}" hidden></span></div>`};
+ const d=CH._d60;const cw=chcOn();const rt=!loc&&!ipt&&d!=null&&d!==0?`<div class="c6e-rt">${cw?"Clawd puanın":"Puanın"} <b>${(cw?chcStats(S.uid):chessStats(S.uid)).r}</b> <em class="${d>0?"up":"dn"}">${d>0?"+":""}${d}</em></div>`:"";
+ const sc=ipt?"–":draw?"½ – ½":res==="1-0"?"1 – 0":"0 – 1";const on=CH.mode==="online";const bd=$("#cBoard");const sm=!!bd&&bd.offsetHeight<470;
+ ov.innerHTML=`<div class="cend c6end ${cls}${sm?" sm":""}" role="dialog" aria-label="${esc(title)}"><button type="button" class="c6e-x" data-chs="review" aria-label="Kapat, tahtaya bak">${I("close")}</button>
+ <div class="c6e-hd"><span class="c6e-ic">${I(cls==="win"?"trophy":cls==="loss"?"flag":"hand")}</span><span class="c6e-tt"><b>${esc(title)}</b><small>${esc(REASON[o.reason]||o.reason||"")}</small></span></div>
+ <div class="c6e-vs">${pl(0)}<span class="c6e-sc">${sc}</span>${pl(8)}</div>${rt}<small class="c6e-w" id="c6EW" hidden></small>
+ <div class="cbtns">${CH.moves.length&&!ipt?`<button class="btn" data-act="rvopen">${rvIcon("be")}Oyun incelemesi</button>`:""}<div class="c6e-2"><button class="btn sec" data-chs="${on?"rematch":"again"}">${I("rotate")}${on?"Rövanş":"Yeni oyun"}</button><button class="btn sec" data-chs="share">${I("send")}Paylaş</button></div>${sm?"":`<button class="btn ghost" data-chs="review">Tahtaya bak</button>`}</div></div>`;
+ ch60EndAcc()}
+/* sonuç kartında oyuncuların altında doğruluk; analiz sürerken ilerleme satırı */
+function ch60EndAcc(){const card=$("#cOv .c6end");if(!card||!CH)return;let st=null,done=0,n=0;
+ try{const P=CH._rvP;if(P&&P.n&&rvShow()){const r=rvStats(P);st=r.st;done=r.done;n=P.n}}catch(e){console.warn("chs60",e)}
+ const busy=!!st&&done<n;
+ for(const el of card.querySelectorAll("[data-acc]")){const a=st?st[+el.dataset.acc].acc:null;const h=a==null?"":`<b>${busy?"~":""}%${rvPct(a)}</b><small>doğruluk</small>`;if(el._h!==h){el._h=h;el.innerHTML=h;el.hidden=!h}}
+ const w=card.querySelector("#c6EW");if(w){const t=busy?`Analiz ediliyor… ${done}/${n}`:"";if(w.textContent!==t)w.textContent=t;w.hidden=!t}}
+const chOverBase60=chOver;
+chOver=async function(...a){const r=await chOverBase60.apply(this,a);try{ch60End()}catch(e){console.warn("chs60",e)}return r};
+
+/* --- E. sesler --- */
+CSND.play=function(kind){if(settings.chessSound===false)return;let c;try{c=this.ctx||(this.ctx=new(window.AudioContext||window.webkitAudioContext)());if(c.state==="suspended"&&c.resume)c.resume()}catch{return}
+ if(!this.out){try{const k=c.createDynamicsCompressor();k.threshold.value=-14;k.ratio.value=6;const g=c.createGain();g.gain.value=.9;k.connect(g);g.connect(c.destination);this.out=k}catch{this.out=c.destination}}
+ const out=this.out,t=c.currentTime+.01;
+ if(!this.nb){const n=c.createBuffer(1,Math.floor(c.sampleRate*.25),c.sampleRate),d=n.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;this.nb=n}
+ /* ahşap tık: süzülmüş kısa gürültü + alçak gövde sesi */
+ const knock=(t0,{f=1000,q=1.1,v=.9,body=165,bv=.55,len=.085}={})=>{const s=c.createBufferSource(),bp=c.createBiquadFilter(),g=c.createGain();s.buffer=this.nb;bp.type="bandpass";bp.frequency.value=f;bp.Q.value=q;
+  g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.0025);g.gain.exponentialRampToValueAtTime(.001,t0+len);s.connect(bp);bp.connect(g);g.connect(out);s.start(t0,Math.random()*.15,len+.02);
+  if(body){const o=c.createOscillator(),og=c.createGain();o.type="sine";o.frequency.setValueAtTime(body,t0);o.frequency.exponentialRampToValueAtTime(body*.55,t0+len);og.gain.setValueAtTime(0,t0);og.gain.linearRampToValueAtTime(bv,t0+.003);og.gain.exponentialRampToValueAtTime(.001,t0+len*1.2);o.connect(og);og.connect(out);o.start(t0);o.stop(t0+len*1.3)}};
+ const tone=(t0,f,d,v,type)=>{const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.value=f;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v,t0+.012);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.connect(g);g.connect(out);o.start(t0);o.stop(t0+d+.05)};
+ if(kind==="move")knock(t);
+ else if(kind==="capture"){knock(t,{f:1500,v:1,body:135,bv:.6,len:.1});knock(t+.042,{f:760,v:.75,body:105,bv:.45,len:.11})}
+ else if(kind==="castle"){knock(t,{f:950});knock(t+.12,{f:1150,v:.75,body:185})}
+ else if(kind==="check"){knock(t,{f:1200,v:.85});tone(t+.03,988,.24,.06,"triangle");tone(t+.05,1480,.3,.04)}
+ else if(kind==="promote"){knock(t,{f:1100,v:.8});[784,988,1175,1568].forEach((f,i)=>tone(t+.06+i*.065,f,.28,.055,"triangle"))}
+ else if(kind==="start"){tone(t,523,.32,.06,"triangle");tone(t+.13,784,.42,.06,"triangle")}
+ else if(kind==="end"){[523,659,784,1047].forEach((f,i)=>tone(t+i*.1,f,.75,.06,"triangle"))}
+ else if(kind==="lose"){[440,370,311].forEach((f,i)=>tone(t+i*.15,f,.65,.065,"triangle"))}
+ else if(kind==="draw"){tone(t,587,.5,.06,"triangle");tone(t+.16,587,.6,.05,"triangle")}
+ else if(kind==="bad"){tone(t,150,.17,.08,"square");tone(t,155,.17,.05,"sawtooth")}
+ else if(kind==="premove")knock(t,{f:2300,v:.4,body:0,len:.05});
+ else if(kind==="low"){tone(t,1760,.08,.05,"square");tone(t+.12,1760,.08,.05,"square")}};
+const chSoundForBase60=chSoundFor;
+chSoundFor=function(m,st){if(st&&st.over)return CSND.play(st.check||CC.inCheck(CH.g)?"check":m.c?"capture":"move");if(st&&st.check)return CSND.play("check");if(m.pr)return CSND.play("promote");return chSoundForBase60(m,st)};
+/* oyun başlarken */
+const chOpenBase60=chOpen;
+chOpen=function(...a){const r=chOpenBase60.apply(this,a);try{if(CH&&!CH.moves.length&&!CH.over&&(CH.mode==="bot"||CH.mode==="local"||CH.mode==="watch"))setTimeout(()=>CSND.play("start"),260)}catch{}return r};
+/* süre 10 saniyenin altına inince bir kez uyarı (sıradaki benim tarafımsa ya da aynı telefonda) */
+const clkPaintBase60=clkPaint;
+clkPaint=function(...a){const r=clkPaintBase60.apply(this,a);try{if(clkOn()&&!CH.over){const s=CH.clk.run;if((s===0||s===8)&&(CH.mode==="local"||s===CH.my)){const ms=clkLeft(s);CH._low60=CH._low60||{};if(ms<10000&&ms>0&&!CH._low60[s]){CH._low60[s]=1;CSND.play("low")}}}}catch{}return r};
+
+/* --- F. tahta etkileşimi: sürükleme çerçevesi, ön hamle, sağ tık işaretleri --- */
+let P60D=null,A60=null;
+const ch60PreOn=()=>!!(CH&&!CH.over&&CH.view==null&&CH.g.turn!==CH.my&&(CH.mode==="bot"||(CH.mode==="online"&&CH.doc&&CH.doc.status==="active")));
+/* ön hamle hedefleri: taşın gidebileceği bütün kareler (ışınlar engel saymaz; yasallık sıra gelince bakılır) */
+function ch60PreTargets(s){const b=CH.g.b,p=b[s];if(!p)return[];const t=p&7,c=p&8,r=s>>3,f=s&7,out=[];const add=(R,F)=>{if(R>=0&&R<8&&F>=0&&F<8)out.push(R*8+F)};
+ if(t===1){const d=c?1:-1;add(r+d,f);if(r===(c?1:6))add(r+2*d,f);add(r+d,f-1);add(r+d,f+1)}
+ else if(t===2){for(const[a,e]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]])add(r+a,f+e)}
+ else if(t===6){for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)if(a||e)add(r+a,f+e);if(s===(c?4:60)){add(r,f+2);add(r,f-2)}}
+ else{const D=t===3?[[-1,-1],[-1,1],[1,-1],[1,1]]:t===4?[[-1,0],[1,0],[0,-1],[0,1]]:[[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]];for(const[a,e]of D){let R=r+a,F=f+e;while(R>=0&&R<8&&F>=0&&F<8){out.push(R*8+F);R+=a;F+=e}}}
+ return out}
+function ch60PreSet(f,t){const p=CH.g.b[f];const pr=(p&7)===1&&((t>>3)===0||(t>>3)===7)?5:0;CH.pre={f,t,pr};CH.psel=null;chMarks();CSND.play("premove");vib(6)}
+function ch60PreClear(){if(!CH||(!CH.pre&&CH.psel==null))return;CH.pre=null;CH.psel=null;chMarks()}
+function ch60PreRun(tok){if(CH!==tok||!CH.pre)return;const p=CH.pre;CH.pre=null;CH.psel=null;
+ if(!chCanMove()||CH.g.turn!==CH.my){chMarks();return}
+ const m=CC.legal(CH.g).find(x=>x.f===p.f&&x.t===p.t&&(!x.pr||(x.pr&7)===(p.pr||5)));chMarks();if(m)chUser(m)}
+const chApplyBase60=chApply;
+chApply=function(m,q){const r=chApplyBase60.call(this,m,q);try{if(CH&&!CHX.replay){if(CH.ann&&(CH.ann.a.size||CH.ann.h.size)){CH.ann=null;ch60AnnDraw()}
+ if(CH.pre){if(CH.over)CH.pre=null;else if(CH.g.turn===CH.my){const tok=CH;setTimeout(()=>ch60PreRun(tok),90)}}}}catch(e){console.warn("chs60",e)}return r};
+const chMarksBase60=chMarks;
+chMarks=function(...a){const r=chMarksBase60.apply(this,a);try{const mk=$("#cMk");if(!mk||!CH)return r;let h="";
+ if(CH.view==null&&!CH.over){if(CH.psel!=null){h+=`<i class="psel" style="transform:${tf(CH.psel)}"></i>`;for(const q of ch60PreTargets(CH.psel))h+=`<i class="pdot" style="transform:${tf(q)}"></i>`}
+  if(CH.pre)h+=`<i class="pre" style="transform:${tf(CH.pre.f)}"></i><i class="pre" style="transform:${tf(CH.pre.t)}"></i>`}
+ if(CH.ann)for(const[s,c]of CH.ann.h)h+=`<i class="ann a-${c}" style="transform:${tf(s)}"></i>`;
+ if(h)mk.insertAdjacentHTML("afterbegin",h)}catch(e){console.warn("chs60",e)}return r};
+const chDrawBase60=chDraw;
+chDraw=function(...a){const r=chDrawBase60.apply(this,a);try{ch60AnnDraw()}catch{}return r};
+const ch60AnnCol={r:"rgba(255,170,0,.8)",g:"rgba(120,180,60,.85)",b:"rgba(60,150,220,.85)"};
+function ch60AnnToggle(a,b,c){CH.ann=CH.ann||{a:new Map,h:new Map};if(a===b){if(CH.ann.h.get(a)===c)CH.ann.h.delete(a);else CH.ann.h.set(a,c);chMarks()}
+ else{const k=a+"-"+b;if(CH.ann.a.get(k)===c)CH.ann.a.delete(k);else CH.ann.a.set(k,c);ch60AnnDraw()}}
+function ch60AnnDraw(){const sv=$("#cAnn");if(!sv)return;if(!CH||!CH.ann||!CH.ann.a.size){if(sv.innerHTML)sv.innerHTML="";return}
+ const at=s=>{const[x,y]=sqXY(s);return[x*100+50,y*100+50]};let h="";
+ for(const[k,cl]of CH.ann.a){const[a,b]=k.split("-").map(Number);const[x1,y1]=at(a),[x2,y2]=at(b);const dx=Math.abs(x2-x1),dy=Math.abs(y2-y1);const kn=(dx===100&&dy===200)||(dx===200&&dy===100);
+  const pts=kn?[[x1,y1],dy>dx?[x1,y2]:[x2,y1],[x2,y2]]:[[x1,y1],[x2,y2]];const[px,py]=pts[pts.length-2];const L=Math.hypot(x2-px,y2-py)||1;const ux=(x2-px)/L,uy=(y2-py)/L;
+  const hl=40,hw=27,ex=x2-ux*hl,ey=y2-uy*hl;const line=[...pts.slice(0,-1),[ex,ey]];if(!kn){line[0]=[x1+ux*22,y1+uy*22]}
+  const col=ch60AnnCol[cl]||ch60AnnCol.r;
+  h+=`<polyline points="${line.map(p=>p.map(v=>v.toFixed(1)).join(",")).join(" ")}" fill="none" stroke="${col}" stroke-width="18" stroke-linejoin="round"/><polygon points="${(x2-ux*6).toFixed(1)},${(y2-uy*6).toFixed(1)} ${(ex-uy*hw).toFixed(1)},${(ey+ux*hw).toFixed(1)} ${(ex+uy*hw).toFixed(1)},${(ey-ux*hw).toFixed(1)}" fill="${col}"/>`}
+ sv.innerHTML=h}
+const ch60Hov=()=>$("#c6Hov");
+function ch60HovAt(e){const h=ch60Hov();if(!h)return;const s=chSqAt(e);if(s<0){h.hidden=true;return}h.hidden=false;h.style.transform=tf(s)}
+function ch60HovHide(){const h=ch60Hov();if(h&&!h.hidden)h.hidden=true}
+/* sürüklenen taş: farede hafif büyür, dokunmatikte büyüyüp parmağın üstüne kalkar */
+function ch60Lift(el,e){const bd=$("#cBoard");if(!bd||!el)return;const r=bd.getBoundingClientRect(),z=r.width/8;const touch=e.pointerType!=="mouse";
+ el.style.transform=`translate(${e.clientX-r.left-z/2}px,${e.clientY-r.top-z/2-(touch?z*.5:0)}px) scale(${touch?1.32:1.08})`}
+function ch60Down(e){if(!CH)return;const bd=$("#cBoard");if(!bd)return;if(e.target.closest&&e.target.closest("#cOv.on"))return;
+ if(e.button===2){const s=chSqAt(e);A60=s>=0?{s,c:e.shiftKey?"g":(e.ctrlKey||e.altKey||e.metaKey)?"b":"r"}:null;e.preventDefault();e.stopImmediatePropagation();return}
+ if(e.pointerType==="mouse"&&e.button!==0)return;
+ if(CH.ann&&(CH.ann.a.size||CH.ann.h.size)){CH.ann=null;ch60AnnDraw();chMarks()}
+ if(!ch60PreOn()){ch60PreClear();return}
+ const s=chSqAt(e);if(s<0)return;e.stopImmediatePropagation();e.preventDefault();const p=CH.g.b[s];
+ if(CH.psel!=null&&CH.psel!==s&&ch60PreTargets(CH.psel).includes(s)){ch60PreSet(CH.psel,s);return}
+ if(p&&(p&8)===CH.my){const was=CH.psel===s;CH.pre=null;CH.psel=s;chMarks();P60D={s,el:CHEL[s],x:e.clientX,y:e.clientY,moved:false,was};try{bd.setPointerCapture(e.pointerId)}catch{}return}
+ ch60PreClear()}
+function ch60MoveCap(e){const D=P60D;if(!D)return;e.stopImmediatePropagation();if(!D.el)return;
+ if(!D.moved&&Math.hypot(e.clientX-D.x,e.clientY-D.y)>5){D.moved=true;D.el.classList.add("drag")}if(D.moved){ch60Lift(D.el,e);ch60HovAt(e)}}
+function ch60MoveBub(e){const D=CDRAG;if(D&&D.moved&&D.el){ch60Lift(D.el,e);ch60HovAt(e)}}
+function ch60Up(e){ch60HovHide();
+ if(e.button===2){const A=A60;A60=null;e.stopImmediatePropagation();e.preventDefault();if(!A||!CH)return;const s=chSqAt(e);if(s>=0)ch60AnnToggle(A.s,s,A.c);return}
+ const D=P60D;if(!D)return;P60D=null;e.stopImmediatePropagation();if(!CH)return;
+ if(D.el){D.el.classList.remove("drag");D.el.style.transform=tf(D.s)}
+ if(D.moved){const s=chSqAt(e);if(s>=0&&s!==D.s&&ch60PreOn()&&ch60PreTargets(D.s).includes(s))ch60PreSet(D.s,s);else{CH.psel=null;chMarks()}}
+ else if(D.was){CH.psel=null;chMarks()}}
+function ch60Cancel(){ch60HovHide();A60=null;const D=P60D;P60D=null;if(D&&D.el){D.el.classList.remove("drag");D.el.style.transform=tf(D.s)}}
+const chWireBase60=chWire;
+chWire=function(...a){const r=chWireBase60.apply(this,a);try{const bd=$("#cBoard");if(bd&&!bd._c60){bd._c60=1;
+ bd.addEventListener("pointerdown",ch60Down,true);bd.addEventListener("pointermove",ch60MoveCap,true);bd.addEventListener("pointermove",ch60MoveBub);
+ bd.addEventListener("pointerup",ch60Up,true);bd.addEventListener("pointercancel",ch60Cancel,true);bd.addEventListener("contextmenu",e=>e.preventDefault());
+ bd.addEventListener("lostpointercapture",()=>{if(!CDRAG&&!P60D)ch60HovHide()})}}catch(e){console.warn("chs60",e)}return r};
+
+/* --- G. lobi --- */
+function ch60GameRows(){const gs=myGames();if(!gs.length)return"";
+ return`<h3 class="sec-h"><span>Oyunların</span>${myTurnGames()?`<span class="cturn">${myTurnGames()} OYUNDA SIRA SENDE</span>`:""}</h3><div class="box">${gs.map(d=>{const o=oppOf(d);const p=P(o);const mine=d.status==="active"&&gTurnUid(d)===S.uid;const inv=d.status==="invite";
+  const sub=d.status==="over"?(d.reason==="iptal"?"İptal edildi":d.result==="1/2"?"Berabere bitti":((d.result==="1-0")===(d.w===S.uid)?"Kazandın":"Kaybettin")):inv?(d.to===S.uid?"Seni davet etti":"Davetin bekliyor"):mine?"Sıra sende":"Rakibin düşünüyor";
+  return`<button class="row" data-cgame="${esc(d.id)}">${avatar(o,44,{click:false,ring:false})}<div class="t"><div><b>${esc(p.name)}</b> <span class="crt">${chessStats(o).r}</span></div><div class="s">${esc(sub)} · ${Math.ceil((d.moves||[]).length/2)}. hamle · ${ago(d.updatedAt||d.at)}</div></div>${mine||(inv&&d.to===S.uid)?'<span class="cturn">SIRA SENDE</span>':""}</button>`}).join("")}</div>`}
+function ch60BotBox(){const opp=settings.chessOpp==="clawd"?"clawd":"rota";const cw=opp==="clawd";const col=settings.chessColor||"w";const tc=chTcKey();
+ const lv=cw?`<div class="lvls" role="group" aria-label="Clawd'un seviyesi">${CHC_LV.map((l,i)=>`<button class="lvl" data-act="chclvl" data-v="${i}" aria-pressed="${chcLv()===i}"><b>${l.n}</b><span>${l.r}</span></button>`).join("")}</div>`
+  :`<div class="lvls" role="group" aria-label="Rota'nın seviyesi">${CLEVELS.map((l,i)=>`<button class="lvl" data-clvl="${i}" aria-pressed="${(settings.chessLevel??1)===i}"><b>${l.n}</b><span>${l.r}</span></button>`).join("")}</div>`;
+ const sv=cw?LS.get(chcKey()):LS.get("kadraj_chess_bot_"+S.uid);const L=cw?CHC_LV:CLEVELS;
+ const resume=sv&&Array.isArray(sv.moves)&&sv.moves.length?`<button class="btn sec block" data-chs="${cw?"cwresume":"botresume"}">${I("play")}Yarım kalan oyuna dön · ${esc((L[sv.level]||L[1]).n)}, ${Math.ceil(sv.moves.length/2)}. hamle</button>`:"";
+ const face=cw?`<span class="c6bf cw">${chcFace(64,"happy","idle")}</span>`:`<span class="c6bf">${botFace(64)}</span>`;
+ const line=cw?chcLobbyLine():"Bir oyuna ne dersin? Seviyeni seç, ben hazırım.";
+ const cst=chcStats(S.uid);const cwRow=cw?`<div class="chcst c6cst"><span class="cwav">${chcFace(46,"","idle")}</span><div><b>Clawd'a karşı puanın: ${cst.r}</b><small>${cst.w} galibiyet · ${cst.d} beraberlik · ${cst.l} yenilgi · ana puanını etkilemez</small></div></div>`:"";
+ return`<h3 class="sec-h" id="c6bots"><span>Botlara karşı</span>${I("admbot")}</h3><div class="box cbox c6bot"><div class="c6say">${face}<div class="c6sb">${esc(line)}</div></div>
+ <span class="lbl">Rakibin</span>${chcOppPick(opp)}<span class="lbl">Seviye</span>${lv}
+ <span class="lbl">Taşların</span><div class="seg">${[["w","Beyaz"],["r","Rastgele"],["b","Siyah"]].map(([v,l])=>`<button data-ccol="${v}" aria-pressed="${col===v}">${l}</button>`).join("")}</div>
+ <span class="lbl">Süre<em>botlara karşı ve aynı telefonda</em></span><div class="seg ctcs" role="group" aria-label="Süre">${TCS.map(([v,l])=>`<button data-act="chtc" data-v="${v}" aria-pressed="${tc===v}">${v==="0"?"":I("chclock")}${esc(l)}</button>`).join("")}</div>
+ <button class="btn block" data-chs="${cw?"cwnew":"botnew"}">${I(cw?"clawd":"knight")}${cw?"Clawd'a karşı oyna":"Rota'ya karşı oyna"}</button>${resume}${cwRow}</div>`}
+function ch60Board(){const lb=Object.values(S.profiles).filter(p=>p&&p.chess&&p.chess.g).sort((a,b)=>b.chess.r-a.chess.r).slice(0,10);
+ return`<h3 class="sec-h"><span>Kadraj sıralaması</span>${I("trophy")}</h3>`+(lb.length?`<div class="box">${lb.map((p,i)=>`<button class="row ${p.uid===S.uid?"meh":""}" data-prof="${esc(p.uid)}"><span class="rank">${i+1}</span>${avatar(p.uid,40,{click:false,ring:false})}<div class="t"><div><b>${esc(P(p.uid).name)}</b></div><div class="s">${p.chess.w} galibiyet · ${p.chess.d} beraberlik · ${p.chess.l} yenilgi</div></div><b class="crate">${p.chess.r}</b></button>`).join("")}</div>`:`<div class="empty" style="padding:16px 24px">Henüz kimse oynamadı. İlk sıraya sen yerleş.</div>`)}
+function ch60Lobby(){const st=chessStats(S.uid),pr=P(S.uid);const pass=LS.get("kadraj_chess_local_"+S.uid);const passOn=!!(pass&&pass.moves&&pass.moves.length);
+ const pzN=pzSolvedN(),N=PUZZLES.length,pzI=pzNextIdx((pzProg().last??0)-1);const turn=myTurnGames();
+ let h=`<div class="c6lob"><div class="box c6me">${avatar(S.uid,52,{click:false,ring:false})}<div class="t"><b>${esc(pr.name||"")}</b><small>${st.w} galibiyet · ${st.d} berabere · ${st.l} yenilgi</small></div><div class="rt"><b>${st.r}</b><small>Puan</small></div></div>
+ <div class="c6play"><button class="c6tile pri" data-act="c6bots"><span class="ic">${I("admbot")}</span><span class="tx"><b>Botlara karşı</b><small>Rota ya da Clawd, beş seviye</small></span></button>
+ <button class="c6tile" data-chs="invite"><span class="ic">${I("users")}</span><span class="tx"><b>Arkadaşınla</b><small>${turn?`${turn} oyunda sıra sende`:"Çevrim içi davet et"}</small></span>${turn?`<i class="c6dot">${turn}</i>`:""}</button>
+ <button class="c6tile" data-act="pzgo" data-v="${pzI}"><span class="ic">${I("chpuzzle")}</span><span class="tx"><b>Bulmacalar</b><small>${pzN}/${N} çözüldü</small></span></button>
+ <button class="c6tile" data-chs="${passOn?"passresume":"pass"}"><span class="ic">${I("rotate")}</span><span class="tx"><b>Aynı telefonda</b><small>${passOn?"Yarım kalan oyuna dön":"İki kişi, tek tahta"}</small></span></button></div></div>`;
+ if(S.gamesDenied)h+=`<div class="banner">${I("info")}<span>Arkadaşla satranç için uygulamanın sahibi Firebase kurallarını güncellemeli (games satırı).</span></div>`;
+ h+=ch60GameRows()+ch60BotBox()+pzCard()+chwLobbyCard()+ch60Board()+chLookCard();
+ return h}
+const vChessBase60=vChess;
+vChess=function(){try{return ch60Lobby()}catch(e){console.warn("chs60",e);return vChessBase60()}};
+ACT.c6bots=()=>{const el=document.getElementById("c6bots");if(el)el.scrollIntoView({behavior:kbReduce()?"auto":"smooth",block:"start"});vib(6)};
+
+/* --- H. 4 kişilik satranç (gizli; yalnızca Yönetici panelinden) --- */
+let s4P=null;
+function s4Load(){return s4P||(s4P=new Promise((res,rej)=>{if(window.SATRANC4)return res();const sc=document.createElement("script");sc.src="satranc4.js?v="+APP_V;sc.onload=()=>window.SATRANC4?res():rej(new Error("yok"));sc.onerror=()=>{s4P=null;rej(new Error("indirilemedi"))};document.head.appendChild(sc)}))}
+function s4Go(fn){if(!S.authed||!S.admin)return;s4Load().then(()=>fn(window.SATRANC4)).catch(()=>{s4P=null;toast("4 kişilik satranç yüklenemedi. İnternetini kontrol et.")})}
+ACT.s4open=()=>s4Go(X=>X.open());
+try{ADM_EXTRA.push({id:"s4",title:"4 kişilik satranç",desc:"Gizli deneme: yalnızca sen açabilirsin",icon:"knight",order:68,count:()=>({t:"Gizli",c:"dim"}),
+ html:()=>`<p class="muted" style="margin:0 0 12px;font-size:.86rem;line-height:1.45">Dört renk, 14x14 artı biçimli tahta. Kırmızı sensin; Mavi, Sarı ve Yeşil botlar. Sıra saat yönünde döner; mat ya da pat olan, teslim olan oyundan çıkar, son kalan kazanır. Henüz kimse göremez: Keşfet'te ve Neler yeni'de yok.</p><button class="btn block" data-act="s4open">${I("knight")}4 kişilik satrancı aç</button>`})}catch(e){console.warn("chs60",e)}
+/*}@js:60CHS*/
 /*@js:511{*/
 /* ===== 5.1.1: Rota'nın yanıtı harf harf gelir =====
    Köprü (kAI) yanıtı tek parça döndürür; botReply sarıldı (botReplyBase511): yanıt gelince S.stream ile parça parça yazılır,
@@ -11180,6 +11944,111 @@ function rdiscHtml(p){const own=P(p.uid);return`<span class="rdisc" aria-hidden=
 /* açıklamaya dokununca tamamı açılır */
 document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest(".reel .info .c");if(!c||e.target.closest("a,button,[data-htag]"))return;e.stopPropagation();c.classList.toggle("open")},true);
 /*}@js:570*/
+/*@js:60UI{*/
+/* ===== 6.0 · Yeni arayüz (60UI) =====
+   Görsel yenileme; davranış değişmez. Kuralların çoğu CSS bölgesi 60UI'da, :root[data-ui] altında (data-ui her zaman yazılı: Vizör ve Klasik ikisinde de geçerli).
+   İki görünümde içerik (kartlar, listeler, profil, sohbet balonları, pencereler) aynıdır. Fark yalnızca çerçevede:
+     Vizör = içeriğin üstünde yüzen cam üst çubuk ve dok, kamera dokunuşları (dokta odak köşeleri, deklanşör, çift dokununca fotoğrafta odak kilidi);
+     Klasik = sabit üst çubuk ve alt menü.
+   Buradaki JS:
+   - #shell[data-r]: geçerli sayfanın adı (render sarıldı → renderBase60); CSS sayfaya özel düzen için kullanır (Sohbet listesi, geniş ekranda Akış sütunu).
+   - Sayfa geçiş yönü: go/back/tab sarıldı (goBase60, backBase60, tabBase60) → K6.nav; tam çizimde main'e k6-fwd (sağdan), k6-back (soldan) ya da k6-tab (aşağıdan) eklenir.
+   - Kayan seçim göstergesi (k6Seg): Akış süzgeci (.chips), Keşfet sekmeleri (.sr-tabs), profil sekmeleri (.ptabs) içine .k6-ind konur; aynı ziyarette seçim
+     değişince eski yerinden yenisine kayar (FLIP, WAAPI, yalnızca transform). Keşfet sekmeleri yerinde yenilendiği için srPaint sarıldı (srPaintBase60).
+   - Klasik dokta da kayan sekme göstergesi: 50UI'ın .vz-focus öğesi ve vzFocusPlace kullanılır (renderDock sarıldı → renderDockBase60).
+   - Klasik'te pencere kapanış animasyonu: 50UI'ın vzGhost'u (closeLayer sarıldı → closeLayerBase60). Üst çubuk kayınca alt çizgi alır (#top.k6-sc).
+   - Vizör üst çubuk alt başlıkları (vzMeta) büyük harfli HUD değil, sade cümle (Akış'ta saate göre selam: "Günaydın, Bilal");
+     Ayarlar › Arayüz açıklaması (vzUiRow) yeni anlamına göre.
+   - Profil: kişinin fotoğrafından bulanık kapak şeridi (vProfile sarıldı → vProfileBase60; .prof'a k6-hasc ve ilk çocuk .k6-cover).
+   - Keşfet ızgarası mozaik (yalnızca CSS: #shell[data-r="explore"] .grid, 18 karede bir iki büyük kare).
+   - Resimler (paylaşım, ızgara, Klaket karesi): yüklenene kadar ışıltı (.k6-ld, en fazla 3 tur), yüklenince yumuşak belirme (k6Img).
+   - Yükleniyor iskeletleri: Sohbet listesi ilk sohbet verisi gelene kadar (S._chatsIn; vChats sarıldı → vChatsBase60), Akış bulutta paylaşımlar gelene kadar
+     (K6.postsIn; subscribeShared sarıldı, DB.watchCol yalnızca o çağrı süresince "posts" için sarılır; vFeed sarıldı → vFeedBase60). İskelet ışıltısı sınırlı tur atar.
+   Boşta hiçbir şey çalışmaz: sonsuz CSS animasyonu yok (eski hikâye halkası ve "canlı" nokta döngüleri kapatıldı), JS döngüsü yok.
+   Hareket azaltılınca (kbReduce: Ayarlar ya da sistem) kayma ve kapanış animasyonları çalışmaz; CSS animasyonları genel kuralla zaten kısalır. */
+const K6={nav:"tab",ind:{},postsIn:false};
+
+/* --- sayfa adı ve geçiş yönü --- */
+const goBase60=go;
+go=function(...a){K6.nav="fwd";return goBase60.apply(this,a)};
+const backBase60=back;
+back=function(...a){K6.nav="back";return backBase60.apply(this,a)};
+const tabBase60=tab;
+tab=function(...a){K6.nav="tab";return tabBase60.apply(this,a)};
+const renderBase60=render;
+render=function(full,...a){const sh=$("#shell");if(sh&&S.route)sh.dataset.r=S.route.name;
+ const r=renderBase60.call(this,full,...a);
+ if(full){const m=main();if(m){m.classList.remove("k6-fwd","k6-back","k6-tab");if(m.classList.contains("enter"))m.classList.add("k6-"+K6.nav)}
+  const t=$("#top");if(t)t.classList.remove("k6-sc");K6.nav="tab"}
+ return r};
+
+/* --- kayan seçim göstergesi --- */
+const K6_SEG=[["#main .chips:not(.sr-tabs)","feed"],["#srBody .sr-tabs","sr"],["#main .ptabs","pt"]];
+function k6Seg(){const still=kbReduce();
+ for(const[sel,key]of K6_SEG){const g=document.querySelector(sel);if(!g)continue;
+  const b=g.querySelector(':scope>[aria-pressed="true"]');let ind=g.querySelector(":scope>.k6-ind");
+  if(!b){if(ind)ind.remove();g.classList.remove("k6-seg");continue}
+  if(!ind){ind=document.createElement("i");ind.className="k6-ind";ind.setAttribute("aria-hidden","true");g.prepend(ind)}
+  g.classList.add("k6-seg");const x=b.offsetLeft,y=b.offsetTop,w=b.offsetWidth,h=b.offsetHeight;
+  if(!w){ind.hidden=true;continue}ind.hidden=false;
+  ind.style.width=w+"px";ind.style.height=h+"px";ind.style.transform=`translate(${x}px,${y}px)`;
+  const L=K6.ind[key];K6.ind[key]={x,w,r:S.route};
+  if(L&&L.r===S.route&&(L.x!==x||L.w!==w)&&!still&&ind.animate)
+   ind.animate([{transform:`translate(${L.x}px,${y}px) scaleX(${L.w/w})`},{transform:`translate(${x}px,${y}px) scaleX(1)`}],{duration:440,easing:"cubic-bezier(.3,1.25,.5,1)"})}}
+
+/* --- resimler: yüklenene kadar ışıltı, sonra yumuşak belirme --- */
+function k6Img(){for(const img of document.querySelectorAll("#main .media img,#main .tile img,#main .sr-fl img")){if(img.complete||img._k6)continue;img._k6=1;
+ const box=img.closest(".media,.tile,.sr-fl");if(!box)continue;box.classList.add("k6-ld");const done=()=>box.classList.remove("k6-ld");
+ img.addEventListener("load",done,{once:true});img.addEventListener("error",done,{once:true})}}
+HOOKS.after.push(()=>{k6Seg();k6Img()});
+const srPaintBase60=srPaint;
+srPaint=function(...a){const r=srPaintBase60.apply(this,a);try{k6Seg();k6Img()}catch(e){console.warn("k6",e)}return r};
+
+/* --- Klasik: dokta kayan gösterge, pencere kapanışı, üst çubuk çizgisi --- */
+const renderDockBase60=renderDock;
+renderDock=function(...a){const r=renderDockBase60.apply(this,a);
+ try{if(!vzOn()){const nav=$("#dock nav");if(nav&&!nav.querySelector(":scope>.vz-focus")){const f=document.createElement("i");f.className="vz-focus";f.setAttribute("aria-hidden","true");nav.prepend(f);vzFocusPlace(true)}}}catch(e){console.warn("k6",e)}
+ return r};
+const closeLayerBase60=closeLayer;
+closeLayer=function(name){if(!vzNoGhost&&!vzOn()&&!kbReduce())try{vzGhost(name)}catch{}return closeLayerBase60(name)};
+document.addEventListener("scroll",e=>{const m=e.target;if(!m||m.id!=="main"||vzOn())return;const t=$("#top");if(t)t.classList.toggle("k6-sc",m.scrollTop>4)},{capture:true,passive:true});
+
+/* --- Vizör alt başlıkları: sade cümle --- */
+vzMeta=function(r){const pr=S.route.params||{};try{
+ if(r==="feed"){const h=new Date().getHours();const g=h<5||h>=22?"İyi geceler":h<11?"Günaydın":h<17?"İyi günler":"İyi akşamlar";const n=String(me().name||"").trim().split(/\s+/)[0];return n?`${g}, ${n}`:g}
+ if(r==="explore")return"Kişiler, etiketler ve paylaşımlar";
+ if(r==="chats"){const u=+unreadCount()||0;const a=activeUsers().length;return(u?`${u} okunmamış sohbet`:"Hepsi okundu")+(a?` · ${a} kişi aktif`:"")}
+ if(r==="profile")return pr.uid===S.uid?"Senin kadrajın":activeLabel(pr.uid)||"";
+ if(r==="post"){const p=postById(pr.id);return p?"@"+P(p.uid).username:""}
+ if(r==="activity")return"Beğeniler, yorumlar ve takipler";
+ if(r==="settings")return"Kadraj "+APP_VER;
+ if(r==="edit")return"Ad, kullanıcı adı ve biyografi";
+ if(r==="people")return pr.type==="followers"?"Takipçiler":"Takip edilenler";
+ if(r==="invite")return"Bağlantı ve davet mesajı";
+ if(r==="admin")return"Yönetim paneli"}catch{}return""};
+vzUiRow=function(){const cur=vzMode();const k=esc(kbFold("arayüz görünüm vizör klasik tasarım stil yeni eski dok menü alt çubuk cam"));
+ const mk=v=>`<span class="vz-mk ${v}" aria-hidden="true"><i class="c1"></i><i class="c2"></i><i class="bar"></i><i class="sh"></i></span>`;
+ return`<div class="srow sblk vz-uirow" data-k="${k}"><div class="sbh"><span class="sic" style="--c:#FF8A4C">${I("aperture")}</span><span class="t">Arayüz<small>Vizör: menüler içeriğin üstünde cam gibi yüzer. Klasik: üst çubuk ve alt menü sabit durur.</small></span><span class="val">${cur==="vizor"?"Vizör":"Klasik"}</span></div><div class="vz-uic" role="group" aria-label="Arayüz">${[["vizor","Vizör"],["klasik","Klasik"]].map(([v,l])=>`<button data-act="uiset" data-v="${v}" aria-pressed="${cur===v}">${mk(v)}<span>${l}</span></button>`).join("")}</div></div>`};
+
+/* --- profil: kişinin fotoğrafından bulanık kapak şeridi (.k6-cover; Clawd'ın profil odası .prof-top/.stats/.btns'e bakar, onlara dokunulmaz) --- */
+const vProfileBase60=vProfile;
+vProfile=function(uid,...a){const h=vProfileBase60.call(this,uid,...a);try{const av=P(uid||S.uid).avatar;const o='<div class="prof">';const i=h.indexOf(o);if(i<0||!av)return h;
+ return h.slice(0,i)+`<div class="prof k6-hasc"><div class="k6-cover" aria-hidden="true"><img src="${esc(av)}" alt=""></div>`+h.slice(i+o.length)}catch(e){console.warn("k6",e);return h}};
+
+/* --- yükleniyor iskeletleri --- */
+const K6_SKROW=`<div class="row k6-skr"><i class="k6-sk k6-ska"></i><span class="t"><i class="k6-sk" style="width:46%"></i><i class="k6-sk" style="width:74%"></i></span></div>`;
+const K6_SKCARD=`<div class="card k6-skc"><div class="card-h"><i class="k6-sk k6-ska"></i><span class="t"><i class="k6-sk" style="width:38%"></i><i class="k6-sk" style="width:24%"></i></span></div><i class="k6-sk k6-skm"></i><span class="t k6-skb"><i class="k6-sk" style="width:62%"></i><i class="k6-sk" style="width:40%"></i></span></div>`;
+const vChatsBase60=vChats;
+vChats=function(...a){const h=vChatsBase60.apply(this,a);if(S._chatsIn)return h;
+ return h.replace(/<div class="empty" style="padding:20px 24px"><b>Henüz sohbet yok<\/b>[^<]*<\/div>/,`<div class="box k6-skl" role="status" aria-label="Sohbetler yükleniyor">${K6_SKROW.repeat(4)}</div>`)};
+const subscribeSharedBase60=subscribeShared;
+subscribeShared=function(...a){K6.postsIn=false;const db=DB,w=db&&db.watchCol;
+ try{db.watchCol=function(col,cb,o){return w.call(this,col,col==="posts"?docs=>{K6.postsIn=true;cb(docs)}:cb,o)}}catch{K6.postsIn=true;return subscribeSharedBase60.apply(this,a)}
+ try{return subscribeSharedBase60.apply(this,a)}finally{db.watchCol=w}};
+const vFeedBase60=vFeed;
+vFeed=function(...a){const h=vFeedBase60.apply(this,a);if(K6.postsIn||S.mode!=="cloud")return h;
+ const sk=`<div class="k6-skf" role="status" aria-label="Paylaşımlar yükleniyor">${K6_SKCARD.repeat(2)}</div>`;const i=h.indexOf('<article class="card"');return i<0?h+sk:h.slice(0,i)+sk+h.slice(i)};
+/*}@js:60UI*/
 /*@js:580{*/
 /* 5.8.0 Cephe (piksel savaşı; 5.9.0'da baştan yazıldı): oyunun bütün kodu ayrı dosyada (cephe.js, haritalar cephe/*.png, menü resimleri cephe/*.jpg). Burada yalnızca yükleyici var:
    Keşfet'teki Cephe kartı (data-act="cephe") cephe.js'i ilk dokunuşta bir kez indirir (?v=APP_V) ve CEPHE.open() çağırır.
