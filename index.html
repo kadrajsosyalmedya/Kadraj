@@ -11872,9 +11872,9 @@ function cfTypers(key,k){if(!k||!k.cid||k.type==="bot")return null;const t=now()
  const ms=currentMsgs()||[];const ids=new Set();
  for(const m of ms){const id=m.id||String(m.at);ids.add(id);if(CFT.seen&&!CFT.seen.has(id)&&m.from!==S.uid&&!m.sys&&CFT.on.has(m.from)){CFT.on.delete(m.from);CFT.cool.set(m.from,t+900)}}
  CFT.seen=ids;
- for(const u of cur){if((CFT.cool.get(u)||0)>t)continue;const o=CFT.on.get(u);if(o)o.last=t;else CFT.on.set(u,{last:t})}
+ for(const u of cur){if((CFT.cool.get(u)||0)>t)continue;const o=CFT.on.get(u);if(o)o.end=0;else CFT.on.set(u,{end:0})}
  let next=0;const soon=ms=>{next=next?Math.min(next,ms):ms};
- for(const[u,o]of CFT.on)if(!cur.has(u)){const left=o.last+1500-t;if(left<=0)CFT.on.delete(u);else soon(left)}
+ for(const[u,o]of CFT.on)if(!cur.has(u)){if(!o.end)o.end=t;const left=o.end+1500-t;if(left<=0)CFT.on.delete(u);else soon(left)}
  for(const[u,c]of CFT.cool)if(c>t){if(cur.has(u))soon(c-t)}else CFT.cool.delete(u);
  clearTimeout(CFT.t);if(next)CFT.t=setTimeout(()=>{if(S.route.name==="chat"&&S.route.params.key===key)renderMsgs()},next+30);
  const map={};for(const[u,v]of Object.entries(real))if(v!==k.cid)map[u]=v;for(const u of CFT.on.keys())map[u]=k.cid;return{map}}
