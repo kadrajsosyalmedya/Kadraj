@@ -3126,6 +3126,12 @@ html.reduce-motion .c6tile:active{transform:none}
 html.reduce-motion #msgs .mn-ty.gl-in,html.reduce-motion .kpop svg.i,html.reduce-motion #msgs .seenav{animation:none}
 @media (prefers-reduced-motion:reduce){#msgs .mn-ty.gl-in,.kpop svg.i,#msgs .seenav{animation:none}}
 /*}@css:540*/
+/*@css:60CHAT{*/
+/* 6.0 sohbet: yazma kutusu yumuşak büyür (cfGrow); 60UI'ın kenar/gölge geçişleri korunur */
+#composer #msgIn{transition:height .16s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .2s}
+html.reduce-motion #composer #msgIn{transition:border-color .2s,box-shadow .2s}
+@media (prefers-reduced-motion:reduce){#composer #msgIn{transition:none}}
+/*}@css:60CHAT*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
 .hlr{display:flex;gap:14px;overflow-x:auto;padding:4px 16px 14px;scrollbar-width:none}
@@ -11780,6 +11786,20 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 HOOKS.after.push(()=>{const k=kPopAt;if(!k)return;const dt=performance.now()-k.t;if(dt>420){kPopAt=null;return}
  for(const el of $$(`[data-${k.a}="${CSS.escape(k.id)}"]`)){if(el.classList.contains("kpop"))continue;el.classList.add("kpop");const sv=el.querySelector("svg.i");if(sv)sv.style.animationDelay=-Math.round(dt)+"ms"}});
 /*}@js:540*/
+/*@js:60CHAT{*/
+/* ===== 6.0 sohbet (60CHAT) =====
+   Yazma kutusu: yükseklik görünmez bir kopyada (CF.mir) ölçülür; "height:auto" ile ölçüm yapılmadığı için kutu CSS geçişiyle
+   yumuşakça büyür/küçülür ve ölçüm sırasında sohbet bir an kaymaz (cfGrow; wireComposer ve taslak sarmalayıcısı bunu çağırır). */
+const CF={raf:0,t:0,off:0,v:0,w:15,bottom:false,items:new Map(),mo:null,en:new Map(),key:null,H:0,ch:0,mir:null,tp0:performance.now()};
+function cfGrow(inp,instant){if(!inp)return;let m=CF.mir;
+ if(!m||!m.isConnected){m=CF.mir=document.createElement("textarea");m.rows=1;m.tabIndex=-1;m.setAttribute("aria-hidden","true");
+  Object.assign(m.style,{position:"fixed",left:"-9999px",top:"0",height:"0",minHeight:"0",visibility:"hidden",overflow:"hidden",pointerEvents:"none",resize:"none"});document.body.appendChild(m)}
+ const cs=getComputedStyle(inp);for(const p of["fontFamily","fontSize","fontWeight","fontStyle","letterSpacing","wordSpacing","lineHeight","textTransform","paddingTop","paddingBottom","paddingLeft","paddingRight","borderLeftWidth","borderRightWidth","boxSizing","whiteSpace","wordBreak","overflowWrap","tabSize"])m.style[p]=cs[p];
+ m.style.width=inp.offsetWidth+"px";m.value=inp.value||" ";const h=Math.min(128,m.scrollHeight);
+ inp.style.overflowY=m.scrollHeight>128?"auto":"hidden";
+ if(instant){const t=inp.style.transition;inp.style.transition="none";inp.style.height=h+"px";void inp.offsetHeight;inp.style.transition=t}
+ else if(inp.style.height!==h+"px")inp.style.height=h+"px"}
+/*}@js:60CHAT*/
 /*@js:550{*/
 /* 5.5.0
    Rota fotoğrafa bakar: Rota sohbetinde fotoğraf gönderilebilir (sendToBot artık `img` taşır; `botImg` 640 px / 60000 karaktere küçültür,
