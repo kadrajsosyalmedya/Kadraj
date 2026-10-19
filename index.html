@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60002">
+<meta name="kadraj-version" content="60005">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3154,6 +3154,34 @@ html.reduce-motion #composer #msgIn{transition:border-color .2s,box-shadow .2s}
 html.reduce-motion .cf-new{animation:none}
 @media (prefers-reduced-motion:reduce){.cf-new{animation:none}}
 /*}@css:60CHAT*/
+/*@css:61CHAT{*/
+/* 6.1 sabit mesaj şeridi: sohbetin üstünde, mesajların üstüne biner (liste yüksekliği değişmez, sohbet zıplamaz) */
+main.chatmode{position:relative}
+.pinbar{position:absolute;left:10px;right:10px;top:8px;z-index:4;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 10px;border-radius:14px;background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid var(--line);box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.pinbar .pj{flex:1;min-width:0;display:flex;align-items:center;gap:8px;text-align:left;background:none;border:0;padding:2px 0;color:inherit}
+.pinbar .pj svg.i{flex:none;width:1.05rem;height:1.05rem;color:var(--accent)}
+.pinbar .pj span{min-width:0;display:grid}
+.pinbar .pj b{font-size:.72rem;color:var(--accent)}
+.pinbar .pj em{font-style:normal;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinbar .px{flex:none;width:2rem;height:2rem;border-radius:10px;display:grid;place-items:center;background:none;border:0;color:var(--muted)}
+.pinbar .px svg.i{width:1rem;height:1rem}
+.pinbar .pdots{display:grid;gap:2px;flex:none}.pinbar .pdots i{width:3px;height:8px;border-radius:2px;background:var(--line)}.pinbar .pdots i.on{background:var(--accent)}
+/* tek seferlik fotoğraf */
+.once{display:flex;align-items:center;gap:10px;padding:2px 2px;background:none;border:0;color:inherit;text-align:left;font:inherit}
+.once .oi{width:2.3rem;height:2.3rem;border-radius:50%;display:grid;place-items:center;flex:none;border:2px dashed currentColor;opacity:.9}
+.once .oi svg.i{width:1.1rem;height:1.1rem}.once span{display:grid}.once small{font-size:.74rem;opacity:.75}
+.once.off .oi{border-style:solid;opacity:.5}
+.oncev{position:fixed;inset:0;z-index:60;background:#000;display:grid;place-items:center}
+.oncev img{max-width:100%;max-height:100%;object-fit:contain;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;pointer-events:none}
+.oncev .ot{position:absolute;left:0;right:0;top:calc(10px + env(safe-area-inset-top,0px));text-align:center;color:#fff;font-size:.82rem;opacity:.8}
+.oncev button{position:absolute;right:12px;top:calc(8px + env(safe-area-inset-top,0px));width:2.6rem;height:2.6rem;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center}
+/* zamanlanmış mesaj */
+.msg:has(.schl){opacity:.62}
+.schl{display:flex;align-items:center;justify-content:flex-end;gap:4px}.schl svg.i{width:.8rem;height:.8rem}
+.schf{display:grid;gap:10px}.schf textarea{min-height:5rem}
+.schq{display:flex;flex-wrap:wrap;gap:8px}.schq button{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:.84rem}
+.schq button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+/*}@css:61CHAT*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
 .hlr{display:flex;gap:14px;overflow-x:auto;padding:4px 16px 14px;scrollbar-width:none}
@@ -3697,7 +3725,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60002,APP_VER="6.0.2";
+const APP_V=60005,APP_VER="6.0.5";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -3960,7 +3988,7 @@ const isActive=uid=>settings.showActive!==false&&!!uid&&!BOT[uid]&&S.online.has(
 function activeLabel(uid){if(settings.showActive===false||!uid||BOT[uid])return"";if(S.online.has(uid))return"Şu an aktif";const t=lastSeenAt(uid);if(!t)return"";const m=(now()-t)/60e3;if(m<1)return"Az önce aktifti";if(m<60)return`${Math.round(m)} dk önce aktifti`;if(m<1440)return`${Math.round(m/60)} sa önce aktifti`;if(m<10080)return`${Math.round(m/1440)} gün önce aktifti`;return""}
 const activeUsers=()=>humans().filter(isActive);
 function seenText(uid){if(settings.showActive===false)return"";if(S.online.has(uid))return"Çevrimiçi";const t=(S.lastSeen||{})[uid];if(!t)return"Çevrimdışı";const a=ago(t);return"Son görülme "+(a==="şimdi"?"az önce":a+" önce")}
-const msgPreview=m=>m?(m.text||(m.post?"Bir paylaşım gönderdi":m.img?"Fotoğraf":m.video?"Video":m.audio?"Sesli mesaj":m.call?"Arama":m.game?"Satranç daveti":"")):"";
+const msgPreview=m=>m?(m.text||(m.once?"Tek seferlik fotoğraf":m.post?"Bir paylaşım gönderdi":m.img?"Fotoğraf":m.video?"Video":m.audio?"Sesli mesaj":m.call?"Arama":m.game?"Satranç daveti":"")):"";
 const noteOf=u=>{const n=S.profiles[u]&&S.profiles[u].note;return n&&n.text&&n.at>now()-24*H?n.text:""};
 function saveHidden(){const h=S.hidden||{};return write(()=>DB.set(`data/users/${S.uid}/hidden`,{msgs:h.msgs||{},chats:h.chats||{}}),{quiet:true})}
 function chatHead(key){const k=keyInfo(key);
@@ -4007,9 +4035,9 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
    if(m.call)body+=`<button class="callmsg" data-call="${esc(mine?(keyInfo(key).uid||""):m.from)}" data-v="${m.call.video?1:0}">${I(m.call.video?"video":"phone")}<span>${esc(callLabel(m.call,mine))}</span></button>`;
    if(m.post){const p0=postById(m.post);const p=p0&&canSee(p0)?p0:null;body+=p?`<button class="mp" data-open="${esc(p.id)}">${postThumb(p)?`<img src="${esc(postThumb(p))}" alt="">`:`<div class="note" style="margin:0;min-height:6rem;font-size:.85rem;border-radius:0;background:${p.kind==="poll"?"#0c7a63":NOTE_BG[p.bg||0]}">${esc(p.text||p.question||"")}</div>`}<span>@${esc(P(p.uid).username)}</span></button>`:"<i>Paylaşım kaldırılmış</i>"}
    if(m.game)body+=gameMsgHtml(m);
-   if(m.img)body+=`<img class="att" src="${esc(m.img)}" alt="Fotoğraf" data-view="1">`;
+   if(m.once)body+=onceHtml(m);else if(m.img)body+=`<img class="att" src="${esc(m.img)}" alt="Fotoğraf" data-view="1">`;
    if(m.text)body+=isAI&&!mine?md(m.text):esc(m.text);
-   if(m.edited)body+=`<span class="edl">düzenlendi</span>`}
+   if(m.edited)body+=`<span class="edl">düzenlendi</span>`;if(m.sch&&m.at>now())body+=`<span class="edl schl">${I("bell")}Zamanlandı · ${esc(schLabel(m.at))}</span>`}
   const hearts=Object.keys(msgReacts(m)).length;
   h+=`<div class="mrow ${mine?"me":""} ${hearts?"has-react":""} ${isNew?"nw":""}" data-k="${esc(mk)}">${multi&&!mine?(showSender?`<button class="avb" data-prof="${esc(m.from)}" aria-label="${esc(P(m.from).name)} profili">${avatar(m.from,32,{click:false,ring:false,online:false})}</button>`:'<span style="width:32px;flex:none"></span>'):""}<div class="mcol">${showSender?`<button class="sender" data-prof="${esc(m.from)}">${esc(P(m.from).name||P(m.from).username)}${BOT[m.from]?badge(m.from):""} <span class="muted">@${esc(P(m.from).username)}</span></button>`:""}<div class="msg ${isAI&&!mine?"ai":""} ${m.del?"del":""}" ${m.id&&k.type!=="bot"?`data-mid="${esc(m.id)}" id="m-${esc(m.id)}"`:""}>${body}${hearts?reactChip(m):""}</div></div></div>`;
   if(seenAt[idx])h+=`<div class="seenrow">${seenAt[idx].slice(0,8).map(([u,t])=>`<button class="seenav ${S.seenKeys&&!S.seenKeys.has(u+":"+(m.id||m.at))&&!fresh?"nw":""}" data-seen="${esc(u)}" data-t="${t}" aria-label="${esc(P(u).username)} gördü"><img src="${esc(P(u).avatar)}" alt=""></button>`).join("")}</div>`;
@@ -4858,7 +4886,7 @@ async function sendMessage(key,payload){const k=keyInfo(key);if(k.type==="dm"&&!
  const at=now();const mid=at.toString(36)+Math.random().toString(36).slice(2,6);const msg={from:S.uid,at,...payload};if(!msg.text)delete msg.text;
  if(S.route.name==="chat"&&chatKey===k.cid){S.msgs=[...S.msgs,{id:mid,...msg}];renderMsgs()}
  if(!await write(()=>DB.set(`chats/${k.cid}/msgs/${mid}`,msg))){if(S.msgs.some(x=>x.id===mid)){S.msgs=S.msgs.filter(x=>x.id!==mid);renderMsgs()}return false}
- const preview=payload.text||(payload.post?"Bir paylaşım gönderdi":payload.img?"Fotoğraf":payload.video?"Video":payload.audio?"Sesli mesaj":payload.call?callLabel(payload.call,false):"");
+ const preview=payload.text||(payload.once?"Tek seferlik fotoğraf":payload.post?"Bir paylaşım gönderdi":payload.img?"Fotoğraf":payload.video?"Video":payload.audio?"Sesli mesaj":payload.call?callLabel(payload.call,false):"");
  if(k.type==="meydan")await write(()=>DB.set("chats/meydan",{last:{text:preview,from:S.uid,at},updatedAt:at}),{quiet:true});
  else if(k.type==="group")await write(()=>DB.update("chats/"+k.cid,{last:{text:preview,from:S.uid,at},updatedAt:at,reads:{[S.uid]:at}}),{quiet:true});
  else{const meta={members:[S.uid,k.uid].sort(),last:{text:preview,from:S.uid,at},updatedAt:at,reads:{[S.uid]:at}};await write(()=>S.chats[k.cid]?DB.update("chats/"+k.cid,meta):DB.set("chats/"+k.cid,meta),{quiet:true})}
@@ -5750,6 +5778,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
 - 6.0 sohbet: gönderdiğin mesaj alttan büyüyerek girer, sohbet zıplamadan kayar; karşı taraf yazarken yazıyor balonu yavaşça yükselir ve mesaj gelince aynı yerde o mesaja dönüşür. Görüldü fotoğrafı (Instagram gibi) gördüğü son mesajının altında durur, yenisini görünce aşağı kayar; yer açmaz, karşı taraf yazarken ya da yanıt verince de yerinde kalır. Sohbet listesinde Rota'nın altındaki "Test botu" ile bunları deneyebilirsin: mesajını görür, yazar, hazır yanıt verir; "yardım" yazınca komutları (yaz, seri, gör, görme, bekle, vazgeç, uzun, fotoğraf, bildirim) gösterir. "bildirim" yazıp sohbetten çıkarsan 5 saniye sonra bildirim gelir.
+- 6.0.5 sohbet: Mesaja basılı tut › Sabitle: en fazla 3 mesaj sohbetin üstünde şeritte durur, şeride dokununca o mesaja gider (birden çoksa sıradakine geçer), X ile kaldırılır (birebir ve grupta; Meydan'da yok). + menüsü › Tek seferlik fotoğraf: alıcı bir kez açar, kapatınca silinir ve "Açıldı" yazar; gönderen fotoğrafı görmez, iletilemez. + menüsü › Mesajı zamanla: 1 saat sonra, bu akşam 20:00, yarın 09:00 ya da istediğin saat; saati gelene kadar karşı taraf görmez, sen soluk "Zamanlandı" balonu görürsün, basılı tut › Hemen gönder; zamanlanmış mesaj telefon bildirimi göndermez.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
 - 6.0 görünüm: arayüz yenilendi (Vizör ve Klasik ikisinde de): daha ferah kartlar, sayfa geçişleri yönlü (ileri sağdan, geri soldan, sekme alttan), alttan açılan pencerelerde seçenekler sırayla gelir. Profilde kişinin fotoğrafından bulanık kapak şeridi, Keşfet'te ara ara büyük karelerle mozaik ızgara, Bildirimler'de her satırda beğeni/yorum/takip rozeti, Ayarlar'da renkli ikonlar, yüklenirken iskelet ve ışıltı. Hareket azaltılmışsa animasyonlar kapanır.
 - 6.0 satranç: varsayılan taş seti Modern, tahta yeşil Turnuva (lobideki Görünüm'den değişir; daha önce seçim yapan kendi seçimini korur). Lobi: Botlara karşı, Arkadaşınla, Bulmacalar, Aynı telefonda. Oyun ekranı: telefonda hamleler üstte, tahta geniş, düğmeler altta; bilgisayarda hamle tablosu sağda. Ön hamle: rakip düşünürken taşını oynarsın, sıra gelince yapılır (kırmızı). Sağ tık kareyi işaretler, sağ tıkla sürükleyince ok çizer (shift yeşil, ctrl/alt mavi). Arkadaşınla çevrim içi oyunda da oyun incelemesi çalışır: Kitap, En iyi, Hata rozetleri, canlı doğruluk, değerlendirme çubuğu (satranç menüsünde Oyun incelemesi: canlı, oyun bitince ya da kapalı). Oyun sonunda yeni sonuç kartı.
@@ -6046,6 +6075,9 @@ setTimeout(verTidyCache,9000);
 /* ---- A · Neler yeni ---- */
 /* Yalnızca şu anki ara sürümün maddeleri gösterilir (v: o sürümün APP_V'si); yeni sürümde eski maddeleri silip yenilerini yaz. */
 const WN_ITEMS=[
+ {v:60005,ic:"pin",g:"linear-gradient(135deg,#f97316,#ffb25b)",t:"Sabit mesaj",d:"Mesaja basılı tut › Sabitle: önemli mesajlar sohbetin üstünde durur, dokununca oraya gider",go:"chats"},
+ {v:60005,ic:"eye",g:"linear-gradient(135deg,#7c3aed,#ec4899)",t:"Tek seferlik fotoğraf",d:"+ › Tek seferlik fotoğraf: karşı taraf bir kez açar, sonra kaybolur",go:"chats"},
+ {v:60005,ic:"bell",g:"linear-gradient(135deg,#0c7a63,#2f6bff)",t:"Mesajı zamanla",d:"+ › Mesajı zamanla: yazdığın mesaj seçtiğin saatte görünür",go:"chats"},
  {v:60000,ic:"flag",g:"linear-gradient(135deg,#b91c1c,#1d4ed8)",t:"Cephe 6.0: gerçek cepheler",d:"İki ordu cephede kendi bayraklarıyla karşı karşıya; kalabalık ve güçlü olan ilerler. Ne kadar çok asker gönderirsen o kadar hızlı ilerlersin, saldırı dokunduğun yere doğru gider",go:"explore"},
  {v:60000,ic:"users",g:"linear-gradient(135deg,#0c7a63,#d97706)",t:"Ekonomi, ordu ve generaller",d:"Şehirler asker, fabrikalar altın üretir; kışla, hastane, ordu eğitimi, kalkınma ve generaller. Oyunu 2x ya da 3x hızlandır",go:"explore"},
  {v:60000,ic:"hand",g:"linear-gradient(135deg,#2563eb,#16a34a)",t:"Barış, vasal ve kuşatma",d:"Barış antlaşması imzala, küçük komşunu vasal yap; çevrelediğin düşman toprağı senin olur, işgal ettiğin yerler zamanla asimile olur",go:"explore"},
@@ -12127,6 +12159,98 @@ vChats=function(...a){const h=vChatsBase60C.apply(this,a);const c=S.botchats.tes
  const row=`<div class="box tb-box"><button class="row" data-msg="${TB_UID}" data-crow="${TB_KEY}">${avatar(TB_UID,50,{click:false})}<div class="t"><div><b>${esc(TB_BOT.name)}</b></div><div class="s">Sohbet hareketlerini, görüldüyü ve bildirimleri dene</div></div></button></div>`;
  const i=h.indexOf('data-crow="u:bot:rota"');const j=i<0?-1:h.indexOf("</button></div>",i);return j<0?h+row:h.slice(0,j+15)+row+h.slice(j+15)};
 /*}@js:60CHAT*/
+/*@js:61CHAT{*/
+/* ===== 6.1 sohbet (61CHAT) =====
+   Sabit mesaj: mesaj menüsünde Sabitle/Sabitlemeyi kaldır (DM ve grup; en fazla PIN_MAX, en yenisi başta). Kayıt chats/{cid}.pins=[mid],
+   sabitlenince sohbete sys notu düşer. Şerit .pinbar main.chatmode'un üstüne biner (liste yüksekliği değişmez); dokununca o mesaja gider ve
+   sıradaki sabite geçer, (x) kaldırır. Meydan belgesi her mesajda baştan yazıldığı için (DB.set) Meydan'da sabit mesaj yok. */
+const PIN_MAX=3;let pinIx=0;
+const pinKey=()=>{if(S.route.name!=="chat")return null;const k=keyInfo(S.route.params.key);return k.type==="dm"||k.type==="group"?k:null};
+const mpinsOf=k=>((S.chats[k.cid]||{}).pins||[]).filter(mid=>S.msgs.some(m=>m.id===mid&&!m.del));
+async function pinSet(k,mid,on){if(!guard())return;const c=S.chats[k.cid]||{};let p=(c.pins||[]).filter(x=>x!==mid);if(on)p=[mid,...p].slice(0,PIN_MAX);
+ S.chats={...S.chats,[k.cid]:{...c,pins:p}};pinIx=0;pinPaint();
+ if(await write(()=>DB.update("chats/"+k.cid,{pins:p}))&&on){const at=now();await write(()=>DB.set(`chats/${k.cid}/msgs/${rid()}`,{from:S.uid,at,sys:"pin",text:`${me().name||me().username} bir mesajı sabitledi`}),{quiet:true})}
+ toast(on?"Mesaj sabitlendi":"Sabitleme kaldırıldı")}
+function pinPaint(){const main=$("#main");let bar=main&&main.querySelector(":scope>.pinbar");const k=pinKey();const p=k?mpinsOf(k):[];
+ if(!p.length){if(bar)bar.remove();return}if(pinIx>=p.length)pinIx=0;const m=S.msgs.find(x=>x.id===p[pinIx]);
+ const h=`<button type="button" class="pj" data-pinj="${esc(m.id)}">${I("pin")}<span><b>Sabit mesaj${p.length>1?` ${pinIx+1}/${p.length}`:""}</b><em>${esc(msgPreview(m).slice(0,90))}</em></span></button>${p.length>1?`<span class="pdots">${p.map((_,i)=>`<i class="${i===pinIx?"on":""}"></i>`).join("")}</span>`:""}<button type="button" class="px" data-pinx="${esc(m.id)}" aria-label="Sabitlemeyi kaldır">${I("close")}</button>`;
+ if(!bar){bar=document.createElement("div");bar.className="pinbar";main.prepend(bar)}if(bar._h!==h){bar.innerHTML=h;bar._h=h}
+ /* Vizör'de üst çubuk sohbetin üstüne biner: şerit mesaj kutusunun görünen üst kenarına oturur */
+ const box=$("#msgs");if(box){const t=Math.max(0,Math.round(box.getBoundingClientRect().top-main.getBoundingClientRect().top))+8;const hd=$("#top");const hb=hd?hd.getBoundingClientRect().bottom-main.getBoundingClientRect().top+8:0;bar.style.top=Math.max(t,hb)+"px"}}
+document.addEventListener("click",e=>{const j=e.target.closest&&e.target.closest("[data-pinj],[data-pinx]");if(!j)return;const k=pinKey();if(!k)return;e.preventDefault();e.stopPropagation();
+ if(j.dataset.pinx)return pinSet(k,j.dataset.pinx,false);
+ const el=document.getElementById("m-"+j.dataset.pinj);if(el){try{cfRelease()}catch{}el.scrollIntoView({block:"center",behavior:kbReduce()?"auto":"smooth"});el.classList.remove("flash");void el.offsetWidth;el.classList.add("flash")}
+ const p=mpinsOf(k);if(p.length>1){pinIx=(pinIx+1)%p.length;pinPaint()}},true);
+const msgMenuBase61=msgMenu;
+msgMenu=function(mid,...a){const r=msgMenuBase61.call(this,mid,...a);try{const k=pinKey();const l=$('#overlay [data-layer="menu"]');const m=S.msgs.find(x=>x.id===mid);
+  if(l&&m&&m.once){const f=l.querySelector("#mmF");if(f)f.remove()}
+  if(k&&l&&m&&m.sch&&m.at>now()&&m.from===S.uid){const cancel=l.querySelector('.opt[data-act="close"]');const b=document.createElement("button");b.className="opt";b.innerHTML=`${I("send")}Hemen gönder`;
+   b.onclick=async()=>{closeLayer("menu");const at=now();S.msgs=S.msgs.map(x=>x.id===mid?{...x,at,sch:null}:x).sort((x,y)=>x.at-y.at);renderMsgs();
+    if(await write(()=>DB.update(`chats/${k.cid}/msgs/${mid}`,{at,sch:null})))await updateLast(k,{...m,at,sch:null})};if(cancel)cancel.before(b)}
+  if(k&&l&&m&&!m.sys){const on=((S.chats[k.cid]||{}).pins||[]).includes(mid);const cancel=l.querySelector('.opt[data-act="close"]');
+   const b=document.createElement("button");b.className="opt";b.innerHTML=`${I("pin")}${on?"Sabitlemeyi kaldır":"Sabitle"}`;b.onclick=()=>{closeLayer("menu");pinSet(k,mid,!on)};if(cancel)cancel.before(b)}}catch(e){console.warn(e)}return r};
+const renderMsgsBase61=renderMsgs;
+renderMsgs=function(...a){const r=renderMsgsBase61.apply(this,a);try{pinPaint()}catch(e){console.warn(e)}return r};
+HOOKS.after.push(()=>{pinIx=0;try{pinPaint()}catch{}try{onceSweep()}catch{}});
+/* Tek seferlik fotoğraf: + menüsünde "Tek seferlik fotoğraf" (DM ve grup). Mesaj {img, once:1}; alıcı dokununca tam ekranda bir kez açar, kapatınca
+   opened.{uid}=zaman yazılır ve DM'de resim silinir (img:null); grupta herkes açınca ya da 24 saat sonra silinir. Gönderen resmi görmez.
+   İlet, kopyala, sohbet ayrıntılarındaki Medya listesi bu mesajda yok; özet "Tek seferlik fotoğraf". Ekran görüntüsü web'de engellenemez. */
+const ONCE_T=24*H;
+function onceOthers(k,m){if(k.type==="dm")return[k.uid];const c=S.chats[k.cid]||{};return(c.members||[]).filter(u=>u!==m.from)}
+function onceHtml(m){const op=m.opened||{};const mine=m.from===S.uid;let k=null;try{k=keyInfo(S.route.params.key)}catch{}
+ const seenBy=k?onceOthers(k,m).filter(u=>op[u]).length:0;
+ if(mine)return`<span class="once${m.img?"":" off"}"><span class="oi">${I("eye")}</span><span><b>Fotoğraf</b><small>Bir kez · ${seenBy?(k&&k.type==="group"?`${seenBy} kişi açtı`:"Açıldı"):"Gönderildi"}</small></span></span>`;
+ if(op[S.uid]||!m.img)return`<span class="once off"><span class="oi">${I("eye")}</span><span><b>Fotoğraf</b><small>Açıldı</small></span></span>`;
+ return`<button type="button" class="once" data-once="${esc(m.id)}"><span class="oi">${I("eye")}</span><span><b>Fotoğraf</b><small>Bir kez görüntülenir · dokun</small></span></button>`}
+async function onceSend(){const key=S.route.params.key;const r=await pickImage({title:"Tek seferlik fotoğraf"});if(!r||!r.img)return;const iw=r.img.naturalWidth||r.img.width,ih=r.img.naturalHeight||r.img.height;
+ const sc=Math.min(1,900/Math.max(iw,ih));const c=document.createElement("canvas");c.width=Math.round(iw*sc);c.height=Math.round(ih*sc);c.getContext("2d").drawImage(r.img,0,0,c.width,c.height);
+ S.forceBottom=true;await sendMessage(key,{img:encode(c,150000),once:1,text:""})}
+function onceOpen(mid){const k=keyInfo(S.route.params.key);const m=S.msgs.find(x=>x.id===mid);if(!m||!m.img||m.from===S.uid||(m.opened||{})[S.uid])return;
+ const l=openLayer("oncev",`<div class="oncev" role="dialog" aria-label="Tek seferlik fotoğraf"><img src="${esc(m.img)}" alt="Fotoğraf"><span class="ot">Bir kez görüntülenir</span><button type="button" data-act="close" aria-label="Kapat">${I("close")}</button></div>`,{noScrim:true,onClose:()=>onceDone(k,mid)});
+ l.addEventListener("contextmenu",e=>e.preventDefault())}
+async function onceDone(k,mid){const m=S.msgs.find(x=>x.id===mid);if(!m)return;const at=now();const op={...(m.opened||{}),[S.uid]:at};
+ const all=onceOthers(k,m).every(u=>op[u]);const patch={opened:{[S.uid]:at}};if(all||k.type==="dm")patch.img=null;
+ S.msgs=S.msgs.map(x=>x.id===mid?{...x,opened:op,...(patch.img===null?{img:null}:{})}:x);renderMsgs();await write(()=>DB.update(`chats/${k.cid}/msgs/${mid}`,patch),{quiet:true})}
+/* gönderen: 24 saati geçen açılmamış tek seferlik fotoğrafı siler */
+function onceSweep(){const k=pinKey();if(!k)return;for(const m of S.msgs)if(m.once&&m.img&&m.from===S.uid&&now()-m.at>ONCE_T)write(()=>DB.update(`chats/${k.cid}/msgs/${m.id}`,{img:null}),{quiet:true})}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-once]");if(!b)return;e.preventDefault();e.stopPropagation();onceOpen(b.dataset.once)},true);
+const plusMenuBase61=plusMenu;
+plusMenu=function(...a){const r=plusMenuBase61.apply(this,a);try{const k=pinKey();const l=$('#overlay [data-layer="plus"]');const box=l&&l.querySelector(".srcs");const ph=box&&box.querySelector("#pph");
+  if(k&&ph){const b=document.createElement("button");b.className="src";b.id="pon";b.innerHTML=`<span class="ic">${I("eye")}</span><span><b>Tek seferlik fotoğraf</b><small>Bir kez açılır, sonra kaybolur</small></span>`;b.onclick=()=>{closeLayer("plus");onceSend()};ph.after(b);
+   const z=document.createElement("button");z.className="src";z.id="psch";z.innerHTML=`<span class="ic">${I("bell")}</span><span><b>Mesajı zamanla</b><small>Seçtiğin saatte görünsün</small></span>`;z.onclick=()=>{closeLayer("plus");schOpen()};b.after(z)}}catch(e){console.warn(e)}return r};
+/* Mesaj zamanlama: + menüsünde "Zamanla" (DM ve grup, var olan sohbet). Sunucu olmadığı için mesaj hemen gelecek zamanla yazılır
+   ({at:gelecek, sch:1}); alıcının cihazı zamanı gelene kadar göstermez (renderMsgs öncesi süzülür), son mesaj özeti ve bildirim o ana kadar
+   değişmez. Zamanı gelince açık sohbette görünür ve görenin cihazı chats.last'ı günceller (o zaman uygulama içi bildirim düşer). Telefon
+   bildirimi (push) zamanlanmış mesajda gönderilmez. Gönderen soluk "Zamanlandı · saat" balonu görür; mesaj menüsünde Hemen gönder, silmek
+   için Herkesten sil. */
+const schLabel=t=>{const d=new Date(t),n=new Date();const hm=d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"});
+ if(d.toDateString()===n.toDateString())return"bugün "+hm;const y=new Date(n);y.setDate(n.getDate()+1);if(d.toDateString()===y.toDateString())return"yarın "+hm;
+ return d.toLocaleDateString("tr-TR",{day:"numeric",month:"short"})+" "+hm};
+function schOpts(){const n=new Date(),o=[];o.push(["1 saat sonra",now()+H]);const ev=new Date(n);ev.setHours(20,0,0,0);if(ev>n)o.push(["Bu akşam 20:00",+ev]);
+ const tm=new Date(n);tm.setDate(n.getDate()+1);tm.setHours(9,0,0,0);o.push(["Yarın 09:00",+tm]);return o}
+function schOpen(){const k=pinKey();if(!k)return;if(!S.chats[k.cid])return toast("Önce bir mesaj gönder, sonra zamanlayabilirsin.");
+ const pad=x=>String(x).padStart(2,"0");const dflt=new Date(now()+H);const loc=`${dflt.getFullYear()}-${pad(dflt.getMonth()+1)}-${pad(dflt.getDate())}T${pad(dflt.getHours())}:${pad(dflt.getMinutes())}`;
+ const l=sheet("sch","Mesajı zamanla",`<form class="schf" id="schF"><textarea class="in" id="schT" maxlength="2000" placeholder="Mesaj yaz…"></textarea>
+  <div class="schq">${schOpts().map(([t,v],i)=>`<button type="button" data-schv="${v}" aria-pressed="${i===0}">${esc(t)}</button>`).join("")}<button type="button" data-schv="c" aria-pressed="false">Başka zaman</button></div>
+  <input class="in" type="datetime-local" id="schD" value="${loc}" hidden><button class="btn block">Zamanla</button></form>`);
+ const ta=$("#schT",l),dt=$("#schD",l);let pick=schOpts()[0][1];const mi=$("#msgIn");if(mi&&mi.value.trim())ta.value=mi.value.trim();ta.focus();
+ $$("[data-schv]",l).forEach(b=>b.onclick=()=>{$$("[data-schv]",l).forEach(x=>x.setAttribute("aria-pressed",x===b));if(b.dataset.schv==="c"){dt.hidden=false;pick=null}else{dt.hidden=true;pick=+b.dataset.schv}});
+ $("#schF",l).onsubmit=async e=>{e.preventDefault();if(!guard())return;const v=kidClean(ta.value.trim());if(!v)return toast("Mesaj boş.");
+  const at=pick||(dt.value?new Date(dt.value).getTime():0);if(!at||at<now()+60e3)return toast("En az bir dakika sonrasını seç.");
+  closeLayer("sch");if(mi&&mi.value.trim()===v){mi.value="";try{cfGrow(mi,true)}catch{}try{draftSet(S.route.params.key,"")}catch{}}
+  const mid=rid();const msg={from:S.uid,at,text:v,sch:1};S.msgs=[...S.msgs,{id:mid,...msg}].sort((a,b)=>a.at-b.at);renderMsgs();
+  if(await write(()=>DB.set(`chats/${k.cid}/msgs/${mid}`,msg)))toast("Zamanlandı: "+schLabel(at));else{S.msgs=S.msgs.filter(x=>x.id!==mid);renderMsgs()}}}
+/* zamanı gelmemiş başkasının mesajı görünmez; zamanı gelince yeniden çizilir ve son mesaj özeti güncellenir */
+let schT=0;
+function schDue(k){const t=now();let next=Infinity;for(const m of S.msgs)if(m.sch&&m.at>t)next=Math.min(next,m.at);clearTimeout(schT);
+ if(next<Infinity&&next-t<2147e6)schT=setTimeout(()=>{if(pinKey())renderMsgs()},next-t+300);
+ const c=S.chats[k.cid]||{};const due=S.msgs.filter(m=>m.sch&&m.at<=t&&!m.del&&m.at>((c.last||{}).at||0));const last=due[due.length-1];
+ if(last){S.chats={...S.chats,[k.cid]:{...c,last:{text:msgPreview(last).slice(0,80),from:last.from,at:last.at}}};write(()=>DB.update("chats/"+k.cid,{last:{text:msgPreview(last).slice(0,80),from:last.from,at:last.at},updatedAt:last.at}),{quiet:true})}}
+const renderMsgsSch61=renderMsgs;
+renderMsgs=function(...a){const k=pinKey();if(!k)return renderMsgsSch61.apply(this,a);const all=S.msgs;const t=now();
+ if(all.some(m=>m.sch&&m.at>t&&m.from!==S.uid))S.msgs=all.filter(m=>!(m.sch&&m.at>t&&m.from!==S.uid));let r;try{r=renderMsgsSch61.apply(this,a)}finally{S.msgs=all}
+ try{schDue(k)}catch(e){console.warn(e)}return r};
+/*}@js:61CHAT*/
 /*@js:550{*/
 /* 5.5.0
    Rota fotoğrafa bakar: Rota sohbetinde fotoğraf gönderilebilir (sendToBot artık `img` taşır; `botImg` 640 px / 60000 karaktere küçültür,
@@ -12249,7 +12373,7 @@ function chatInfo(key){key=key||(S.route.params&&S.route.params.key);if(!key)ret
   const row=(id,ic,col,t,sub,extra)=>`<button class="ci-row" data-ci="${id}"><span class="ic" style="background:${col}">${I(ic)}</span><span class="t"><b>${t}</b>${sub?`<small>${sub}</small>`:""}</span>${extra||I("next")}</button>`;
   const rows=`<div class="ci-list">${row("theme","palette","linear-gradient(135deg,#7c3aed,#ec4899)","Tema","Sohbet rengi ve duvar kağıdı: "+esc(th))}${row("nick","type","#0C7A63","Takma adlar",nicks?nicks+" takma ad":"Bu sohbette kime ne denileceğini seç")}${dm?row("priv","lock","#1d4ed8","Gizlilik ve güvenlik",iBlocked(uid)?"Engelledin":"Engelle, görüldü bilgisi"):""}${dm?row("group","add","#d97706","Grup sohbeti oluştur","@"+esc(p.username)+" ile birlikte"):""}</div>`;
   const hid=(S.hidden&&S.hidden.msgs)||{};const msgs=(S.msgs||[]).filter(m=>m&&!m.del&&!m.sys&&!(m.id&&hid[m.id]));
-  const media=msgs.filter(m=>m.img||m.video).reverse(),posts=msgs.filter(m=>m.post&&postById(m.post)&&canSee(postById(m.post))).reverse();
+  const media=msgs.filter(m=>!m.once&&(m.img||m.video)).reverse(),posts=msgs.filter(m=>m.post&&postById(m.post)&&canSee(postById(m.post))).reverse();
   const links=[];for(const m of msgs.slice().reverse())for(const u of String(m.text||"").match(/https?:\/\/[^\s<>"']+/gi)||[])if(links.length<60)links.push({u,m});
   const tabs=`<div class="ci-tabs" role="tablist">${[["media","image","Medya",media.length],["posts","grid","Paylaşımlar",posts.length],["links","link","Bağlantılar",links.length]].map(([id,ic,lb,n])=>`<button data-cit="${id}" aria-pressed="${tab===id}">${I(ic)}${lb}${n?` (${n})`:""}</button>`).join("")}</div>`;
   let body="";
