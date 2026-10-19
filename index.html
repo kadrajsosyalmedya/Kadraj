@@ -11908,7 +11908,9 @@ function cfAfter(box,key,k,old,pinned,fresh){
  if(!box._cfw){box._cfw=1;box.addEventListener("scroll",()=>{if(CF.bottom&&CF.raf)box._pin=true},{passive:true})}
  box.style.setProperty("--cf-tp",(-Math.round((performance.now()-CF.tp0)%1000))+"ms");
  cfDecor(box,key,k);
- if(fresh||!old){cfStop();CF.en.clear();CF.key=key;box._cfKey=key;if(pinned){box.scrollTop=box.scrollHeight;box._pin=true}cfMeas(box);return}
+ /* ilk çizim ya da mesajlar ilk kez geldi (sohbet açılınca liste boş başlar): kayma yok, en altta açılır */
+ const bulk=!!old&&!old.order.some(x=>x[0]==="r")&&currentMsgs().length>2;
+ if(fresh||!old||bulk){cfStop();CF.en.clear();CF.key=key;box._cfKey=key;if(pinned){box.scrollTop=box.scrollHeight;box._pin=true}cfMeas(box);return}
  const br=box.getBoundingClientRect(),st1=box.scrollTop;const N=cfRows(box,st1,br.top,cfTyU(k));const cur=N.rows;
  /* çapa: eskiden görünen ilk ortak satır yerinde kalır */
  let U=0;for(const kk of old.order){if(kk==="ph"||kk==="ty"||kk==="stream"||kk.startsWith("sr:"))continue;const o=old.rows.get(kk),n=cur.get(kk);if(!n)continue;if(o.y+o.h-old.st>0){U=n.y-o.y;break}}
@@ -11925,7 +11927,8 @@ function cfAfter(box,key,k,old,pinned,fresh){
  if(CF.mo&&!mo){const n=cur.get(CF.mo.key);if(n&&n.bel)CF.mo.el=n.bel;else cfMoEnd()}
  /* girişler */
  const t0=performance.now();
- for(const x of added){if(CF.mo&&x===CF.mo.key)continue;const n=cur.get(x);const kind=x==="ty"?"ty":x[0]==="r"||x==="stream"?(n.el.classList.contains("me")?"me":"in"):x[0]==="s"||x==="hero"||x==="empty"?"st":null;if(kind&&!CF.en.has(x))CF.en.set(x,{t0,kind})}
+ const many=added.filter(x=>x[0]==="r").length>6;/* çok mesaj birden geldiyse (çevrimdışından dönüş) tek tek girmez */
+ for(const x of added){if(CF.mo&&x===CF.mo.key||many&&x[0]==="r")continue;const n=cur.get(x);const kind=x==="ty"?"ty":x[0]==="r"||x==="stream"?(n.el.classList.contains("me")?"me":"in"):x[0]==="s"||x==="hero"||x==="empty"?"st":null;if(kind&&!CF.en.has(x))CF.en.set(x,{t0,kind})}
  /* sertlik: kendi mesajın hızlı, yazıyor yavaş */
  const has=f=>added.some(x=>{const n=cur.get(x);return n&&f(x,n)});
  const meNew=has((x,n)=>x[0]==="r"&&n.el.classList.contains("me")),inNew=has((x,n)=>(x[0]==="r"||x==="stream")&&!n.el.classList.contains("me"));
