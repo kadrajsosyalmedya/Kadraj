@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60005">
+<meta name="kadraj-version" content="60006">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -886,6 +886,7 @@ html.reduce-motion #verBar,html.reduce-motion #verBlock,html.reduce-motion #verB
 .wn-badge{display:flex;width:max-content;margin:14px auto 0;align-items:center;gap:6px;font:600 .66rem/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent);animation:inUp .5s ease .15s both}
 .wn-title{margin:12px 0 8px;font:700 clamp(2.5rem,12vw,3.3rem)/1.02 var(--f-display);letter-spacing:-.045em;background:linear-gradient(100deg,var(--accent) 0%,var(--accent) 22%,#0ea5e9 41%,#8b5cf6 51%,#0ea5e9 61%,var(--accent) 80%,var(--accent) 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;padding-bottom:.08em;animation:inUp .55s cubic-bezier(.2,.8,.2,1) .2s both,wnGrad 5.5s ease-in-out .8s infinite alternate}
 @keyframes wnGrad{from{background-position:100% 0}to{background-position:0 0}}
+.wn-name{margin:-4px auto 6px;font:700 .95rem/1.2 var(--f-display);letter-spacing:.02em;color:var(--accent)}
 .wn-sub{margin:0 auto;max-width:19rem;color:var(--muted);font-size:.95rem;line-height:1.45;animation:inUp .5s ease .3s both}
 .wn-list{display:grid;gap:10px;padding:6px 14px 10px}
 .wn-item{display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;border-radius:20px;background:var(--surface);border:1px solid var(--line);text-align:left;animation:wnIn .5s cubic-bezier(.2,.9,.3,1.1) calc(.32s + var(--i) * .055s) both;transition:transform .15s,background-color .15s}
@@ -3679,6 +3680,15 @@ html.reduce-motion .reel .rdisc img{animation:none}
 @media (prefers-reduced-motion:reduce){:root[data-ui] *::before,:root[data-ui] *::after{animation:none!important}:root[data-ui] *{animation-delay:0s!important}}
 html.reduce-motion *{animation-delay:0s!important}
 /*}@css:60UI*/
+/*@css:61PERF{*/
+/* 6.0.5 hafif cam: Vizör'deki canlı bulanıklık (backdrop-filter) zayıf telefonlarda her kaydırma karesinde yeniden hesaplanıp kasıyordu.
+   html.k-lite'ta bulanıklık kapanır, cam yüzeyler neredeyse aynı renkte düz yarı saydam olur (görünüm çok az değişir). */
+html.k-lite *,html.k-lite *::before,html.k-lite *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.k-lite:root[data-ui="vizor"] #top{background:color-mix(in srgb,var(--bg) 94%,transparent)}
+html.k-lite:root[data-ui="vizor"] .dock nav{background:color-mix(in srgb,var(--surface) 97%,transparent)}
+html.k-lite:root[data-ui="vizor"] .setq,html.k-lite:root[data-ui="vizor"] .sr-sug{background:var(--surface)}
+html.k-lite .scrim{background:rgba(0,0,0,.42)}
+/*}@css:61PERF*/
 /*@css:580{*/
 /* 5.8.0 Cephe kartı ve sohbetteki savaşa katıl düğmesi */
 .square.cpcard{background:linear-gradient(135deg,#7f1d1d,#0c7a63 70%,#0a5a8a)}
@@ -3725,7 +3735,11 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60005,APP_VER="6.0.5";
+const APP_V=60006,APP_VER="6.0.6";
+/* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
+const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
+const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
+const APP_FULL=APP_NAME?`${APP_VER} ${APP_NAME}`:APP_VER;
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -6092,7 +6106,7 @@ const WN_MARK=`<svg class="wn-mark" viewBox="0 0 24 24" stroke-width="2.6" strok
 function showWhatsNew(force){if($('#overlay [data-layer="whatsnew"]'))return;if(!force&&verLvl(LS.get("kadraj_seen_ver",0)||0)>=verLvl(APP_V))return;
  const items=WN_ITEMS.filter(x=>verLvl(x.v)===verLvl(APP_V)).map((x,i)=>`<button type="button" class="wn-item" data-act="wnGo" data-r="${x.go}" style="--i:${i};--g:${x.g}"><span class="wn-ic">${I(x.ic)}</span><span class="wn-t"><b>${esc(x.t)}</b><span>${esc(x.d)}</span></span>${I("next")}</button>`).join("");
  openLayer("whatsnew",`<div class="full wn" role="dialog" aria-modal="true" aria-label="Kadraj ${esc(APP_VER)} ile gelenler"><button class="ib plain wn-x" data-act="close" aria-label="Kapat">${I("close")}</button>
- <div class="body"><div class="wn-hero"><i class="wn-blob b1"></i><i class="wn-blob b2"></i><i class="wn-blob b3"></i>${WN_MARK}<div class="wn-badge">Yeni sürüm</div><h2 class="wn-title">Kadraj ${esc(APP_VER)}</h2><p class="wn-sub">Bu sürümle gelenler:</p></div>
+ <div class="body"><div class="wn-hero"><i class="wn-blob b1"></i><i class="wn-blob b2"></i><i class="wn-blob b3"></i>${WN_MARK}<div class="wn-badge">Yeni sürüm</div><h2 class="wn-title">Kadraj ${esc(APP_VER)}</h2>${APP_NAME?`<div class="wn-name">${esc(APP_NAME)} güncellemesi</div>`:""}<p class="wn-sub">Bu sürümle gelenler:</p></div>
  <div class="wn-list">${items}</div></div>
  <div class="wn-foot"><button type="button" class="btn block" data-act="wnOk">Hadi başlayalım${I("next")}</button></div></div>`,{noScrim:true,onClose:()=>LS.set("kadraj_seen_ver",APP_V)})}
 ACT.wnOk=()=>{vib(12);closeLayer("whatsnew")};
@@ -6402,9 +6416,9 @@ function vSettings(){const p=me();const pal=accentPal();const dark=isDark();cons
  h+=sec("yardim","Yardım",
   btn({a:'data-act="invite"',ic:"users",c:"#0A84FF",t:"Arkadaşlarını davet et",s:"Birlikte kullanmanın yolu",k:"davet bağlantı"})+
   btn({a:'data-msg="bot:rota"',ic:"spark",c:"#0C7A63",t:"Rota'ya sor",s:"Yapay zekâ rehberi",k:"yardım yapay zeka asistan"})+
-  btn({a:'data-act="whatsnew"',ic:"gift",c:"#FF2D55",t:"Neler yeni?",s:`Kadraj ${APP_VER} yenilikleri`,k:"yenilikler sürüm güncelleme"}));
+  btn({a:'data-act="whatsnew"',ic:"gift",c:"#FF2D55",t:"Neler yeni?",s:`Kadraj ${APP_FULL} yenilikleri`,k:"yenilikler sürüm güncelleme"}));
  h+=sec("hakkinda","Hakkında",
-  kv({ic:"info",c:"#8E8E93",t:"Sürüm",v:`Kadraj ${APP_VER} · Firebase`,mono:1,k:"versiyon"})+
+  kv({ic:"info",c:"#8E8E93",t:"Sürüm",v:`Kadraj ${APP_FULL} · Firebase`,mono:1,k:"versiyon"})+
   btn({a:'data-act="checkver"',ic:"rotate",c:"#0A84FF",t:"Güncellemeleri denetle",k:"güncelle yeni sürüm"})+
   kv({ic:"globe",c:"#30B0C7",t:"Veri",s:S.mode==="cloud"?"Arkadaşlarınla canlı":"Yalnızca bu cihazda",v:S.mode==="cloud"?"Firebase":"Demo",k:"firebase demo"})+
   kv({ic:"radio",c:"#34C759",t:"Şu an açık",v:`${S.online.size+1} kişi`,k:"çevrimiçi aktif"})+
@@ -6417,7 +6431,7 @@ function vSettings(){const p=me();const pal=accentPal();const dark=isDark();cons
   btn({a:'data-act="resetcfg"',ic:"link",c:"#8E8E93",t:S.mode==="cloud"?"Firebase bağlantısını değiştir":"Firebase'i kur",s:S.mode==="cloud"?"Kurulum ekranına döner":"Arkadaşlarınla konuşmak için gerekli",k:"firebase bağlantı kurulum"})+
   btn({a:'data-act="delacct"',ic:"trash",c:"#FF3B30",red:1,t:"Hesabı sil",s:"Profil, paylaşımlar ve hikâyeler kalıcı olarak silinir",chev:false,k:"hesap sil"}));
  h+=`<div class="empty" id="setEmpty" hidden><span class="ic">${I("search")}</span><b>Sonuç yok</b><span>“<span id="setEmptyQ"></span>” için bir ayar bulunamadı.</span></div>`;
- h+=`<div class="setfoot">${VF}<span>Kadraj ${APP_VER}</span></div>`;
+ h+=`<div class="setfoot">${VF}<span>Kadraj ${APP_FULL}</span></div>`;
  return h}
 function kbFilterSettings(){const q=kbFold(S.setQ||"").trim();const words=q?q.split(/\s+/):[];let any=false;
  for(const s of $$("#main .sxs")){const tm=!!q&&(s.dataset.t||"").includes(q);let vis=0;for(const r of $$("[data-k]",s)){const ok=!q||tm||words.every(w=>r.dataset.k.includes(w));r.hidden=!ok;if(ok)vis++}s.hidden=!vis;if(vis)any=true}
@@ -9954,7 +9968,7 @@ function mdnSync(){let el=document.getElementById("k51Mdn");const r=S.route;cons
  f.insertAdjacentHTML("beforebegin",`<div id="k51Mdn" class="k51mdn${md.lock?" lock":""}" data-key="${esc(key)}" role="status">${I(md.lock?"lock":"admclock")}<span>${esc(txt)}</span></div>`)}
 
 /* ---------- 5 · Sürüm etiketi ve yapımcılar ---------- */
-function verTagSync(){let el=document.getElementById("k51Ver");if(!el){el=document.createElement("div");el.id="k51Ver";el.setAttribute("aria-hidden","true");el.textContent="Kadraj "+APP_VER;document.body.appendChild(el)}
+function verTagSync(){let el=document.getElementById("k51Ver");if(!el){el=document.createElement("div");el.id="k51Ver";el.setAttribute("aria-hidden","true");el.textContent="Kadraj "+APP_FULL;document.body.appendChild(el)}
  el.dataset.r=(S.authed&&S.route&&S.route.name)||"auth";verTagPlace(el)}
 /* dok sağ alt köşeyi kaplıyorsa (Klasik tablet) etiket dokun hemen üstüne çıkar; yoksa CSS'teki köşe */
 function verTagPlace(el){let b="";try{const d=$("#dock");const nav=S.authed&&d&&!d.hidden&&d.querySelector("nav");if(nav){const r=nav.getBoundingClientRect(),vw=innerWidth,vh=(window.visualViewport&&visualViewport.height)||innerHeight;
@@ -12522,6 +12536,20 @@ const vFeedBase60=vFeed;
 vFeed=function(...a){const h=vFeedBase60.apply(this,a);if(K6.postsIn||S.mode!=="cloud")return h;
  const sk=`<div class="k6-skf" role="status" aria-label="Paylaşımlar yükleniyor">${K6_SKCARD.repeat(2)}</div>`;const i=h.indexOf('<article class="card"');return i<0?h+sk:h.slice(0,i)+sk+h.slice(i)};
 /*}@js:60UI*/
+/*@js:61PERF{*/
+/* 6.0.5 hafif cam (k-lite): sahibinin telefonunda Vizör kasıyor, Klasik kasmıyordu; neden canlı bulanıklık. Cihaz zayıfsa (bellek ≤4 GB ya da
+   çekirdek ≤4) ya da ilk kaydırmalarda kareler yavaşsa (yüzde 75'lik kare süresi > 22 ms) html.k-lite açılır ve cihazda hatırlanır
+   (kadraj_lite: 1 açık, 0 hızlı cihaz). */
+(function(){const de=document.documentElement;const v=LS.get("kadraj_lite",null);
+ const weak=(navigator.deviceMemory&&navigator.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4);
+ if(v===1||(v==null&&weak)){de.classList.add("k-lite");return}if(v===0)return;
+ let fr=[],last=0,on=false,stopT=0,runs=0;
+ const tick=t=>{if(last)fr.push(t-last);last=t;if(on)requestAnimationFrame(tick)};
+ const judge=()=>{on=false;last=0;if(fr.length<20)return;const a=fr.slice().sort((x,y)=>x-y);const p75=a[Math.floor(a.length*.75)];runs++;
+  if(p75>22){de.classList.add("k-lite");LS.set("kadraj_lite",1);removeEventListener("scroll",onS,true)}else if(runs>=3){LS.set("kadraj_lite",0);removeEventListener("scroll",onS,true)}fr=[]};
+ const onS=()=>{if(document.documentElement.dataset.ui!=="vizor")return;if(!on){on=true;requestAnimationFrame(tick)}clearTimeout(stopT);stopT=setTimeout(judge,400)};
+ addEventListener("scroll",onS,{capture:true,passive:true})})();
+/*}@js:61PERF*/
 /*@js:580{*/
 /* 5.8.0 Cephe (piksel savaşı; 5.9.0'da baştan yazıldı): oyunun bütün kodu ayrı dosyada (cephe.js, haritalar cephe/*.png, menü resimleri cephe/*.jpg). Burada yalnızca yükleyici var:
    Keşfet'teki Cephe kartı (data-act="cephe") cephe.js'i ilk dokunuşta bir kez indirir (?v=APP_V) ve CEPHE.open() çağırır.
