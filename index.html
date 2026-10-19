@@ -11465,7 +11465,7 @@ async function rtTypewrite(key,text){const box=$("#msgs");if(!box||!rtTypeOk(key
   if(!rtTypeOk(key)||!S.stream||S.stream.key!==key)return;
   if(!bub.isConnected){const bs=box.querySelectorAll(".msg.ai");bub=bs[bs.length-1];if(!bub)return}/* 5.2.3: yazarken sohbet yeniden çizilirse yeni baloncuktan devam */
   n=Math.min(text.length,n+step);const sp=text.indexOf(" ",n);if(sp>n&&sp-n<6)n=sp;
-  S.stream.text=text.slice(0,n);const pin=box.scrollHeight-box.scrollTop-box.clientHeight<80;bub.innerHTML=md(S.stream.text);if(pin)box.scrollTop=box.scrollHeight}}
+  S.stream.text=text.slice(0,n);const pin=(CF.bottom&&!!CF.raf)||box.scrollHeight-box.scrollTop-box.clientHeight<80;bub.innerHTML=md(S.stream.text);if(pin)msgsPin(box)/* 6.0: balon büyüdükçe kayarak (60CHAT) */}}
 const botReplyBase511=botReply;
 botReply=async function(b,msgs){const key="u:"+b.uid;const smp=S.caps.sample;let calls=0;
  /* köprü yanıtı tek seferde onText ile verir: ilk çağrı tutulur (yazıyor noktaları kalır); ikinci çağrı gelirse gerçek akıştır, iletilir */
