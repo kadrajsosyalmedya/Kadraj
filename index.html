@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60002">
+<meta name="kadraj-version" content="60005">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3725,7 +3725,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60002,APP_VER="6.0.2";
+const APP_V=60005,APP_VER="6.0.5";
 const verNorm=x=>{x=Math.max(0,Math.floor(+x||0));return x<1000?Math.floor(x/10)*10000+(x%10)*100:x};
 const verLvl=x=>Math.floor(verNorm(x)/100);
 /* 4.9: fark sürüm adımıyla sayılır (4.9 → 5.0 bir adım); eskisi ana*100+ara farkıydı ve 5.0'ı 91 sürüm ileride sanıyordu */
@@ -5778,6 +5778,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 5.6: Alt menü: Akış, Keşfet, Klaket, ortada +, Sohbet, Bildirim, Ben. Bildirimler (beğeni, yorum, takip) artık alttaki Bildirim düğmesinde, yeni olanların sayısı üstünde yazar; Akış'ın üstündeki zil kaldırıldı. Klaket düğmesine dokununca Klaketler açılır. Birinin profilinden bir Klaket açarsan yalnızca o kişinin Klaketleri profildeki sırasıyla gelir (yukarıda başlıkta @kullanıcıadı yazar); Akış'tan, menüden ya da sana gönderilen bir Klaketten açarsan diğerleri karışık gelir. Klaketler her girişte karışık sırayla gelir (aynı ziyarette sıra değişmez; bir Klaketi seçerek açarsan o en başta gelir). Rota her Kadraj güncellemesinde Akış'a küçük ve her seferinde farklı bir paylaşım yapar (not, anket ya da fotoğraf).
 - 5.7 sohbet ayrıntıları: birebir ya da grup sohbetinde üstteki ada veya sağ üstteki (i) düğmesine dokun. Orada Profil (grupta Üyeler), Ara, Sessize al (o sohbetten bildirim gelmez), Seçenekler (sabitle, sil, gruptan ayrıl); Tema (sohbet rengi ve duvar kağıdı, eskiden üst çubuktaki palet düğmesiydi), Takma adlar (sohbetteki herkes görür), Gizlilik ve güvenlik (engelle, görüldü bilgisi, çevrimiçi durumu), Grup sohbeti oluştur; altta sohbette paylaşılan Medya, Paylaşımlar ve Bağlantılar var. Süreli mesaj yok.
 - 6.0 sohbet: gönderdiğin mesaj alttan büyüyerek girer, sohbet zıplamadan kayar; karşı taraf yazarken yazıyor balonu yavaşça yükselir ve mesaj gelince aynı yerde o mesaja dönüşür. Görüldü fotoğrafı (Instagram gibi) gördüğü son mesajının altında durur, yenisini görünce aşağı kayar; yer açmaz, karşı taraf yazarken ya da yanıt verince de yerinde kalır. Sohbet listesinde Rota'nın altındaki "Test botu" ile bunları deneyebilirsin: mesajını görür, yazar, hazır yanıt verir; "yardım" yazınca komutları (yaz, seri, gör, görme, bekle, vazgeç, uzun, fotoğraf, bildirim) gösterir. "bildirim" yazıp sohbetten çıkarsan 5 saniye sonra bildirim gelir.
+- 6.0.5 sohbet: Mesaja basılı tut › Sabitle: en fazla 3 mesaj sohbetin üstünde şeritte durur, şeride dokununca o mesaja gider (birden çoksa sıradakine geçer), X ile kaldırılır (birebir ve grupta; Meydan'da yok). + menüsü › Tek seferlik fotoğraf: alıcı bir kez açar, kapatınca silinir ve "Açıldı" yazar; gönderen fotoğrafı görmez, iletilemez. + menüsü › Mesajı zamanla: 1 saat sonra, bu akşam 20:00, yarın 09:00 ya da istediğin saat; saati gelene kadar karşı taraf görmez, sen soluk "Zamanlandı" balonu görürsün, basılı tut › Hemen gönder; zamanlanmış mesaj telefon bildirimi göndermez.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
 - 6.0 görünüm: arayüz yenilendi (Vizör ve Klasik ikisinde de): daha ferah kartlar, sayfa geçişleri yönlü (ileri sağdan, geri soldan, sekme alttan), alttan açılan pencerelerde seçenekler sırayla gelir. Profilde kişinin fotoğrafından bulanık kapak şeridi, Keşfet'te ara ara büyük karelerle mozaik ızgara, Bildirimler'de her satırda beğeni/yorum/takip rozeti, Ayarlar'da renkli ikonlar, yüklenirken iskelet ve ışıltı. Hareket azaltılmışsa animasyonlar kapanır.
 - 6.0 satranç: varsayılan taş seti Modern, tahta yeşil Turnuva (lobideki Görünüm'den değişir; daha önce seçim yapan kendi seçimini korur). Lobi: Botlara karşı, Arkadaşınla, Bulmacalar, Aynı telefonda. Oyun ekranı: telefonda hamleler üstte, tahta geniş, düğmeler altta; bilgisayarda hamle tablosu sağda. Ön hamle: rakip düşünürken taşını oynarsın, sıra gelince yapılır (kırmızı). Sağ tık kareyi işaretler, sağ tıkla sürükleyince ok çizer (shift yeşil, ctrl/alt mavi). Arkadaşınla çevrim içi oyunda da oyun incelemesi çalışır: Kitap, En iyi, Hata rozetleri, canlı doğruluk, değerlendirme çubuğu (satranç menüsünde Oyun incelemesi: canlı, oyun bitince ya da kapalı). Oyun sonunda yeni sonuç kartı.
@@ -6074,6 +6075,9 @@ setTimeout(verTidyCache,9000);
 /* ---- A · Neler yeni ---- */
 /* Yalnızca şu anki ara sürümün maddeleri gösterilir (v: o sürümün APP_V'si); yeni sürümde eski maddeleri silip yenilerini yaz. */
 const WN_ITEMS=[
+ {v:60005,ic:"pin",g:"linear-gradient(135deg,#f97316,#ffb25b)",t:"Sabit mesaj",d:"Mesaja basılı tut › Sabitle: önemli mesajlar sohbetin üstünde durur, dokununca oraya gider",go:"chats"},
+ {v:60005,ic:"eye",g:"linear-gradient(135deg,#7c3aed,#ec4899)",t:"Tek seferlik fotoğraf",d:"+ › Tek seferlik fotoğraf: karşı taraf bir kez açar, sonra kaybolur",go:"chats"},
+ {v:60005,ic:"bell",g:"linear-gradient(135deg,#0c7a63,#2f6bff)",t:"Mesajı zamanla",d:"+ › Mesajı zamanla: yazdığın mesaj seçtiğin saatte görünür",go:"chats"},
  {v:60000,ic:"flag",g:"linear-gradient(135deg,#b91c1c,#1d4ed8)",t:"Cephe 6.0: gerçek cepheler",d:"İki ordu cephede kendi bayraklarıyla karşı karşıya; kalabalık ve güçlü olan ilerler. Ne kadar çok asker gönderirsen o kadar hızlı ilerlersin, saldırı dokunduğun yere doğru gider",go:"explore"},
  {v:60000,ic:"users",g:"linear-gradient(135deg,#0c7a63,#d97706)",t:"Ekonomi, ordu ve generaller",d:"Şehirler asker, fabrikalar altın üretir; kışla, hastane, ordu eğitimi, kalkınma ve generaller. Oyunu 2x ya da 3x hızlandır",go:"explore"},
  {v:60000,ic:"hand",g:"linear-gradient(135deg,#2563eb,#16a34a)",t:"Barış, vasal ve kuşatma",d:"Barış antlaşması imzala, küçük komşunu vasal yap; çevrelediğin düşman toprağı senin olur, işgal ettiğin yerler zamanla asimile olur",go:"explore"},
