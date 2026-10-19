@@ -3680,6 +3680,15 @@ html.reduce-motion .reel .rdisc img{animation:none}
 @media (prefers-reduced-motion:reduce){:root[data-ui] *::before,:root[data-ui] *::after{animation:none!important}:root[data-ui] *{animation-delay:0s!important}}
 html.reduce-motion *{animation-delay:0s!important}
 /*}@css:60UI*/
+/*@css:61PERF{*/
+/* 6.0.5 hafif cam: Vizör'deki canlı bulanıklık (backdrop-filter) zayıf telefonlarda her kaydırma karesinde yeniden hesaplanıp kasıyordu.
+   html.k-lite'ta bulanıklık kapanır, cam yüzeyler neredeyse aynı renkte düz yarı saydam olur (görünüm çok az değişir). */
+html.k-lite *,html.k-lite *::before,html.k-lite *::after{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html.k-lite:root[data-ui="vizor"] #top{background:color-mix(in srgb,var(--bg) 94%,transparent)}
+html.k-lite:root[data-ui="vizor"] .dock nav{background:color-mix(in srgb,var(--surface) 97%,transparent)}
+html.k-lite:root[data-ui="vizor"] .setq,html.k-lite:root[data-ui="vizor"] .sr-sug{background:var(--surface)}
+html.k-lite .scrim{background:rgba(0,0,0,.42)}
+/*}@css:61PERF*/
 /*@css:580{*/
 /* 5.8.0 Cephe kartı ve sohbetteki savaşa katıl düğmesi */
 .square.cpcard{background:linear-gradient(135deg,#7f1d1d,#0c7a63 70%,#0a5a8a)}
@@ -12527,6 +12536,20 @@ const vFeedBase60=vFeed;
 vFeed=function(...a){const h=vFeedBase60.apply(this,a);if(K6.postsIn||S.mode!=="cloud")return h;
  const sk=`<div class="k6-skf" role="status" aria-label="Paylaşımlar yükleniyor">${K6_SKCARD.repeat(2)}</div>`;const i=h.indexOf('<article class="card"');return i<0?h+sk:h.slice(0,i)+sk+h.slice(i)};
 /*}@js:60UI*/
+/*@js:61PERF{*/
+/* 6.0.5 hafif cam (k-lite): sahibinin telefonunda Vizör kasıyor, Klasik kasmıyordu; neden canlı bulanıklık. Cihaz zayıfsa (bellek ≤4 GB ya da
+   çekirdek ≤4) ya da ilk kaydırmalarda kareler yavaşsa (yüzde 75'lik kare süresi > 22 ms) html.k-lite açılır ve cihazda hatırlanır
+   (kadraj_lite: 1 açık, 0 hızlı cihaz). */
+(function(){const de=document.documentElement;const v=LS.get("kadraj_lite",null);
+ const weak=(navigator.deviceMemory&&navigator.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4);
+ if(v===1||(v==null&&weak)){de.classList.add("k-lite");return}if(v===0)return;
+ let fr=[],last=0,on=false,stopT=0,runs=0;
+ const tick=t=>{if(last)fr.push(t-last);last=t;if(on)requestAnimationFrame(tick)};
+ const judge=()=>{on=false;last=0;if(fr.length<20)return;const a=fr.slice().sort((x,y)=>x-y);const p75=a[Math.floor(a.length*.75)];runs++;
+  if(p75>22){de.classList.add("k-lite");LS.set("kadraj_lite",1);removeEventListener("scroll",onS,true)}else if(runs>=3){LS.set("kadraj_lite",0);removeEventListener("scroll",onS,true)}fr=[]};
+ const onS=()=>{if(document.documentElement.dataset.ui!=="vizor")return;if(!on){on=true;requestAnimationFrame(tick)}clearTimeout(stopT);stopT=setTimeout(judge,400)};
+ addEventListener("scroll",onS,{capture:true,passive:true})})();
+/*}@js:61PERF*/
 /*@js:580{*/
 /* 5.8.0 Cephe (piksel savaşı; 5.9.0'da baştan yazıldı): oyunun bütün kodu ayrı dosyada (cephe.js, haritalar cephe/*.png, menü resimleri cephe/*.jpg). Burada yalnızca yükleyici var:
    Keşfet'teki Cephe kartı (data-act="cephe") cephe.js'i ilk dokunuşta bir kez indirir (?v=APP_V) ve CEPHE.open() çağırır.
