@@ -4300,7 +4300,8 @@ async function copyText(s,msg){try{await navigator.clipboard.writeText(s);toast(
 /* ============ Katmanlar ============ */
 function openLayer(name,html,{onClose,noScrim}={}){closeLayer(name);const d=document.createElement("div");d.className="layer";d.dataset.layer=name;d.innerHTML=(noScrim?"":`<div class="scrim"></div>`)+html;$("#overlay").appendChild(d);const sc=d.querySelector(".scrim");if(sc)sc.onclick=()=>closeLayer(name);d._onClose=onClose;return d}
 function closeLayer(name){const d=$(`#overlay [data-layer="${name}"]`);if(d){const f=d._onClose;d._onClose=null;d.remove();f&&f()}}
-function closeTop(){const ls=$$("#overlay .layer");if(ls.length)closeLayer(ls[ls.length-1].dataset.layer)}
+/* 6.0: Esc ve geri tuşu en üstteki katmanı kapatır; katmanın _guard()'ı true dönerse kapatmaz (Cephe oyun sürerken önce sorar) */
+function closeTop(){const ls=$$("#overlay .layer");if(!ls.length)return;const d=ls[ls.length-1];if(typeof d._guard==="function"&&d._guard())return;closeLayer(d.dataset.layer)}
 function closeAll(){$$("#overlay .layer").forEach(d=>closeLayer(d.dataset.layer))}
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeTop()});
 function sheet(name,title,body,{tall=false,onClose}={}){return openLayer(name,`<div class="sheet" role="dialog" aria-label="${esc(title||"Seçenekler")}" ${tall?'style="height:82%"':""}><div class="grab"></div>${title?`<h4><span>${esc(title)}</span><button class="ib plain" data-act="close" aria-label="Kapat">${I("close")}</button></h4>`:""}<div class="body">${body}</div></div>`,{onClose})}
