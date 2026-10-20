@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60103">
+<meta name="kadraj-version" content="60104">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3241,6 +3241,14 @@ textarea.in.k1l{box-sizing:border-box;height:3rem;min-height:3rem!important;padd
 .svst .stk-ask .ans{display:block;width:calc(100% - 44px * var(--u));margin:calc(16px * var(--u)) auto calc(20px * var(--u));min-height:calc(76px * var(--u));border-radius:calc(22px * var(--u));background:#F1F3F2;color:#8A9490;font:600 calc(32px * var(--u))/1.2 Figtree,'Avenir Next',sans-serif;padding:0 calc(16px * var(--u))}
 .st-res{padding:0 16px 18px}.st-res .h{font-weight:800;margin:12px 0 6px}.st-res .row{display:flex;align-items:center;gap:10px;padding:6px 0}.st-res .s{font-size:.8rem;color:var(--muted)}
 /*}@css:61STORY*/
+/*@css:61TEST{*/
+.kt-btns{display:grid;gap:8px}.kt-box{margin-top:10px}.kt-box:empty{display:none}.kt-h{margin:16px 0 6px;font:700 .9rem var(--f-body)}
+.kt-busy{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
+.kt-sum{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;border-radius:14px;background:var(--surface-2)}.kt-sum.ok{color:var(--ok)}.kt-sum.bad{color:var(--heart)}
+.kt-sum b{color:var(--fg)}.kt-sum span{font-size:.78rem;color:var(--muted);flex-basis:100%}
+.kt-list{display:grid;gap:2px;margin-top:6px}.kt-row{display:flex;gap:8px;align-items:flex-start;padding:6px 4px;font-size:.86rem}.kt-row .i{flex:none;width:1.1rem;height:1.1rem;margin-top:1px}
+.kt-row.ok .i{color:var(--ok)}.kt-row.bad .i{color:var(--heart)}.kt-row span{display:grid;min-width:0}.kt-row small{color:var(--muted);font-size:.76rem;overflow-wrap:anywhere}
+/*}@css:61TEST*/
 /*@css:61FUN{*/
 /* 6.1 Anılar (js bölgesi 61FUN) */
 .memc{display:flex;gap:12px;align-items:center;margin:4px 16px 12px;padding:10px;border-radius:20px;background:var(--surface);border:1px solid var(--line);position:relative}
@@ -3849,7 +3857,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60103,APP_VER="6.1.3";
+const APP_V=60104,APP_VER="6.1.4";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -12513,6 +12521,21 @@ function stPaint(l,s,owner,pause){let ov=$(".svst",l);if(!ov){ov=document.create
    if(!v||(cur().pv||{})[S.uid]!=null||!guard())return;const j=+v.dataset.stv;vib(12);const c0=cur();if(S.stories[s.id]){S.stories[s.id]={...c0,pv:{...(c0.pv||{}),[S.uid]:j}};DB.update("stories/"+s.id,{pv:{[S.uid]:j}}).catch(()=>{})}paint();return}
   if(k.t==="ask"&&!mine){if(!guard())return;pause(true);const a=await stAsk(k.q,"Yanıtını yaz",160);pause(false);if(a&&await sendMessage("u:"+owner,{text:`Hikâyendeki “${k.q}” sorusuna yanıt: ${kidClean(a)}`}))toast("Yanıtın gönderildi")}}}
 /*}@js:61STORY*/
+/*@js:61TEST{*/
+/* 6.1.4 Yönetici paneli › Kadraj testi: bütün kod kadraj-test.js'te (window.KTEST, başındaki yorum ayrıntılı); burada cephe.js kalıbında yükleyici ve
+   ADM_EXTRA kaydı. Test Kadraj'ı (demo, gerçek veriye dokunmaz), Hızlı test (sandbox'ta otomatik adımlar) ve ajan raporu (testler/rapor.json). */
+let ktP=null;
+function ktLoad(){return ktP||(ktP=new Promise((res,rej)=>{if(window.KTEST)return res();const sc=document.createElement("script");sc.src="kadraj-test.js?v="+APP_V;sc.onload=()=>window.KTEST?res():rej(new Error("yok"));sc.onerror=()=>{ktP=null;rej(new Error("indirilemedi"))};document.head.appendChild(sc)}))}
+function ktGo(fn){if(!S.authed||!S.admin)return;ktLoad().then(()=>fn(window.KTEST)).catch(()=>{ktP=null;toast("Kadraj testi yüklenemedi. İnternetini kontrol et.")})}
+ACT.ktOpen=()=>ktGo(K=>K.open());
+ACT.ktRun=()=>{const b=$("#ktRes");if(b)ktGo(K=>K.run(b))};
+ACT.ktRep=()=>{const b=$("#ktRep");if(b)ktGo(K=>K.report(b))};
+try{ADM_EXTRA.push({id:"ktest",title:"Kadraj testi",desc:"Gerçek veriye dokunmadan dene, testleri gör",icon:"check",order:67,count:()=>({t:"Demo",c:"dim"}),
+ html:()=>`<p class="muted" style="margin:0 0 12px;font-size:.86rem;line-height:1.45">Ajanların test ettiği Kadraj'ın aynısı: Bilal Kara (sen), Ayşe Yıldız ve Can Demir; paylaşımlar, çıkartmalı hikâye, Yakın Arkadaşlar hikâyesi, Anılar, sohbetler. Her şey bu sayfada kalır, gerçek hesaplara ve Firebase'e hiçbir şey gitmez; kapatınca silinir.</p>
+  <div class="kt-btns"><button class="btn block" data-act="ktOpen">${I("play")}Test Kadraj'ı aç</button><button class="btn sec block" data-act="ktRun">${I("check")}Hızlı testi çalıştır</button></div>
+  <div id="ktRes" class="kt-box"></div>
+  <h4 class="kt-h">Ajan raporu</h4><div id="ktRep" class="kt-box"><button class="btn ghost" data-act="ktRep">Son raporu göster</button></div>`})}catch(e){console.warn("ktest",e)}
+/*}@js:61TEST*/
 /*@js:61FUN{*/
 /* 6.1 Anılar: kendi paylaşımlarının bugünkü ay ya da yıl dönümü (aynı ay günü, en az 1 ay önce). S.posts son 300 paylaşımı tuttuğu için kişinin bütün
    paylaşımları oturumda bir kez ayrıca okunur (memLoad, where uid==). Akış'ta hikâye şeridinin altında kart (HOOKS.after, .memc): Gör, fotoğraflıysa
