@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60106">
+<meta name="kadraj-version" content="60107">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3867,7 +3867,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60106,APP_VER="6.1.6";
+const APP_V=60107,APP_VER="6.1.7";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -5152,7 +5152,7 @@ addEventListener("appinstalled",()=>{INSTALL=null;LS.set("kadraj_installed",1);t
 const isStandaloneOld=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch{return false}};
 /* 5.1.11: manifest artık tam ekran (fullscreen); ana ekrandan açılan Kadraj o modda da "uygulama" sayılır */
 const isStandalone=()=>{try{return kgal()!=null||isStandaloneOld()||matchMedia("(display-mode: fullscreen)").matches}catch{return false}};
-if("serviceWorker"in navigator&&(location.protocol==="https:"||location.hostname==="127.0.0.1"||location.hostname==="localhost"))addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
+if("serviceWorker"in navigator&&!/KadrajApp/.test(navigator.userAgent)&&(location.protocol==="https:"||location.hostname==="127.0.0.1"||location.hostname==="localhost"))addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
 async function installApp(){if(isStandalone())return toast("Kadraj zaten ana ekranında açık.");
  if(INSTALL){const ev=INSTALL;INSTALL=null;try{ev.prompt();const r=await ev.userChoice;if(r&&r.outcome==="accepted"){LS.set("kadraj_installed",1);toast("Kadraj yükleniyor…")}}catch{}return scheduleRefresh()}
  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
@@ -12571,6 +12571,12 @@ const APK_URL="https://github.com/kadrajsosyalmedya/Kadraj/releases/latest/downl
 function kgal(){try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return(C.Plugins&&C.Plugins.KadrajGaleri)||null}catch{return null}}
 HOOKS.after.push(r=>{if(r!=="settings"||kgal()||!/Android/i.test(navigator.userAgent))return;const m=$("#main");if(!m||m.querySelector("#appEntry"))return;const d=document.createElement("div");d.id="appEntry";d.className="box";d.style.margin="12px 16px";
  d.innerHTML=`<a class="row" href="${APK_URL}" style="width:100%;color:inherit;text-decoration:none" target="_blank" rel="noopener">${I("image")}<div class="t"><b>Kadraj Android uygulaması</b><div class="s">Telefon galerin Kadraj'ın içinde · APK'yı indir ve kur</div></div>${I("next")}</a>`;const cf=m.querySelector("#cfEntry");if(cf)cf.before(d);else m.appendChild(d)});
+/* 6.1.7: Android uygulamasında sw.js yok. Service worker'ın açtığı sayfaya Capacitor köprüsü eklenmiyor (istek uygulamanın içinden geçmiyor), bu yüzden
+   Galerin çıkmıyordu. Kayıtlı service worker silinir, köprü yoksa sayfa bir kez yeniden açılır (SS kadraj_app_sw döngüyü önler). */
+if(/KadrajApp/.test(navigator.userAgent)&&navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(rs=>{if(!rs.length)return;
+ return Promise.all(rs.map(r=>r.unregister().catch(()=>{}))).then(()=>{if(kgal()||SS.get("kadraj_app_sw"))return;SS.set("kadraj_app_sw","1");location.reload()})}).catch(()=>{});
+HOOKS.after.push(r=>{if(r!=="settings"||!/KadrajApp/.test(navigator.userAgent))return;const m=$("#main");if(!m||m.querySelector("#appInfo"))return;const ok=!!kgal();const d=document.createElement("div");d.id="appInfo";d.className="box";d.style.margin="12px 16px";
+ d.innerHTML=`<div class="row">${I("image")}<div class="t"><b>Kadraj Android uygulaması</b><div class="s">${ok?"Telefon galerin bağlı":"Telefon galerine bağlanılamadı · uygulamayı kapatıp yeniden aç"}</div></div></div>`;const cf=m.querySelector("#cfEntry");if(cf)cf.before(d);else m.appendChild(d)});
 /*}@js:61APP*/
 /*@js:61TEST{*/
 /* 6.1.4 Yönetici paneli › Kadraj testi: bütün kod kadraj-test.js'te (window.KTEST, başındaki yorum ayrıntılı); burada cephe.js kalıbında yükleyici ve
