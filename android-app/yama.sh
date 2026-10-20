@@ -17,3 +17,20 @@ G=android/app/build.gradle
 sed -i "s/versionCode 1$/versionCode ${GITHUB_RUN_NUMBER:-1}/; s/versionName \"1.0\"/versionName \"${VER:-1.0}\"/" "$G"
 grep -n "versionCode\|versionName" "$G"
 grep -c READ_MEDIA_IMAGES "$M"
+# Sabit imza: anahtar GitHub önbelleğinde (~/.android/kadraj.keystore), iş akışı yoksa oluşturur. Depoda anahtar yok.
+cat >> "$G" <<'GR'
+
+android {
+    signingConfigs {
+        kadraj {
+            storeFile file(System.getenv("KADRAJ_KS") ?: (System.getProperty("user.home") + "/.android/kadraj.keystore"))
+            storePassword "kadraj-android"
+            keyAlias "kadraj"
+            keyPassword "kadraj-android"
+        }
+    }
+    buildTypes {
+        debug { signingConfig signingConfigs.kadraj }
+    }
+}
+GR

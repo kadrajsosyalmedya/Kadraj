@@ -25,8 +25,13 @@ jobs:
       - name: İmza anahtarı
         uses: actions/cache@v4
         with:
-          path: ~/.android/debug.keystore
-          key: kadraj-imza-${{ github.ref_name }}-v1
+          path: ~/.android/kadraj.keystore
+          key: kadraj-imza-${{ github.ref_name }}-v2
+      - name: Anahtar yoksa oluştur
+        run: |
+          mkdir -p ~/.android
+          [ -f ~/.android/kadraj.keystore ] || keytool -genkeypair -v -keystore ~/.android/kadraj.keystore -storepass kadraj-android -keypass kadraj-android -alias kadraj -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Kadraj, O=Kadraj, C=TR"
+          keytool -list -keystore ~/.android/kadraj.keystore -storepass kadraj-android | tail -2
       - name: Capacitor projesi
         working-directory: android-app
         run: |
@@ -38,7 +43,9 @@ jobs:
         working-directory: android-app/android
         run: ./gradlew assembleDebug --no-daemon --stacktrace
       - name: APK
-        run: cp android-app/android/app/build/outputs/apk/debug/app-debug.apk kadraj.apk && ls -la kadraj.apk
+        run: |
+          cp android-app/android/app/build/outputs/apk/debug/app-debug.apk kadraj.apk && ls -la kadraj.apk
+          "$ANDROID_HOME"/build-tools/*/apksigner verify --print-certs kadraj.apk | head -3 || true
       - name: Deneme dosyası (main dışı)
         if: github.ref_name != 'main'
         uses: actions/upload-artifact@v4
