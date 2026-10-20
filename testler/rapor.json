@@ -1,13 +1,18 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.3.0 Yıldız",
+  "ver": "6.3.1 Yıldız",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
     {
-      "ad": "Oyunlar tek yerde",
+      "ad": "Oyunlar Ayarlar'da",
       "ok": true,
-      "not": "Keşfet'te Cephe ve Satranç kartları yok, tek Oyunlar kartı 3 kutucuk açtı; XOX/4'lü/Kelime arkadaş listesini (5 kişi) gösterdi."
+      "not": "Keşfet'te oyun kartı yok; Ayarlar › Oyunlar 3 kutucuk açtı (Satranç, Cephe, XOX/4'lü/Kelime), sohbette + › Oyunlar duruyor."
+    },
+    {
+      "ad": "Okul sayacı",
+      "ok": true,
+      "not": "Keşfet'te: ara tatile 27, okulun kapanmasına 248, LGS'ye 235 gün (20 Ekim 2026'da). LGS tarihi MEB açıklayana kadar tahmini (12 Haziran 2027)."
     },
     {
       "ad": "Sohbet + menüsü",
@@ -35,9 +40,9 @@
       "not": "Taslaklar, arşiv, yeni paylaşımlar düğmesi ve okunmadı işaretle testi yine geçti."
     },
     {
-      "ad": "Kadraj testi (28 adım)",
+      "ad": "Kadraj testi (29 adım)",
       "ok": true,
-      "not": "Yönetici › Kadraj testi'nin hızlı testi 28 adımın hepsini geçti."
+      "not": "Yönetici › Kadraj testi'nin hızlı testi 29 adımın hepsini geçti."
     },
     {
       "ad": "Telefonda: notta YouTube şarkısının çalması, Android uygulamasında galeri, geri tuşu ve durum çubuğu",
