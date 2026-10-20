@@ -5940,11 +5940,11 @@ async function sendToBot(uid,payload){const b=BOT[uid];const k=b.key;const path=
  if(onScreen)renderMsgs();else if(settings.notify)toast(`${b.name}: ${String(reply).replace(/\*\*|__|`/g,"").replace(/\s+/g," ").slice(0,70)}`,uid);scheduleRefresh()}
 /* 6.1: köprü kuruluyken hazır yanıta düşülürse Rota nedenini söyler (sahibi "Rota niye hazır cevap" dedi) */
 function rotaWhy(e){if(!kAI.url())return"";if(!kAI.ready())return"(Yapay zekâ bağlantım şu an hazır değil: "+(S.mode!=="cloud"?"demo modundasın":"oturum açılıyor, birazdan tekrar dene")+". Hazır yanıtla cevaplıyorum.)\n\n";
- const c=e&&e.code||"",m=e&&e.message||"";const why=c==="rate_limited"?"bugünlük soru hakkın doldu":c==="free_ai"?"ücretsiz yapay zekânın günlük kotası dolmuş olabilir":c==="network"?"köprüye ulaşılamadı":c==="timeout"?"yanıt çok uzun sürdü":c==="auth"?"oturum doğrulanamadı":m?m.replace(/[.]+$/,""):"yanıt boş geldi";
+ const c=e&&e.code||"",m=e&&e.message||"";if(!e)return"";const why=c==="rate_limited"?(m||"bugünlük soru hakkın doldu").replace(/[.]+$/,""):c==="free_ai"?"ücretsiz yapay zekânın günlük kotası dolmuş olabilir":c==="network"?"köprüye ulaşılamadı":c==="timeout"?"yanıt çok uzun sürdü":c==="auth"?"oturum doğrulanamadı":m?m.replace(/[.]+$/,""):"yanıt boş geldi";
  return"(Yapay zekâ köprüsü yanıt vermedi: "+why+". Hazır yanıtla cevaplıyorum.)\n\n"}
 function fallbackRota(q){for(const[re,a]of FAQ)if(re.test(q))return a;return"Şu an yapay zekâ bağlantım yok, hazır yanıtlarla çalışıyorum. Şunları sorabilirsin: nasıl kullanırım, arkadaşlarımla nasıl konuşurum, fotoğraf yüklenmiyor, Klaket, sesli mesaj, arama, hikâye, tema, şifre. Ya da “Test bildirimleri oluştur” de."}
 async function botReply(b,msgs){const sample=S.caps.sample;if(!sample)return null;const meName=me().name||"kullanıcı";
- const transcript=msgs.slice(-14).map(m=>`${m.from===S.uid?meName:b.name}: ${m.img?"[fotoğraf gönderdi] ":""}${m.text||(m.post?"[bir paylaşım gönderdi: "+(postById(m.post)?.caption||postById(m.post)?.text||"")+"]":"")}`).join("\n");
+ const transcript=msgs.slice(-14).map(m=>`${m.from===S.uid?meName:b.name}: ${m.img?"[fotoğraf gönderdi] ":""}${(m.text||"").replace(/^\(Yapay zekâ [^)]*\)\s*/,"")||(m.post?"[bir paylaşım gönderdi: "+(postById(m.post)?.caption||postById(m.post)?.text||"")+"]":"")}`).join("\n");
  const prompt=b.ai?`${ROTA_SYS}\n\nKonuşma:\n${transcript}\n\nRota olarak son mesaja yanıt ver. Sadece yanıt metnini yaz.`:`Kadraj adlı sosyal uygulamada test amaçlı bir bot hesabısın. Karakterin: ${b.persona} Kullanıcı adın @${b.username}. Türkçe, doğal ve samimi bir mesaj yanıtı yaz: 1-2 kısa cümle, emoji yok, karakterden çıkma.\n\nKonuşma:\n${transcript}\n\n${b.name} olarak yanıtın:`;
  const key="u:"+b.uid;if(b.ai)S.stream={key,text:""};
  const r=await sample(prompt,{cache:false,modelTier:b.ai?"default":"quick",onText:b.ai?({text})=>{S.botTyping=null;S.stream={key,text};if(S.route.name==="chat"&&S.route.params.key===key)renderMsgs()}:undefined});
@@ -12516,11 +12516,12 @@ const PM={a:null,uid:null,t:0,PLAY:30};
 function pmStop(){clearTimeout(PM.t);clearInterval(PM.f);PM.n=(PM.n||0)+1;if(PM.a){try{PM.a.pause()}catch{}}PM.uid=null;if($('#overlay [data-layer="pmyt"]'))closeLayer("pmyt");$$(".pmus.on").forEach(b=>b.classList.remove("on"))}
 const pmSrc=async u=>String(u||"").startsWith("chunk:")?await resolveVideo(u).catch(()=>null):u;
 async function pmPlay(uid){const m=(P(uid)||{}).music;if(!m||!m.u)return;if(PM.uid===uid)return pmStop();pmStop();try{Music.stop()}catch{}if(pmYtId(m.u))return pmYtSheet(uid,m);PM.uid=uid;
- const src=await pmSrc(m.u);if(PM.uid!==uid)return;if(!src){pmStop();return toast("Şarkı açılamadı.")}const a=PM.a||(PM.a=new Audio());a.preload="auto";a.src=src;a.volume=1;PM.uid=uid;const n=PM.n;const go=()=>{if(PM.n!==n||PM.uid!==uid)return;try{a.currentTime=+m.s||0}catch{}a.play().catch(()=>{if(PM.n===n){pmStop();toast("Şarkı çalınamadı.")}});
+ const src=await pmSrc(m.u);if(PM.uid!==uid)return;if(!src){pmStop();return toast("Şarkı açılamadı.")}const a=PM.a||(PM.a=new Audio());a.preload="auto";a.src=src;a.volume=1;PM.uid=uid;const n=PM.n;a.onended=()=>{if(PM.n===n&&PM.uid===uid)pmStop()};const go=()=>{if(PM.n!==n||PM.uid!==uid)return;try{a.currentTime=+m.s||0}catch{}a.play().catch(()=>{if(PM.n===n){pmStop();toast("Şarkı çalınamadı.")}});
   PM.t=setTimeout(()=>{const v0=a.volume;let k=0;PM.f=setInterval(()=>{k++;a.volume=Math.max(0,v0*(1-k/10));if(k>=10)pmStop()},80)},(PM.PLAY-1)*1000)};
  if(a.readyState>=1)go();else a.addEventListener("loadedmetadata",go,{once:true});$$(`.pmus[data-pmu="${CSS.escape(uid)}"]`).forEach(b=>b.classList.add("on"))}
 const pmMS=t=>{t=Math.max(0,Math.round(t));return Math.floor(t/60)+":"+String(t%60).padStart(2,"0")};
-function pmChip(uid){const m=(P(uid)||{}).music;if(!m||!m.u)return"";return`<button class="pmus${PM.uid===uid?" on":""}" type="button" data-pmu="${esc(uid)}" aria-label="Profil müziğini çal: ${esc(m.t||"Şarkı")}"><span class="eq"><i></i><i></i><i></i></span>${I("music")}<span class="t">${esc(m.t||"Şarkı")}</span></button>`}
+const pmKidOk=m=>!isChild(S.uid)||!pmYtId(m.u)||PM_PRESET.some(([id])=>"yt:"+id===m.u);
+function pmChip(uid){const m=(P(uid)||{}).music;if(!m||!m.u||!pmKidOk(m))return"";return`<button class="pmus${PM.uid===uid?" on":""}" type="button" data-pmu="${esc(uid)}" aria-label="Profil müziğini çal: ${esc(m.t||"Şarkı")}"><span class="eq"><i></i><i></i><i></i></span>${I("music")}<span class="t">${esc(m.t||"Şarkı")}</span></button>`}
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-pmu]");if(!b)return;e.preventDefault();e.stopPropagation();pmPlay(b.dataset.pmu)},true);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)pmStop()});
 HOOKS.after.push(r=>{const uid=r==="profile"?(S.route.params.uid||S.uid):null;if(PM.uid&&PM.uid!==uid)pmStop();if(!uid)return;const m=$("#main");const bt=m&&m.querySelector(".prof .btns");if(!bt||m.querySelector(".pmus"))return;const h=pmChip(uid);if(h)bt.insertAdjacentHTML("beforebegin",h)});
@@ -12544,15 +12545,16 @@ function pmYtSheet(uid,m){const id=pmYtId(m.u);if(!id)return;PM.uid=uid;$$(`.pmu
 function pmSheet(){if(!guard())return;const cur=(me()||{}).music||null;let lib={},sel=cur?{u:cur.u,t:cur.t,d:cur.d||0,s:+cur.s||0}:null,prev=null,pt=0,q="",pvYt=false;
  const l=sheet("pmus","Profil müziği",`<div class="pm-sh"><div class="pm-sel" id="pmSel"></div>
   <div class="pm-lh"><b>Kadraj Müzik</b><small>Hazır şarkılar ve ikinizin eklediği YouTube şarkıları. Şarkıya dokun, seç.</small></div>
-  <form class="pm-tools" id="pmYF"><input class="in" id="pmY" placeholder="YouTube bağlantısını yapıştır" aria-label="YouTube bağlantısı" autocomplete="off"><button class="btn sec" type="submit">${I("add")}Ekle</button></form>
+  ${isChild(S.uid)?"":`<form class="pm-tools" id="pmYF"><input class="in" id="pmY" placeholder="YouTube bağlantısını yapıştır" aria-label="YouTube bağlantısı" autocomplete="off"><button class="btn sec" type="submit">${I("add")}Ekle</button></form>`}
   <input class="in" id="pmQ" placeholder="Kütüphanede ara" aria-label="Kütüphanede ara" autocomplete="off">
-  <div class="pm-list" id="pmL"><div class="muted" style="padding:10px 2px">Yükleniyor…</div></div></div>`,{tall:true,onClose:()=>stopPrev()});
- const all=()=>[...pmLibList(lib),...PM_PRESET.filter(([id])=>!Object.values(lib).some(x=>x&&x.u==="yt:"+id)).map(([id,t])=>({id:"p-"+id,u:"yt:"+id,t,by:"",at:0}))];
+  <div class="pm-list" id="pmL"><div class="muted" style="padding:10px 2px">Yükleniyor…</div></div></div>`,{tall:true,onClose:()=>{seq++;stopPrev();document.removeEventListener("visibilitychange",onVis)}});
+ const kid=isChild(S.uid);let seq=0;const onVis=()=>{if(document.hidden)stopPrev()};document.addEventListener("visibilitychange",onVis);
+ const all=()=>[...(kid?[]:pmLibList(lib)),...PM_PRESET.filter(([id])=>!Object.values(lib).some(x=>x&&x.u==="yt:"+id)).map(([id,t])=>({id:"p-"+id,u:"yt:"+id,t,by:"",at:0}))];
  const find=id=>all().find(x=>x.id===id);
  const stopPrev=()=>{clearTimeout(pt);if(prev){try{prev.pause()}catch{}}pvYt=false;const f=$("#pmPvY",l);if(f)f.innerHTML="";$$("[data-pmpv].on",l).forEach(b=>{b.classList.remove("on");b.innerHTML=I("play")})};
- const preview=async(u,start,btn)=>{const was=btn&&btn.classList.contains("on");stopPrev();if(was)return;pmStop();const yt=pmYtId(u);
+ const preview=async(u,start,btn)=>{const was=btn&&btn.classList.contains("on");stopPrev();if(was)return;pmStop();const yt=pmYtId(u);const tk=++seq;
   if(yt){if(!sel||sel.u!==u){sel={u,t:(find(lastId)||{}).t||"",d:0,s:start||0};drawSel()}const f=$("#pmPvY",l);if(f){f.innerHTML=pmYtFrame(yt,sel.s);pvYt=true}const b2=$('[data-pmpv="sel"]',l);if(b2){b2.classList.add("on");b2.innerHTML=I("pause")}return}
-  const src=await pmSrc(u);if(!src)return toast("Şarkı açılamadı.");prev=prev||new Audio();if(prev.src!==src)prev.src=src;const go=()=>{try{prev.currentTime=start||0}catch{}prev.play().catch(()=>{})};if(prev.readyState>=1)go();else prev.addEventListener("loadedmetadata",go,{once:true});if(btn){btn.classList.add("on");btn.innerHTML=I("pause")}pt=setTimeout(stopPrev,PM.PLAY*1000)};
+  const src=await pmSrc(u);if(tk!==seq||!l.isConnected)return;if(!src)return toast("Şarkı açılamadı.");prev=prev||new Audio();if(prev.src!==src)prev.src=src;const go=()=>{try{prev.currentTime=start||0}catch{}prev.play().catch(()=>{})};if(prev.readyState>=1)go();else prev.addEventListener("loadedmetadata",go,{once:true});if(btn){btn.classList.add("on");btn.innerHTML=I("pause")}clearTimeout(pt);pt=setTimeout(stopPrev,PM.PLAY*1000)};
  let lastId=null;
  const drawSel=()=>{const box=$("#pmSel",l);if(!sel){box.innerHTML=`<div class="pm-empty">${I("music")}<span>Aşağıdan bir şarkı seç ya da YouTube bağlantısı yapıştır.</span></div>`;return}const yt=pmYtId(sel.u);
   const mx=yt?0:Math.max(0,Math.floor((sel.d||0)-PM.PLAY));box.innerHTML=`<div class="field"><label for="pmT">Profilinde görünecek ad</label><input class="in" id="pmT" maxlength="60" value="${esc(sel.t||"")}" placeholder="Örn. Barış Manço · Gülpembe" autocomplete="off"></div>
@@ -12568,13 +12570,13 @@ function pmSheet(){if(!guard())return;const cur=(me()||{}).music||null;let lib={
   const sb=e.target.closest("[data-pmsel]");if(sb){const x=find(sb.dataset.pmsel);if(!x)return;lastId=x.id;stopPrev();sel={u:x.u,t:x.t,d:x.d||0,s:0};drawSel();drawList();return}
   const rm=e.target.closest("[data-pmrm]");if(rm){const id=rm.dataset.pmrm;const x=lib[id];if(!x||x.by!==S.uid)return;dialog("Şarkı kütüphaneden silinsin mi?",`“${esc(x.t||"Şarkı")}” listeden kalkar. Profil müziği yaptıysanız profilde çalmaya devam eder.`,[{label:"Vazgeç"},{label:"Sil",cls:"danger",fn:async()=>{if(await pmLibPut(id,null)){lib={...lib,[id]:null};drawList()}else toast("Silinemedi.")}}]);return}});
  $("#pmQ",l).oninput=e=>{q=e.target.value.trim().toLocaleLowerCase("tr");drawList()};
- $("#pmYF",l).onsubmit=e=>{e.preventDefault();const y=pmYtParse($("#pmY",l).value);if(!y)return toast("Bu bir YouTube bağlantısı değil. YouTube'da şarkıda Paylaş › Bağlantıyı kopyala de, buraya yapıştır.");
+ const yf=$("#pmYF",l);if(yf)yf.onsubmit=e=>{e.preventDefault();const y=pmYtParse($("#pmY",l).value);if(!y)return toast("Bu bir YouTube bağlantısı değil. YouTube'da şarkıda Paylaş › Bağlantıyı kopyala de, buraya yapıştır.");
   stopPrev();const ex=all().find(x=>x.u==="yt:"+y.id);sel={u:"yt:"+y.id,t:ex?ex.t:"",d:0,s:y.s};$("#pmY",l).value="";drawSel();drawList();const ti=$("#pmT",l);if(ti&&!ti.value){ti.focus();toast("Şarkının adını yaz, sonra Kaydet.")}};
  async function save(){const bt=$("#pmSave",l);if(!sel)return;const t=kidClean(String(sel.t||"").trim());if(!t){toast("Şarkının adını yaz.");const ti=$("#pmT",l);if(ti)ti.focus();return}bt.disabled=true;
   if(pmYtId(sel.u)&&!PM_PRESET.some(([id])=>"yt:"+id===sel.u)&&!pmLibList(lib).some(x=>x.u===sel.u)){const id=rid();const v={t,u:sel.u,by:S.uid,at:now(),d:0};if(await pmLibPut(id,v))lib={...lib,[id]:v}}
   const m={u:sel.u,t,s:Math.floor(sel.s||0),d:Math.round(sel.d||0)};bt.textContent="Kaydediliyor…";if(!(await write(()=>DB.update("profiles/"+S.uid,{music:m})))){bt.disabled=false;bt.textContent="Kaydet";return}
-  S.profiles[S.uid]={...S.profiles[S.uid],music:m};pmStop();closeLayer("pmus");toast("Profil müziği kaydedildi");scheduleRefresh()}
- async function remove(){if(!(await write(()=>DB.update("profiles/"+S.uid,{music:null}))))return;S.profiles[S.uid]={...S.profiles[S.uid],music:null};pmStop();closeLayer("pmus");toast("Profil müziği kaldırıldı");scheduleRefresh()}
+  S.profiles[S.uid]={...S.profiles[S.uid],music:m};pmStop();closeLayer("pmus");{const e=$("#pmEdit small");if(e)e.textContent=t}toast("Profil müziği kaydedildi");scheduleRefresh()}
+ async function remove(){if(!(await write(()=>DB.update("profiles/"+S.uid,{music:null}))))return;S.profiles[S.uid]={...S.profiles[S.uid],music:null};pmStop();closeLayer("pmus");{const e=$("#pmEdit small");if(e)e.textContent="Profiline bir şarkı ekle"}toast("Profil müziği kaldırıldı");scheduleRefresh()}
  drawSel();drawList();pmLibGet().then(x=>{lib=x;if(l.isConnected)drawList()})}
 ACT.pmusic=()=>pmSheet();
 /* 6.1 Rota resim çizer: Rota'ya "kedi çiz", "çiz: uzayda bir kedi", "deniz kenarı resmi yap" yazınca (rotaDrawQ) istem köprünün /image yoluna gider

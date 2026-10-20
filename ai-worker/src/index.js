@@ -388,6 +388,11 @@ async function drawImage(env, body, uid) {
     giveBackImageQuota(uid);
     return { status: 400, data: { error: "unsafe", message: child ? "Bunu çizemem. Hayvan, doğa, uzay ya da sevdiğin bir oyuncak gibi başka bir şey iste." : "Bu isteği çizemem. Başka bir şey iste." } };
   }
+  if (!en && child) {
+    // 6.1: çeviri (ve modelin UNSAFE denetimi) yapılamadıysa çocuğa yalnızca kelime süzgeciyle çizim yapılmaz
+    giveBackImageQuota(uid);
+    return { status: 502, data: { error: "image_failed", message: "Şu an çizemiyorum, birazdan tekrar dene." } };
+  }
   if (!en) en = raw;
   const model = String(env.IMAGE_MODEL || IMAGE_MODEL_DEFAULT);
   let out = null;
