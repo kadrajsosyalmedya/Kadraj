@@ -1,0 +1,10 @@
+{
+  "name": "kadraj-android",
+  "private": true,
+  "description": "Kadraj Android uygulaması: siteyi (GitHub Pages) açar, telefon galerisini Kadraj'a verir (KadrajGaleri eklentisi).",
+  "dependencies": {
+    "@capacitor/android": "6.2.0",
+    "@capacitor/cli": "6.2.0",
+    "@capacitor/core": "6.2.0"
+  }
+}
