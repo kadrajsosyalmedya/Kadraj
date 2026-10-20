@@ -186,6 +186,7 @@ function shell(){const r=st.root;if(!r)return;
  <div class="og-ps" id="ogPs"></div><div class="og-st" id="ogSt" role="status" aria-live="polite"></div><div id="ogBd" style="flex:1 1 auto;min-height:0;display:flex;flex-direction:column;position:relative"></div>`}
 
 function statusText(d){const res=resOf(d);const i=meIdx(d);
+ if(d.end&&d.end.why==="iptal")return["İptal edildi",false];
  if(d.st==="wait")return["Rakip bekleniyor",false];
  if(res){if(res.w<0)return["Berabere",false];const wu=d.u[res.w];return[wu===S.uid?"Kazandın":`${nm(wu)} kazandı`,wu===S.uid]}
  if(d.t==="kel"){if(i<0)return["İzliyorsun",false];const s=kelOf(d,S.uid);if(s.done)return[s.found?"Buldun, rakip bekleniyor":"Hakların bitti, rakip bekleniyor",false];return[`${s.n+1}. deneme`,true]}
@@ -201,6 +202,7 @@ function draw(){const d=st.d,r=st.root;if(!r)return;r.classList.toggle("og-reduc
  $("#ogPs",r).innerHTML=pchip(d,0)+pchip(d,1);
  const[t,me]=statusText(d);const se=$("#ogSt",r);se.textContent=t;se.classList.toggle("me",!!me);
  const bd=$("#ogBd",r);
+ if(d.end&&d.end.why==="iptal"){bd.innerHTML=`<div class="og-bw"><div class="og-wait">${SV(X.icons[d.t]||"","")}<h3>${esc(TN[d.t])}</h3><p>Bu oyun iptal edildi.</p></div></div>`;return}
  if(d.st==="wait"){const host=d.by===S.uid;
   bd.innerHTML=`<div class="og-bw"><div class="og-wait">${SV(X.icons[d.t]||"","")}<h3>${esc(TN[d.t])}</h3><p>${host?"Grupta Oyna'ya ilk dokunan kişi rakibin olur.":`${esc(nm(d.by))} bir rakip arıyor.`}</p>${host?`<button class="btn ghost" data-og="cancel">İptal et</button>`:`<button class="btn" data-og="join">Oyuna katıl</button>`}</div></div>`;return}
  if(d.t==="kel")drawKel(bd,d,res);else drawGrid(bd,d,res);
