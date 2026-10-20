@@ -269,9 +269,29 @@ async function askFree(env, body, uid, fetcher = fetch) {
     }
   }
   const msgs = [{ role: "system", content: sys }, ...messages.map((m) => ({ role: m.role, content: flatText(m.content) }))];
-  const r = await env.AI.run(model, { messages: msgs, max_tokens: 900 });
-  const text = String((r && (r.response ?? r.result?.response)) || "").trim();
-  return { status: 200, data: { text, sources, model, provider: "free", searched: !!sources.length, ...(img ? { saw } : {}) } };
+  // 6.1: ana model hata verirse ya da boş dönerse (çoğunlukla ücretsiz günlük kota) daha az kota harcayan yedek modelle bir kez daha denenir.
+  const run = async (m) => {
+    const r = await env.AI.run(m, { messages: msgs, max_tokens: 900 });
+    return String((r && (r.response ?? r.result?.response)) || "").trim();
+  };
+  let used = model, text = "", err = null;
+  try {
+    text = await run(model);
+  } catch (e) {
+    err = e;
+  }
+  const fb = String(env.FALLBACK_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast");
+  if (!text && fb && fb !== model) {
+    try {
+      text = await run(fb);
+      used = fb;
+      err = null;
+    } catch (e) {
+      err = err || e;
+    }
+  }
+  if (!text && err) throw err;
+  return { status: 200, data: { text, sources, model: used, provider: "free", searched: !!sources.length, ...(img ? { saw } : {}) } };
 }
 
 // 6.1 Rota resim çizer (POST /image, yalnızca Workers AI, ücretsiz). İstem önce süzülür (uygunsuz istek ve çocuk modu),

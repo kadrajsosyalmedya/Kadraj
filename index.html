@@ -5917,12 +5917,16 @@ async function sendToBot(uid,payload){const b=BOT[uid];const k=b.key;const path=
  let msgs=[...cur,mine];S.botchats={...S.botchats,[k]:{msgs,readAt:now()}};renderMsgs();
  if(!S.guest)DB.set(path,{msgs:botSlim(msgs),readAt:now()}).catch(()=>{});
  S.botTyping=uid;renderMsgs();let reply="";
- try{reply=await botReply(b,msgs)}catch(e){console.warn(e)}
- if(!reply){const cn=b.replies||BOT_CANNED[k]||["Merhaba!"];reply=b.ai?fallbackRota(payload.text||""):cn[Math.floor(Math.random()*cn.length)]}
+ let aiErr=null;try{reply=await botReply(b,msgs)}catch(e){console.warn(e);aiErr=e}
+ if(!reply){const cn=b.replies||BOT_CANNED[k]||["Merhaba!"];reply=b.ai?rotaWhy(aiErr)+fallbackRota(payload.text||""):cn[Math.floor(Math.random()*cn.length)]}
  S.botTyping=null;S.stream=null;
  msgs=[...(S.botchats[k]?.msgs||msgs),{from:uid,text:reply,at:now()}];const onScreen=S.route.name==="chat"&&S.route.params.key==="u:"+uid;S.botchats={...S.botchats,[k]:{msgs,readAt:onScreen?now():0}};
  if(!S.guest)DB.set(path,{msgs:botSlim(msgs.slice(-80)),readAt:onScreen?now():0}).catch(()=>{});
  if(onScreen)renderMsgs();else if(settings.notify)toast(`${b.name}: ${String(reply).replace(/\*\*|__|`/g,"").replace(/\s+/g," ").slice(0,70)}`,uid);scheduleRefresh()}
+/* 6.1: köprü kuruluyken hazır yanıta düşülürse Rota nedenini söyler (sahibi "Rota niye hazır cevap" dedi) */
+function rotaWhy(e){if(!kAI.url())return"";if(!kAI.ready())return"(Yapay zekâ bağlantım şu an hazır değil: "+(S.mode!=="cloud"?"demo modundasın":"oturum açılıyor, birazdan tekrar dene")+". Hazır yanıtla cevaplıyorum.)\n\n";
+ const c=e&&e.code||"",m=e&&e.message||"";const why=c==="rate_limited"?"bugünlük soru hakkın doldu":c==="free_ai"?"ücretsiz yapay zekânın günlük kotası dolmuş olabilir":c==="network"?"köprüye ulaşılamadı":c==="timeout"?"yanıt çok uzun sürdü":c==="auth"?"oturum doğrulanamadı":m?m.replace(/[.]+$/,""):"yanıt boş geldi";
+ return"(Yapay zekâ köprüsü yanıt vermedi: "+why+". Hazır yanıtla cevaplıyorum.)\n\n"}
 function fallbackRota(q){for(const[re,a]of FAQ)if(re.test(q))return a;return"Şu an yapay zekâ bağlantım yok, hazır yanıtlarla çalışıyorum. Şunları sorabilirsin: nasıl kullanırım, arkadaşlarımla nasıl konuşurum, fotoğraf yüklenmiyor, Klaket, sesli mesaj, arama, hikâye, tema, şifre. Ya da “Test bildirimleri oluştur” de."}
 async function botReply(b,msgs){const sample=S.caps.sample;if(!sample)return null;const meName=me().name||"kullanıcı";
  const transcript=msgs.slice(-14).map(m=>`${m.from===S.uid?meName:b.name}: ${m.img?"[fotoğraf gönderdi] ":""}${m.text||(m.post?"[bir paylaşım gönderdi: "+(postById(m.post)?.caption||postById(m.post)?.text||"")+"]":"")}`).join("\n");
