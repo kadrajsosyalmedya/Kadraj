@@ -3250,6 +3250,17 @@ main.chatmode{position:relative}
 .memc .x{position:absolute;top:6px;right:6px;width:1.9rem;height:1.9rem;display:grid;place-items:center;border-radius:50%;color:var(--muted)}
 .memc .x .i{width:1rem;height:1rem}
 .mem-list{padding:0 16px 18px;display:grid;gap:10px}.mem-list .memc{margin:0}
+.pmus{display:inline-flex;width:fit-content;justify-self:start;align-items:center;gap:6px;max-width:100%;margin:8px 0 2px;padding:5px 12px 5px 8px;border-radius:999px;background:var(--surface-2);color:var(--fg);font-size:.82rem;font-weight:600}
+.pmus .i{width:.95rem;height:.95rem;flex:none}.pmus .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pmus .eq{display:none;align-items:flex-end;gap:2px;height:.9rem;flex:none}.pmus .eq i{width:3px;border-radius:2px;background:var(--accent);height:40%}
+.pmus.on{background:var(--accent-soft);color:var(--accent)}.pmus.on .eq{display:inline-flex}.pmus.on>.i{display:none}
+.pmus.on .eq i{animation:pmEq .9s ease-in-out infinite}.pmus.on .eq i:nth-child(2){animation-delay:-.3s}.pmus.on .eq i:nth-child(3){animation-delay:-.6s}
+@keyframes pmEq{0%,100%{height:30%}50%{height:100%}}
+@media (prefers-reduced-motion:reduce){.pmus.on .eq i{animation:none;height:70%}}html.reduce-motion .pmus.on .eq i{animation:none;height:70%}
+.pm-sh{display:grid;gap:12px;padding:4px 16px calc(18px + env(safe-area-inset-bottom,0px))}.pm-sh .field{margin:0}.pm-sh .field[hidden]{display:none}
+.pm-sh input[type=range]{width:100%;accent-color:var(--accent)}
+.pm-bt{display:flex;gap:8px;flex-wrap:wrap}.pm-bt .btn{flex:1 1 auto}
+#pmEdit{width:100%}
 /*}@css:61FUN*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
@@ -12464,6 +12475,43 @@ function memClick(e){const b=e.target.closest("[data-mem]");if(!b)return;const c
 HOOKS.after.push(r=>{if(r!=="feed"||!S.uid||S.guest)return;memLoad();const m=$("#main");if(!m||m.querySelector(".memc"))return;if(LS.get("kadraj_mem_"+S.uid,"")===memDay())return;const ls=memList();if(!ls.length)return;
  const st=m.querySelector(".stories");const d=document.createElement("div");d.innerHTML=memCard(ls[0],ls.length-1);const el=d.firstElementChild;el.addEventListener("click",memClick);if(st)st.after(el);else m.prepend(el)});
 ACT.memories=()=>memSheet();
+/* 6.1 Profil müziği: profiles.music={u,t,s,d} (u: Cloudinary ses adresi; yerel modda küçük data URL, t: şarkı adı, s: başlangıç sn, d: süre).
+   Kişi telefonundan ses dosyası seçer (pmSheet: ad, başlangıç kaydırıcısı, 30 sn önizleme), Kaydet → cldUpload → profil. Profilde ad ve bio altında
+   .pmus çipi (HOOKS.after "profile"), dokununca s'den 30 sn çalar (PM, tek Audio), sayfadan çıkınca/arka plana geçince durur. Düzenle ekranında #pmEdit. */
+const PM={a:null,uid:null,t:0,PLAY:30};
+function pmStop(){clearTimeout(PM.t);if(PM.a){try{PM.a.pause()}catch{}}PM.uid=null;$$(".pmus.on").forEach(b=>b.classList.remove("on"))}
+const pmSrc=async u=>String(u||"").startsWith("chunk:")?await resolveVideo(u).catch(()=>null):u;
+async function pmPlay(uid){const m=(P(uid)||{}).music;if(!m||!m.u)return;if(PM.uid===uid)return pmStop();pmStop();try{Music.stop()}catch{}PM.uid=uid;
+ const src=await pmSrc(m.u);if(PM.uid!==uid)return;if(!src){pmStop();return toast("Şarkı açılamadı.")}const a=PM.a||(PM.a=new Audio());a.preload="auto";a.src=src;a.volume=1;PM.uid=uid;const go=()=>{try{a.currentTime=+m.s||0}catch{}a.play().catch(()=>{pmStop();toast("Şarkı çalınamadı.")})};
+ if(a.readyState>=1)go();else a.addEventListener("loadedmetadata",go,{once:true});$$(`.pmus[data-pmu="${CSS.escape(uid)}"]`).forEach(b=>b.classList.add("on"));
+ PM.t=setTimeout(()=>{const v0=a.volume;let k=0;const f=setInterval(()=>{k++;a.volume=Math.max(0,v0*(1-k/10));if(k>=10){clearInterval(f);pmStop()}},80)},(PM.PLAY-1)*1000)}
+const pmMS=t=>{t=Math.max(0,Math.round(t));return Math.floor(t/60)+":"+String(t%60).padStart(2,"0")};
+function pmChip(uid){const m=(P(uid)||{}).music;if(!m||!m.u)return"";return`<button class="pmus${PM.uid===uid?" on":""}" type="button" data-pmu="${esc(uid)}" aria-label="Profil müziğini çal: ${esc(m.t||"Şarkı")}"><span class="eq"><i></i><i></i><i></i></span>${I("music")}<span class="t">${esc(m.t||"Şarkı")}</span></button>`}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-pmu]");if(!b)return;e.preventDefault();e.stopPropagation();pmPlay(b.dataset.pmu)},true);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)pmStop()});
+HOOKS.after.push(r=>{const uid=r==="profile"?(S.route.params.uid||S.uid):null;if(PM.uid&&PM.uid!==uid)pmStop();if(!uid)return;const m=$("#main");const bt=m&&m.querySelector(".prof .btns");if(!bt||m.querySelector(".pmus"))return;const h=pmChip(uid);if(h)bt.insertAdjacentHTML("beforebegin",h)});
+function pmSheet(){if(!guard())return;const cur=(me()||{}).music||null;let f=null,url=null,dur=cur&&cur.d||0,start=cur&&+cur.s||0,prev=null,pt=0;
+ const l=sheet("pmus","Profil müziği",`<div class="pm-sh"><button class="src" type="button" id="pmPick"><span class="ic">${I("music")}</span><span><b id="pmPN">${cur?"Başka şarkı seç":"Şarkı seç"}</b><small id="pmPS">${cur?esc(cur.t||""):"Telefonundaki bir ses dosyası (mp3, m4a…)"}</small></span></button>
+  <div class="field"><label for="pmT">Şarkının adı</label><input class="in" id="pmT" maxlength="60" placeholder="Örn. Barış Manço · Gülpembe" value="${esc(cur&&cur.t||"")}" autocomplete="off"></div>
+  <div class="field" id="pmSF"${dur>PM.PLAY?"":" hidden"}><label for="pmS">Başlangıç: <b id="pmSL">${pmMS(start)}</b></label><input type="range" id="pmS" min="0" max="${Math.max(0,Math.floor(dur-PM.PLAY))}" step="1" value="${Math.floor(start)}"></div>
+  <p class="muted" style="margin:0;font-size:.82rem">Profiline girenler dokununca ${PM.PLAY} saniye dinler.</p>
+  <div class="pm-bt"><button class="btn sec" type="button" id="pmPrev"${cur||f?"":" disabled"}>${I("play")}Dinle</button><button class="btn" type="button" id="pmSave">Kaydet</button>${cur?`<button class="btn ghost danger" type="button" id="pmDel">${I("trash")}Kaldır</button>`:""}</div></div>`,{onClose:()=>{if(prev)try{prev.pause()}catch{}clearTimeout(pt);if(url)URL.revokeObjectURL(url)}});
+ const stopPrev=()=>{clearTimeout(pt);if(prev){try{prev.pause()}catch{}}$("#pmPrev",l).innerHTML=`${I("play")}Dinle`};
+ $("#pmPick",l).onclick=async()=>{const x=await nativePick("audio/*,.mp3,.m4a,.aac,.wav,.ogg,.opus,.flac");if(!x)return;if(x.size>25*1048576)return toast("Dosya çok büyük (25 MB üstü).");
+  try{const buf=await x.arrayBuffer();f=new File([buf],x.name||"sarki.mp3",{type:x.type||"audio/mpeg"})}catch{return toast("Dosya okunamadı. Yeniden seç.")}stopPrev();if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);
+  dur=await new Promise(r=>{const a=new Audio();a.preload="metadata";a.onloadedmetadata=()=>r(isFinite(a.duration)?a.duration:0);a.onerror=()=>r(-1);setTimeout(()=>r(0),8000);a.src=url});if(dur<0){f=null;return toast("Bu dosya çalınamıyor. Başka bir ses dosyası seç.")}
+  start=0;const nm=String(f.name).replace(/\.[^.]+$/,"").replace(/[_]+/g," ").trim().slice(0,60);const ti=$("#pmT",l);if(!ti.value.trim()||cur&&ti.value===cur.t)ti.value=nm;
+  $("#pmPN",l).textContent="Başka şarkı seç";$("#pmPS",l).textContent=f.name+(dur?" · "+pmMS(dur):"");const sf=$("#pmSF",l),sr=$("#pmS",l);sf.hidden=!(dur>PM.PLAY);sr.max=Math.max(0,Math.floor(dur-PM.PLAY));sr.value=0;$("#pmSL",l).textContent=pmMS(0);$("#pmPrev",l).disabled=false};
+ $("#pmS",l).oninput=e=>{start=+e.target.value;$("#pmSL",l).textContent=pmMS(start);if(prev&&!prev.paused){try{prev.currentTime=start}catch{}}};
+ $("#pmPrev",l).onclick=async()=>{if(prev&&!prev.paused)return stopPrev();pmStop();const src=url||await pmSrc(cur&&cur.u);if(!src)return;prev=prev||new Audio();if(prev.src!==src)prev.src=src;const go=()=>{try{prev.currentTime=start}catch{}prev.play().catch(()=>{})};if(prev.readyState>=1)go();else prev.addEventListener("loadedmetadata",go,{once:true});$("#pmPrev",l).innerHTML=`${I("pause")}Durdur`;clearTimeout(pt);pt=setTimeout(stopPrev,PM.PLAY*1000)};
+ const del=$("#pmDel",l);if(del)del.onclick=async()=>{if(!(await write(()=>DB.update("profiles/"+S.uid,{music:null}))))return;S.profiles[S.uid]={...S.profiles[S.uid],music:null};pmStop();closeLayer("pmus");toast("Profil müziği kaldırıldı");scheduleRefresh()};
+ $("#pmSave",l).onclick=async()=>{const t=kidClean($("#pmT",l).value.trim())||"Şarkı";const bt=$("#pmSave",l);if(!f&&!cur)return toast("Önce bir şarkı seç.");let u=cur&&cur.u;
+  if(f){if(S.mode==="local"){if(f.size>1.5*1048576)return toast("Demo modunda en fazla 1,5 MB. Bulutta sınır 25 MB.");u=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>r(null);fr.readAsDataURL(f)});if(!u)return toast("Dosya okunamadı.")}
+   else{if(!cldOn())return toast("Şarkı yüklenemiyor: bulut ayarı yok.");bt.disabled=true;const prog=(a,b)=>{bt.textContent="Yükleniyor %"+Math.round(a/Math.max(1,b)*100)};try{u=await cldUpload(f,prog)}catch(e){console.warn("cloudinary ses",e);u=null;if(f.size<=8*1048576)try{u=await storeVideoFs(f,prog)}catch(e2){console.warn(e2)}if(!u){bt.disabled=false;bt.textContent="Kaydet";return toast("Şarkı yüklenemedi: "+(e&&e.message||"hata"))}}if(!l.isConnected)return}}
+  const m={u,t,s:Math.floor(start),d:Math.round(dur||cur&&cur.d||0)};bt.disabled=true;bt.textContent="Kaydediliyor…";if(!(await write(()=>DB.update("profiles/"+S.uid,{music:m})))){bt.disabled=false;bt.textContent="Kaydet";return}
+  S.profiles[S.uid]={...S.profiles[S.uid],music:m};pmStop();closeLayer("pmus");toast("Profil müziği kaydedildi");scheduleRefresh()}}
+ACT.pmusic=()=>pmSheet();
+HOOKS.after.push(r=>{if(r!=="edit")return;const b=$("#eBio");const fd=b&&b.closest(".field");if(!fd||$("#pmEdit"))return;const m=(me()||{}).music;const d=document.createElement("button");d.type="button";d.id="pmEdit";d.className="src";d.dataset.act="pmusic";d.innerHTML=`<span class="ic">${I("music")}</span><span><b>Profil müziği</b><small>${m&&m.u?esc(m.t||"Şarkı"):"Profiline bir şarkı ekle"}</small></span>`;fd.after(d)});
 /*}@js:61FUN*/
 /*@js:550{*/
 /* 5.5.0
