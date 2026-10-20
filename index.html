@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60108">
+<meta name="kadraj-version" content="60109">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3867,7 +3867,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60108,APP_VER="6.1.8";
+const APP_V=60109,APP_VER="6.1.9";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -12580,6 +12580,10 @@ if(/KadrajApp/.test(navigator.userAgent)&&navigator.serviceWorker&&navigator.ser
  return Promise.all(rs.map(r=>r.unregister().catch(()=>{}))).then(()=>{if(kgal()||SS.get("kadraj_app_sw"))return;SS.set("kadraj_app_sw","1");location.reload()})}).catch(()=>{});
 HOOKS.after.push(r=>{if(r!=="settings"||!/KadrajApp/.test(navigator.userAgent))return;const m=$("#main");if(!m||m.querySelector("#appInfo"))return;const ok=!!kgal();const d=document.createElement("div");d.id="appInfo";d.className="box";d.style.margin="12px 16px";
  d.innerHTML=`<div class="row">${I("image")}<div class="t"><b>Kadraj Android uygulaması</b><div class="s">${ok?"Telefon galerin bağlı":"Telefon galerine bağlanılamadı · uygulamayı kapatıp yeniden aç"}</div></div></div>`;const cf=m.querySelector("#cfEntry");if(cf)cf.before(d);else m.appendChild(d)});
+/* 6.1.9: uygulamada durum/gezinme çubuğu theme-color'ı izler (KadrajGaleri.renk; eski APK'da yöntem yoksa bir şey yapmaz). */
+(()=>{const G=kgal();if(!G||typeof G.renk!=="function")return;const m=document.querySelector('meta[name="theme-color"]');if(!m)return;let last="";
+ const go=()=>{const c=(m.getAttribute("content")||"").trim();if(!/^#[0-9a-f]{6}$/i.test(c)||c===last)return;last=c;try{G.renk({c}).catch(()=>{})}catch{}};
+ go();try{new MutationObserver(go).observe(m,{attributes:true,attributeFilter:["content"]})}catch{}})();
 /*}@js:61APP*/
 /*@js:61TEST{*/
 /* 6.1.4 Yönetici paneli › Kadraj testi: bütün kod kadraj-test.js'te (window.KTEST, başındaki yorum ayrıntılı); burada cephe.js kalıbında yükleyici ve

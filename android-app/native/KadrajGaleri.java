@@ -230,4 +230,14 @@ public class KadrajGaleri extends Plugin {
             call.reject("Fotoğraf açılamadı: " + e.getMessage());
         }
     }
+
+    /* Durum ve gezinme çubuğu rengi sayfanın theme-color'ına uyar: renk({c:"#0A110F"}). Açık renkte simgeler koyu olur. */
+    @PluginMethod
+    public void renk(PluginCall call) {
+        int col;
+        try { col = android.graphics.Color.parseColor(call.getString("c", "#0A110F").trim()); } catch (Exception e) { call.reject("renk"); return; }
+        final int fc = col | 0xFF000000;
+        getActivity().runOnUiThread(() -> MainActivity.boya(getActivity(), fc));
+        call.resolve();
+    }
 }
