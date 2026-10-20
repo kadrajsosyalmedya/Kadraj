@@ -3221,18 +3221,18 @@ main.chatmode{position:relative}
 .svst{position:absolute;inset:0;z-index:2;pointer-events:none;--u:.5}
 .svst .stk{position:absolute;transform:translate(-50%,-50%);pointer-events:auto}
 .svst .stk.men{border-radius:999px}
-.svst .poll,.svst .ask{width:calc(560px * var(--u));border-radius:calc(34px * var(--u));background:#fff;color:#111;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden;text-align:center}
-.svst .stk .q{font:700 calc(38px * var(--u))/1.26 Figtree,'Avenir Next',sans-serif;padding:calc(24px * var(--u)) calc(34px * var(--u)) calc(14px * var(--u));overflow-wrap:anywhere}
-.svst .ask .q{background:linear-gradient(90deg,#0C7A63,#2BC8A4);color:#fff;padding-bottom:calc(22px * var(--u))}
-.svst .poll .os{display:flex;gap:calc(22px * var(--u));padding:0 calc(22px * var(--u)) calc(22px * var(--u))}
-.svst .poll .os button{flex:1;min-width:0;position:relative;overflow:hidden;min-height:calc(88px * var(--u));border-radius:calc(24px * var(--u));background:#F1F3F2;display:grid;place-items:center;font:800 calc(36px * var(--u))/1.1 Figtree,'Avenir Next',sans-serif;color:#0C7A63}
-.svst .poll .os button+button{color:#E23E57}
-.svst .poll .os button b{position:relative;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:92%}
-.svst .poll.res .os button::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--p,0%);background:color-mix(in srgb,currentColor 18%,transparent)}
-.svst .poll .os button i{position:relative;font-style:normal;font-size:.72em;color:#333}
-.svst .poll .os button.me{box-shadow:inset 0 0 0 calc(4px * var(--u)) currentColor}
-.svst .poll small{display:block;font-size:max(11px,calc(26px * var(--u)));color:#6B7570;padding:0 0 calc(16px * var(--u));margin-top:calc(-8px * var(--u))}
-.svst .ask .ans{display:block;width:calc(100% - 44px * var(--u));margin:calc(16px * var(--u)) auto calc(20px * var(--u));min-height:calc(76px * var(--u));border-radius:calc(22px * var(--u));background:#F1F3F2;color:#8A9490;font:600 calc(32px * var(--u))/1.2 Figtree,'Avenir Next',sans-serif;padding:0 calc(16px * var(--u))}
+.svst .stk-poll,.svst .stk-ask{width:calc(560px * var(--u));border-radius:calc(34px * var(--u));background:#fff;color:#111;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden;text-align:center}
+.svst .st-q{font:700 calc(38px * var(--u))/1.26 Figtree,'Avenir Next',sans-serif;padding:calc(24px * var(--u)) calc(34px * var(--u)) calc(14px * var(--u));overflow-wrap:anywhere}
+.svst .stk-ask .st-q{background:linear-gradient(90deg,#0C7A63,#2BC8A4);color:#fff;padding-bottom:calc(22px * var(--u))}
+.svst .stk-poll .st-os{display:flex;gap:calc(22px * var(--u));padding:0 calc(22px * var(--u)) calc(22px * var(--u))}
+.svst .stk-poll .st-os button{flex:1;min-width:0;position:relative;overflow:hidden;min-height:calc(88px * var(--u));border-radius:calc(24px * var(--u));background:#F1F3F2;display:grid;place-items:center;font:800 calc(36px * var(--u))/1.1 Figtree,'Avenir Next',sans-serif;color:#0C7A63}
+.svst .stk-poll .st-os button+button{color:#E23E57}
+.svst .stk-poll .st-os button b{position:relative;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:92%}
+.svst .stk-poll.res .st-os button::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--p,0%);background:color-mix(in srgb,currentColor 18%,transparent)}
+.svst .stk-poll .st-os button i{position:relative;font-style:normal;font-size:.72em;color:#333}
+.svst .stk-poll .st-os button.me{box-shadow:inset 0 0 0 calc(4px * var(--u)) currentColor}
+.svst .stk-poll small{display:block;font-size:max(11px,calc(26px * var(--u)));color:#6B7570;padding:0 0 calc(16px * var(--u));margin-top:calc(-8px * var(--u))}
+.svst .stk-ask .ans{display:block;width:calc(100% - 44px * var(--u));margin:calc(16px * var(--u)) auto calc(20px * var(--u));min-height:calc(76px * var(--u));border-radius:calc(22px * var(--u));background:#F1F3F2;color:#8A9490;font:600 calc(32px * var(--u))/1.2 Figtree,'Avenir Next',sans-serif;padding:0 calc(16px * var(--u))}
 .st-res{padding:0 16px 18px}.st-res .h{font-weight:800;margin:12px 0 6px}.st-res .row{display:flex;align-items:center;gap:10px;padding:6px 0}.st-res .s{font-size:.8rem;color:var(--muted)}
 /*}@css:61STORY*/
 /*@css:550{*/
@@ -12374,7 +12374,8 @@ function stPickUser(){return new Promise(res=>{let done=false;const all=cfCands(
 function stAdd(c,redraw){if(c.st.length>=ST_MAX)return toast(`En fazla ${ST_MAX} çıkartma ekleyebilirsin.`);
  const tiles=[["time","Saat","clock"],["date","Tarih","cal"],["loc","Konum","pin"],["men","Bahset","users"],["poll","Anket","poll"],["ask","Soru","comment"]];
  const l=sheet("stadd","Çıkartma ekle",`<div class="st-grid">${tiles.map(([t,lb,ic])=>`<button type="button" data-stt="${t}"><span>${I(ic)}</span>${lb}</button>`).join("")}</div><div class="st-icons">${ST_ICONS.map(([n,col])=>`<button type="button" data-sti="${n}" style="--c:${col}" aria-label="Simge">${I(n)}</button>`).join("")}</div>`);
- const put=k=>{const n=c.st.length;c.st.push({x:360,y:Math.min(1040,860+(n%4)*-90),s:1,...k});redraw();stChips(c,redraw)};
+ const put=k=>{const big=k.t==="poll"||k.t==="ask",hw=big?285:k.t==="ic"?90:160,hh=big?115:k.t==="ic"?90:60;const sl=big?[[360,330],[360,980],[360,640]]:[[360,860],[360,1080],[200,560],[520,560],[200,200],[520,200],[200,1180],[520,1180],[360,640]];
+  const p=sl.find(([x,y])=>(c.text?[{x:c.tx,y:c.ty,_w:300,_h:60}]:[]).concat(c.st).every(o=>Math.abs(o.x-x)>=(o._w||150)+hw||Math.abs(o.y-y)>=(o._h||60)+hh))||sl[c.st.length%sl.length];c.st.push({x:p[0],y:p[1],s:1,...k});redraw();stChips(c,redraw)};
  l.onclick=async e=>{const ic=e.target.closest("[data-sti]");if(ic){closeLayer("stadd");return put({t:"ic",v:ic.dataset.sti})}const b=e.target.closest("[data-stt]");if(!b)return;const t=b.dataset.stt;closeLayer("stadd");const d=new Date();
   if((t==="poll"||t==="ask")&&c.st.some(k=>k.t===t))return toast(t==="poll"?"Bir hikâyede bir anket olabilir.":"Bir hikâyede bir soru olabilir.");
   if(t==="time")return put({t,v:String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")});
@@ -12401,8 +12402,8 @@ function stComposer(c,b,l){c.st=c.st||[];if(c.ty==null){c.tx=360;c.ty=640}
 function stPaint(l,s,owner,pause){let ov=$(".svst",l);if(!ov){ov=document.createElement("div");ov.className="svst";$(".img",l).after(ov)}ov.innerHTML="";ov._place=null;const st=s.st||[],mn=s.mn||[];if(!st.length&&!mn.length)return;
  const cur=()=>S.stories[s.id]||s;const mine=owner===S.uid;
  const html=()=>{const pv=cur().pv||{};const me=pv[S.uid];return st.map((k,i)=>{if(k.t==="poll"){const o=(k.o||[]).slice(0,2);const n=[0,1].map(j=>Object.values(pv).filter(v=>v===j).length),tot=n[0]+n[1];const res=mine||me!=null;
-   return`<div class="stk poll${res?" res":""}" data-sk="${i}"><div class="q">${esc(k.q)}</div><div class="os">${o.map((t,j)=>{const pc=tot?Math.round(n[j]/tot*100):0;return`<button type="button" data-stv="${j}" class="${me===j?"me":""}"${res?` style="--p:${pc}%"`:""}><b>${esc(t)}</b>${res?`<i>%${pc}</i>`:""}</button>`}).join("")}</div>${mine?`<small>${tot} oy · sonuçlar için dokun</small>`:""}</div>`}
-  if(k.t==="ask")return`<div class="stk ask" data-sk="${i}"><div class="q">${esc(k.q)}</div><button type="button" class="ans" data-sta="1">${mine?"Yanıtlar sana mesaj olarak gelir":"Yanıtını yaz…"}</button></div>`;return""}).join("")+mn.map(m=>`<button type="button" class="stk men" data-stm="${esc(m.u)}" data-mx="${m.x}" data-my="${m.y}" style="width:calc(${m.w*720}px * var(--u));height:calc(${m.h*1280}px * var(--u))" aria-label="@${esc(P(m.u).username||"")} profiline git"></button>`).join("")};
+   return`<div class="stk stk-poll${res?" res":""}" data-sk="${i}"><div class="st-q">${esc(k.q)}</div><div class="st-os">${o.map((t,j)=>{const pc=tot?Math.round(n[j]/tot*100):0;return`<button type="button" data-stv="${j}" class="${me===j?"me":""}"${res?` style="--p:${pc}%"`:""}><b>${esc(t)}</b>${res?`<i>%${pc}</i>`:""}</button>`}).join("")}</div>${mine?`<small>${tot} oy · sonuçlar için dokun</small>`:""}</div>`}
+  if(k.t==="ask")return`<div class="stk stk-ask" data-sk="${i}"><div class="st-q">${esc(k.q)}</div><button type="button" class="ans" data-sta="1">${mine?"Yanıtlar sana mesaj olarak gelir":"Yanıtını yaz…"}</button></div>`;return""}).join("")+mn.map(m=>`<button type="button" class="stk men" data-stm="${esc(m.u)}" data-mx="${m.x}" data-my="${m.y}" style="width:calc(${m.w*720}px * var(--u));height:calc(${m.h*1280}px * var(--u))" aria-label="@${esc(P(m.u).username||"")} profiline git"></button>`).join("")};
  const place=()=>{const img=$("#svImg",l),box=$(".img",l);if(!img||!box)return;const W=box.clientWidth,H=box.clientHeight;if(!W||!H)return;const fit=getComputedStyle(img).objectFit;const sc=fit==="contain"?Math.min(W/720,H/1280):Math.max(W/720,H/1280);const ox=(W-720*sc)/2,oy=(H-1280*sc)/2;ov.style.setProperty("--u",sc);
   for(const el of ov.children){const k=el.dataset.sk!=null?st[+el.dataset.sk]:{x:+el.dataset.mx,y:+el.dataset.my};let cx=ox+k.x*720*sc,cy=oy+k.y*1280*sc;const hw=el.offsetWidth/2,hh=el.offsetHeight/2;cx=Math.max(hw+6,Math.min(W-hw-6,cx));cy=Math.max(hh+70,Math.min(H-hh-80,cy));el.style.left=cx+"px";el.style.top=cy+"px"}};
  const paint=()=>{ov.innerHTML=html();place()};ov._place=place;paint();if(!l._stR){l._stR=1;addEventListener("resize",function f(){if(!l.isConnected)return removeEventListener("resize",f);const o=$(".svst",l);o&&o._place&&o._place()})}
