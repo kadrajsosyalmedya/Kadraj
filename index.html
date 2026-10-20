@@ -3182,6 +3182,9 @@ main.chatmode{position:relative}
 .schf{display:grid;gap:10px}.schf textarea{min-height:5rem}
 .schq{display:flex;flex-wrap:wrap;gap:8px}.schq button{padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:.84rem}
 .schq button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* 6.1 DM'de Instagram gibi: karşı tarafın art arda mesajlarının sonuncusunda yuvarlak profil fotoğrafı (renderMsgs tabanında dmAv) */
+.mrow .dmav,.mrow .dmav .av,.mrow .dmav .av img,.mrow .dmav .av svg{border-radius:50%!important}
+.mrow .dmav .av::before,.mrow .dmav .av::after{display:none}
 /*}@css:61CHAT*/
 /*@css:61STORY{*/
 /* 6.1 Yakın Arkadaşlar ve hikâye çıkartmaları (js bölgesi 61STORY) */
@@ -4138,7 +4141,7 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
    else{for(let i=msgs.length-1;i>=0;i--)if(msgs[i].at<=t){idx=i;break}if(idx<0||msgs[idx].from===u)continue;let later=false;for(let i=idx+1;i<msgs.length;i++)if(msgs[i].from===u){later=true;break}if(later)continue}
    (seenAt[idx]=seenAt[idx]||[]).push([u,t])}}
  let lastAt=0;const multi=k.type==="group"||k.type==="meydan";
- msgs.forEach((m,idx)=>{if(m.sys){h+=`<div class="stamp sysn" data-k="${esc(m.id||String(m.at))}">${esc(m.text||"")}</div>`;lastAt=m.at;S.knownMids.add(m.id||String(m.at));return}const gap=m.at-lastAt;if(gap>30*60e3)h+=`<div class="stamp" data-k="t-${esc(m.id||String(m.at))}">${new Date(m.at).toLocaleString("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>`;const prev=msgs[idx-1];const showSender=multi&&m.from!==S.uid&&(!prev||prev.from!==m.from||gap>5*60e3);lastAt=m.at;
+ msgs.forEach((m,idx)=>{if(m.sys){h+=`<div class="stamp sysn" data-k="${esc(m.id||String(m.at))}">${esc(m.text||"")}</div>`;lastAt=m.at;S.knownMids.add(m.id||String(m.at));return}const gap=m.at-lastAt;if(gap>30*60e3)h+=`<div class="stamp" data-k="t-${esc(m.id||String(m.at))}">${new Date(m.at).toLocaleString("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})}</div>`;const prev=msgs[idx-1];const showSender=multi&&m.from!==S.uid&&(!prev||prev.from!==m.from||gap>5*60e3);const nx=msgs[idx+1];const dmAv=k.type==="dm"&&m.from!==S.uid&&(!nx||nx.sys||nx.from!==m.from||nx.at-m.at>5*60e3);lastAt=m.at;
   const mine=m.from===S.uid;let body="";const isAI=m.from==="bot:rota";const mk=m.id||String(m.at);const isNew=!fresh&&!S.knownMids.has(mk);
   if(m.del)body="Bu mesaj silindi";else{if(m.fwd)body+=`<span class="fwd">${I("send")}İletildi</span>`;
    if(m.reply)body+=`<button class="quote" data-jump="${esc(m.reply.mid)}">${esc(P(m.reply.from).username)}: ${esc(m.reply.text||"")}</button>`;
@@ -4150,7 +4153,7 @@ function renderMsgs(){const box=$("#msgs");if(!box||S.route.name!=="chat")return
    if(m.text)body+=isAI&&!mine?md(m.text):esc(m.text);
    if(m.edited)body+=`<span class="edl">düzenlendi</span>`;if(m.sch&&m.at>now())body+=`<span class="edl schl">${I("bell")}Zamanlandı · ${esc(schLabel(m.at))}</span>`}
   const hearts=Object.keys(msgReacts(m)).length;
-  h+=`<div class="mrow ${mine?"me":""} ${hearts?"has-react":""} ${isNew?"nw":""}" data-k="${esc(mk)}">${multi&&!mine?(showSender?`<button class="avb" data-prof="${esc(m.from)}" aria-label="${esc(P(m.from).name)} profili">${avatar(m.from,32,{click:false,ring:false,online:false})}</button>`:'<span style="width:32px;flex:none"></span>'):""}<div class="mcol">${showSender?`<button class="sender" data-prof="${esc(m.from)}">${esc(P(m.from).name||P(m.from).username)}${BOT[m.from]?badge(m.from):""} <span class="muted">@${esc(P(m.from).username)}</span></button>`:""}<div class="msg ${isAI&&!mine?"ai":""} ${m.del?"del":""}" ${m.id&&k.type!=="bot"?`data-mid="${esc(m.id)}" id="m-${esc(m.id)}"`:""}>${body}${hearts?reactChip(m):""}</div></div></div>`;
+  h+=`<div class="mrow ${mine?"me":""} ${hearts?"has-react":""} ${isNew?"nw":""}" data-k="${esc(mk)}">${multi&&!mine?(showSender?`<button class="avb" data-prof="${esc(m.from)}" aria-label="${esc(P(m.from).name)} profili">${avatar(m.from,32,{click:false,ring:false,online:false})}</button>`:'<span style="width:32px;flex:none"></span>'):k.type==="dm"&&!mine?(dmAv?`<button class="avb dmav" data-prof="${esc(m.from)}" aria-label="${esc(P(m.from).name)} profili">${avatar(m.from,28,{click:false,ring:false,online:false})}</button>`:'<span class="dmav-sp" style="width:28px;flex:none"></span>'):""}<div class="mcol">${showSender?`<button class="sender" data-prof="${esc(m.from)}">${esc(P(m.from).name||P(m.from).username)}${BOT[m.from]?badge(m.from):""} <span class="muted">@${esc(P(m.from).username)}</span></button>`:""}<div class="msg ${isAI&&!mine?"ai":""} ${m.del?"del":""}" ${m.id&&k.type!=="bot"?`data-mid="${esc(m.id)}" id="m-${esc(m.id)}"`:""}>${body}${hearts?reactChip(m):""}</div></div></div>`;
   if(seenAt[idx])h+=`<div class="seenrow">${seenAt[idx].slice(0,8).map(([u,t])=>`<button class="seenav ${S.seenKeys&&!S.seenKeys.has(u+":"+(m.id||m.at))&&!fresh?"nw":""}" data-seen="${esc(u)}" data-t="${t}" aria-label="${esc(P(u).username)} gördü"><img src="${esc(P(u).avatar)}" alt=""></button>`).join("")}</div>`;
   if(seenAt[idx]){S.seenKeys=S.seenKeys||new Set();seenAt[idx].forEach(([u])=>S.seenKeys.add(u+":"+(m.id||m.at)))}
   S.knownMids.add(mk)});
@@ -12365,6 +12368,10 @@ const renderMsgsSch61=renderMsgs;
 renderMsgs=function(...a){const k=pinKey();if(!k)return renderMsgsSch61.apply(this,a);const all=S.msgs;const t=now();
  if(all.some(m=>m.sch&&m.at>t&&m.from!==S.uid))S.msgs=all.filter(m=>!(m.sch&&m.at>t&&m.from!==S.uid));let r;try{r=renderMsgsSch61.apply(this,a)}finally{S.msgs=all}
  try{schDue(k)}catch(e){console.warn(e)}return r};
+/* 6.1 klavye: Android Chrome yazı kutularında klavyenin üstüne eski yazılardan öneri ("Meraba") ve şifre/kart/adres şeridi koyuyordu (sahibi "beyaz şey
+   rahatsız edici" dedi). Giriş/kayıt dışındaki autocomplete'i belirtilmemiş bütün kutulara autocomplete="off" yazılır (MutationObserver). */
+(function(){const fix=root=>{for(const el of (root.querySelectorAll?root.querySelectorAll("input:not([autocomplete]),textarea:not([autocomplete])"):[])){const t=(el.type||"").toLowerCase();if(t==="password"||t==="email"||t==="file"||t==="range"||t==="checkbox"||t==="radio")continue;el.setAttribute("autocomplete","off");if(el.tagName==="INPUT"&&!el.name)el.name="k"+Math.random().toString(36).slice(2,8)}};
+ fix(document);new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input,textarea"))fix(n.parentNode||document);else fix(n)}}).observe(document.documentElement,{childList:true,subtree:true})})();
 /*}@js:61CHAT*/
 /*@js:61STORY{*/
 /* 6.1 Lodos: Yakın Arkadaşlar ve hikâye çıkartmaları.
