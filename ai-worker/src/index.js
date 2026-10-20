@@ -238,6 +238,19 @@ async function describeImage(env, src) {
   }
   return "";
 }
+// Workers AI yanıtından metni çıkarır: Llama {response}, gpt-oss (Responses API) {output_text} ya da output[].content[].text, OpenAI biçimi choices.
+function outText(r) {
+  if (!r) return "";
+  if (typeof r === "string") return r.trim();
+  let t = r.response ?? r.result?.response ?? r.output_text ?? "";
+  if (!t && Array.isArray(r.output)) {
+    for (const o of r.output) {
+      if (o && o.type === "message" && Array.isArray(o.content)) for (const c of o.content) if (c && (c.type === "output_text" || c.type === "text") && typeof c.text === "string") t += c.text;
+    }
+  }
+  if (!t && Array.isArray(r.choices)) t = r.choices[0]?.message?.content || "";
+  return String(t || "").trim();
+}
 async function askFree(env, body, uid, fetcher = fetch) {
   const messages = cleanMessages(body.messages);
   if (!messages) return { status: 400, data: { error: "bad_request", message: "İstek biçimi hatalı." } };
@@ -269,23 +282,27 @@ async function askFree(env, body, uid, fetcher = fetch) {
     }
   }
   const msgs = [{ role: "system", content: sys }, ...messages.map((m) => ({ role: m.role, content: flatText(m.content) }))];
-  // 6.1: ana model hata verirse ya da boş dönerse (çoğunlukla ücretsiz günlük kota) daha az kota harcayan yedek modelle bir kez daha denenir.
+  // 6.1.1: sahibi "Rota çok kısa ve az zeki" dedi. Önce daha zeki gpt-oss-120b (SMART_MODEL; Workers AI'da Responses API biçimi, düşük akıl yürütme),
+  // olmazsa FREE_MODEL (Llama 3.3 70B), o da olmazsa daha az kota harcayan FALLBACK_MODEL denenir. SMART_MODEL="off" ilk adımı kapatır.
   const run = async (m) => {
-    const r = await env.AI.run(m, { messages: msgs, max_tokens: 900 });
-    return String((r && (r.response ?? r.result?.response)) || "").trim();
+    if (/gpt-oss/.test(m)) {
+      const r = await env.AI.run(m, { input: msgs, reasoning: { effort: "low" }, max_output_tokens: 2500 });
+      return outText(r);
+    }
+    const r = await env.AI.run(m, { messages: msgs, max_tokens: 1500 });
+    return outText(r);
   };
+  const smart = String(env.SMART_MODEL || "@cf/openai/gpt-oss-120b");
+  const chain = [...new Set([smart === "off" ? "" : smart, model, String(env.FALLBACK_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast")].filter(Boolean))];
   let used = model, text = "", err = null;
-  try {
-    text = await run(model);
-  } catch (e) {
-    err = e;
-  }
-  const fb = String(env.FALLBACK_MODEL || "@cf/meta/llama-3.1-8b-instruct-fast");
-  if (!text && fb && fb !== model) {
+  for (const m of chain) {
     try {
-      text = await run(fb);
-      used = fb;
-      err = null;
+      text = await run(m);
+      if (text) {
+        used = m;
+        err = null;
+        break;
+      }
     } catch (e) {
       err = err || e;
     }
