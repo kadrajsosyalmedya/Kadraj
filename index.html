@@ -3747,6 +3747,12 @@ html.k-lite .scrim{background:rgba(0,0,0,.42)}
 .msg .cpj{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:8px;padding:9px 12px;border-radius:12px;background:linear-gradient(135deg,#b91c1c,#0C7A63);color:#fff;font-weight:700;font-size:.86rem}
 .msg .cpj svg.i{width:1.05rem;height:1.05rem}
 /*}@css:580*/
+/*@css:61GAME{*/
+/* 6.1 sohbette mini oyunlar: oyunun kendi görünümü oyunlar.js içinde (ogCss); burada yalnızca sohbetteki düğme ve seçim penceresi */
+.msg .ogj{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:8px;padding:9px 12px;border-radius:12px;background:linear-gradient(135deg,#0C7A63,#9B5CF6);color:#fff;font-weight:700;font-size:.86rem}
+.msg .ogj svg{width:1.05rem;height:1.05rem;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.src .ic svg.ogi{width:1.25rem;height:1.25rem;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+/*}@css:61GAME*/
 
 
 </style>
@@ -11768,7 +11774,7 @@ function mnTag(el,map,myU){const re=/@([\w.ğüşıöçĞÜŞİÖÇ]{2,30})/g;le
  for(const n of nodes){const v=n.nodeValue;re.lastIndex=0;if(!re.test(v))continue;re.lastIndex=0;const fr=document.createDocumentFragment();let last=0,m;
   while((m=re.exec(v))){const name=m[1].replace(/\.+$/,"");const uid=map.get(name.toLowerCase());if(!uid)continue;fr.append(v.slice(last,m.index));const b=document.createElement("span");b.className="mtag";b.dataset.prof=uid;b.textContent="@"+name;fr.append(b);last=m.index+1+name.length;if(name.toLowerCase()===myU)hit=true}
   if(last){fr.append(v.slice(last));n.replaceWith(fr)}}return hit}
-function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)return;try{nickPaint(key,box)}catch(e){console.warn(e)}try{cpMsgPaint(box)}catch(e){console.warn(e)}let k;try{k=keyInfo(key)}catch{return}if(!k||k.type==="bot")return;
+function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)return;try{nickPaint(key,box)}catch(e){console.warn(e)}try{cpMsgPaint(box)}catch(e){console.warn(e)}try{ogMsgPaint(box)}catch(e){console.warn(e)}let k;try{k=keyInfo(key)}catch{return}if(!k||k.type==="bot")return;
  const byId=new Map((S.msgs||[]).map(m=>[m.id,m]));const map=mnUserMap();const myU=String(me().username||"").toLowerCase();
  for(const el of box.querySelectorAll(".msg[data-mid]")){const m=byId.get(el.dataset.mid);if(!m||m.del)continue;
   if(m.text&&m.text.includes("@")&&!el.dataset.mn){el.dataset.mn="1";if(mnTag(el,map,myU)&&m.from!==S.uid)el.classList.add("mme")}
@@ -12281,7 +12287,8 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 const plusMenuBase61=plusMenu;
 plusMenu=function(...a){const r=plusMenuBase61.apply(this,a);try{const k=pinKey();const l=$('#overlay [data-layer="plus"]');const box=l&&l.querySelector(".srcs");const ph=box&&box.querySelector("#pph");
   if(k&&ph){const b=document.createElement("button");b.className="src";b.id="pon";b.innerHTML=`<span class="ic">${I("eye")}</span><span><b>Tek seferlik fotoğraf</b><small>Bir kez açılır, sonra kaybolur</small></span>`;b.onclick=()=>{closeLayer("plus");onceSend()};ph.after(b);
-   const z=document.createElement("button");z.className="src";z.id="psch";z.innerHTML=`<span class="ic">${I("bell")}</span><span><b>Mesajı zamanla</b><small>Seçtiğin saatte görünsün</small></span>`;z.onclick=()=>{closeLayer("plus");schOpen()};b.after(z)}}catch(e){console.warn(e)}return r};
+   const z=document.createElement("button");z.className="src";z.id="psch";z.innerHTML=`<span class="ic">${I("bell")}</span><span><b>Mesajı zamanla</b><small>Seçtiğin saatte görünsün</small></span>`;z.onclick=()=>{closeLayer("plus");schOpen()};b.after(z);
+   const g=document.createElement("button");g.className="src";g.id="pog";g.innerHTML=`<span class="ic">${OG_IC}</span><span><b>Oyun oyna</b><small>XOX, 4'lü Bağla ya da Kelime</small></span>`;g.onclick=()=>{closeLayer("plus");ogPick(S.route.params.key)};z.after(g)}}catch(e){console.warn(e)}return r};
 /* Mesaj zamanlama: + menüsünde "Zamanla" (DM ve grup, var olan sohbet). Sunucu olmadığı için mesaj hemen gelecek zamanla yazılır
    ({at:gelecek, sch:1}); alıcının cihazı zamanı gelene kadar göstermez (renderMsgs öncesi süzülür), son mesaj özeti ve bildirim o ana kadar
    değişmez. Zamanı gelince açık sohbette görünür ve görenin cihazı chats.last'ı günceller (o zaman uygulama içi bildirim düşer). Telefon
@@ -12703,6 +12710,21 @@ document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest
 function cpMsgPaint(box){const hid=(S.hidden&&S.hidden.msgs)||{};for(const m of S.msgs||[]){if(!m||!m.cephe||!m.id||m.del||hid[m.id])continue;const el=document.getElementById("m-"+m.id);if(!el||el.querySelector(".cpj"))continue;
  el.insertAdjacentHTML("beforeend",`<button class="cpj" data-cpjoin="${esc(String(m.cephe).slice(0,8))}">${I("flag")}Savaşa katıl</button>`)}}
 /*}@js:580*/
+/*@js:61GAME{*/
+/* 6.1 sohbette mini oyunlar (XOX, 4'lü Bağla, Kelime). Bütün oyun kodu oyunlar.js'te (başındaki yorum ayrıntılı; window.OYUNLAR); burada cephe.js
+   kalıbında yükleyici: ogLoad oyunlar.js?v=APP_V'yi bir kez indirir. + menüsü (plusMenu 61 sarmalayıcısı, #pog; yalnızca DM ve grup) › ogPick › OYUNLAR.invite.
+   Davet mesajı {text, oyun:{t,gid}}; mnAfterRender içinde ogMsgPaint "Oyuna git" düğmesi (data-ogo) ekler. Oyun belgesi games/og-<id> (kural değişikliği yok). */
+const OG_IC='<svg class="ogi" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="7" width="19" height="11" rx="5.5"/><path d="M7.5 10.5v4M5.5 12.5h4"/><circle cx="15.5" cy="11.5" r=".6"/><circle cx="17.5" cy="13.5" r=".6"/></svg>';
+let ogP=null;
+function ogLoad(){return ogP||(ogP=new Promise((res,rej)=>{if(window.OYUNLAR)return res();const sc=document.createElement("script");sc.src="oyunlar.js?v="+APP_V;sc.onload=()=>window.OYUNLAR?res():rej(new Error("yok"));sc.onerror=()=>{ogP=null;rej(new Error("indirilemedi"))};document.head.appendChild(sc)}))}
+function ogGo(fn){if(!S.authed)return;ogLoad().then(()=>fn(window.OYUNLAR)).catch(()=>{ogP=null;toast("Oyun yüklenemedi. İnternetini kontrol et.")})}
+function ogPick(key){if(!guard())return;const gs=[["xox","XOX","Üçünü yan yana diz"],["c4","4'lü Bağla","Taşları düşür, dördünü birleştir"],["kel","Kelime","Aynı 5 harfli kelimeyi kim daha az denemede bulur"]];
+ const l=sheet("ogpick","Oyun oyna",`<div class="srcs">${gs.map(([t,n,d])=>`<button class="src" type="button" data-ogt="${t}"><span class="ic">${OG_IC}</span><span><b>${n}</b><small>${d}</small></span></button>`).join("")}</div>`);
+ l.onclick=e=>{const b=e.target.closest("[data-ogt]");if(!b)return;closeLayer("ogpick");const t=b.dataset.ogt;ogGo(O=>O.invite(key,t))}}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-ogo]");if(!b)return;e.preventDefault();e.stopPropagation();const g=b.dataset.ogo;ogGo(O=>O.open(g))},true);
+function ogMsgPaint(box){const hid=(S.hidden&&S.hidden.msgs)||{};for(const m of S.msgs||[]){if(!m||!m.oyun||!m.id||m.del||hid[m.id])continue;const g=String(m.oyun.gid||"");if(!/^og-[a-z0-9]{4,30}$/.test(g))continue;const el=document.getElementById("m-"+m.id);if(!el||el.querySelector(".ogj"))continue;
+ el.insertAdjacentHTML("beforeend",`<button class="ogj" data-ogo="${esc(g)}">${OG_IC}Oyuna git</button>`)}}
+/*}@js:61GAME*/
 
 
 boot();
