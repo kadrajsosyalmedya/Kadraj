@@ -50,7 +50,7 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  await step("Hikâye ve çıkartmalar",()=>openStories("u2"),()=>document.querySelectorAll(".svst .stk").length>=2?true:"çıkartma yok");
  await step("Yakın Arkadaşlar halkası",()=>tab("feed"),()=>storyRing("u2")==="ring cf"||storyRing("u2")==="ring seen"?true:"halka: "+storyRing("u2"));
  await step("Hikâye oluştur + çıkartma",async()=>{const cv=document.createElement("canvas");cv.width=72;cv.height=128;const img=await loadImg(cv.toDataURL());S.cmp={kind:"story",filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides",img,src:null,st:[{t:"time",v:"12:00",x:360,y:860,s:1},{t:"poll",q:"Test",o:["A","B"],x:360,y:330,s:1}]};drawComposer()},has("#cCv"));
- await step("Not yazma kutusu",()=>openNote(),()=>{const n=$("#nIn");return n&&n.tagName==="TEXTAREA"?true:"not kutusu yok"});
+ await step("Not yazma kutusu",()=>openNote(),()=>{const n=$("#nIn");return n&&n.classList.contains("kce")&&n.isContentEditable?true:"not kutusu yok"});
  await step("Fotoğraf seçici ve kütüphane",()=>{kmpOpen({})},has('[data-src="lib"]'));
  await step("Profil",()=>tab("profile"),has("#main .prof"));
  await step("Başkasının profili ve müzik",()=>go("profile",{uid:"u2"}),has(".pmus"));
