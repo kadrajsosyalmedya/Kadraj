@@ -19,6 +19,8 @@ DAILY_LIMIT = "60"
 ALLOWED_ORIGINS = "https://kadrajsosyalmedya.github.io"
 FIREBASE_PROJECT = "kadraj-6f1e0"
 FREE_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+# 6.1.1: önce bu daha zeki model denenir ("off" kapatır), olmazsa FREE_MODEL, sonra FALLBACK_MODEL.
+SMART_MODEL = "@cf/openai/gpt-oss-120b"
 PUSH_DAILY_LIMIT = "600"
 SEARCH_DAILY_LIMIT = "20"
 # 6.1: Rota resim çizer (Workers AI, ücretsiz). Kişi başına günlük resim sınırı ve görsel modeli.

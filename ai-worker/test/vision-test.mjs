@@ -5,7 +5,7 @@ const ok = (c, m) => { console.log((c ? "PASS " : "FAIL ") + m); if (!c) fail++;
 const img = { type: "image", source: { type: "base64", media_type: "image/jpeg", data: btoa("\xff\xd8\xff\xe0fake") } };
 const msg = [{ role: "user", content: [img, { type: "text", text: "Bu fotoğrafa açıklama yaz." }] }];
 let calls = [], sys = "";
-const mk = (vision) => ({ AI: { run: async (m, o) => { calls.push(m); if (o.messages && o.messages[0].role === "system") { sys = o.messages[0].content; return { response: "Kahve keyfi #kahve" }; } return vision(m, o); } } });
+const mk = (vision) => ({ AI: { run: async (m, o) => { calls.push(m); const tm = o.messages || o.input; if (Array.isArray(tm) && tm[0].role === "system") { sys = tm[0].content; return { response: "Kahve keyfi #kahve" }; } return vision(m, o); } } });
 let r = await _askFree(mk(async () => ({ response: "A red cup of espresso on a wooden table." })), { messages: msg }, "u1");
 ok(r.data.saw === true && sys.includes("espresso") && calls[0] === "@cf/google/gemma-4-26b-a4b-it", "ilk görsel model betimledi, sisteme eklendi");
 calls = []; sys = "";
