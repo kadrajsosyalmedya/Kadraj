@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60107">
+<meta name="kadraj-version" content="60108">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3867,7 +3867,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60107,APP_VER="6.1.7";
+const APP_V=60108,APP_VER="6.1.8";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -4225,6 +4225,9 @@ addEventListener("popstate",e=>{
  if(S.route.name!=="feed"){tab("feed");return}
  /* kök (Akış): çıkmayı engelle, yerinde kal */
  navPush()});
+/* Android uygulamasının geri tuşu (MainActivity): 1 = Kadraj içinde geri gitti, 0 = uygulamadan çık. */
+window.kBack=()=>{try{if($$("#overlay .layer").length){closeTop();return 1}if(S.route.name==="chessgame"&&CH&&CH.view!=null){CH.view=null;chDraw();return 1}
+ if(S.stack.length){back();return 1}if(S.authed&&S.route.name!=="feed"){tab("feed");return 1}}catch{}return 0};
 let refreshQ=false;
 function scheduleRefresh(){if(refreshQ)return;refreshQ=true;requestAnimationFrame(()=>{refreshQ=false;refresh()})}
 function refresh(){if(!S.authed)return;renderDock();renderTop();const r=S.route.name;

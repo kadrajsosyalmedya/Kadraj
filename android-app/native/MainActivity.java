@@ -10,12 +10,14 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(KadrajGaleri.class);
         super.onCreate(savedInstanceState);
-        /* Geri tuşu: sayfa geçmişinde geri gider (Kadraj navPush/popstate), geçmiş bitince uygulamadan çıkar. */
+        /* Geri tuşu: önce Kadraj'a sorar (window.kBack: katman, yığın, Akış'a dön); "0" dönerse uygulamadan çıkar. */
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                if (bridge != null && bridge.getWebView().canGoBack()) bridge.getWebView().goBack();
-                else { setEnabled(false); getOnBackPressedDispatcher().onBackPressed(); setEnabled(true); }
+                if (bridge == null) { finish(); return; }
+                bridge.getWebView().evaluateJavascript("String(window.kBack?window.kBack():0)", v -> {
+                    if (v == null || !v.contains("1")) finish();
+                });
             }
         });
     }
