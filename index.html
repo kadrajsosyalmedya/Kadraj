@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60102">
+<meta name="kadraj-version" content="60103">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -453,8 +453,8 @@ main.chatmode:has(textarea:focus) .cchips{display:none}
 .sv .tap{position:absolute;top:80px;bottom:90px;width:35%;z-index:1}
 .sv .tap.l{left:0}.sv .tap.r{right:0;width:65%}
 .sv .ft{margin-top:auto;position:relative;z-index:2;display:flex;gap:10px;padding:12px 12px calc(14px + env(safe-area-inset-bottom,0px))}
-.sv .ft input{flex:1;min-width:0;min-height:2.9rem;border-radius:16px;border:1.5px solid rgba(255,255,255,.6);background:rgba(0,0,0,.25);color:#fff;padding:0 16px;outline:none}
-.sv .ft input::placeholder{color:rgba(255,255,255,.75)}
+.sv .ft input,.sv .ft textarea{flex:1;min-width:0;min-height:2.9rem;border-radius:16px;border:1.5px solid rgba(255,255,255,.6);background:rgba(0,0,0,.25);color:#fff;padding:0 16px;outline:none}
+.sv .ft input::placeholder,.sv .ft textarea::placeholder{color:rgba(255,255,255,.75)}
 .sv .ib{background:rgba(0,0,0,.35);border:0;color:#fff}
 
 /* Ayarlar */
@@ -3185,6 +3185,9 @@ main.chatmode{position:relative}
 /* 6.1 DM'de Instagram gibi: karşı tarafın art arda mesajlarının sonuncusunda yuvarlak profil fotoğrafı (renderMsgs tabanında dmAv) */
 .mrow .dmav,.mrow .dmav .av,.mrow .dmav .av img,.mrow .dmav .av svg{border-radius:50%!important}
 .mrow .dmav .av::before,.mrow .dmav .av::after{display:none}
+textarea.k1l{resize:none;overflow:hidden;white-space:nowrap;overflow-wrap:normal;font:inherit;line-height:1.3;min-height:0!important;height:auto;field-sizing:fixed}
+textarea.in.k1l{box-sizing:border-box;height:3rem;min-height:3rem!important;padding-top:calc(1.5rem - .65em - 1.5px);padding-bottom:0}
+.sv .ft textarea.k1l{width:auto;flex:1;padding-top:.8rem;padding-bottom:.8rem;line-height:1.3;height:2.9rem}
 /*}@css:61CHAT*/
 /*@css:61STORY{*/
 /* 6.1 Yakın Arkadaşlar ve hikâye çıkartmaları (js bölgesi 61STORY) */
@@ -3846,7 +3849,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60102,APP_VER="6.1.2";
+const APP_V=60103,APP_VER="6.1.3";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -4548,7 +4551,7 @@ function openNewChat(){const people=[...humans(),...BOTS.map(b=>b.uid)];
 /* ============ Hikâye görüntüleyici ============ */
 let canSeeUser=uid=>{const o=S.profiles[uid];return!o||!o.private||uid===S.uid||isFollowing(S.uid,uid)};
 function openStories(uid){if(!canSeeUser(uid))return toast("Bu hesap gizli. Hikâyelerini görmek için takip et.");const list=storiesOf(uid);if(!list.length)return;let i=0;const seen=seenStories();const fu=list.findIndex(s=>!seen[s.id]);if(fu>0)i=fu;let raf=0;
- const l=openLayer("story",`<div class="sv" role="dialog" aria-label="Hikâye"><div class="bars">${list.map(()=>"<i><b></b></i>").join("")}</div><div class="shd">${avatar(uid,34,{ring:false,click:false})}<div class="n">${esc(P(uid).username)}<small id="svT"></small><span class="cfp" id="svCf" hidden>${I("star")}Yakın Arkadaşlar</span></div><button class="ib" data-act="close" aria-label="Kapat">${I("close")}</button></div><div class="img"><img id="svImg" alt=""></div><button class="tap l" id="svPrev" aria-label="Önceki"></button><button class="tap r" id="svNext" aria-label="Sonraki"></button>${uid===S.uid?`<div class="ft"><button class="btn sec" id="svViews">${I("eye")}<span id="svVc">0</span> görüntüleme</button><button class="btn sec" id="svHl">${I("spark")}Öne çıkar</button><button class="btn sec" id="svDel" style="margin-left:auto">${I("trash")}Sil</button></div>`:`<form class="ft" id="svF"><span class="svrx">${["heart","fire","laugh","wow"].map(t=>`<button type="button" data-svrx="${t}" aria-label="${esc((REACTS.find(r=>r[0]===t)||[0,""])[1])} gönder">${rxSvg(t)}</button>`).join("")}</span><input id="svIn" placeholder="${esc(P(uid).username)} kişisine yanıt yaz…" aria-label="Yanıt"><button class="ib" aria-label="Gönder">${I("send")}</button></form>`}</div>`,{noScrim:true,onClose:()=>{cancelAnimationFrame(raf);scheduleRefresh()}});
+ const l=openLayer("story",`<div class="sv" role="dialog" aria-label="Hikâye"><div class="bars">${list.map(()=>"<i><b></b></i>").join("")}</div><div class="shd">${avatar(uid,34,{ring:false,click:false})}<div class="n">${esc(P(uid).username)}<small id="svT"></small><span class="cfp" id="svCf" hidden>${I("star")}Yakın Arkadaşlar</span></div><button class="ib" data-act="close" aria-label="Kapat">${I("close")}</button></div><div class="img"><img id="svImg" alt=""></div><button class="tap l" id="svPrev" aria-label="Önceki"></button><button class="tap r" id="svNext" aria-label="Sonraki"></button>${uid===S.uid?`<div class="ft"><button class="btn sec" id="svViews">${I("eye")}<span id="svVc">0</span> görüntüleme</button><button class="btn sec" id="svHl">${I("spark")}Öne çıkar</button><button class="btn sec" id="svDel" style="margin-left:auto">${I("trash")}Sil</button></div>`:`<form class="ft" id="svF"><span class="svrx">${["heart","fire","laugh","wow"].map(t=>`<button type="button" data-svrx="${t}" aria-label="${esc((REACTS.find(r=>r[0]===t)||[0,""])[1])} gönder">${rxSvg(t)}</button>`).join("")}</span><textarea class="k1l" rows="1" id="svIn" placeholder="${esc(P(uid).username)} kişisine yanıt yaz…" aria-label="Yanıt" enterkeyhint="send"></textarea><button class="ib" aria-label="Gönder">${I("send")}</button></form>`}</div>`,{noScrim:true,onClose:()=>{cancelAnimationFrame(raf);scheduleRefresh()}});
  const bars=$$(".bars b",l);let start=0,paused=false;const dur=5000;
  const show=()=>{const s=list[i];$("#svImg",l).src=R(s.img);$("#svT",l).textContent=ago(s.at);$("#svCf",l).hidden=!s.cf;{const h=$("#svHl",l);if(h)h.hidden=!!s.cf}stPaint(l,s,uid,v=>{paused=v});const sn=seenStories();sn[s.id]=1;LS.set("kadraj_seen",sn);if(uid!==S.uid&&S.stories[s.id]&&!((S.stories[s.id].views||{})[S.uid])&&S.canWrite&&!S.guest){S.stories[s.id]={...S.stories[s.id],views:{...(S.stories[s.id].views||{}),[S.uid]:now()}};DB.update("stories/"+s.id,{views:{[S.uid]:now()}}).catch(()=>{})}const vc=$("#svVc",l);if(vc)vc.textContent=Object.values((S.stories[s.id]||{}).views||{}).filter(Boolean).length;bars.forEach((b,j)=>b.style.width=j<i?"100%":"0");start=performance.now();tick()};
  const tick=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(function f(t){if(!l.isConnected)return;if(paused){l._pz=l._pz||t;raf=requestAnimationFrame(f);return}if(l._pz){start+=t-l._pz;l._pz=0}const pr=Math.min(1,(t-start)/dur);bars[i].style.width=pr*100+"%";if(pr>=1)next();else raf=requestAnimationFrame(f)})};
@@ -5059,7 +5062,7 @@ document.addEventListener("click",e=>{if(crFired&&e.target.closest("[data-crow]"
 document.addEventListener("contextmenu",e=>{if(e.target.closest("[data-crow],.msg[data-mid]"))e.preventDefault();const m=e.target.closest(".msg[data-mid]");if(m&&!$('#overlay [data-layer="menu"]')){clearTimeout(lpT);msgMenu(m.dataset.mid)}});
 /* notlar */
 function openNote(){if(!guard())return;const cur=noteOf(S.uid);
- const l=sheet("note","Not paylaş",`<div class="form"><div class="note-prev"><div class="nb big" id="npB">${esc(cur||"Aklından ne geçiyor?")}</div>${avatar(S.uid,76,{click:false,ring:false,online:false})}</div><input class="in" id="nIn" maxlength="60" placeholder="Kısa bir not yaz… (en fazla 60 karakter)" value="${esc(cur)}"><p class="muted" style="margin:0;font-size:.82rem">Notun 24 saat boyunca Sohbet ekranında, fotoğrafının üstünde görünür. Arkadaşların dokunup yanıt verebilir.</p><button class="btn block" id="nGo">${I("send")}Paylaş</button>${cur?`<button class="btn ghost block" id="nDel">Notu sil</button>`:""}</div>`);
+ const l=sheet("note","Not paylaş",`<div class="form"><div class="note-prev"><div class="nb big" id="npB">${esc(cur||"Aklından ne geçiyor?")}</div>${avatar(S.uid,76,{click:false,ring:false,online:false})}</div><textarea class="in k1l" rows="1" id="nIn" maxlength="60" placeholder="Kısa bir not yaz… (en fazla 60 karakter)" enterkeyhint="done">${esc(cur)}</textarea><p class="muted" style="margin:0;font-size:.82rem">Notun 24 saat boyunca Sohbet ekranında, fotoğrafının üstünde görünür. Arkadaşların dokunup yanıt verebilir.</p><button class="btn block" id="nGo">${I("send")}Paylaş</button>${cur?`<button class="btn ghost block" id="nDel">Notu sil</button>`:""}</div>`);
  const inp=$("#nIn",l);inp.focus();inp.oninput=()=>{$("#npB",l).textContent=inp.value||"Aklından ne geçiyor?"};
  const save=async note=>{S.profiles={...S.profiles,[S.uid]:{...S.profiles[S.uid],note}};closeLayer("note");render(false);return write(()=>DB.update("profiles/"+S.uid,{note}))};
  $("#nGo",l).onclick=async()=>{const v=kidClean(inp.value.trim());if(!v)return toast("Önce notunu yaz.");if(await save({text:v,at:now()}))toast("Notun paylaşıldı")};
@@ -5701,7 +5704,7 @@ function reelDur(v){const k=+v.dataset.dur||0;if(k>0)return k;const d=v.duration
 function chatList(){const pins=settings.pinChats||[];return chatListOld().map(c=>({...c,pinned:pins.includes(c.key)})).sort((a,b)=>(b.pinned-a.pinned)||(a.pinned&&b.pinned?pins.indexOf(a.key)-pins.indexOf(b.key):b.at-a.at))}
 /* sohbette arama: açık sohbetin yüklü mesajlarında */
 function chatSearch(){const hid=(S.hidden&&S.hidden.msgs)||{};const msgs=(S.msgs||[]).filter(m=>m&&!m.del&&m.text&&!m.sys&&!hid[m.id]);
- const l=sheet("csr","Sohbette ara",`<input class="in csr-in" id="csrIn" placeholder="Kelime yaz…" autocomplete="off" enterkeyhint="search"><div class="csr-list" id="csrL"></div>`,{tall:true});const inp=$("#csrIn",l),L=$("#csrL",l);
+ const l=sheet("csr","Sohbette ara",`<textarea class="in csr-in k1l" rows="1" id="csrIn" placeholder="Kelime yaz…" autocomplete="off" enterkeyhint="search"></textarea><div class="csr-list" id="csrL"></div>`,{tall:true});const inp=$("#csrIn",l),L=$("#csrL",l);
  const draw=()=>{const q=kbFold(inp.value.trim());if(q.length<2){L.innerHTML=`<p class="muted" style="margin:6px 20px">En az 2 harf yaz. Yalnızca bu sohbette yüklü olan son mesajlarda aranır.</p>`;return}
   const hit=msgs.filter(m=>kbFold(m.text).includes(q)).slice(-40).reverse();
   if(!hit.length){L.innerHTML=`<p class="muted" style="margin:6px 20px">“${esc(inp.value.trim())}” bulunamadı.</p>`;return}
@@ -7411,7 +7414,7 @@ function srSugHtml(){const qq=srParse(S.q);if(!qq.raw)return"";const ctx=srCtx()
 
 /* --- görünüm --- */
 function srBarHtml(){const q=S.q||"";const open=!!(S.srMode||q.trim());
- return`<div class="search sr-bar${open?" on":""}" id="srBar"><div class="sr-in${q?" hasx":""}"><input class="in" id="q" type="search" placeholder="Kişi ya da #etiket ara" value="${esc(q)}" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Ara" aria-autocomplete="list" aria-controls="srSug" aria-expanded="false"><button class="sr-x" data-act="srx" aria-label="Yazıyı temizle"${q?"":" hidden"}>${I("close")}</button></div><button class="btn ghost sm sr-cancel" data-act="srcancel"${open?"":" hidden"}>Vazgeç</button><div class="sr-sug" id="srSug" role="listbox" aria-label="Öneriler" hidden></div></div>`}
+ return`<div class="search sr-bar${open?" on":""}" id="srBar"><div class="sr-in${q?" hasx":""}"><textarea class="in k1l" rows="1" id="q" data-k1own="1" placeholder="Kişi ya da #etiket ara" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="Ara" aria-autocomplete="list" aria-controls="srSug" aria-expanded="false">${esc(q)}</textarea><button class="sr-x" data-act="srx" aria-label="Yazıyı temizle"${q?"":" hidden"}>${I("close")}</button></div><button class="btn ghost sm sr-cancel" data-act="srcancel"${open?"":" hidden"}>Vazgeç</button><div class="sr-sug" id="srSug" role="listbox" aria-label="Öneriler" hidden></div></div>`}
 function srBodyHtml(){const raw=(S.q||"").trim();const ctx=srCtx();
  if(!raw&&S.srMode)return srRecentHtml(ctx);const tab=srTab();
  if(!raw)return srChips()+(tab==="all"?srBrowseAll(ctx):srBrowse(tab,ctx));
@@ -12402,6 +12405,11 @@ renderMsgs=function(...a){const k=pinKey();if(!k)return renderMsgsSch61.apply(th
    rahatsız edici" dedi). Giriş/kayıt dışındaki autocomplete'i belirtilmemiş bütün kutulara autocomplete="off" yazılır (MutationObserver). */
 (function(){const fix=root=>{for(const el of (root.querySelectorAll?root.querySelectorAll("input:not([autocomplete]),textarea:not([autocomplete])"):[])){const t=(el.type||"").toLowerCase();if(t==="password"||t==="email"||t==="file"||t==="range"||t==="checkbox"||t==="radio")continue;el.setAttribute("autocomplete","off");if(el.tagName==="INPUT"&&!el.name)el.name="k"+Math.random().toString(36).slice(2,8)}};
  fix(document);new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input,textarea"))fix(n.parentNode||document);else fix(n)}}).observe(document.documentElement,{childList:true,subtree:true})})();
+/* 6.1.3: Android Chrome tek satırlık <input>'larda klavyenin üstüne şifre/kart/adres şeridini (beyaz şerit) koyuyor, <textarea>'da koymuyor (sohbet kutusu
+   zaten textarea). Not, hikâye yanıtı, sohbette ara ve Keşfet araması tek satırlık textarea (.k1l): Enter yeni satır açmaz, formdaysa gönderir
+   (data-k1own olanın kendi Enter işleyicisi var), yapıştırılan satır sonları boşluk olur. */
+document.addEventListener("keydown",e=>{const t=e.target;if(!t||!t.classList||!t.classList.contains("k1l")||e.key!=="Enter"||e.isComposing)return;e.preventDefault();if(!t.dataset.k1own&&t.form){try{t.form.requestSubmit()}catch{t.form.dispatchEvent(new Event("submit",{cancelable:true}))}}},true);
+document.addEventListener("input",e=>{const t=e.target;if(t&&t.classList&&t.classList.contains("k1l")&&/[\r\n]/.test(t.value)){const p=t.selectionStart;t.value=t.value.replace(/[\r\n]+/g," ");try{t.setSelectionRange(p,p)}catch{}}},true);
 /*}@js:61CHAT*/
 /*@js:61STORY{*/
 /* 6.1 Lodos: Yakın Arkadaşlar ve hikâye çıkartmaları.
