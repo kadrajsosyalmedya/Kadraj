@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60101">
+<meta name="kadraj-version" content="60102">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3276,6 +3276,17 @@ main.chatmode{position:relative}
 .pm-yt{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#000}.pm-yt iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .pm-th{width:3.6rem;height:2.4rem;border-radius:8px;object-fit:cover;flex:none;background:var(--surface-2);display:grid;place-items:center;color:var(--muted)}
 #pmPvY:empty{display:none}
+/* 6.1.1 Kadraj kütüphanesi (kmlOpen) */
+.kmp{min-width:0;max-width:100%}.kmp>*{min-width:0}.kmp-tiles>.kmp-t{min-width:0}.kmp-tiles>.kmp-t small,.kmp-tiles>.kmp-t b{overflow-wrap:anywhere}.kmp-rb{display:flex;gap:12px}
+.kml{padding:0 12px calc(16px + env(safe-area-inset-bottom,0px))}
+.kml-add{width:100%;margin:2px 0 10px}
+.kml-h{font:700 .82rem/1 var(--f-body);color:var(--muted);margin:14px 4px 8px;text-transform:capitalize}
+.kml-g{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+@media (min-width:600px){.kml-g{grid-template-columns:repeat(5,1fr)}}
+.kml .kmp-r.kml-i{width:auto;height:auto;aspect-ratio:1;border-radius:4px;overflow:hidden;position:relative}
+.kml:not(.multi) .kmp-ck{display:none}
+.kml-p{position:absolute;left:5px;bottom:5px;width:1.3rem;height:1.3rem;border-radius:6px;background:rgba(0,0,0,.45);color:#fff;display:grid;place-items:center}.kml-p .i{width:.8rem;height:.8rem}
+.kml-foot{position:sticky;bottom:0;padding:10px 0 0;background:linear-gradient(transparent,var(--surface) 30%)}.kml-foot .btn{width:100%}
 /*}@css:61FUN*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
@@ -3835,7 +3846,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60101,APP_VER="6.1.1";
+const APP_V=60102,APP_VER="6.1.2";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -5897,6 +5908,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 6.1 Anılar: Eski paylaşımlarının ay ya da yıl dönümünde (aynı gün) Akış'ta hikâyelerin altında "Anılar" kartı çıkar: Gör, fotoğrafsa "Hikâyende paylaş" (fotoğraf "1 yıl önce bugün" çıkartmasıyla hikâye oluşturda açılır), birden çoksa Tümü. X ile o gün için gizlenir.
 - 6.1 profil müziği: Profilini düzenle › Profil müziği: ortak "Kadraj Müzik" listesinden bir şarkıya dokun (hazır şarkılar: Barış Manço, Tarkan, Sezen Aksu, mor ve ötesi, Duman, maNga, Cem Karaca, Edis) ya da YouTube'da şarkıda Paylaş › Bağlantıyı kopyala deyip bağlantıyı yapıştır › Ekle. Profilinde görünecek adı yaz, başlangıcı dakika:saniye olarak yaz, oynat düğmesiyle dene, Kaydet. Yapıştırdığın şarkı ortak listeye girer, arkadaşın da seçebilir. Şarkılar YouTube'un kendi oynatıcısıyla çalar, dosya yüklenmez. Profilinde adının altında şarkı çipi çıkar; dokunan 30 saniye dinler (küçük YouTube penceresi açılır, kapatınca durur). Kaldır ile silinir.
 - 6.1 Rota resim çizer: Rota'ya "kedi çiz", "çiz: deniz kenarında gün batımı" ya da "bana uzayda bir kedi çizer misin" yaz; Rota resmi çizip sohbete gönderir (yapay zekâ bağlantısı gerekir, günde 10 resim; uygunsuz istekler çizilmez, Çocuk Modu'nda daha sıkı). "Henüz öğrenmedim" derse yapay zekâ köprüsünün güncellenmesi gerekiyordur.
+- 6.1 Kadraj kütüphanen: Fotoğraf eklerken açılan Kadraj penceresinde ilk kutucuk "Kütüphanen": Kadraj'da seçtiğin, çektiğin ve çizdiğin fotoğraflar (bu cihazda, en fazla 240) ve paylaşımlarındaki fotoğraflar aylara göre ızgarada durur; dokunup seçersin, çoklu seçimde işaretleyip Ekle. Yeni fotoğraf için "Telefondan fotoğraf ekle" telefonun kendi seçicisini açar (Android telefon galerisini uygulamalara yalnızca kendi ekranıyla verir). "Son seçtiklerin" satırındaki Tümü de kütüphaneyi açar.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
 - 6.0 görünüm: arayüz yenilendi (Vizör ve Klasik ikisinde de): daha ferah kartlar, sayfa geçişleri yönlü (ileri sağdan, geri soldan, sekme alttan), alttan açılan pencerelerde seçenekler sırayla gelir. Profilde kişinin fotoğrafından bulanık kapak şeridi, Keşfet'te ara ara büyük karelerle mozaik ızgara, Bildirimler'de her satırda beğeni/yorum/takip rozeti, Ayarlar'da renkli ikonlar, yüklenirken iskelet ve ışıltı. Hareket azaltılmışsa animasyonlar kapanır.
 - 6.0 satranç: varsayılan taş seti Modern, tahta yeşil Turnuva (lobideki Görünüm'den değişir; daha önce seçim yapan kendi seçimini korur). Lobi: Botlara karşı, Arkadaşınla, Bulmacalar, Aynı telefonda. Oyun ekranı: telefonda hamleler üstte, tahta geniş, düğmeler altta; bilgisayarda hamle tablosu sağda. Ön hamle: rakip düşünürken taşını oynarsın, sıra gelince yapılır (kırmızı). Sağ tık kareyi işaretler, sağ tıkla sürükleyince ok çizer (shift yeşil, ctrl/alt mavi). Arkadaşınla çevrim içi oyunda da oyun incelemesi çalışır: Kitap, En iyi, Hata rozetleri, canlı doğruluk, değerlendirme çubuğu (satranç menüsünde Oyun incelemesi: canlı, oyun bitince ya da kapalı). Oyun sonunda yeni sonuç kartı.
@@ -10384,18 +10396,22 @@ function kmNative(accept,{capture,multi}={}){return new Promise(resolve=>{const 
  const slow=S.onPickSlow;S.onPickSlow=null;setTimeout(()=>{if(!settled&&!document.hidden&&document.hasFocus()&&slow)slow()},4000)})}
 
 /* --- son seçilenler (IndexedDB; yalnızca bu cihazda, hesaba özel) --- */
+/* 6.1.1 Kadraj kütüphanesi (sahibi Android'in hazır fotoğraf seçicisini sevmedi): Kadraj'da seçilen/çekilen/çizilen fotoğraflar cihazda (IndexedDB kadraj_media)
+   en fazla KML_MAX tutulur ve kmpOpen içindeki "Kadraj kütüphanen" (kmlOpen) aylara göre ızgarada gösterir; kişinin paylaşımlarındaki fotoğraflar da orada.
+   Telefonun galerisini web uygulaması kendi ızgarasında listeleyemez (Android izin vermez); yeni fotoğraf için yine telefonun seçicisi açılır. */
+const KML_MAX=240;
 const KMR={p:null,
  db(){if(this.p)return this.p;this.p=new Promise((res,rej)=>{try{const r=indexedDB.open("kadraj_media",1);r.onupgradeneeded=()=>{try{r.result.createObjectStore("recent",{keyPath:"id"})}catch{}};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error("blocked"))}catch(e){rej(e)}});this.p.catch(()=>{this.p=null});return this.p},
  async all(){try{const db=await this.db();return await new Promise(res=>{const out=[];try{const q=db.transaction("recent","readonly").objectStore("recent").openCursor();q.onsuccess=()=>{const c=q.result;if(c){out.push(c.value);c.continue()}else res(out)};q.onerror=()=>res(out)}catch{res(out)}})}catch{return[]}},
  async tx(fn){try{const db=await this.db();await new Promise(res=>{try{const t=db.transaction("recent","readwrite");fn(t.objectStore("recent"));t.oncomplete=res;t.onerror=res;t.onabort=res}catch{res()}})}catch{}},
- async list(){if(!S.uid||S.guest)return[];return(await this.all()).filter(r=>r&&r.uid===S.uid&&(r.src||r.blob)).sort((a,b)=>b.at-a.at).slice(0,12)},
+ async list(n=12){if(!S.uid||S.guest)return[];return(await this.all()).filter(r=>r&&r.uid===S.uid&&(r.src||r.blob)).sort((a,b)=>b.at-a.at).slice(0,n)},
  put(rec){return this.tx(st=>st.put(rec))},
  del(ids){return ids.length?this.tx(st=>ids.forEach(id=>st.delete(id))):Promise.resolve()},
  async add({img,src}){const u=S.uid;if(!u||S.guest||!window.indexedDB)return;try{let rec;
   if(src)rec={id:u+"|g|"+src,uid:u,at:now(),src};
   else{const iw=img.naturalWidth||img.videoWidth||img.width,ih=img.naturalHeight||img.videoHeight||img.height;if(!iw||!ih)return;const s=Math.min(1,1280/Math.max(iw,ih));const c=document.createElement("canvas");c.width=Math.round(iw*s);c.height=Math.round(ih*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);
    const blob=await new Promise(r=>{try{c.toBlob(r,"image/jpeg",.86)}catch{r(null)}});if(!blob)return;rec={id:u+"|"+rid(),uid:u,at:now(),blob}}
-  await this.put(rec);const mine=(await this.all()).filter(r=>r&&r.uid===u).sort((a,b)=>b.at-a.at);await this.del(mine.slice(12).map(r=>r.id))}catch(e){console.warn("kmr",e)}},
+  await this.put(rec);const mine=(await this.all()).filter(r=>r&&r.uid===u).sort((a,b)=>b.at-a.at);await this.del(mine.slice(KML_MAX).map(r=>r.id))}catch(e){console.warn("kmr",e)}},
  async clear(){const u=S.uid;await this.del((await this.all()).filter(r=>r&&r.uid===u).map(r=>r.id))}};
 
 /* --- Kadraj medya seçici --- */
@@ -10405,14 +10421,14 @@ function kmpOpen(opt={}){const o={title:"Fotoğraf ekle",accept:"image",multi:fa
  return new Promise(resolve=>{let done=false;const urls=[];const picked=new Map();
   const sel=()=>[...picked.values()];
   const finish=v=>{if(done)return;done=true;document.removeEventListener("paste",onPaste,true);setTimeout(()=>urls.forEach(u=>{try{URL.revokeObjectURL(u)}catch{}}),30000);closeLayer("gal");closeLayer("pick");resolve(v&&v.length?v:null)};
-  const T=[["file",vOk&&!iOk?"film":"image",vOk&&!iOk?"Videolar":"Galeri",(vOk&&iOk?"Fotoğraf ve video":vOk?"Telefondaki videolar":"Telefondaki fotoğraflar")+(max>1?", çoklu":""),"#0C7A63"]];
+  const T=[];if(iOk&&S.uid&&!S.guest)T.push(["lib","grid","Kütüphanen","Kadraj'daki fotoğrafların","#0C7A63"]);T.push(["file",vOk&&!iOk?"film":"image",vOk&&!iOk?"Videolar":"Telefon galerisi",(vOk&&iOk?"Fotoğraf ve video":vOk?"Telefondaki videolar":"Telefondaki fotoğraflar")+(max>1?", çoklu":""),"#2F6BFF"]);
   if(o.camera&&iOk)T.push(["camera","camera","Kamera","Fotoğraf çek","#D97706"]);
   if(o.record&&vOk)T.push(["rec","video","Video çek",`En fazla ${recS} sn`,"#DB2777"]);
   if(o.gallery&&iOk)T.push(["gallery","grid","Kadraj galerisi","Hazır fotoğraflar","#1D4ED8"]);
   if(o.draw&&iOk)T.push(["draw","pen","Çizim","Parmağınla çiz","#0E7490"]);
   if(o.paste&&iOk)T.push(["paste","paste","Yapıştır","Kopyaladığın fotoğraf","#7C3AED"]);
   const what=vOk&&iOk?"Fotoğraf ya da videoyu":vOk?"Videoyu":"Fotoğrafı";
-  const l=sheet("pick",o.title,`<div class="kmp${max>1?" multi":""}" id="kmp"><button type="button" class="kmp-drop" data-src="file"><span class="kmp-dic">${I("kvup")}</span><b>${what} buraya sürükle</b><small>ya da dokun, dosyalarından seç${max>1?` · en fazla ${max}`:""}</small></button><div class="kmp-tiles">${T.map(([k,ic,b,s,c])=>`<button type="button" class="kmp-t" data-src="${k}" style="--c:${c}"><span class="ic">${I(ic)}</span><b>${b}</b><small>${esc(s)}</small></button>`).join("")}</div><div class="kmp-rc" id="kmpRc" hidden><div class="kmp-rh"><span class="lbl">Son seçtiklerin</span><button type="button" class="kmp-rx" id="kmpRx">Temizle</button></div><div class="kmp-rr" id="kmpRr"></div></div><div class="hint" id="pickHint" hidden></div><div class="pastebox kmp-pb" contenteditable="true" id="pasteBox" hidden aria-label="Fotoğraf yapıştırma alanı">${I("paste")}<br>Kopyaladığın fotoğrafı buraya yapıştır<br><small>(uzun bas, sonra Yapıştır)</small></div><div class="kmp-busy" id="kmpBusy" hidden><span class="spin"></span><span>Hazırlanıyor…</span></div><div class="kmp-foot" id="kmpFoot" hidden><button type="button" class="btn block" id="kmpGo">Ekle</button></div></div>`,{onClose:()=>finish(null)});
+  const l=sheet("pick",o.title,`<div class="kmp${max>1?" multi":""}" id="kmp"><button type="button" class="kmp-drop" data-src="file"><span class="kmp-dic">${I("kvup")}</span><b>${what} buraya sürükle</b><small>ya da dokun, dosyalarından seç${max>1?` · en fazla ${max}`:""}</small></button><div class="kmp-tiles">${T.map(([k,ic,b,s,c])=>`<button type="button" class="kmp-t" data-src="${k}" style="--c:${c}"><span class="ic">${I(ic)}</span><b>${b}</b><small>${esc(s)}</small></button>`).join("")}</div><div class="kmp-rc" id="kmpRc" hidden><div class="kmp-rh"><span class="lbl">Son seçtiklerin</span><span class="kmp-rb"><button type="button" class="kmp-rx" id="kmpRall">Tümü</button><button type="button" class="kmp-rx" id="kmpRx">Temizle</button></span></div><div class="kmp-rr" id="kmpRr"></div></div><div class="hint" id="pickHint" hidden></div><div class="pastebox kmp-pb" contenteditable="true" id="pasteBox" hidden aria-label="Fotoğraf yapıştırma alanı">${I("paste")}<br>Kopyaladığın fotoğrafı buraya yapıştır<br><small>(uzun bas, sonra Yapıştır)</small></div><div class="kmp-busy" id="kmpBusy" hidden><span class="spin"></span><span>Hazırlanıyor…</span></div><div class="kmp-foot" id="kmpFoot" hidden><button type="button" class="btn block" id="kmpGo">Ekle</button></div></div>`,{onClose:()=>finish(null)});
   const k=$("#kmp",l);const hint=$("#pickHint",l);
   const showHint=()=>{if(done)return;hint.hidden=false;hint.innerHTML=`<b>Galerin açılmadı mı?</b> Tarayıcı izin vermiyor olabilir. ${iOk?"<b>Kadraj galerisi</b> ya da <b>Çizim</b> her zaman çalışır; fotoğrafı kopyalayıp <b>Yapıştır</b>'a da basabilirsin. ":""}${vOk?"Videoyu <b>Video çek</b> ile Kadraj'ın içinde çekebilirsin. ":""}Uygulamayı Chrome ya da Safari'de açmayı da dene.`;hint.scrollIntoView({block:"nearest"})};
   let busyN=0;const busy=on=>{busyN=Math.max(0,busyN+(on?1:-1));const b=$("#kmpBusy",l);if(b)b.hidden=!busyN;k.classList.toggle("busy",!!busyN)};
@@ -10454,6 +10470,20 @@ function kmpOpen(opt={}){const o={title:"Fotoğraf ekle",accept:"image",multi:fa
     if(picked.has(r.id)){picked.delete(r.id);b.setAttribute("aria-pressed","false")}else{if(picked.size>=max)return toast(`En fazla ${max} dosya seçebilirsin.`);const it=await load(r);if(!it)return;picked.set(r.id,it);b.setAttribute("aria-pressed","true")}foot()});
    $("#kmpRx",l).onclick=async()=>{await KMR.clear();picked.clear();foot();$("#kmpRc",l).hidden=true;toast("Son seçilenler temizlendi")}};
   $("#kmpGo",l).onclick=()=>finish(sel());
+  const kmlOpen=async()=>{const recs=await KMR.list(KML_MAX);if(done)return;const items=[];const seen=new Set();
+   for(const r of recs){r._u=r.src?R(r.src):URL.createObjectURL(r.blob);if(!r.src)urls.push(r._u);items.push({id:"k:"+r.id,u:r._u,at:r.at,src:r.src||null,rec:r})}
+   for(const p of Object.values(S.posts).filter(p=>p&&p.uid===S.uid&&p.kind==="photo").sort((a,b)=>b.at-a.at))for(const [j,x] of [p.src||p.img,...(p.more||[])].entries()){if(!x||seen.has(x))continue;seen.add(x);items.push({id:"p:"+p.id+":"+j,u:R(x),at:p.at,src:/^data:/.test(x)?null:x,post:1})}
+   const mon=t=>new Date(t).toLocaleDateString("tr-TR",{month:"long",year:"numeric"});let h="",cur="";
+   items.forEach((it,i)=>{const m=mon(it.at||0);if(m!==cur){if(cur)h+="</div>";cur=m;h+=`<div class="kml-h">${esc(m)}</div><div class="kml-g">`}h+=`<button type="button" class="kmp-r kml-i" data-kl="${i}" aria-pressed="${picked.has(it.id)}" aria-label="Fotoğraf ${i+1}"><img src="${esc(it.u)}" alt="" loading="lazy"><span class="kmp-ck">${I("check")}</span>${it.post?`<span class="kml-p">${I("grid")}</span>`:""}</button>`});if(cur)h+="</div>";
+   const ll=sheet("kmplib","Kadraj kütüphanen",`<div class="kml${max>1?" multi":""}"><button type="button" class="btn sec kml-add" id="kmlAdd">${I("add")}Telefondan fotoğraf ekle</button>${items.length?h:`<div class="empty"><b>Kütüphanen boş</b>Kadraj'da seçtiğin, çektiğin ve çizdiğin fotoğraflar burada birikir.</div>`}<div class="kmp-foot kml-foot" id="kmlFoot" hidden><button type="button" class="btn" id="kmlGo">Ekle</button></div></div>`,{tall:true});
+   const lf=()=>{const f=$("#kmlFoot",ll);if(!f)return;f.hidden=!picked.size;$("#kmlGo",ll).textContent=`Ekle (${picked.size})`;foot()};lf();
+   const load=async it=>{try{const img=await loadImg(it.u);if(it.rec){const{_u,...rest}=it.rec;KMR.put({...rest,at:now()})}else KMR.add(it.src?{src:it.src}:{img});return it.src?{img,src:it.src}:{img}}catch{toast("Fotoğraf açılamadı.");return null}};
+   ll.addEventListener("click",async e=>{const b=e.target.closest("[data-kl]");if(!b)return;const it=items[+b.dataset.kl];if(!it)return;
+    if(max<=1){const x=await load(it);if(x){closeLayer("kmplib");finish([x])}return}
+    if(picked.has(it.id)){picked.delete(it.id);b.setAttribute("aria-pressed","false")}else{if(picked.size>=max)return toast(`En fazla ${max} dosya seçebilirsin.`);const x=await load(it);if(!x)return;picked.set(it.id,x);b.setAttribute("aria-pressed","true")}lf()});
+   $("#kmlGo",ll).onclick=()=>{closeLayer("kmplib");finish(sel())};
+   $("#kmlAdd",ll).onclick=()=>{closeLayer("kmplib");const fb=$('.kmp-t[data-src="file"]',l)||$('[data-src="file"]',l);if(fb)fb.click()}};
+  const lt=$('[data-src="lib"]',l);if(lt)lt.onclick=kmlOpen;const ra=$("#kmpRall",l);if(ra)ra.onclick=kmlOpen;
   if(iOk)drawRecent();
   /* sürükle-bırak: pencerenin tamamı */
   const sh=l.querySelector(".sheet");let dc=0;
