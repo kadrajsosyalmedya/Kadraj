@@ -3261,6 +3261,15 @@ main.chatmode{position:relative}
 .pm-sh input[type=range]{width:100%;accent-color:var(--accent)}
 .pm-bt{display:flex;gap:8px;flex-wrap:wrap}.pm-bt .btn{flex:1 1 auto}
 #pmEdit{width:100%}
+.pm-sel{display:grid;gap:10px;padding:12px;border-radius:18px;background:var(--surface-2)}.pm-sel .field{margin:0}
+.pm-empty{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:.86rem}.pm-empty .i{flex:none}
+.pm-lh{display:grid;gap:2px;margin-top:4px}.pm-lh small{color:var(--muted);font-size:.78rem}
+.pm-tools{display:flex;gap:8px}.pm-tools .in{flex:1;min-width:0}.pm-tools .btn{flex:none}
+.pm-list{display:grid;gap:2px}
+.pm-row{display:flex;align-items:center;gap:6px;padding:4px;border-radius:14px}.pm-row.on{background:var(--accent-soft)}
+.pm-row .pm-t{flex:1;min-width:0;display:grid;text-align:left;padding:6px 4px;color:var(--fg)}
+.pm-row .pm-t b,.pm-row .pm-t small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pm-row .pm-t small{color:var(--muted);font-size:.78rem}
+[data-pmpv].on{color:var(--accent)}
 /*}@css:61FUN*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
@@ -5880,7 +5889,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 6.1 Yakın Arkadaşlar: Ayarlar › Yakın Arkadaşlar'dan ya da bir profilin üç nokta menüsünden kişi ekle/çıkar (kişiye haber gitmez). Hikâye oluştururken "Yakın Arkadaşlar" anahtarını açarsan hikâyeyi yalnızca listendekiler görür; halkası yeşil olur, hikâyede yeşil "Yakın Arkadaşlar" etiketi çıkar. Anahtara basılı tutunca liste açılır.
 - 6.1 sohbette oyunlar: Birebir ya da grup sohbetinde + › Oyun oyna › XOX, 4'lü Bağla ya da Kelime (5 harfli Türkçe kelime; ikiniz de aynı kelimeyi bulmaya çalışırsınız, az denemede bulan kazanır). Davet mesajındaki "Oyuna git" oyunu açar; grupta ilk dokunan rakip olur. Bitince sonuç mesajı gelir, Rövanş düğmesi var; oyundan çıkmak için Pes et.
 - 6.1 Anılar: Eski paylaşımlarının ay ya da yıl dönümünde (aynı gün) Akış'ta hikâyelerin altında "Anılar" kartı çıkar: Gör, fotoğrafsa "Hikâyende paylaş" (fotoğraf "1 yıl önce bugün" çıkartmasıyla hikâye oluşturda açılır), birden çoksa Tümü. X ile o gün için gizlenir.
-- 6.1 profil müziği: Profilini düzenle › Profil müziği: telefonundaki bir şarkı dosyasını (mp3, m4a...) seç, şarkının adını yaz, başlangıç yerini kaydırıcıyla seç, Dinle ile dene, Kaydet. Profilinde adının altında şarkı çipi çıkar; dokunan 30 saniye dinler, sayfadan çıkınca durur. Kaldır ile silinir.
+- 6.1 profil müziği: Profilini düzenle › Profil müziği: ortak "Kadraj Müzik" kütüphanesinden bir şarkı seç ya da "Şarkı yükle" ile telefonundaki dosyayı (mp3, m4a..., en fazla 12 MB) yükle; yüklenen şarkı kütüphaneye girer, arkadaşın da seçebilir (şarkılar yalnızca Kadraj hesabı olanlara açık, kendi yüklediğini çöp kutusuyla silersin). Profilinde görünecek adı yaz, başlangıç yerini kaydırıcıyla seç, oynat düğmesiyle dene, Kaydet. Profilinde adının altında şarkı çipi çıkar; dokunan 30 saniye dinler, sayfadan çıkınca durur. Kaldır ile silinir.
 - 6.1 Rota resim çizer: Rota'ya "kedi çiz", "çiz: deniz kenarında gün batımı" ya da "bana uzayda bir kedi çizer misin" yaz; Rota resmi çizip sohbete gönderir (yapay zekâ bağlantısı gerekir, günde 10 resim; uygunsuz istekler çizilmez, Çocuk Modu'nda daha sıkı). "Henüz öğrenmedim" derse yapay zekâ köprüsünün güncellenmesi gerekiyordur.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
 - 6.0 görünüm: arayüz yenilendi (Vizör ve Klasik ikisinde de): daha ferah kartlar, sayfa geçişleri yönlü (ileri sağdan, geri soldan, sekme alttan), alttan açılan pencerelerde seçenekler sırayla gelir. Profilde kişinin fotoğrafından bulanık kapak şeridi, Keşfet'te ara ara büyük karelerle mozaik ızgara, Bildirimler'de her satırda beğeni/yorum/takip rozeti, Ayarlar'da renkli ikonlar, yüklenirken iskelet ve ışıltı. Hareket azaltılmışsa animasyonlar kapanır.
@@ -6185,7 +6194,7 @@ const WN_ITEMS=[
  {v:60100,ic:"spark",g:"linear-gradient(135deg,#f97316,#ec4899)",t:"Hikâye çıkartmaları",d:"Hikâye oluştururken Çıkartma ekle: saat, tarih, konum, bahsetme, simge, anket ve soru. Sürükleyip taşı, dokunup büyüt",go:"feed"},
  {v:60100,ic:"star",g:"linear-gradient(135deg,#1DB954,#0c7a63)",t:"Yakın Arkadaşlar",d:"Hikâyeni yalnızca seçtiğin kişiler görsün, halkası yeşil olur. Listeni Ayarlar'dan ya da profil menüsünden düzenle",go:"settings"},
  {v:60100,ic:"trophy",g:"linear-gradient(135deg,#0c7a63,#9b5cf6)",t:"Sohbette oyunlar",d:"+ › Oyun oyna: XOX, 4'lü Bağla ve Kelime. Sırayla oyna, bitince rövanş iste",go:"chats"},
- {v:60100,ic:"music",g:"linear-gradient(135deg,#2f6bff,#7c3aed)",t:"Profil müziği",d:"Profili düzenle › Profil müziği: telefonundaki şarkıyı seç, başlangıç yerini ayarla. Profiline girenler dokununca dinler",go:"profile"},
+ {v:60100,ic:"music",g:"linear-gradient(135deg,#2f6bff,#7c3aed)",t:"Profil müziği ve Kadraj Müzik",d:"Profili düzenle › Profil müziği: ortak kütüphaneden şarkı seç ya da kendi şarkını yükle. Profiline girenler dokununca dinler",go:"profile"},
  {v:60100,ic:"cal",g:"linear-gradient(135deg,#d97706,#f5b921)",t:"Anılar",d:"Eski paylaşımların ay ve yıl dönümünde Akış'ta çıkar; fotoğrafı tek dokunuşla hikâyende paylaş",go:"feed"},
  {v:60100,ic:"pen",g:"linear-gradient(135deg,#0ea5e9,#0c7a63)",t:"Rota resim çizer",d:"Rota'ya \"uzayda bir kedi çiz\" yaz, istediğin resmi çizsin",go:"chats"},
  {v:60100,ic:"pin",g:"linear-gradient(135deg,#f97316,#ffb25b)",t:"Sohbette daha fazlası",d:"Önemli mesajı sabitle, tek seferlik fotoğraf gönder, mesajını istediğin saate zamanla",go:"chats"},
@@ -12480,8 +12489,8 @@ function memClick(e){const b=e.target.closest("[data-mem]");if(!b)return;const c
 HOOKS.after.push(r=>{if(r!=="feed"||!S.uid||S.guest)return;memLoad();const m=$("#main");if(!m||m.querySelector(".memc"))return;if(LS.get("kadraj_mem_"+S.uid,"")===memDay())return;const ls=memList();if(!ls.length)return;
  const st=m.querySelector(".stories");const d=document.createElement("div");d.innerHTML=memCard(ls[0],ls.length-1);const el=d.firstElementChild;el.addEventListener("click",memClick);if(st)st.after(el);else m.prepend(el)});
 ACT.memories=()=>memSheet();
-/* 6.1 Profil müziği: profiles.music={u,t,s,d} (u: Cloudinary ses adresi; yerel modda küçük data URL, t: şarkı adı, s: başlangıç sn, d: süre).
-   Kişi telefonundan ses dosyası seçer (pmSheet: ad, başlangıç kaydırıcısı, 30 sn önizleme), Kaydet → cldUpload → profil. Profilde ad ve bio altında
+/* 6.1 Profil müziği: profiles.music={u,t,s,d} (u: Kadraj Müzik parçası chunk:… ; eski kayıtlarda Cloudinary/data URL olabilir, t: şarkı adı, s: başlangıç sn, d: süre).
+   Kişi ortak kütüphaneden seçer ya da telefonundan yükler (pmSheet: ad, başlangıç kaydırıcısı, 30 sn önizleme). Profilde ad ve bio altında
    .pmus çipi (HOOKS.after "profile"), dokununca s'den 30 sn çalar (PM, tek Audio), sayfadan çıkınca/arka plana geçince durur. Düzenle ekranında #pmEdit. */
 const PM={a:null,uid:null,t:0,PLAY:30};
 function pmStop(){clearTimeout(PM.t);if(PM.a){try{PM.a.pause()}catch{}}PM.uid=null;$$(".pmus.on").forEach(b=>b.classList.remove("on"))}
@@ -12495,26 +12504,44 @@ function pmChip(uid){const m=(P(uid)||{}).music;if(!m||!m.u)return"";return`<but
 document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-pmu]");if(!b)return;e.preventDefault();e.stopPropagation();pmPlay(b.dataset.pmu)},true);
 document.addEventListener("visibilitychange",()=>{if(document.hidden)pmStop()});
 HOOKS.after.push(r=>{const uid=r==="profile"?(S.route.params.uid||S.uid):null;if(PM.uid&&PM.uid!==uid)pmStop();if(!uid)return;const m=$("#main");const bt=m&&m.querySelector(".prof .btns");if(!bt||m.querySelector(".pmus"))return;const h=pmChip(uid);if(h)bt.insertAdjacentHTML("beforebegin",h)});
-function pmSheet(){if(!guard())return;const cur=(me()||{}).music||null;let f=null,url=null,dur=cur&&cur.d||0,start=cur&&+cur.s||0,prev=null,pt=0;
- const l=sheet("pmus","Profil müziği",`<div class="pm-sh"><button class="src" type="button" id="pmPick"><span class="ic">${I("music")}</span><span><b id="pmPN">${cur?"Başka şarkı seç":"Şarkı seç"}</b><small id="pmPS">${cur?esc(cur.t||""):"Telefonundaki bir ses dosyası (mp3, m4a…)"}</small></span></button>
-  <div class="field"><label for="pmT">Şarkının adı</label><input class="in" id="pmT" maxlength="60" placeholder="Örn. Barış Manço · Gülpembe" value="${esc(cur&&cur.t||"")}" autocomplete="off"></div>
-  <div class="field" id="pmSF"${dur>PM.PLAY?"":" hidden"}><label for="pmS">Başlangıç: <b id="pmSL">${pmMS(start)}</b></label><input type="range" id="pmS" min="0" max="${Math.max(0,Math.floor(dur-PM.PLAY))}" step="1" value="${Math.floor(start)}"></div>
-  <p class="muted" style="margin:0;font-size:.82rem">Profiline girenler dokununca ${PM.PLAY} saniye dinler.</p>
-  <div class="pm-bt"><button class="btn sec" type="button" id="pmPrev"${cur||f?"":" disabled"}>${I("play")}Dinle</button><button class="btn" type="button" id="pmSave">Kaydet</button>${cur?`<button class="btn ghost danger" type="button" id="pmDel">${I("trash")}Kaldır</button>`:""}</div></div>`,{onClose:()=>{if(prev)try{prev.pause()}catch{}clearTimeout(pt);if(url)URL.revokeObjectURL(url)}});
- const stopPrev=()=>{clearTimeout(pt);if(prev){try{prev.pause()}catch{}}$("#pmPrev",l).innerHTML=`${I("play")}Dinle`};
- $("#pmPick",l).onclick=async()=>{const x=await nativePick("audio/*,.mp3,.m4a,.aac,.wav,.ogg,.opus,.flac");if(!x)return;if(x.size>25*1048576)return toast("Dosya çok büyük (25 MB üstü).");
-  try{const buf=await x.arrayBuffer();f=new File([buf],x.name||"sarki.mp3",{type:x.type||"audio/mpeg"})}catch{return toast("Dosya okunamadı. Yeniden seç.")}stopPrev();if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);
-  dur=await new Promise(r=>{const a=new Audio();a.preload="metadata";a.onloadedmetadata=()=>r(isFinite(a.duration)?a.duration:0);a.onerror=()=>r(-1);setTimeout(()=>r(0),8000);a.src=url});if(dur<0){f=null;return toast("Bu dosya çalınamıyor. Başka bir ses dosyası seç.")}
-  start=0;const nm=String(f.name).replace(/\.[^.]+$/,"").replace(/[_]+/g," ").trim().slice(0,60);const ti=$("#pmT",l);if(!ti.value.trim()||cur&&ti.value===cur.t)ti.value=nm;
-  $("#pmPN",l).textContent="Başka şarkı seç";$("#pmPS",l).textContent=f.name+(dur?" · "+pmMS(dur):"");const sf=$("#pmSF",l),sr=$("#pmS",l);sf.hidden=!(dur>PM.PLAY);sr.max=Math.max(0,Math.floor(dur-PM.PLAY));sr.value=0;$("#pmSL",l).textContent=pmMS(0);$("#pmPrev",l).disabled=false};
- $("#pmS",l).oninput=e=>{start=+e.target.value;$("#pmSL",l).textContent=pmMS(start);if(prev&&!prev.paused){try{prev.currentTime=start}catch{}}};
- $("#pmPrev",l).onclick=async()=>{if(prev&&!prev.paused)return stopPrev();pmStop();const src=url||await pmSrc(cur&&cur.u);if(!src)return;prev=prev||new Audio();if(prev.src!==src)prev.src=src;const go=()=>{try{prev.currentTime=start}catch{}prev.play().catch(()=>{})};if(prev.readyState>=1)go();else prev.addEventListener("loadedmetadata",go,{once:true});$("#pmPrev",l).innerHTML=`${I("pause")}Durdur`;clearTimeout(pt);pt=setTimeout(stopPrev,PM.PLAY*1000)};
- const del=$("#pmDel",l);if(del)del.onclick=async()=>{if(!(await write(()=>DB.update("profiles/"+S.uid,{music:null}))))return;S.profiles[S.uid]={...S.profiles[S.uid],music:null};pmStop();closeLayer("pmus");toast("Profil müziği kaldırıldı");scheduleRefresh()};
- $("#pmSave",l).onclick=async()=>{const t=kidClean($("#pmT",l).value.trim())||"Şarkı";const bt=$("#pmSave",l);if(!f&&!cur)return toast("Önce bir şarkı seç.");let u=cur&&cur.u;
-  if(f){if(S.mode==="local"){if(f.size>1.5*1048576)return toast("Demo modunda en fazla 1,5 MB. Bulutta sınır 25 MB.");u=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>r(null);fr.readAsDataURL(f)});if(!u)return toast("Dosya okunamadı.")}
-   else{if(!cldOn())return toast("Şarkı yüklenemiyor: bulut ayarı yok.");bt.disabled=true;const prog=(a,b)=>{bt.textContent="Yükleniyor %"+Math.round(a/Math.max(1,b)*100)};try{u=await cldUpload(f,prog)}catch(e){console.warn("cloudinary ses",e);u=null;if(f.size<=8*1048576)try{u=await storeVideoFs(f,prog)}catch(e2){console.warn(e2)}if(!u){bt.disabled=false;bt.textContent="Kaydet";return toast("Şarkı yüklenemedi: "+(e&&e.message||"hata"))}}if(!l.isConnected)return}}
-  const m={u,t,s:Math.floor(start),d:Math.round(dur||cur&&cur.d||0)};bt.disabled=true;bt.textContent="Kaydediliyor…";if(!(await write(()=>DB.update("profiles/"+S.uid,{music:m})))){bt.disabled=false;bt.textContent="Kaydet";return}
-  S.profiles[S.uid]={...S.profiles[S.uid],music:m};pmStop();closeLayer("pmus");toast("Profil müziği kaydedildi");scheduleRefresh()}}
+/* Kadraj Müzik (ortak, gizli kütüphane): şarkılar GitHub'a değil Firestore'a parça parça (storeVideoFs, vchunks; okuma yalnızca girişli hesaplar) yüklenir;
+   liste games/mz-lib = {mz:1, list:{id:{t,u,by,at,d}}} (games kuralı girişli herkese açık, satranç dinleyicisine düşmez). Silinen kayıt null olur (pmLibList süzer). */
+const PM_LIB="games/mz-lib",PM_MAXMB=12;
+async function pmLibGet(){try{const d=await DB.get(PM_LIB);return d&&d.list||{}}catch{return{}}}
+const pmLibList=l=>Object.entries(l||{}).filter(([,x])=>x&&x.u).map(([id,x])=>({id,...x})).sort((a,b)=>(b.at||0)-(a.at||0));
+async function pmLibPut(id,v){const patch={list:{[id]:v}};try{await DB.update(PM_LIB,patch);return true}catch{}try{const cur=await DB.get(PM_LIB).catch(()=>null);if(cur){await DB.update(PM_LIB,patch);return true}await DB.set(PM_LIB,{mz:1,list:{[id]:v}});return true}catch(e){console.warn(e);return false}}
+function pmSheet(){if(!guard())return;const cur=(me()||{}).music||null;let lib={},sel=cur?{u:cur.u,t:cur.t,d:cur.d||0,s:+cur.s||0}:null,url=null,prev=null,pt=0,q="";
+ const l=sheet("pmus","Profil müziği",`<div class="pm-sh"><div class="pm-sel" id="pmSel"></div>
+  <div class="pm-lh"><b>Kadraj Müzik</b><small>İkinizin yüklediği şarkılar. Yalnızca Kadraj hesabı olanlar dinleyebilir.</small></div>
+  <div class="pm-tools"><input class="in" id="pmQ" placeholder="Kütüphanede ara" aria-label="Kütüphanede ara" autocomplete="off"><button class="btn sec" type="button" id="pmPick">${I("add")}Şarkı yükle</button></div>
+  <div class="pm-list" id="pmL"><div class="muted" style="padding:10px 2px">Yükleniyor…</div></div></div>`,{tall:true,onClose:()=>{stopPrev();if(url)URL.revokeObjectURL(url)}});
+ const stopPrev=()=>{clearTimeout(pt);if(prev){try{prev.pause()}catch{}}$$("[data-pmpv].on",l).forEach(b=>{b.classList.remove("on");b.innerHTML=I("play")})};
+ const preview=async(src,start,btn)=>{const was=btn&&btn.classList.contains("on");stopPrev();if(was)return;pmStop();const u=String(src||"").startsWith("blob:")?src:await pmSrc(src);if(!u)return toast("Şarkı açılamadı.");prev=prev||new Audio();if(prev.src!==u)prev.src=u;const go=()=>{try{prev.currentTime=start||0}catch{}prev.play().catch(()=>{})};if(prev.readyState>=1)go();else prev.addEventListener("loadedmetadata",go,{once:true});if(btn){btn.classList.add("on");btn.innerHTML=I("pause")}pt=setTimeout(stopPrev,PM.PLAY*1000)};
+ const drawSel=()=>{const box=$("#pmSel",l);if(!sel){box.innerHTML=`<div class="pm-empty">${I("music")}<span>Kütüphaneden bir şarkı seç ya da yeni şarkı yükle.</span></div>`;return}
+  const mx=Math.max(0,Math.floor((sel.d||0)-PM.PLAY));box.innerHTML=`<div class="field"><label for="pmT">Profilinde görünecek ad</label><input class="in" id="pmT" maxlength="60" value="${esc(sel.t||"")}" placeholder="Örn. Barış Manço · Gülpembe" autocomplete="off"></div>
+   ${mx>0?`<div class="field"><label for="pmS">Başlangıç: <b id="pmSL">${pmMS(sel.s||0)}</b></label><input type="range" id="pmS" min="0" max="${mx}" step="1" value="${Math.min(mx,Math.floor(sel.s||0))}"></div>`:""}
+   <div class="pm-bt"><button class="btn sec" type="button" data-pmpv="sel">${I("play")}</button><button class="btn" type="button" id="pmSave">${sel.file?"Yükle ve kaydet":"Kaydet"}</button>${cur?`<button class="btn ghost danger" type="button" id="pmDel">${I("trash")}Kaldır</button>`:""}</div>`;
+  const r=$("#pmS",l);if(r)r.oninput=e=>{sel.s=+e.target.value;$("#pmSL",l).textContent=pmMS(sel.s);if(prev&&!prev.paused){try{prev.currentTime=sel.s}catch{}}};$("#pmT",l).oninput=e=>{sel.t=e.target.value};
+  $("#pmSave",l).onclick=save;const del=$("#pmDel",l);if(del)del.onclick=remove};
+ const drawList=()=>{const ls=pmLibList(lib).filter(x=>!q||String(x.t||"").toLocaleLowerCase("tr").includes(q));const box=$("#pmL",l);
+  box.innerHTML=ls.length?ls.map(x=>`<div class="pm-row${sel&&sel.u===x.u?" on":""}"><button class="ib" type="button" data-pmpv="${esc(x.id)}" aria-label="Dinle">${I("play")}</button><button type="button" class="pm-t" data-pmsel="${esc(x.id)}"><b>${esc(x.t||"Şarkı")}</b><small>@${esc((P(x.by)||{}).username||"")}${x.d?" · "+pmMS(x.d):""}</small></button>${x.by===S.uid?`<button class="ib" type="button" data-pmrm="${esc(x.id)}" aria-label="Kütüphaneden sil">${I("trash")}</button>`:""}</div>`).join("")
+   :`<div class="empty" style="padding:22px"><b>${q?"Bulunamadı":"Kütüphane boş"}</b>${q?"Başka bir ad dene.":"İlk şarkıyı sen yükle; arkadaşın da buradan seçebilir."}</div>`};
+ l.addEventListener("click",async e=>{const pv=e.target.closest("[data-pmpv]");if(pv){const id=pv.dataset.pmpv;if(id==="sel"){if(sel)preview(url&&sel.file?url:sel.u,sel.s,pv)}else{const x=lib[id];if(x)preview(x.u,0,pv)}return}
+  const sb=e.target.closest("[data-pmsel]");if(sb){const x=lib[sb.dataset.pmsel];if(!x)return;stopPrev();sel={u:x.u,t:x.t,d:x.d||0,s:0};drawSel();drawList();return}
+  const rm=e.target.closest("[data-pmrm]");if(rm){const id=rm.dataset.pmrm;const x=lib[id];if(!x||x.by!==S.uid)return;dialog("Şarkı kütüphaneden silinsin mi?",`“${esc(x.t||"Şarkı")}” listeden kalkar. Profil müziği yaptıysanız profilde çalmaya devam eder.`,[{label:"Vazgeç"},{label:"Sil",cls:"danger",fn:async()=>{if(await pmLibPut(id,null)){lib={...lib,[id]:null};drawList()}else toast("Silinemedi.")}}]);return}});
+ $("#pmQ",l).oninput=e=>{q=e.target.value.trim().toLocaleLowerCase("tr");drawList()};
+ $("#pmPick",l).onclick=async()=>{const x=await nativePick("audio/*,.mp3,.m4a,.aac,.wav,.ogg,.opus,.flac");if(!x)return;const lim=S.mode==="local"?1.5:PM_MAXMB;if(x.size>lim*1048576)return toast(`Dosya çok büyük (en fazla ${String(lim).replace(".",",")} MB).`);
+  let f;try{const buf=await x.arrayBuffer();f=new File([buf],x.name||"sarki.mp3",{type:x.type||"audio/mpeg"})}catch{return toast("Dosya okunamadı. Yeniden seç.")}stopPrev();if(url)URL.revokeObjectURL(url);url=URL.createObjectURL(f);
+  const d=await new Promise(r=>{const a=new Audio();a.preload="metadata";a.onloadedmetadata=()=>r(isFinite(a.duration)?a.duration:0);a.onerror=()=>r(-1);setTimeout(()=>r(0),8000);a.src=url});if(d<0)return toast("Bu dosya çalınamıyor. Başka bir ses dosyası seç.");
+  sel={file:f,u:"",t:String(f.name).replace(/\.[^.]+$/,"").replace(/[_]+/g," ").trim().slice(0,60),d:Math.round(d),s:0};drawSel();drawList()};
+ async function save(){const bt=$("#pmSave",l);if(!sel)return;const t=kidClean(String(sel.t||"").trim())||"Şarkı";bt.disabled=true;
+  if(sel.file){bt.textContent="Yükleniyor…";let ref=null;try{ref=await storeVideoFs(sel.file,(i,n)=>{bt.textContent="Yükleniyor %"+Math.round(i/Math.max(1,n)*100)})}catch(e){console.warn(e)}
+   if(!ref){bt.disabled=false;bt.textContent="Yükle ve kaydet";return toast("Şarkı yüklenemedi. İnternetini kontrol et.")}if(!l.isConnected)return;const id=rid();const v={t,u:ref,by:S.uid,at:now(),d:sel.d||0};
+   if(!(await pmLibPut(id,v)))toast("Şarkı yüklendi ama kütüphaneye eklenemedi.");else lib={...lib,[id]:v};sel={u:ref,t,d:sel.d||0,s:sel.s||0}}
+  const m={u:sel.u,t,s:Math.floor(sel.s||0),d:Math.round(sel.d||0)};bt.textContent="Kaydediliyor…";if(!(await write(()=>DB.update("profiles/"+S.uid,{music:m})))){bt.disabled=false;bt.textContent="Kaydet";return}
+  S.profiles[S.uid]={...S.profiles[S.uid],music:m};pmStop();closeLayer("pmus");toast("Profil müziği kaydedildi");scheduleRefresh()}
+ async function remove(){if(!(await write(()=>DB.update("profiles/"+S.uid,{music:null}))))return;S.profiles[S.uid]={...S.profiles[S.uid],music:null};pmStop();closeLayer("pmus");toast("Profil müziği kaldırıldı");scheduleRefresh()}
+ drawSel();pmLibGet().then(x=>{lib=x;if(l.isConnected)drawList()})}
 ACT.pmusic=()=>pmSheet();
 /* 6.1 Rota resim çizer: Rota'ya "kedi çiz", "çiz: uzayda bir kedi", "deniz kenarı resmi yap" yazınca (rotaDrawQ) istem köprünün /image yoluna gider
    (kAI.image; Workers AI FLUX, süzgeç ve günlük sınır köprüde, çocuk modunda daha sıkı). Resim botImg ile 640 px'e küçültülüp Rota'nın mesajı olarak
