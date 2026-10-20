@@ -1,84 +1,36 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.1.9 Lodos",
-  "at": "20 Ekim 2026",
+  "ver": "6.2.0 Karayel",
+  "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
     {
-      "ad": "Bütün sekmeler hatasız açılıyor (Akış, Keşfet, Klaket, Sohbet, Bildirim, Profil, Ayarlar, Satranç)",
-      "ok": true
-    },
-    {
-      "ad": "Neler yeni: yalnızca 6.1 maddeleri",
-      "ok": true
-    },
-    {
-      "ad": "Hikâye çıkartmaları: ekle, sürükle, büyüt, anket oyu, soru yanıtı mesaj olarak, bahsetme",
-      "ok": true
-    },
-    {
-      "ad": "Yakın Arkadaşlar: listede olmayan hikâyeyi görmüyor, yeşil halka, Öne çıkar gizli",
-      "ok": true
-    },
-    {
-      "ad": "Kötü niyetli hikâye belgesi kod çalıştıramıyor, çökmüyor",
-      "ok": true
-    },
-    {
-      "ad": "Sohbette oyunlar: XOX iki oyuncu sonuna kadar, sonuç mesajı, Kelime klavyesi, iptal edilen oyun",
-      "ok": true
-    },
-    {
-      "ad": "Anılar: 1 yıl ve 3 ay önceki paylaşım kartı, Hikâyende paylaş, gizle, başka hesapta çıkmıyor",
-      "ok": true
-    },
-    {
-      "ad": "Profil müziği: hazır şarkılar, YouTube bağlantısı yapıştırma, ortak liste, çip çalar ve durur",
-      "ok": true
-    },
-    {
-      "ad": "Rota resim çizer: bağlantı yok / köprü eski / başarılı çizim; 'resim çizer misin' gibi istekler",
-      "ok": true
-    },
-    {
-      "ad": "Rota hazır yanıta düşünce nedenini söylüyor",
-      "ok": true
-    },
-    {
-      "ad": "Köprü: gpt-oss-120b, Llama ve küçük model sırası, resim yolu, arama, görsel, bildirim (ai-worker testleri)",
-      "ok": true
-    },
-    {
-      "ad": "DM'de profil fotoğrafı son mesajın yanında; sohbet kayması öncekiyle aynı (meas.js, still.js)",
-      "ok": true
-    },
-    {
-      "ad": "Sabit mesaj, tek seferlik fotoğraf, zamanlanmış mesaj",
-      "ok": true
-    },
-    {
-      "ad": "Kadraj kütüphanesi: tek ve çoklu seçim, aylara göre ızgara; seçici 360 ve 390 px'te taşmıyor",
-      "ok": true
-    },
-    {
-      "ad": "Not kutusu artık Chrome'un form alanı saymadığı yazı alanı: yazma, 60 karakter sınırı, Enter, yapıştırma, paylaşma; diğer tek satırlık kutular eski boyda",
-      "ok": true
-    },
-    {
-      "ad": "Yönetici › Kadraj testi: Test Kadraj'ı açılıyor, Hızlı test 22 adım geçiyor",
-      "ok": true
-    },
-    {
-      "ad": "Android uygulamasının galeri ekranı (sahte galeriyle): Galerin kutucuğu, albümler, kaydırdıkça yükleme, tek ve çoklu seçim",
-      "ok": true
-    },
-    {
-      "ad": "Android uygulaması GitHub'da derleniyor (APK)",
+      "ad": "Paylaşım taslakları",
       "ok": true,
-      "not": "Derleme sonucu GitHub Actions › Kadraj APK"
+      "not": "Not ve 2 fotoğraflı taslak kapatınca saklandı, + penceresinden açıldı (filtre, oran, açıklama korundu), paylaşınca silindi; hemen paylaşılan not taslak olmadı."
     },
     {
-      "ad": "Telefonda: not kutusunda klavye şeridi, YouTube şarkıları, Android uygulamasında gerçek galeri ve fotoğraf izni",
+      "ad": "Hikâye arşivi",
+      "ok": true,
+      "not": "Paylaşılan hikâye arşive düştü, Ayarlar'dan açıldı; yeniden paylaş oluştur ekranını, öne çıkar öne çıkanlar penceresini açtı."
+    },
+    {
+      "ad": "Yeni paylaşımlar düğmesi",
+      "ok": true,
+      "not": "Akış'ta aşağıdayken başkasının paylaşımı gelince düğme çıktı, dokununca en üste kaydı ve kayboldu."
+    },
+    {
+      "ad": "Okunmadı olarak işaretle",
+      "ok": true,
+      "not": "Sohbet okunmamış göründü, sayıya eklendi, sohbet açılınca kalktı."
+    },
+    {
+      "ad": "Kadraj testi (25 adım)",
+      "ok": true,
+      "not": "Yönetici › Kadraj testi'nin hızlı testi demo kopyada 25 adımın hepsini geçti (3 yeni 6.2 adımı dahil)."
+    },
+    {
+      "ad": "Telefonda: Android uygulamasında gerçek galeri, geri tuşu ve durum çubuğu rengi, YouTube şarkıları",
       "ok": false,
       "not": "Burada ölçülemiyor; senin telefonunda denenmeli."
     }

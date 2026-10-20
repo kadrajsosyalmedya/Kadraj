@@ -56,6 +56,9 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  await step("Başkasının profili ve müzik",()=>go("profile",{uid:"u2"}),has(".pmus"));
  await step("Profili düzenle",()=>go("edit"),has("#pmEdit"));
  await step("Ayarlar",()=>tab("settings"),has("#cfEntry"));
+ await step("Taslaklar (6.2)",async()=>{tab("settings");await W(300);$("#k62D").click();await W(400)},has('#overlay [data-layer="dft"]'));
+ await step("Hikâye arşivi (6.2)",async()=>{tab("settings");await W(300);$("#k62A").click();await W(400)},has('#overlay [data-layer="ars"]'));
+ await step("Okunmadı işaretle (6.2)",async()=>{tab("chats");await W(300);chatRowMenu("u:u2");await W(300)},()=>[...document.querySelectorAll('#overlay [data-layer="crow"] .opt')].some(b=>/Okun(ma)?dı olarak/.test(b.textContent))?true:"menü satırı yok");
  await step("Satranç",()=>go("chess"),()=>$("#main").children.length?true:"boş");
  await step("Rota",()=>go("chat",{key:"u:bot:rota"}),has("#msgs"));
  removeEventListener("error",onE);removeEventListener("unhandledrejection",onE);tab("feed");
