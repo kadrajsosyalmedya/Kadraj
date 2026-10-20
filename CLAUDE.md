@@ -1,4 +1,4 @@
-# Kadraj: kod haritası (sürüm 6.1.8; 3.9 haritası + sonraki sürüm notları aşağıda)
+# Kadraj: kod haritası (sürüm 6.1.9; 3.9 haritası + sonraki sürüm notları aşağıda)
 
 Bu dosya, `index.html` okunarak çıkarılmış ayrıntılı bir haritadır. Yeni bir oturumda önce bunu oku, sonra gerekli fonksiyonu `grep` ile bul (satır numaraları değişir, isimlerle ara).
 
@@ -131,7 +131,7 @@ Bu dosya, `index.html` okunarak çıkarılmış ayrıntılı bir haritadır. Yen
 - Tepki bildirimi yok (`notifyChats` yalnızca son mesajı izler).
 
 ## 4.0'da eklenenler (kısa)
-- Sürüm (şu an 6.1.8 Lodos): `APP_V=60108`, `APP_VER="6.1.8"` ve `<head>`'deki `<meta name="kadraj-version" content="60108">` birlikte artırılmalı; eski biçim (40) `verNorm` ile çevrilir (sürüm denetimi bu etiketi okur; `meta/_surum` belgesi en yüksek sürümü tutar; iki sürüm geride kalan istemci kapanır).
+- Sürüm (şu an 6.1.9 Lodos): `APP_V=60109`, `APP_VER="6.1.9"` ve `<head>`'deki `<meta name="kadraj-version" content="60109">` birlikte artırılmalı; eski biçim (40) `verNorm` ile çevrilir (sürüm denetimi bu etiketi okur; `meta/_surum` belgesi en yüksek sürümü tutar; iki sürüm geride kalan istemci kapanır).
 - Kancalar: `ACT` (data-act eylemleri), `HOOKS.after/enter/profiles/boot` + `runHooks`. Aktiflik: `isActive`, `activeLabel`, `activeUsers`, `lastSeenAt`.
 - Blok A (`/*@js:A{*/`): `#intro` açılış animasyonu, karşılama ekranı (`welScreen`), sürüm denetimi (`verWatch`, `fetchRemoteVersion`, `hardReload`, `showVersionBlock`), `showWhatsNew` (`WN_ITEMS`).
 - Blok B: vurgu renkleri (`applyAccent`, `effAccent`), `themeSwitch`, tema eşitleme (`profiles.prefs`), yönetici ortak teması (`admin/tema`), ortak sohbet temaları (`chats/{cid}.theme`, `KB_THEMES`, yeni `applyWp`/`wallpaperMenu`), yeni `vSettings` (`data-set` anahtarları).
@@ -247,3 +247,4 @@ Bu dosya, `index.html` okunarak çıkarılmış ayrıntılı bir haritadır. Yen
 - 6.1.7: Sahibinin telefonunda uygulamada "Galerin" çıkmadı. Neden: Capacitor köprüsü yalnızca uygulamanın içinden geçen sayfa isteğine eklenir; sw.js kaydolduktan sonra sayfayı service worker açıyor, köprü (`window.Capacitor`) gelmiyordu (Capacitor 6'da ServiceWorkerClient yok). Uygulamada (UA `KadrajApp`) sw.js kaydolmaz, eski kayıt silinir ve köprü yoksa sayfa bir kez yeniden açılır (`SS kadraj_app_sw`); APK değişmedi, yeniden kurmak gerekmez. Ayarlar'da uygulamadayken `#appInfo` satırı galerinin bağlı olup olmadığını yazar. Not: Android WebView'da Notification/Push yok, uygulamada telefon bildirimi çıkmaz. Test `scratchpad/c61t3/appsw.js` (gerçek sunucu 8766).
 - Android geri tuşu (MainActivity, APK yeniden derlenir): WebView geçmişinde geri gider, geçmiş bitince çıkar. Uygulama üstüne kurulur (aynı imza).
 - 6.1.8: Geri tuşu yine çıkıyordu (popstate içinde kullanıcı dokunuşu olmadan eklenen geçmiş kayıtlarını Chrome/WebView atlıyor). MainActivity geri tuşunda `window.kBack()` çağırır (katman kapat, yığında geri, Akışa dön; 0 ise çıkar). APK yeniden kurulmalı.
+- 6.1.9: Uygulamada üst durum çubuğu açık gri kalıyordu (WebView theme-color'ı uygulamaz). `MainActivity.boya` açılışta koyu (#0A110F) boyar, `KadrajGaleri.renk({c})` ile sayfa theme-color'ı değişince (61APP MutationObserver) durum ve gezinme çubuğu ona uyar, açık renkte simgeler koyu. APK yeniden kurulmalı.
