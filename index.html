@@ -3235,6 +3235,22 @@ main.chatmode{position:relative}
 .svst .stk-ask .ans{display:block;width:calc(100% - 44px * var(--u));margin:calc(16px * var(--u)) auto calc(20px * var(--u));min-height:calc(76px * var(--u));border-radius:calc(22px * var(--u));background:#F1F3F2;color:#8A9490;font:600 calc(32px * var(--u))/1.2 Figtree,'Avenir Next',sans-serif;padding:0 calc(16px * var(--u))}
 .st-res{padding:0 16px 18px}.st-res .h{font-weight:800;margin:12px 0 6px}.st-res .row{display:flex;align-items:center;gap:10px;padding:6px 0}.st-res .s{font-size:.8rem;color:var(--muted)}
 /*}@css:61STORY*/
+/*@css:61FUN{*/
+/* 6.1 Anılar (js bölgesi 61FUN) */
+.memc{display:flex;gap:12px;align-items:center;margin:4px 16px 12px;padding:10px;border-radius:20px;background:var(--surface);border:1px solid var(--line);position:relative}
+.memc .th{width:4.6rem;height:4.6rem;border-radius:14px;flex:none;overflow:hidden;background:var(--surface-2);display:grid;place-items:center;font-size:.7rem;font-weight:700;color:#fff;text-align:center;padding:0;line-height:1.2}
+.memc .th img{width:100%;height:100%;object-fit:cover;display:block}
+.memc .th.tx{padding:6px;overflow-wrap:anywhere}
+.memc .t{flex:1;min-width:0;display:grid;gap:2px}
+.memc .t small{font:600 .68rem/1 var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.memc .t b{font-size:.95rem}
+.memc .t span{font-size:.8rem;color:var(--muted)}
+.memc .bt{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.memc .bt .btn{min-height:2rem;padding:0 12px;font-size:.8rem}
+.memc .x{position:absolute;top:6px;right:6px;width:1.9rem;height:1.9rem;display:grid;place-items:center;border-radius:50%;color:var(--muted)}
+.memc .x .i{width:1rem;height:1rem}
+.mem-list{padding:0 16px 18px;display:grid;gap:10px}.mem-list .memc{margin:0}
+/*}@css:61FUN*/
 /*@css:550{*/
 /* 5.5.0 öne çıkan hikâyeler */
 .hlr{display:flex;gap:14px;overflow-x:auto;padding:4px 16px 14px;scrollbar-width:none}
@@ -12421,6 +12437,34 @@ function stPaint(l,s,owner,pause){let ov=$(".svst",l);if(!ov){ov=document.create
    if(!v||(cur().pv||{})[S.uid]!=null||!guard())return;const j=+v.dataset.stv;vib(12);const c0=cur();if(S.stories[s.id]){S.stories[s.id]={...c0,pv:{...(c0.pv||{}),[S.uid]:j}};DB.update("stories/"+s.id,{pv:{[S.uid]:j}}).catch(()=>{})}paint();return}
   if(k.t==="ask"&&!mine){if(!guard())return;pause(true);const a=await stAsk(k.q,"Yanıtını yaz",160);pause(false);if(a&&await sendMessage("u:"+owner,{text:`Hikâyendeki “${k.q}” sorusuna yanıt: ${kidClean(a)}`}))toast("Yanıtın gönderildi")}}}
 /*}@js:61STORY*/
+/*@js:61FUN{*/
+/* 6.1 Anılar: kendi paylaşımlarının bugünkü ay ya da yıl dönümü (aynı ay günü, en az 1 ay önce). S.posts son 300 paylaşımı tuttuğu için kişinin bütün
+   paylaşımları oturumda bir kez ayrıca okunur (memLoad, where uid==). Akış'ta hikâye şeridinin altında kart (HOOKS.after, .memc): Gör, fotoğraflıysa
+   "Hikâyende paylaş" (memStory: hikâye oluşturu fotoğraf + "… önce bugün" çıkartmasıyla açılır), birden çoksa "Tümü" (memSheet). Kapatılınca o gün
+   bir daha çıkmaz (kadraj_mem_<uid> = gün). */
+const MEM={own:null,busy:false,uid:null};
+const memDay=(d=new Date())=>d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+function memLoad(){if(!S.uid||S.guest||MEM.busy||(MEM.own&&MEM.uid===S.uid))return;MEM.busy=true;MEM.uid=S.uid;let un=null,done=false;
+ const fin=ds=>{if(done)return;done=true;MEM.busy=false;MEM.own=(ds||[]).filter(d=>d&&d.uid===S.uid);setTimeout(()=>{try{un&&un()}catch{}},0);if(S.route.name==="feed")scheduleRefresh()};
+ try{un=DB.watchCol("posts",fin,{where:["uid","==",S.uid],limit:500,onError:()=>fin([])})}catch{fin([])}}
+function memList(){const t=new Date(),seen=new Set(),out=[];const all=[...(MEM.own||[]),...Object.values(S.posts).filter(p=>p.uid===S.uid)];
+ for(const p of all){if(!p||!p.id||seen.has(p.id)||!p.at)continue;seen.add(p.id);const d=new Date(p.at);if(d.getDate()!==t.getDate())continue;const m=(t.getFullYear()-d.getFullYear())*12+t.getMonth()-d.getMonth();if(m<1)continue;
+  out.push({p,m,lb:m%12===0?`${m/12} yıl önce bugün`:`${m} ay önce bugün`})}
+ return out.sort((a,b)=>b.m-a.m)}
+function memImg(p){return p.src||p.img||(p.more&&p.more[0])||p.poster||null}
+function memCard(x,more){const p=x.p,im=memImg(p);const th=im?`<span class="th"><img src="${esc(R(im))}" alt=""></span>`:`<span class="th tx" style="background:${p.kind==="note"?NOTE_BG[p.bg||0]:"var(--accent)"}">${esc(String(p.text||p.question||p.caption||"").slice(0,40))}</span>`;
+ const what={photo:"bir fotoğraf",note:"bir not",poll:"bir anket",reel:"bir Klaket"}[p.kind]||"bir paylaşım";
+ return`<div class="memc" data-memid="${esc(p.id)}">${th}<div class="t"><small>Anılar</small><b>${x.lb}</b><span>Bu tarihte ${what} paylaşmıştın${p.caption?": "+esc(String(p.caption).slice(0,60)):""}</span><div class="bt"><button class="btn sec" type="button" data-mem="see">Gör</button>${(p.kind==="photo"&&im)?`<button class="btn sec" type="button" data-mem="story">Hikâyende paylaş</button>`:""}${more?`<button class="btn ghost" type="button" data-mem="all">Tümü (${more+1})</button>`:""}</div></div>${more===null?"":`<button class="x" type="button" data-mem="hide" aria-label="Anıyı gizle">${I("close")}</button>`}</div>`}
+function memSheet(){const ls=memList();const l=sheet("mem","Anılar",ls.length?`<div class="mem-list">${ls.map(x=>memCard(x,null)).join("")}</div>`:`<div class="empty"><b>Bugün için anı yok</b>Paylaşımlarının ay ve yıl dönümünde burada görünür.</div>`,{tall:ls.length>2});l.addEventListener("click",memClick)}
+async function memStory(p,lb){if(!guard())return;const im=memImg(p);if(!im)return;let img;try{img=await loadImg(R(im))}catch{return toast("Fotoğraf açılamadı.")}
+ S.cmp={kind:"story",filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides",img,src:null,st:[{t:"date",v:lb,x:360,y:1080,s:1}]};closeLayer("mem");drawComposer()}
+function memClick(e){const b=e.target.closest("[data-mem]");if(!b)return;const c=b.closest("[data-memid]");const id=c&&c.dataset.memid;const x=memList().find(x=>x.p.id===id);const a=b.dataset.mem;
+ if(a==="hide"){LS.set("kadraj_mem_"+S.uid,memDay());c.remove();return}if(a==="all")return memSheet();if(!x)return;
+ if(a==="see"){closeLayer("mem");return go(x.p.kind==="reel"?"reels":"post",x.p.kind==="reel"?{start:x.p.id}:{id:x.p.id})}if(a==="story")memStory(x.p,x.lb)}
+HOOKS.after.push(r=>{if(r!=="feed"||!S.uid||S.guest)return;memLoad();const m=$("#main");if(!m||m.querySelector(".memc"))return;if(LS.get("kadraj_mem_"+S.uid,"")===memDay())return;const ls=memList();if(!ls.length)return;
+ const st=m.querySelector(".stories");const d=document.createElement("div");d.innerHTML=memCard(ls[0],ls.length-1);const el=d.firstElementChild;el.addEventListener("click",memClick);if(st)st.after(el);else m.prepend(el)});
+ACT.memories=()=>memSheet();
+/*}@js:61FUN*/
 /*@js:550{*/
 /* 5.5.0
    Rota fotoğrafa bakar: Rota sohbetinde fotoğraf gönderilebilir (sendToBot artık `img` taşır; `botImg` 640 px / 60000 karaktere küçültür,
