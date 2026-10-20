@@ -1,0 +1,12 @@
+{
+  "appId": "io.github.kadrajsosyalmedya.kadraj",
+  "appName": "Kadraj",
+  "webDir": "www",
+  "appendUserAgent": "KadrajApp",
+  "backgroundColor": "#0A110F",
+  "server": {
+    "url": "https://kadrajsosyalmedya.github.io/Kadraj/",
+    "androidScheme": "https",
+    "allowNavigation": ["kadrajsosyalmedya.github.io", "*.firebaseapp.com", "*.googleapis.com", "*.gstatic.com", "res.cloudinary.com", "api.cloudinary.com", "*.workers.dev", "www.youtube-nocookie.com", "i.ytimg.com"]
+  }
+}

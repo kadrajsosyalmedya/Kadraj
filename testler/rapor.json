@@ -1,6 +1,6 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.1.5 Lodos",
+  "ver": "6.1.6 Lodos",
   "at": "20 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
@@ -69,7 +69,16 @@
       "ok": true
     },
     {
-      "ad": "Telefonda klavye şeridinin not kutusunda kaybolması, YouTube şarkılarının çalması",
+      "ad": "Android uygulamasının galeri ekranı (sahte galeriyle): Galerin kutucuğu, albümler, kaydırdıkça yükleme, tek ve çoklu seçim",
+      "ok": true
+    },
+    {
+      "ad": "Android uygulaması GitHub'da derleniyor (APK)",
+      "ok": true,
+      "not": "Derleme sonucu GitHub Actions › Kadraj APK"
+    },
+    {
+      "ad": "Telefonda: not kutusunda klavye şeridi, YouTube şarkıları, Android uygulamasında gerçek galeri ve fotoğraf izni",
       "ok": false,
       "not": "Burada ölçülemiyor; senin telefonunda denenmeli."
     }
