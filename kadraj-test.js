@@ -59,7 +59,8 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  await step("Taslaklar (6.2)",async()=>{tab("settings");await W(300);$("#k62D").click();await W(400)},has('#overlay [data-layer="dft"]'));
  await step("Hikâye arşivi (6.2)",async()=>{tab("settings");await W(300);$("#k62A").click();await W(400)},has('#overlay [data-layer="ars"]'));
  await step("Okunmadı işaretle (6.2)",async()=>{tab("chats");await W(300);chatRowMenu("u:u2");await W(300)},()=>[...document.querySelectorAll('#overlay [data-layer="crow"] .opt')].some(b=>/Okun(ma)?dı olarak/.test(b.textContent))?true:"menü satırı yok");
- await step("Oyunlar kartı (6.3)",async()=>{S.q="";S.srMode=false;tab("explore");await W(400);$("#main .gmcard").click();await W(300)},()=>document.querySelectorAll('#overlay [data-layer="games"] [data-gm]').length===3?true:"oyun kutucukları yok");
+ await step("Okul sayacı (6.3)",async()=>{S.q="";S.srMode=false;tab("explore");await W(400)},()=>document.querySelectorAll("#main .okc .okc-i").length>=2?true:"sayaç yok");
+ await step("Ayarlar › Oyunlar (6.3)",async()=>{tab("settings");await W(400);$("#k63G button").click();await W(300)},()=>document.querySelectorAll('#overlay [data-layer="games"] [data-gm]').length===3?true:"oyun kutucukları yok");
  await step("+ menüsü Oyunlar (6.3)",async()=>{go("chat",{key:"u:u2"});await W(500);plusMenu();await W(300)},()=>$("#pgm")&&!$("#pch")&&!$("#pog")?true:"Oyunlar satırı yok");
  await step("Notta şarkı (6.3)",async()=>{tab("chats");await W(300);openNote();await W(300)},has(".nm-row"));
  await step("Satranç",()=>go("chess"),()=>$("#main").children.length?true:"boş");
