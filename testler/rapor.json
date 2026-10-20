@@ -1,36 +1,46 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.2.0 Karayel",
+  "ver": "6.3.0 Yıldız",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
     {
-      "ad": "Paylaşım taslakları",
+      "ad": "Oyunlar tek yerde",
       "ok": true,
-      "not": "Not ve 2 fotoğraflı taslak kapatınca saklandı, + penceresinden açıldı (filtre, oran, açıklama korundu), paylaşınca silindi; hemen paylaşılan not taslak olmadı."
+      "not": "Keşfet'te Cephe ve Satranç kartları yok, tek Oyunlar kartı 3 kutucuk açtı; XOX/4'lü/Kelime arkadaş listesini (5 kişi) gösterdi."
     },
     {
-      "ad": "Hikâye arşivi",
+      "ad": "Sohbet + menüsü",
       "ok": true,
-      "not": "Paylaşılan hikâye arşive düştü, Ayarlar'dan açıldı; yeniden paylaş oluştur ekranını, öne çıkar öne çıkanlar penceresini açtı."
+      "not": "DM ve grupta simge ızgarası; Satranç daveti ve Oyun oyna yerine tek Oyunlar satırı (DM'de satranç, XOX, 4'lü, Kelime)."
     },
     {
-      "ad": "Yeni paylaşımlar düğmesi",
+      "ad": "Notta şarkı",
       "ok": true,
-      "not": "Akış'ta aşağıdayken başkasının paylaşımı gelince düğme çıktı, dokununca en üste kaydı ve kayboldu."
+      "not": "Listeden şarkı seçildi, not şarkıyla kaydedildi, balonda şarkı adı göründü, arkadaşın notunu açınca oynatıcı geldi; yalnız şarkı seçilince yazı şarkının adı oldu."
     },
     {
-      "ad": "Okunmadı olarak işaretle",
+      "ad": "Yeni renkler ve temalar",
       "ok": true,
-      "not": "Sohbet okunmamış göründü, sayıya eklendi, sohbet açılınca kalktı."
+      "not": "14 uygulama rengi (7 yeni), 20 sohbet teması (7 yeni); Lacivert seçilince vurgu rengi değişti."
     },
     {
-      "ad": "Kadraj testi (25 adım)",
+      "ad": "Hikâyende paylaş",
       "ok": true,
-      "not": "Yönetici › Kadraj testi'nin hızlı testi demo kopyada 25 adımın hepsini geçti (3 yeni 6.2 adımı dahil)."
+      "not": "Fotoğraf ve not paylaşımı hikâye kartı olarak oluştur ekranına geldi."
     },
     {
-      "ad": "Telefonda: Android uygulamasında gerçek galeri, geri tuşu ve durum çubuğu rengi, YouTube şarkıları",
+      "ad": "6.2 özellikleri yeniden",
+      "ok": true,
+      "not": "Taslaklar, arşiv, yeni paylaşımlar düğmesi ve okunmadı işaretle testi yine geçti."
+    },
+    {
+      "ad": "Kadraj testi (28 adım)",
+      "ok": true,
+      "not": "Yönetici › Kadraj testi'nin hızlı testi 28 adımın hepsini geçti."
+    },
+    {
+      "ad": "Telefonda: notta YouTube şarkısının çalması, Android uygulamasında galeri, geri tuşu ve durum çubuğu",
       "ok": false,
       "not": "Burada ölçülemiyor; senin telefonunda denenmeli."
     }
