@@ -1,0 +1,14 @@
+# Kadraj Android uygulaması (APK): GitHub derler, Releases'e koyar. Ayrıntı android-app/BENIOKU.md
+name: Kadraj APK
+on:
+  workflow_dispatch:
+  push:
+    paths: ["android-app/**", ".github/workflows/apk.yml"]
+permissions:
+  contents: write
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo "deneme"
