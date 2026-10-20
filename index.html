@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60105">
+<meta name="kadraj-version" content="60106">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3243,6 +3243,14 @@ textarea.in.k1l{box-sizing:border-box;height:3rem;min-height:3rem!important;padd
 .svst .stk-ask .ans{display:block;width:calc(100% - 44px * var(--u));margin:calc(16px * var(--u)) auto calc(20px * var(--u));min-height:calc(76px * var(--u));border-radius:calc(22px * var(--u));background:#F1F3F2;color:#8A9490;font:600 calc(32px * var(--u))/1.2 Figtree,'Avenir Next',sans-serif;padding:0 calc(16px * var(--u))}
 .st-res{padding:0 16px 18px}.st-res .h{font-weight:800;margin:12px 0 6px}.st-res .row{display:flex;align-items:center;gap:10px;padding:6px 0}.st-res .s{font-size:.8rem;color:var(--muted)}
 /*}@css:61STORY*/
+/*@css:61APP{*/
+.kmg-al{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -12px 10px;padding:2px 12px}.kmg-al:empty{display:none}
+.kmg-c{flex:none;display:flex;align-items:center;gap:6px;padding:4px 12px 4px 4px;border-radius:999px;background:var(--surface-2);font-size:.82rem;font-weight:600;color:var(--fg);white-space:nowrap}
+.kmg-c[data-kga=""]{padding-left:12px}.kmg-c img{width:1.8rem;height:1.8rem;border-radius:50%;object-fit:cover}.kmg-c small{color:var(--muted);font-weight:500}
+.kmg-c[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}.kmg-c[aria-pressed="true"] small{color:inherit;opacity:.8}
+.kmg-more{display:grid;place-items:center;padding:18px}.kmg-more[hidden]{display:none}.kmg-note{margin:0 0 10px;font-size:.8rem;line-height:1.4}
+.kml-i.kmg-ld{opacity:.5}
+/*}@css:61APP*/
 /*@css:61TEST{*/
 .kt-btns{display:grid;gap:8px}.kt-box{margin-top:10px}.kt-box:empty{display:none}.kt-h{margin:16px 0 6px;font:700 .9rem var(--f-body)}
 .kt-busy{display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--muted)}
@@ -3859,7 +3867,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60105,APP_VER="6.1.5";
+const APP_V=60106,APP_VER="6.1.6";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -5143,7 +5151,7 @@ addEventListener("beforeinstallprompt",e=>{e.preventDefault();INSTALL=e;schedule
 addEventListener("appinstalled",()=>{INSTALL=null;LS.set("kadraj_installed",1);toast("Kadraj ana ekranına eklendi");scheduleRefresh()});
 const isStandaloneOld=()=>{try{return matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}catch{return false}};
 /* 5.1.11: manifest artık tam ekran (fullscreen); ana ekrandan açılan Kadraj o modda da "uygulama" sayılır */
-const isStandalone=()=>{try{return isStandaloneOld()||matchMedia("(display-mode: fullscreen)").matches}catch{return false}};
+const isStandalone=()=>{try{return kgal()!=null||isStandaloneOld()||matchMedia("(display-mode: fullscreen)").matches}catch{return false}};
 if("serviceWorker"in navigator&&(location.protocol==="https:"||location.hostname==="127.0.0.1"||location.hostname==="localhost"))addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
 async function installApp(){if(isStandalone())return toast("Kadraj zaten ana ekranında açık.");
  if(INSTALL){const ev=INSTALL;INSTALL=null;try{ev.prompt();const r=await ev.userChoice;if(r&&r.outcome==="accepted"){LS.set("kadraj_installed",1);toast("Kadraj yükleniyor…")}}catch{}return scheduleRefresh()}
@@ -5922,6 +5930,7 @@ const APP_GUIDE=`Kadraj bir sosyal uygulamadır (Firebase üzerinde çalışır,
 - 6.1 profil müziği: Profilini düzenle › Profil müziği: ortak "Kadraj Müzik" listesinden bir şarkıya dokun (hazır şarkılar: Barış Manço, Tarkan, Sezen Aksu, mor ve ötesi, Duman, maNga, Cem Karaca, Edis) ya da YouTube'da şarkıda Paylaş › Bağlantıyı kopyala deyip bağlantıyı yapıştır › Ekle. Profilinde görünecek adı yaz, başlangıcı dakika:saniye olarak yaz, oynat düğmesiyle dene, Kaydet. Yapıştırdığın şarkı ortak listeye girer, arkadaşın da seçebilir. Şarkılar YouTube'un kendi oynatıcısıyla çalar, dosya yüklenmez. Profilinde adının altında şarkı çipi çıkar; dokunan 30 saniye dinler (küçük YouTube penceresi açılır, kapatınca durur). Kaldır ile silinir.
 - 6.1 Rota resim çizer: Rota'ya "kedi çiz", "çiz: deniz kenarında gün batımı" ya da "bana uzayda bir kedi çizer misin" yaz; Rota resmi çizip sohbete gönderir (yapay zekâ bağlantısı gerekir, günde 10 resim; uygunsuz istekler çizilmez, Çocuk Modu'nda daha sıkı). "Henüz öğrenmedim" derse yapay zekâ köprüsünün güncellenmesi gerekiyordur.
 - 6.1 Kadraj kütüphanen: Fotoğraf eklerken açılan Kadraj penceresinde ilk kutucuk "Kütüphanen": Kadraj'da seçtiğin, çektiğin ve çizdiğin fotoğraflar (bu cihazda, en fazla 240) ve paylaşımlarındaki fotoğraflar aylara göre ızgarada durur; dokunup seçersin, çoklu seçimde işaretleyip Ekle. Yeni fotoğraf için "Telefondan fotoğraf ekle" telefonun kendi seçicisini açar (Android telefon galerisini uygulamalara yalnızca kendi ekranıyla verir). "Son seçtiklerin" satırındaki Tümü de kütüphaneyi açar.
+- 6.1 Kadraj Android uygulaması: Ayarlar'daki "Kadraj Android uygulaması" satırından (yalnızca Android telefonda) APK indirilip kurulur; kurulumda "bilinmeyen kaynak" izni ve Play Protect uyarısı çıkabilir ("Yine de yükle"). Uygulamada fotoğraf eklerken ilk kutucuk "Galerin": telefondaki bütün fotoğraflar ve albümler Kadraj'ın kendi ekranında; ilk açılışta fotoğraf izni ister. Site güncellemeleri uygulamaya kendiliğinden gelir.
 - 5.7 Klaket ekranı: video hiç kırpılmaz, her zaman tamamı görünür; videonun dışında kalan yerler düz siyah. Açıklamaya dokununca tamamı açılır. Altta solda paylaşanın yuvarlak fotoğrafı ve adı, takip etmiyorsan adın yanında "Takip et" düğmesi var. Sağ altta paylaşanın fotoğrafıyla dönen yuvarlak ses plağı var.
 - 6.0 görünüm: arayüz yenilendi (Vizör ve Klasik ikisinde de): daha ferah kartlar, sayfa geçişleri yönlü (ileri sağdan, geri soldan, sekme alttan), alttan açılan pencerelerde seçenekler sırayla gelir. Profilde kişinin fotoğrafından bulanık kapak şeridi, Keşfet'te ara ara büyük karelerle mozaik ızgara, Bildirimler'de her satırda beğeni/yorum/takip rozeti, Ayarlar'da renkli ikonlar, yüklenirken iskelet ve ışıltı. Hareket azaltılmışsa animasyonlar kapanır.
 - 6.0 satranç: varsayılan taş seti Modern, tahta yeşil Turnuva (lobideki Görünüm'den değişir; daha önce seçim yapan kendi seçimini korur). Lobi: Botlara karşı, Arkadaşınla, Bulmacalar, Aynı telefonda. Oyun ekranı: telefonda hamleler üstte, tahta geniş, düğmeler altta; bilgisayarda hamle tablosu sağda. Ön hamle: rakip düşünürken taşını oynarsın, sıra gelince yapılır (kırmızı). Sağ tık kareyi işaretler, sağ tıkla sürükleyince ok çizer (shift yeşil, ctrl/alt mavi). Arkadaşınla çevrim içi oyunda da oyun incelemesi çalışır: Kitap, En iyi, Hata rozetleri, canlı doğruluk, değerlendirme çubuğu (satranç menüsünde Oyun incelemesi: canlı, oyun bitince ya da kapalı). Oyun sonunda yeni sonuç kartı.
@@ -10434,7 +10443,7 @@ function kmpOpen(opt={}){const o={title:"Fotoğraf ekle",accept:"image",multi:fa
  return new Promise(resolve=>{let done=false;const urls=[];const picked=new Map();
   const sel=()=>[...picked.values()];
   const finish=v=>{if(done)return;done=true;document.removeEventListener("paste",onPaste,true);setTimeout(()=>urls.forEach(u=>{try{URL.revokeObjectURL(u)}catch{}}),30000);closeLayer("gal");closeLayer("pick");resolve(v&&v.length?v:null)};
-  const T=[];if(iOk&&S.uid&&!S.guest)T.push(["lib","grid","Kütüphanen","Kadraj'daki fotoğrafların","#0C7A63"]);T.push(["file",vOk&&!iOk?"film":"image",vOk&&!iOk?"Videolar":"Telefon galerisi",(vOk&&iOk?"Fotoğraf ve video":vOk?"Telefondaki videolar":"Telefondaki fotoğraflar")+(max>1?", çoklu":""),"#2F6BFF"]);
+  const T=[];if(iOk&&kgal())T.push(["pgal","image","Galerin","Telefonundaki bütün fotoğraflar","#2F6BFF"]);if(iOk&&S.uid&&!S.guest)T.push(["lib","grid","Kütüphanen","Kadraj'daki fotoğrafların","#0C7A63"]);T.push(["file",vOk&&!iOk?"film":"image",vOk&&!iOk?"Videolar":"Telefon galerisi",(vOk&&iOk?"Fotoğraf ve video":vOk?"Telefondaki videolar":"Telefondaki fotoğraflar")+(max>1?", çoklu":""),"#2F6BFF"]);
   if(o.camera&&iOk)T.push(["camera","camera","Kamera","Fotoğraf çek","#D97706"]);
   if(o.record&&vOk)T.push(["rec","video","Video çek",`En fazla ${recS} sn`,"#DB2777"]);
   if(o.gallery&&iOk)T.push(["gallery","grid","Kadraj galerisi","Hazır fotoğraflar","#1D4ED8"]);
@@ -10496,6 +10505,24 @@ function kmpOpen(opt={}){const o={title:"Fotoğraf ekle",accept:"image",multi:fa
     if(picked.has(it.id)){picked.delete(it.id);b.setAttribute("aria-pressed","false")}else{if(picked.size>=max)return toast(`En fazla ${max} dosya seçebilirsin.`);const x=await load(it);if(!x)return;picked.set(it.id,x);b.setAttribute("aria-pressed","true")}lf()});
    $("#kmlGo",ll).onclick=()=>{closeLayer("kmplib");finish(sel())};
    $("#kmlAdd",ll).onclick=()=>{closeLayer("kmplib");const fb=$('.kmp-t[data-src="file"]',l)||$('[data-src="file"]',l);if(fb)fb.click()}};
+  const kmgOpen=async()=>{const G=kgal();if(!G)return;let p={ok:false};try{p=await G.izin()}catch{}if(done)return;
+   if(!p||!p.ok)return dialog("Galeri izni gerekli","Kadraj'ın telefonundaki fotoğrafları gösterebilmesi için izin ver. Daha önce reddettiysen telefonun Ayarlar › Uygulamalar › Kadraj › İzinler › Fotoğraflar'dan açabilirsin.",[{label:"Tamam"}]);
+   let album=null,off=0,total=1,busy=false,gen=0;const items=[];
+   const ll=sheet("kmpgal","Galerin",`<div class="kml kmg${max>1?" multi":""}">${p.kismi?`<p class="muted kmg-note">Yalnızca izin verdiğin fotoğraflar görünüyor. Hepsi için telefonun Ayarlar › Uygulamalar › Kadraj › İzinler › Fotoğraflar › Tümüne izin ver.</p>`:""}<div class="kmg-al" id="kmgAl"></div><div class="kml-g" id="kmgG"></div><div class="kmg-more" id="kmgM"><span class="spin"></span></div><div class="kmp-foot kml-foot" id="kmgFoot" hidden><button type="button" class="btn" id="kmgGo">Ekle</button></div></div>`,{tall:true});
+   const gf=()=>{const f=$("#kmgFoot",ll);if(!f)return;f.hidden=!picked.size;$("#kmgGo",ll).textContent=`Ekle (${picked.size})`;foot()};gf();
+   const more=async()=>{if(busy||off>=total||!ll.isConnected)return;busy=true;const g=gen;let r=null;try{r=await G.liste({offset:off,limit:60,album,thumb:240})}catch(e){toast("Galeri okunamadı.")}busy=false;if(g!==gen||!ll.isConnected||!r)return;
+    total=+r.total||0;const its=Array.isArray(r.items)?r.items:[];off+=its.length;if(!its.length)total=off;const G2=$("#kmgG",ll);
+    G2.insertAdjacentHTML("beforeend",its.map(it=>{const i=items.push(it)-1;return`<button type="button" class="kmp-r kml-i" data-kg="${i}" aria-pressed="${picked.has("g:"+it.id)}" aria-label="Fotoğraf"><img src="${esc(String(it.thumb||""))}" alt="" loading="lazy"><span class="kmp-ck">${I("check")}</span></button>`}).join(""));
+    const m=$("#kmgM",ll);if(m)m.hidden=off>=total;if(!items.length&&off>=total)G2.innerHTML=`<div class="empty" style="grid-column:1/-1"><b>Fotoğraf yok</b>Bu albümde fotoğraf bulunamadı.</div>`;if(m&&!m.hidden&&m.getBoundingClientRect().top<innerHeight+200)more()};
+   const io=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting))more()},{root:ll.querySelector(".body")||null,rootMargin:"400px"});io.observe($("#kmgM",ll));
+   const reset=a=>{album=a;off=0;total=1;gen++;items.length=0;$("#kmgG",ll).innerHTML="";const m=$("#kmgM",ll);if(m)m.hidden=false;$$("[data-kga]",ll).forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.kga||null)===(a||"")||(!a&&!b.dataset.kga))));more()};
+   G.albumler().then(r=>{const al=$("#kmgAl",ll);if(!al||!r||!Array.isArray(r.items)||r.items.length<2)return;al.innerHTML=`<button type="button" class="kmg-c" data-kga="" aria-pressed="true">Tümü</button>`+r.items.map(a=>`<button type="button" class="kmg-c" data-kga="${esc(String(a.name))}" aria-pressed="false">${a.thumb?`<img src="${esc(String(a.thumb))}" alt="">`:""}<span>${esc(String(a.name))}</span><small>${+a.count||0}</small></button>`).join("")}).catch(()=>{});
+   const load=async it=>{try{const d=await G.al({id:it.id,max:2048});const img=await loadImg(d.data);KMR.add({img});return{img}}catch{toast("Fotoğraf açılamadı.");return null}};
+   ll.addEventListener("click",async e=>{const a=e.target.closest("[data-kga]");if(a)return reset(a.dataset.kga||null);const b=e.target.closest("[data-kg]");if(!b)return;const it=items[+b.dataset.kg];if(!it)return;const key="g:"+it.id;
+    if(max<=1){b.classList.add("kmg-ld");const x=await load(it);b.classList.remove("kmg-ld");if(x){closeLayer("kmpgal");finish([x])}return}
+    if(picked.has(key)){picked.delete(key);b.setAttribute("aria-pressed","false")}else{if(picked.size>=max)return toast(`En fazla ${max} dosya seçebilirsin.`);b.classList.add("kmg-ld");const x=await load(it);b.classList.remove("kmg-ld");if(!x)return;picked.set(key,x);b.setAttribute("aria-pressed","true")}gf()});
+   $("#kmgGo",ll).onclick=()=>{closeLayer("kmpgal");finish(sel())};more()};
+  const pg=$('[data-src="pgal"]',l);if(pg)pg.onclick=kmgOpen;
   const lt=$('[data-src="lib"]',l);if(lt)lt.onclick=kmlOpen;const ra=$("#kmpRall",l);if(ra)ra.onclick=kmlOpen;
   if(iOk)drawRecent();
   /* sürükle-bırak: pencerenin tamamı */
@@ -12534,6 +12561,17 @@ function stPaint(l,s,owner,pause){let ov=$(".svst",l);if(!ov){ov=document.create
    if(!v||(cur().pv||{})[S.uid]!=null||!guard())return;const j=+v.dataset.stv;vib(12);const c0=cur();if(S.stories[s.id]){S.stories[s.id]={...c0,pv:{...(c0.pv||{}),[S.uid]:j}};DB.update("stories/"+s.id,{pv:{[S.uid]:j}}).catch(()=>{})}paint();return}
   if(k.t==="ask"&&!mine){if(!guard())return;pause(true);const a=await stAsk(k.q,"Yanıtını yaz",160);pause(false);if(a&&await sendMessage("u:"+owner,{text:`Hikâyendeki “${k.q}” sorusuna yanıt: ${kidClean(a)}`}))toast("Yanıtın gönderildi")}}}
 /*}@js:61STORY*/
+/*@js:61APP{*/
+/* 6.1.6 Kadraj Android uygulaması (android-app/, GitHub derler: .github/workflows/apk.yml; indirme releases/latest/download/kadraj.apk).
+   Uygulama bu siteyi açar ve Capacitor köprüsüyle KadrajGaleri eklentisini verir (android-app/native/KadrajGaleri.java): izin, albumler, liste, al.
+   kgal(): eklenti varsa onu döndürür (sitede null). kmpOpen'da ilk kutucuk "Galerin" (kmgOpen): telefondaki bütün fotoğraflar, albüm çipleri,
+   60'lık sayfalar (IntersectionObserver), tek/çoklu seçim; seçilen fotoğraf 2048 px JPEG olarak gelir ve Kütüphane'ye (KMR) de eklenir.
+   Uygulamada "ana ekrana ekle" afişi çıkmaz (isStandalone). Android tarayıcıda Ayarlar'da uygulamayı indirme satırı (#appEntry). */
+const APK_URL="https://github.com/kadrajsosyalmedya/Kadraj/releases/latest/download/kadraj.apk";
+function kgal(){try{const C=window.Capacitor;if(!C||!C.isNativePlatform||!C.isNativePlatform())return null;return(C.Plugins&&C.Plugins.KadrajGaleri)||null}catch{return null}}
+HOOKS.after.push(r=>{if(r!=="settings"||kgal()||!/Android/i.test(navigator.userAgent))return;const m=$("#main");if(!m||m.querySelector("#appEntry"))return;const d=document.createElement("div");d.id="appEntry";d.className="box";d.style.margin="12px 16px";
+ d.innerHTML=`<a class="row" href="${APK_URL}" style="width:100%;color:inherit;text-decoration:none" target="_blank" rel="noopener">${I("image")}<div class="t"><b>Kadraj Android uygulaması</b><div class="s">Telefon galerin Kadraj'ın içinde · APK'yı indir ve kur</div></div>${I("next")}</a>`;const cf=m.querySelector("#cfEntry");if(cf)cf.before(d);else m.appendChild(d)});
+/*}@js:61APP*/
 /*@js:61TEST{*/
 /* 6.1.4 Yönetici paneli › Kadraj testi: bütün kod kadraj-test.js'te (window.KTEST, başındaki yorum ayrıntılı); burada cephe.js kalıbında yükleyici ve
    ADM_EXTRA kaydı. Test Kadraj'ı (demo, gerçek veriye dokunmaz), Hızlı test (sandbox'ta otomatik adımlar) ve ajan raporu (testler/rapor.json). */
