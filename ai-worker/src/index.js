@@ -274,6 +274,116 @@ async function askFree(env, body, uid, fetcher = fetch) {
   return { status: 200, data: { text, sources, model, provider: "free", searched: !!sources.length, ...(img ? { saw } : {}) } };
 }
 
+// 6.1 Rota resim çizer (POST /image, yalnızca Workers AI, ücretsiz). İstem önce süzülür (uygunsuz istek ve çocuk modu),
+// metin modeliyle kısa İngilizce görsel istemine çevrilir, sonra görsel modeli (IMAGE_MODEL, varsayılan FLUX.1 schnell) çizer.
+// Kişi başına günde IMAGE_DAILY_LIMIT (varsayılan 10) resim, 10 dakikada en fazla 5. Başarısız çizim hakkı yemez.
+const IMAGE_MODEL_DEFAULT = "@cf/black-forest-labs/flux-1-schnell";
+// Süzgeç: metin küçük harfe çevrilir, Türkçe harfler sadeleşir (ç→c, ğ→g, ı→i, ö→o, ş→s, ü→u), kelimelere bölünür.
+// STEM: kelime bununla başlıyorsa; WORD: kelime tam buysa (kısa kelimeler: "seksen", "nazik", "biraz", "kanat" yanlışlıkla engellenmesin); PHRASE: metinde geçiyorsa.
+const IMG_STEM = ["porn", "nsfw", "nude", "naked", "nudit", "erotik", "erotic", "hentai", "fetis", "fetish", "ciplak", "ustsuz", "topless", "lingerie", "orgy", "orgazm", "penis", "vajina", "vagina", "genital", "tecavuz", "rape", "taciz", "molest", "vahset", "dismember", "decapitat", "beheading", "mutilat", "tortur", "iskence", "intihar", "suicide", "katliam", "massacre", "teror", "terrorist", "swastika", "kokain", "cocaine", "eroin", "heroin", "uyusturucu", "marijuana"];
+const IMG_WORD = ["sex", "sexy", "seks", "seksi", "gore", "gory", "nazi", "naziler", "nazis", "kkk", "isis", "isid", "meth", "weed", "esrar", "bikini"];
+const IMG_PHRASE = ["ic camasir", "kesik bas", "self harm", "kendine zarar", "bomba yap", "bomb making", "gamali hac"];
+const KID_STEM = ["silah", "tabanca", "tufek", "bicak", "kilic", "rifle", "pistol", "knife", "sword", "weapon", "kanli", "blood", "korku", "korkunc", "horror", "scary", "zombi", "zombie", "death", "corpse", "ceset", "iskelet", "skeleton", "seytan", "demon", "devil", "savas", "kavga", "fight", "dovus", "sigara", "cigarette", "alkol", "alcohol", "sarap", "opus", "opucuk", "kiss"];
+const KID_WORD = ["gun", "guns", "kan", "olu", "olum", "dead", "war", "wars", "bira", "beer", "wine"];
+function foldTr(t) {
+  return String(t || "").toLocaleLowerCase("tr").replace(/ç/g, "c").replace(/ğ/g, "g").replace(/ı/g, "i").replace(/ö/g, "o").replace(/ş/g, "s").replace(/ü/g, "u").replace(/â/g, "a").replace(/î/g, "i").replace(/û/g, "u");
+}
+function imageBlocked(text, child) {
+  const words = foldTr(text).split(/[^a-z0-9]+/).filter(Boolean);
+  const hit = (stems, list) => words.some((w) => list.includes(w) || stems.some((st) => w.startsWith(st)));
+  const flat = " " + words.join(" ") + " ";
+  // ifadenin son kelimesi ek alabilir (ör. "iç çamaşırlı")
+  if (hit(IMG_STEM, IMG_WORD) || IMG_PHRASE.some((p) => flat.includes(" " + p))) return true;
+  if (child && hit(KID_STEM, KID_WORD)) return true;
+  return false;
+}
+const imageUsage = new Map();
+function takeImageQuota(uid, env) {
+  const day = new Date().toISOString().slice(0, 10);
+  const lim = Math.max(0, parseInt(env.IMAGE_DAILY_LIMIT || "10", 10) || 0);
+  let u = imageUsage.get(uid);
+  if (!u || u.day !== day) u = { day, n: 0, recent: [] };
+  const t = Date.now();
+  u.recent = u.recent.filter((x) => t - x < 600e3);
+  if (u.n >= lim || u.recent.length >= 5) {
+    imageUsage.set(uid, u);
+    return false;
+  }
+  u.n++;
+  u.recent.push(t);
+  imageUsage.set(uid, u);
+  if (imageUsage.size > 5000) imageUsage.clear();
+  return true;
+}
+function giveBackImageQuota(uid) {
+  const u = imageUsage.get(uid);
+  if (u && u.n > 0) {
+    u.n--;
+    u.recent.pop();
+  }
+}
+const TRANSLATE_SYS =
+  "You turn a Turkish drawing request into a short English prompt for an image generator. Output ONLY the prompt, one line, at most 40 words, no quotes. " +
+  "Keep the subject and details the user asked for; you may add a short style hint (for example: colorful illustration) if no style was given. " +
+  "If the request asks for sexual, nude, violent, gory, hateful or illegal content, or for a real private person, output exactly: UNSAFE";
+async function toEnglishPrompt(env, text, child) {
+  const model = String(env.FREE_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast");
+  const sys = TRANSLATE_SYS + (child ? " The user is a child: if the request is scary, violent or not suitable for children, output exactly: UNSAFE" : "");
+  try {
+    const r = await env.AI.run(model, { messages: [{ role: "system", content: sys }, { role: "user", content: text }], max_tokens: 120 });
+    let en = String((r && (r.response ?? r.result?.response)) || "").replace(/\s+/g, " ").trim().replace(/^["'“”]+|["'“”]+$/g, "");
+    en = en.replace(/^(prompt|english prompt)\s*:\s*/i, "").slice(0, 400);
+    return en;
+  } catch {
+    return "";
+  }
+}
+function bytesB64(u8) {
+  let s = "";
+  for (let i = 0; i < u8.length; i += 32768) s += String.fromCharCode.apply(null, u8.subarray(i, i + 32768));
+  return btoa(s);
+}
+// FLUX { image: base64 jpeg } verir; Stable Diffusion türü modeller PNG akışı (ReadableStream) ya da bayt verir.
+async function imageOut(r) {
+  if (r && typeof r.image === "string" && r.image.length > 100) {
+    const d = r.image.replace(/^data:[^,]+,/, "");
+    return { mime: d.startsWith("iVBOR") ? "image/png" : "image/jpeg", b64: d };
+  }
+  let buf = null;
+  if (r instanceof ArrayBuffer) buf = new Uint8Array(r);
+  else if (r instanceof Uint8Array) buf = r;
+  else if (r && typeof r.getReader === "function") buf = new Uint8Array(await new Response(r).arrayBuffer());
+  if (!buf || buf.length < 100) return null;
+  const png = buf[0] === 0x89 && buf[1] === 0x50;
+  return { mime: png ? "image/png" : "image/jpeg", b64: bytesB64(buf) };
+}
+async function drawImage(env, body, uid) {
+  const raw = typeof body.prompt === "string" ? body.prompt.replace(/\s+/g, " ").trim() : "";
+  const child = !!body.child;
+  if (raw.length < 2 || raw.length > 400) return { status: 400, data: { error: "bad_request", message: "Ne çizeyim? Kısaca yaz (ör. kedi çiz)." } };
+  if (imageBlocked(raw, child)) return { status: 400, data: { error: "unsafe", message: child ? "Bunu çizemem. Hayvan, doğa, uzay ya da sevdiğin bir oyuncak gibi başka bir şey iste." : "Bu isteği çizemem. Başka bir şey iste." } };
+  if (!takeImageQuota(uid, env)) return { status: 429, data: { error: "rate_limited", message: "Bugünlük resim hakkın doldu, yarın yine çizerim." } };
+  let en = await toEnglishPrompt(env, raw, child);
+  if (/^UNSAFE\b/i.test(en) || imageBlocked(en, child)) {
+    giveBackImageQuota(uid);
+    return { status: 400, data: { error: "unsafe", message: child ? "Bunu çizemem. Hayvan, doğa, uzay ya da sevdiğin bir oyuncak gibi başka bir şey iste." : "Bu isteği çizemem. Başka bir şey iste." } };
+  }
+  if (!en) en = raw;
+  const model = String(env.IMAGE_MODEL || IMAGE_MODEL_DEFAULT);
+  let out = null;
+  try {
+    const r = await env.AI.run(model, /flux/.test(model) ? { prompt: en, steps: 4 } : { prompt: en, num_steps: 20 });
+    out = await imageOut(r);
+  } catch {
+    out = null;
+  }
+  if (!out) {
+    giveBackImageQuota(uid);
+    return { status: 502, data: { error: "image_failed", message: "Resim çizilemedi; ücretsiz kota dolmuş olabilir, birazdan tekrar dene." } };
+  }
+  return { status: 200, data: { image: "data:" + out.mime + ";base64," + out.b64, prompt: en, model } };
+}
+
 async function ask(env, body) {
   const model = String(env.MODEL || "claude-opus-5-5");
   const effort = ["low", "medium", "high", "xhigh", "max"].includes(env.EFFORT) ? env.EFFORT : "low";
@@ -320,7 +430,7 @@ export default {
     if (req.method === "OPTIONS") return new Response(null, { status: origin ? 204 : 403, headers: cors(origin) });
     if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/health")) {
       const free = !env.ANTHROPIC_API_KEY && !!env.AI;
-      return json({ ok: true, name: "kadraj-ai", provider: env.ANTHROPIC_API_KEY ? "claude" : free ? "free" : "none", model: env.ANTHROPIC_API_KEY ? String(env.MODEL || "claude-opus-5-5") : free ? String(env.FREE_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") : "", key: !!(env.ANTHROPIC_API_KEY || env.AI), push: !!(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY), search: !!(env.ANTHROPIC_API_KEY || env.TAVILY_API_KEY) }, 200, origin);
+      return json({ ok: true, name: "kadraj-ai", provider: env.ANTHROPIC_API_KEY ? "claude" : free ? "free" : "none", model: env.ANTHROPIC_API_KEY ? String(env.MODEL || "claude-opus-5-5") : free ? String(env.FREE_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") : "", key: !!(env.ANTHROPIC_API_KEY || env.AI), push: !!(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY), search: !!(env.ANTHROPIC_API_KEY || env.TAVILY_API_KEY), image: !!env.AI }, 200, origin);
     }
     // 5.1: Web Push açık anahtarı (tarayıcı aboneliği için applicationServerKey)
     if (req.method === "GET" && url.pathname === "/vapid") {
@@ -362,6 +472,29 @@ export default {
         return json({ error: "push", message: "Bildirim gönderilemedi (" + String((e && e.message) || "") + ")." }, 500, origin);
       }
     }
+    // 6.1: Rota resim çizer (Workers AI, Anthropic anahtarı olsa da ücretsiz görsel modeli kullanılır)
+    if (req.method === "POST" && url.pathname === "/image") {
+      if (!origin) return json({ error: "origin", message: "Bu adres yalnızca Kadraj'dan kullanılabilir." }, 403, origin);
+      if (!env.AI) return json({ error: "no_image", message: "Köprüde Workers AI bağlantısı yok; resim çizilemiyor." }, 501, origin);
+      let iuid;
+      try {
+        iuid = await verifyFirebase((req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, ""), env);
+      } catch {
+        return json({ error: "auth", message: "Kadraj'a giriş yapmış olman gerekiyor." }, 401, origin);
+      }
+      let ib;
+      try {
+        ib = await req.json();
+      } catch {
+        return json({ error: "bad_request", message: "İstek okunamadı." }, 400, origin);
+      }
+      try {
+        const r = await drawImage(env, ib || {}, iuid);
+        return json(r.data, r.status, origin);
+      } catch {
+        return json({ error: "image_failed", message: "Resim çizilemedi, birazdan tekrar dene." }, 502, origin);
+      }
+    }
     if (req.method !== "POST" || url.pathname !== "/ask") return json({ error: "not_found" }, 404, origin);
     if (!origin) return json({ error: "origin", message: "Bu adres yalnızca Kadraj'dan kullanılabilir." }, 403, origin);
     if (!env.ANTHROPIC_API_KEY && !env.AI) return json({ error: "no_key", message: "Köprüde ne ANTHROPIC_API_KEY ne de Workers AI bağlantısı var." }, 500, origin);
@@ -398,4 +531,4 @@ export default {
 };
 
 // Testler için (test/search-test.mjs); Worker yalnızca default dışa aktarımı kullanır.
-export { askFree as _askFree, searchQuery as _searchQuery };
+export { askFree as _askFree, searchQuery as _searchQuery, drawImage as _drawImage, imageBlocked as _imageBlocked };

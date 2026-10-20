@@ -5741,7 +5741,7 @@ try{new MutationObserver(()=>reelOverlayPause()).observe($("#overlay"),{childLis
 /* Rota'ya komutu yazınca da çalışır */
 const sendToBotBase=sendToBot;
 sendToBot=async function(uid,payload){const t=String((payload&&payload.text)||"").trim().toLocaleLowerCase("tr").replace(/[.!?]+$/,"");
- if(uid==="bot:rota"&&payload&&!payload.post){if(/^test bildirim(i|leri)?( oluştur)?$/.test(t))return runTest();if(/^satranç oynayalım$/.test(t)){go("chess");return}}return sendToBotBase(uid,payload)};
+ if(uid==="bot:rota"&&payload&&!payload.post){if(/^test bildirim(i|leri)?( oluştur)?$/.test(t))return runTest();if(/^satranç oynayalım$/.test(t)){go("chess");return}if(!payload.img){const dq=rotaDrawQ(payload.text);if(dq)return rotaDraw(payload,dq)}}return sendToBotBase(uid,payload)};
 /* çevrim içi satranç: oyun ekranı açılmasa da bitince bir kez puanlanır (işaret oyun belgesinde) */
 function chRateMissed(m){if(S.guest||!S.canWrite||!S.uid)return;const done=LS.get("kadraj_cg_rated",{})||{};let ch=false;
  for(const d of Object.values(m||{})){if(!d||d.status!=="over"||d.reason==="iptal"||!d.result||!(d.players||[]).includes(S.uid))continue;if(CH&&CH.mode==="online"&&CH.gid===d.id)continue;
@@ -12511,6 +12511,28 @@ function pmSheet(){if(!guard())return;const cur=(me()||{}).music||null;let f=nul
   const m={u,t,s:Math.floor(start),d:Math.round(dur||cur&&cur.d||0)};bt.disabled=true;bt.textContent="Kaydediliyor…";if(!(await write(()=>DB.update("profiles/"+S.uid,{music:m})))){bt.disabled=false;bt.textContent="Kaydet";return}
   S.profiles[S.uid]={...S.profiles[S.uid],music:m};pmStop();closeLayer("pmus");toast("Profil müziği kaydedildi");scheduleRefresh()}}
 ACT.pmusic=()=>pmSheet();
+/* 6.1 Rota resim çizer: Rota'ya "kedi çiz", "çiz: uzayda bir kedi", "deniz kenarı resmi yap" yazınca (rotaDrawQ) istem köprünün /image yoluna gider
+   (kAI.image; Workers AI FLUX, süzgeç ve günlük sınır köprüde, çocuk modunda daha sıkı). Resim botImg ile 640 px'e küçültülüp Rota'nın mesajı olarak
+   (img) data/users/{uid}/bot-rota'ya yazılır; botSlim son 3 resmi tutar. Köprü eskiyse (404) Rota güncelleme gerektiğini söyler. */
+kAI.image=async function(prompt,{child=false,timeout=120000}={}){if(!this.ready())throw this.err("off","Yapay zekâ bağlantısı kurulmamış.");
+ let tok="";try{tok=await FB.auth.currentUser.getIdToken()}catch{throw this.err("auth","Oturum doğrulanamadı, yeniden giriş yap.")}
+ const ac=new AbortController();const t=setTimeout(()=>ac.abort(),timeout);let r;
+ try{r=await fetch(this.url()+"/image",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+tok},body:JSON.stringify({prompt:String(prompt).slice(0,400),child:!!child}),signal:ac.signal})}
+ catch(e){throw this.err(e&&e.name==="AbortError"?"timeout":"network",e&&e.name==="AbortError"?"Çizim çok uzun sürdü.":"Yapay zekâ köprüsüne ulaşılamadı.")}finally{clearTimeout(t)}
+ let d=null;try{d=await r.json()}catch{}if(!r.ok)throw this.err((d&&d.error)||"http_"+r.status,(d&&d.message)||"Resim çizilemedi.");if(!d||typeof d.image!=="string")throw this.err("image_failed","Resim çizilemedi.");return d.image};
+function rotaDrawQ(text){const lo=String(text||"").trim().replace(/\s+/g," ").replace(/[.!?]+$/,"").toLocaleLowerCase("tr");let m;
+ if((m=lo.match(/^(?:bana |bi |bir )*(?:resim|görsel) (?:çiz|yap|oluştur)\s*[:,-]?\s*(.{2,})$/))||(m=lo.match(/^çiz\s*[:,-]\s*(.{2,})$/)))return m[1];
+ if((m=lo.match(/^(?:rota,? )?(?:bana )?(.{2,}?) (?:resmi(?:ni)?|görseli(?:ni)?|çizimi(?:ni)?) (?:çiz|çizer misin|çizebilir misin|çizsene|yap|yapar mısın|yapabilir misin|oluştur|oluşturur musun)$/))||(m=lo.match(/^(?:rota,? )?(?:bana )?(.{2,}?) (?:çiz|çizer misin|çizebilir misin|çizsene|çiz bakalım)$/)))
+  return /^(nasıl|ne|neden|niye|kim|nereye)\b/.test(m[1])?null:m[1];
+ return null}
+async function rotaDraw(payload,q){const uid="bot:rota",b=BOT[uid];if(!b)return;const k=b.key,path=`data/users/${S.uid}/bot-${k}`;
+ const cur=(S.botchats[k]?.msgs||[]).slice(-60);let msgs=[...cur,{from:S.uid,text:payload.text||"",at:now()}];S.botchats={...S.botchats,[k]:{msgs,readAt:now()}};renderMsgs();
+ if(!S.guest)DB.set(path,{msgs:botSlim(msgs),readAt:now()}).catch(()=>{});S.botTyping=uid;renderMsgs();
+ let rep;if(!kAI.ready())rep={text:"Resim çizmek için yapay zekâ bağlantım gerekiyor; şu an bağlı değilim."};
+ else try{const img=await kAI.image(q,{child:isChild(S.uid)});const sm=await botImg(img);rep=sm?{text:"İşte çizdiğim: "+q,img:sm}:{text:"Resmi çizdim ama gösteremedim, bir daha dener misin?"}}
+ catch(e){rep={text:e&&(e.code==="not_found"||e.code==="http_404")?"Resim çizmeyi henüz öğrenmedim: yapay zekâ köprüsünün güncellenmesi gerekiyor.":(e&&e.message)||"Resim çizilemedi."}}
+ S.botTyping=null;S.stream=null;msgs=[...(S.botchats[k]?.msgs||msgs),{from:uid,at:now(),...rep}];const onScreen=S.route.name==="chat"&&S.route.params.key==="u:"+uid;S.botchats={...S.botchats,[k]:{msgs,readAt:onScreen?now():0}};
+ if(!S.guest)DB.set(path,{msgs:botSlim(msgs.slice(-80)),readAt:onScreen?now():0}).catch(()=>{});if(onScreen)renderMsgs();else if(settings.notify)toast(`${b.name}: ${rep.img?"Resmin hazır":rep.text.slice(0,70)}`,uid);scheduleRefresh();return true}
 HOOKS.after.push(r=>{if(r!=="edit")return;const b=$("#eBio");const fd=b&&b.closest(".field");if(!fd||$("#pmEdit"))return;const m=(me()||{}).music;const d=document.createElement("button");d.type="button";d.id="pmEdit";d.className="src";d.dataset.act="pmusic";d.innerHTML=`<span class="ic">${I("music")}</span><span><b>Profil müziği</b><small>${m&&m.u?esc(m.t||"Şarkı"):"Profiline bir şarkı ekle"}</small></span>`;fd.after(d)});
 /*}@js:61FUN*/
 /*@js:550{*/
