@@ -1,51 +1,51 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.3.1 Yıldız",
+  "ver": "6.4.0 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
     {
-      "ad": "Oyunlar Ayarlar'da",
+      "ad": "Yorumlara yanıt",
       "ok": true,
-      "not": "Keşfet'te oyun kartı yok; Ayarlar › Oyunlar 3 kutucuk açtı (Satranç, Cephe, XOX/4'lü/Kelime), sohbette + › Oyunlar duruyor."
+      "not": "Yanıtla şeridi ve @ad geldi, yanıt yorumun altında içeride göründü (re alanı bildirim sarmalayıcısından da geçiyor)."
     },
     {
-      "ad": "Okul sayacı",
+      "ad": "Yorum sabitleme",
       "ok": true,
-      "not": "Keşfet'te: ara tatile 27, okulun kapanmasına 248, LGS'ye 235 gün (20 Ekim 2026'da). LGS tarihi MEB açıklayana kadar tahmini (12 Haziran 2027)."
+      "not": "Paylaşım sahibi yorumu sabitledi, en üstte Sabitlendi etiketiyle çıktı (meta.pin)."
     },
     {
-      "ad": "Sohbet + menüsü",
+      "ad": "Hikâyede müzik",
       "ok": true,
-      "not": "DM ve grupta simge ızgarası; Satranç daveti ve Oyun oyna yerine tek Oyunlar satırı (DM'de satranç, XOX, 4'lü, Kelime)."
+      "not": "Müzik ekle ile şarkı seçildi, hikâye belgesine mus yazıldı, izleyicide şarkı çipi çıktı, dokununca oynatıcı penceresi açıldı."
     },
     {
-      "ad": "Notta şarkı",
+      "ad": "Sessize al",
       "ok": true,
-      "not": "Listeden şarkı seçildi, not şarkıyla kaydedildi, balonda şarkı adı göründü, arkadaşın notunu açınca oynatıcı geldi; yalnız şarkı seçilince yazı şarkının adı oldu."
+      "not": "Ayşe'nin paylaşımları ve hikâyesi Akış'tan kalktı, Ayarlar › Sessize alınanlar'da listelendi."
     },
     {
-      "ad": "Yeni renkler ve temalar",
+      "ad": "Paylaşım arşivi",
       "ok": true,
-      "not": "14 uygulama rengi (7 yeni), 20 sohbet teması (7 yeni); Lacivert seçilince vurgu rengi değişti."
+      "not": "Fotoğraf arşivlendi (allPosts'tan çıktı), Ayarlar › Paylaşım arşivi'nden Profilde göster ile geri geldi."
     },
     {
-      "ad": "Hikâyende paylaş",
+      "ad": "Geçirdiğin süre",
       "ok": true,
-      "not": "Fotoğraf ve not paylaşımı hikâye kartı olarak oluştur ekranına geldi."
+      "not": "Bugün 1 sa 5 dk ve 7 günlük çubuklar göründü, 1 saatlik hatırlatma kaydedildi."
     },
     {
-      "ad": "6.2 özellikleri yeniden",
+      "ad": "6.2 ve 6.3 özellikleri yeniden",
       "ok": true,
-      "not": "Taslaklar, arşiv, yeni paylaşımlar düğmesi ve okunmadı işaretle testi yine geçti."
+      "not": "Taslaklar, arşiv, okunmadı, oyunlar, notta şarkı, temalar ve hikâyende paylaş testleri yine geçti."
     },
     {
-      "ad": "Kadraj testi (29 adım)",
+      "ad": "Kadraj testi (32 adım)",
       "ok": true,
-      "not": "Yönetici › Kadraj testi'nin hızlı testi 29 adımın hepsini geçti."
+      "not": "Yönetici › Kadraj testi'nin hızlı testi 32 adımın hepsini geçti."
     },
     {
-      "ad": "Telefonda: notta YouTube şarkısının çalması, Android uygulamasında galeri, geri tuşu ve durum çubuğu",
+      "ad": "Telefonda: hikâye ve notlarda YouTube şarkısının çalması, Android uygulamasında galeri, geri tuşu ve durum çubuğu",
       "ok": false,
       "not": "Burada ölçülemiyor; senin telefonunda denenmeli."
     }
