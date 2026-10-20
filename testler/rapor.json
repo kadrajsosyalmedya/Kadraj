@@ -1,6 +1,6 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.1.7 Lodos",
+  "ver": "6.1.8 Lodos",
   "at": "20 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
