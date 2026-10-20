@@ -12665,7 +12665,8 @@ async function dftSheet(){const a=await K62.list("taslak");const urls=[];const l
  $$("[data-dfx]",l).forEach(b=>b.onclick=async()=>{await K62.del("taslak",b.dataset.dfx);const it=b.closest(".dft-i");if(it)it.remove();toast("Taslak silindi")})}
 {const f=closeLayer;closeLayer=function(name,...r){try{const c=S.cmp;if(name==="composer"&&c&&$('#overlay [data-layer="composer"]')){if(c._pub)c._pubX=1;else if(!c._dfs){c._dfs=1;dftSave(c)}}}catch{}return f.call(this,name,...r)}}
 {const f=publishComposer;publishComposer=async function(...a){const c=S.cmp;if(!c)return f.apply(this,a);const l=$('#overlay [data-layer="composer"]');const cv=c.kind==="story"&&l?$("#cCv",l):null;c._pub=1;c._pubX=0;
- try{return await f.apply(this,a)}finally{c._pub=0;if(c._pubX){if(c._dft)K62.del("taslak",c._dft);if(cv)arsSave(cv)}}}}
+ const n=()=>Object.keys(S.posts||{}).length+Object.keys(S.stories||{}).length;const n0=n();
+ try{return await f.apply(this,a)}finally{c._pub=0;if(c._pubX){if(n()>n0){if(c._dft)K62.del("taslak",c._dft);if(cv)arsSave(cv)}else if(!c._dfs){c._dfs=1;dftSave(c)}}}}}
 {const f=openCreate;openCreate=function(...a){const r=f.apply(this,a);K62.list("taslak").then(d=>{const l=$('#overlay [data-layer="create"]');if(!d.length||!l||l.querySelector(".dft-b"))return;const b=document.createElement("button");b.className="opt dft-b";b.type="button";b.innerHTML=`${I("edit")}<span>Taslaklar<small class="muted">${d.length} taslak</small></span>`;b.onclick=()=>{closeLayer("create");dftSheet()};const t=l.querySelector(".ctiles");if(t)t.after(b)}).catch(()=>{});return r}}
 /* hikâye arşivi */
 async function arsSave(cv){if(!cv||S.guest||!S.uid)return;const b=await k62Blob(cv,1280,.85);if(b&&await K62.put("arsiv",{id:S.uid+"|"+rid(),uid:S.uid,at:now(),blob:b}))K62.trim("arsiv",ARS_MAX)}
