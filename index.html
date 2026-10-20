@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60104">
+<meta name="kadraj-version" content="60105">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3188,6 +3188,8 @@ main.chatmode{position:relative}
 textarea.k1l{resize:none;overflow:hidden;white-space:nowrap;overflow-wrap:normal;font:inherit;line-height:1.3;min-height:0!important;height:auto;field-sizing:fixed}
 textarea.in.k1l{box-sizing:border-box;height:3rem;min-height:3rem!important;padding-top:calc(1.5rem - .65em - 1.5px);padding-bottom:0}
 .sv .ft textarea.k1l{width:auto;flex:1;padding-top:.8rem;padding-bottom:.8rem;line-height:1.3;height:2.9rem}
+.kce{display:block;min-height:3rem;padding:calc(1.5rem - .65em - 1.5px) 14px 0;line-height:1.3;white-space:nowrap;overflow:hidden;cursor:text;-webkit-user-select:text;user-select:text;outline:none}
+.kce:focus{border-color:var(--accent)}.kce:empty::before{content:attr(data-ph);color:var(--muted);pointer-events:none}
 /*}@css:61CHAT*/
 /*@css:61STORY{*/
 /* 6.1 Yakın Arkadaşlar ve hikâye çıkartmaları (js bölgesi 61STORY) */
@@ -3857,7 +3859,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60104,APP_VER="6.1.4";
+const APP_V=60105,APP_VER="6.1.5";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -5070,8 +5072,8 @@ document.addEventListener("click",e=>{if(crFired&&e.target.closest("[data-crow]"
 document.addEventListener("contextmenu",e=>{if(e.target.closest("[data-crow],.msg[data-mid]"))e.preventDefault();const m=e.target.closest(".msg[data-mid]");if(m&&!$('#overlay [data-layer="menu"]')){clearTimeout(lpT);msgMenu(m.dataset.mid)}});
 /* notlar */
 function openNote(){if(!guard())return;const cur=noteOf(S.uid);
- const l=sheet("note","Not paylaş",`<div class="form"><div class="note-prev"><div class="nb big" id="npB">${esc(cur||"Aklından ne geçiyor?")}</div>${avatar(S.uid,76,{click:false,ring:false,online:false})}</div><textarea class="in k1l" rows="1" id="nIn" maxlength="60" placeholder="Kısa bir not yaz… (en fazla 60 karakter)" enterkeyhint="done">${esc(cur)}</textarea><p class="muted" style="margin:0;font-size:.82rem">Notun 24 saat boyunca Sohbet ekranında, fotoğrafının üstünde görünür. Arkadaşların dokunup yanıt verebilir.</p><button class="btn block" id="nGo">${I("send")}Paylaş</button>${cur?`<button class="btn ghost block" id="nDel">Notu sil</button>`:""}</div>`);
- const inp=$("#nIn",l);inp.focus();inp.oninput=()=>{$("#npB",l).textContent=inp.value||"Aklından ne geçiyor?"};
+ const l=sheet("note","Not paylaş",`<div class="form"><div class="note-prev"><div class="nb big" id="npB">${esc(cur||"Aklından ne geçiyor?")}</div>${avatar(S.uid,76,{click:false,ring:false,online:false})}</div><div class="in kce" id="nIn" role="textbox" aria-label="Not" data-ph="Kısa bir not yaz… (en fazla 60 karakter)" enterkeyhint="done">${esc(cur)}</div><p class="muted" style="margin:0;font-size:.82rem">Notun 24 saat boyunca Sohbet ekranında, fotoğrafının üstünde görünür. Arkadaşların dokunup yanıt verebilir.</p><button class="btn block" id="nGo">${I("send")}Paylaş</button>${cur?`<button class="btn ghost block" id="nDel">Notu sil</button>`:""}</div>`);
+ const inp=kCE($("#nIn",l),60);inp.focus();inp.oninput=()=>{$("#npB",l).textContent=inp.value||"Aklından ne geçiyor?"};
  const save=async note=>{S.profiles={...S.profiles,[S.uid]:{...S.profiles[S.uid],note}};closeLayer("note");render(false);return write(()=>DB.update("profiles/"+S.uid,{note}))};
  $("#nGo",l).onclick=async()=>{const v=kidClean(inp.value.trim());if(!v)return toast("Önce notunu yaz.");if(await save({text:v,at:now()}))toast("Notun paylaşıldı")};
  const d=$("#nDel",l);if(d)d.onclick=async()=>{if(await save({text:"",at:0}))toast("Not silindi")}}
@@ -12418,6 +12420,17 @@ renderMsgs=function(...a){const k=pinKey();if(!k)return renderMsgsSch61.apply(th
    (data-k1own olanın kendi Enter işleyicisi var), yapıştırılan satır sonları boşluk olur. */
 document.addEventListener("keydown",e=>{const t=e.target;if(!t||!t.classList||!t.classList.contains("k1l")||e.key!=="Enter"||e.isComposing)return;e.preventDefault();if(!t.dataset.k1own&&t.form){try{t.form.requestSubmit()}catch{t.form.dispatchEvent(new Event("submit",{cancelable:true}))}}},true);
 document.addEventListener("input",e=>{const t=e.target;if(t&&t.classList&&t.classList.contains("k1l")&&/[\r\n]/.test(t.value)){const p=t.selectionStart;t.value=t.value.replace(/[\r\n]+/g," ");try{t.setSelectionRange(p,p)}catch{}}},true);
+/* 6.1.5: not kutusunda Chrome'un beyaz şeridi (eski yazı önerisi + şifre/kart/adres) textarea'da da çıkıyordu (sahibinin telefonu, yalnızca not). Not kutusu artık
+   contenteditable (kCE): Chrome bunu form alanı saymaz, öneri ve şerit koymaz. el.value okunur/yazılır (textContent), en fazla max karakter, Enter yeni satır
+   açmaz, yapıştırma düz yazı ve tek satır; boşken data-ph yer tutucusu (CSS .kce:empty::before). Gerekirse başka tek satırlık kutular da buna geçirilebilir. */
+function kCE(el,max){if(!el||el._kce)return el;el._kce=1;try{el.contentEditable="plaintext-only";if(el.contentEditable!=="plaintext-only")el.contentEditable="true"}catch{el.contentEditable="true"}
+ el.setAttribute("spellcheck","true");el.setAttribute("autocapitalize","sentences");
+ Object.defineProperty(el,"value",{configurable:true,get(){return(el.textContent||"").replace(/[\r\n]+/g," ")},set(v){el.textContent=String(v==null?"":v)}});
+ const caretEnd=()=>{try{const r=document.createRange();r.selectNodeContents(el);r.collapse(false);const sl=getSelection();sl.removeAllRanges();sl.addRange(r)}catch{}};
+ el.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault()}});
+ el.addEventListener("paste",e=>{e.preventDefault();const t=((e.clipboardData&&e.clipboardData.getData("text/plain"))||"").replace(/[\r\n]+/g," ");const room=max?Math.max(0,max-el.value.length):t.length;if(!room)return;try{document.execCommand("insertText",false,t.slice(0,room))}catch{el.textContent=(el.value+t).slice(0,max||1e9);caretEnd()}});
+ el.addEventListener("input",()=>{const v=el.textContent||"";if(/[\r\n]/.test(v)||(max&&v.length>max)||el.children.length){el.textContent=v.replace(/[\r\n]+/g," ").slice(0,max||1e9);caretEnd()}});
+ const f0=el.focus.bind(el);el.focus=o=>{f0(o);caretEnd()};return el}
 /*}@js:61CHAT*/
 /*@js:61STORY{*/
 /* 6.1 Lodos: Yakın Arkadaşlar ve hikâye çıkartmaları.
