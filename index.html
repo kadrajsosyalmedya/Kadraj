@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60400">
+<meta name="kadraj-version" content="60401">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3944,7 +3944,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60400,APP_VER="6.4.0";
+const APP_V=60401,APP_VER="6.4.1";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -5800,7 +5800,7 @@ HOOKS.after.push(r=>{if(r!=="admin")return;archWire();if(S.archTried)return;S.ar
   for(const c of list||[]){const m=String(c&&c.commit&&c.commit.message||"").match(/^(\d+\.\d+\.\d+):/);if(!m||seen.has(m[1])||/^(750f2d81|97475240)/.test(c.sha||""))continue;seen.add(m[1]);ex.push([m[1],c.sha,String(c.commit.author&&c.commit.author.date||"").slice(0,10)])}
   if(!ex.length)return;S.archExtra=ex;const el=$("#archBox");if(el){el.outerHTML=archBox();archWire()}}).catch(()=>{})});
 /* 4.4.6: ana ekrandaki simgeyi telefon tutar ve kendisi yenilemez. Uygulamadan (ana ekrandan) girenlere yeni logo için bir kez yol gösterilir. */
-HOOKS.enter.push(()=>setTimeout(()=>{try{if(!isStandalone()||LS.get("kadraj_icon_tip_442"))return;if($("#overlay")&&$("#overlay").children.length)return;LS.set("kadraj_icon_tip_442",now());
+HOOKS.enter.push(()=>setTimeout(()=>{try{if(!isStandalone()||kgal()||LS.get("kadraj_icon_tip_442"))return;if($("#overlay")&&$("#overlay").children.length)return;LS.set("kadraj_icon_tip_442",now());
  dialog("Kadraj'ın yeni logosu",`Uygulamanın içindeki logo yenilendi. Ana ekrandaki simgeyi ise telefonun kendisi saklar ve kendiliğinden değiştirmez.<br><br>Yeni simge için:<br>1. Ana ekranda Kadraj simgesine basılı tut, <b>Kaldır</b>'a dokun.<br>2. Chrome'da <b>kadrajsosyalmedya.github.io/Kadraj</b> adresini aç.<br>3. Sağ üstteki ⋮ menüsünden <b>Ana ekrana ekle</b> ya da <b>Uygulamayı yükle</b>'ye dokun.<br><br>Hesabın ve mesajların silinmez.`,[{label:"Tamam"}])}catch(e){}},4000));
 /* ===== 4.5: sohbette arama, mesaj iletme, sohbet sabitleme, hikâyeye tepki, sesli mesaj hızı, Klaket süresi ===== */
 /* Klaket ilerleme çubuğu: bulut videoyu ilk açılışta parça parça hazırlarken süre yanlış (kısa) görünür; kayıtlı süre ya da sabitlenmiş süre kullanılır */
@@ -12916,6 +12916,16 @@ function tmSheet(){const t=LS.get(tmKey())||{};const days=[...Array(7)].map((_,i
 HOOKS.after.push(r=>{if(r!=="settings"||S.guest)return;const m=$("#main");if(!m||m.querySelector("#k64"))return;const d=document.createElement("div");d.id="k64";d.className="box";d.style.margin="12px 16px";const t=(LS.get(tmKey())||{})[tmDay()]||0;
  d.innerHTML=`<button class="row" type="button" id="k64T" style="width:100%">${I("clock")}<div class="t"><b>Kadraj'da geçirdiğin süre</b><div class="s">Bugün ${tmFmt(t)}</div></div>${I("next")}</button><button class="row" type="button" id="k64A" style="width:100%">${I("box")}<div class="t"><b>Paylaşım arşivi</b><div class="s">Arşivlediğin paylaşımlar</div></div>${I("next")}</button><button class="row" type="button" id="k64M" style="width:100%">${I("mute")}<div class="t"><b>Sessize alınanlar</b><div class="s">Akış'ta görmediğin hesaplar</div></div>${I("next")}</button>`;
  $("#k64T",d).onclick=tmSheet;$("#k64A",d).onclick=arcSheet;$("#k64M",d).onclick=muListSheet;const k=m.querySelector("#k63G")||m.querySelector("#k62Entry");if(k)k.after(d);else m.appendChild(d)});
+/* 6.4.1 uygulama güncellemesi: APK'nın yerel sürümü (KadrajGaleri.surum, SURUM sabiti) APK_NATIVE'den küçükse ya da yöntem yoksa (eski APK)
+   açılışta günde bir kez "Yeni sürüm var" penceresi (kadraj_apkask_<uid> = gün); İndir telefonun tarayıcısında APK_URL'yi açar (KadrajGaleri.ac).
+   Ayarlar'daki #appInfo satırına da yazılır. Java tarafı değişince iki sayıyı birlikte artır. Site güncellemeleri APK'sız gelir, bunlar için gerekmez. */
+const APK_NATIVE=2;
+async function apkNative(){const G=kgal();if(!G)return null;try{if(typeof G.surum==="function"){const r=await G.surum();return r&&+r.surum||0}}catch{}return 0}
+function apkOpen(){const G=kgal();try{if(G&&typeof G.ac==="function"){G.ac({url:APK_URL}).catch(()=>{location.href=APK_URL});return}}catch{}location.href=APK_URL}
+async function apkCheck(force){const v=await apkNative();if(v==null||v>=APK_NATIVE)return false;const k="kadraj_apkask_"+(S.uid||"");if(!force){if(LS.get(k)===tmDay())return true;if($$("#overlay .layer").length){setTimeout(()=>apkCheck(false),15000);return true}LS.set(k,tmDay())}
+ dialog("Kadraj uygulamasının yeni sürümü var","İndir'e dokun, inen dosyayı aç ve kur. Eskisinin üstüne kurulur, hesabın ve paylaşımların yerinde kalır.",[{label:"İndir",fn:apkOpen},{label:"Sonra"}]);return true}
+HOOKS.enter.push(()=>setTimeout(()=>apkCheck(false),6000));
+HOOKS.after.push(r=>{if(r!=="settings"||!kgal())return;apkNative().then(v=>{const row=$("#appInfo");if(!row||v==null||v>=APK_NATIVE||row.querySelector(".apk-up"))return;const b=document.createElement("button");b.type="button";b.className="btn sm apk-up";b.textContent="Güncelle";b.onclick=apkOpen;const r0=row.querySelector(".row");(r0||row).appendChild(b);const s=row.querySelector(".s");if(s)s.textContent="Uygulamanın yeni sürümü var"})});
 /*}@js:64*/
 /*@js:61FUN{*/
 /* 6.1 Anılar: kendi paylaşımlarının bugünkü ay ya da yıl dönümü (aynı ay günü, en az 1 ay önce). S.posts son 300 paylaşımı tuttuğu için kişinin bütün
