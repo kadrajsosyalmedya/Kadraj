@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60403">
+<meta name="kadraj-version" content="60404">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3054,15 +3054,6 @@ html.reduce-motion .c6tile:active{transform:none}
 .kapi.kapi-rm,.kapi.kapi-rm .kq,.kapi.kapi-rm .kc{animation-name:kapiFade!important;animation-duration:1s!important;animation-delay:0s!important;transform:none!important}
 .kapi.kapi-rm .kc{opacity:1}
 @keyframes kapiFade{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}
-.reel .kemb{position:absolute;inset:0;background:#000;z-index:0}
-.reel .kemb iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;background:#000}
-.reel .kemb.on iframe{pointer-events:auto}
-.reel .kemb .kemb-b{position:absolute;left:14px;top:calc(4.2rem + env(safe-area-inset-top,0px));z-index:2;font:600 .7rem/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;padding:6px 9px;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;pointer-events:none}
-.reel .kemb .kemb-tap{position:absolute;inset:0;z-index:1;display:grid;place-items:center;background:transparent;border:0;color:#fff;cursor:pointer}
-.reel .kemb .kemb-tap span{display:inline-flex;gap:8px;align-items:center;padding:10px 14px;border-radius:999px;background:rgba(0,0,0,.55);font:600 .85rem/1.2 var(--f-body)}
-.reel .kemb.on .kemb-tap{display:none}
-.reel .kemb .kemb-ic{position:absolute;left:50%;top:50%;z-index:2;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.45);display:grid;place-items:center;opacity:0;transition:opacity .2s;pointer-events:none}
-.reel .kemb .kemb-ic.show{opacity:1}.reel .kemb .kemb-ic .i{width:30px;height:30px}
 /*}@css:511*/
 /*@css:520{*/
 #composer{position:relative}
@@ -3944,7 +3935,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60403,APP_VER="6.4.3";
+const APP_V=60404,APP_VER="6.4.4";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -11564,8 +11555,9 @@ HOOKS.after.push(r=>{if(r==="chessgame"&&CH&&CH.mode!=="puzzle")rvKick()});
    G. Lobi (vChess yeniden yazıldı → ch60Lobby, .c6lob): profil kartı (puan), dört büyük kutu (Botlara karşı, Arkadaşınla, Bulmacalar,
       Aynı telefonda), oyunların, bot kutusu (#c6bots: rakip, seviye, renk, süre, oyna/devam), bulmaca kartı, Clawd–Rota, sıralama, Görünüm.
       Eski parçalar ve işleyicileri aynen kullanılır (data-clvl, data-ccol, chopp, chclvl, chtc, botnew, cwnew, pzgo…).
-   H. 4 kişilik satranç: satranc4.js (window.SATRANC4) ilk kullanımda yüklenir (s4Load/s4Go, cephe.js'in kalıbı). Tek giriş Yönetici paneli
-      (ADM_EXTRA "s4", yalnızca S.admin açabilir). Sahibi açana kadar sürpriz: Keşfet'te, lobide, Neler yeni'de ve Rota'nın bilgisinde yok. */
+   H. 4 kişilik satranç: satranc4.js (window.SATRANC4) ilk kullanımda yüklenir (s4Load/s4Go, cephe.js'in kalıbı). Gizli girişler (6.4.4):
+      satranç lobisinde üstteki kendi kartına (.c6me) basılı tutmak ve Yönetici paneli (ADM_EXTRA "s4", satıra basınca açılır). Herkes açabilir
+      (botlarla ya da çevrim içi oda); Keşfet'te, Neler yeni'de ve Rota'nın bilgisinde yok. Sohbet daveti m.s4 → s4MsgPaint "Oyuna katıl". */
 
 /* --- A. Modern taş seti ve Turnuva tahtası --- */
 const CH60_PAL={w:{lit:"#ffffff",mid:"#f3f1ec",sh:"#c8c4bb",st:"#383632",ln:"#5b5852",hi:"#ffffff",base:"#e4e1da"},
@@ -11786,13 +11778,20 @@ const vChessBase60=vChess;
 vChess=function(){try{return ch60Lobby()}catch(e){console.warn("chs60",e);return vChessBase60()}};
 ACT.c6bots=()=>{const el=document.getElementById("c6bots");if(el)el.scrollIntoView({behavior:kbReduce()?"auto":"smooth",block:"start"});vib(6)};
 
-/* --- H. 4 kişilik satranç (gizli; yalnızca Yönetici panelinden) --- */
+/* --- H. 4 kişilik satranç (gizli; lobide kendi kartına basılı tut ya da Yönetici paneli) --- */
 let s4P=null;
 function s4Load(){return s4P||(s4P=new Promise((res,rej)=>{if(window.SATRANC4)return res();const sc=document.createElement("script");sc.src="satranc4.js?v="+APP_V;sc.onload=()=>window.SATRANC4?res():rej(new Error("yok"));sc.onerror=()=>{s4P=null;rej(new Error("indirilemedi"))};document.head.appendChild(sc)}))}
-function s4Go(fn){if(!S.authed||!S.admin)return;s4Load().then(()=>fn(window.SATRANC4)).catch(()=>{s4P=null;toast("4 kişilik satranç yüklenemedi. İnternetini kontrol et.")})}
+function s4Go(fn){if(!S.authed)return;s4Load().then(()=>fn(window.SATRANC4)).catch(()=>{s4P=null;toast("4 kişilik satranç yüklenemedi. İnternetini kontrol et.")})}
 ACT.s4open=()=>s4Go(X=>X.open());
-try{ADM_EXTRA.push({id:"s4",title:"4 kişilik satranç",desc:"Gizli deneme: yalnızca sen açabilirsin",icon:"knight",order:68,count:()=>({t:"Gizli",c:"dim"}),
- html:()=>`<p class="muted" style="margin:0 0 12px;font-size:.86rem;line-height:1.45">Dört renk, 14x14 artı biçimli tahta. Kırmızı sensin; Mavi, Sarı ve Yeşil botlar. Sıra saat yönünde döner; mat ya da pat olan, teslim olan oyundan çıkar, son kalan kazanır. Henüz kimse göremez: Keşfet'te ve Neler yeni'de yok.</p><button class="btn block" data-act="s4open">${I("knight")}4 kişilik satrancı aç</button>`})}catch(e){console.warn("chs60",e)}
+try{ADM_EXTRA.push({id:"s4",title:"4 kişilik satranç",desc:"Gizli: basınca açılır (lobide kendi kartına basılı tutunca da)",icon:"knight",order:68,count:()=>({t:"Gizli",c:"dim"}),html:()=>""})}catch(e){console.warn("chs60",e)}
+document.addEventListener("click",e=>{const h=e.target.closest&&e.target.closest("#admH-s4");if(!h)return;e.preventDefault();e.stopPropagation();s4Go(X=>X.open())},true);
+{let t=0;const off=()=>{clearTimeout(t);t=0};
+ document.addEventListener("pointerdown",e=>{const c=e.target.closest&&e.target.closest(".c6lob .c6me");if(!c)return;off();t=setTimeout(()=>{t=0;vib(20);s4Go(X=>X.open())},700)},true);
+ for(const ev of["pointerup","pointercancel","pointerleave","scroll"])document.addEventListener(ev,off,true);
+ document.addEventListener("contextmenu",e=>{if(e.target.closest&&e.target.closest(".c6lob .c6me"))e.preventDefault()},true)}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-s4join]");if(!b)return;e.preventDefault();e.stopPropagation();const c=b.dataset.s4join;s4Go(X=>X.join(c))},true);
+function s4MsgPaint(){const hid=(S.hidden&&S.hidden.msgs)||{};for(const m of S.msgs||[]){if(!m||!m.s4||!m.id||m.del||hid[m.id])continue;const el=document.getElementById("m-"+m.id);if(!el||el.querySelector(".cpj"))continue;
+ el.insertAdjacentHTML("beforeend",`<button class="cpj" data-s4join="${esc(String(m.s4).slice(0,5))}">${I("knight")}Oyuna katıl</button>`)}}
 /*}@js:60CHS*/
 /*@js:511{*/
 /* ===== 5.1.1: Rota'nın yanıtı harf harf gelir =====
@@ -11908,38 +11907,6 @@ const renderBase517=render;
 render=function(...a){try{if(S.route.name!=="reels"){const vs=$$("#main .reel video");if(vs.length){vs.forEach(v=>kmsUnload(v,false));kmsIdle()}}}catch{}return renderBase517.apply(this,a)};
 function kmsNoCast(){for(const v of document.querySelectorAll("video:not([disableremoteplayback])")){try{v.disableRemotePlayback=true}catch{}v.setAttribute("disableremoteplayback","")}}
 (()=>{let q=0;const mo=new MutationObserver(()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;kmsNoCast()})});mo.observe(document.documentElement,{childList:true,subtree:true});kmsNoCast()})();
-/* ===== 5.1.8: Bağlantıyla Klaket (YouTube Shorts, Instagram Reels, TikTok) =====
-   Video indirilmez: paylaşımda posts.embed={p:"yt"|"ig"|"tt",id,u}, Klaket'te platformun resmî gömülü oynatıcısı (iframe) açılır.
-   slidesHtml sarıldı (slidesHtmlBase518): embed varsa yer tutucu çizer; iframe yalnızca Klaket açıkken yüklenir (activateReel sarıldı → activateReelBase518),
-   uzaktakiler kaldırılır. YouTube: postMessage ile oynat/durdur/ses (iframe dokunuşa kapalı, kaydırma bozulmaz; dokununca durur/oynar).
-   Instagram ve TikTok'ta denetim yok: ilk dokunuşta oynatıcı dokunuşa açılır (.kemb.on); kaydırmak için alttaki yazı ya da sağdaki düğmeler kullanılır.
-   YouTube kapağı posts.poster'a yazılır (postThumb ızgarada kullanır). Yönetici › Bağlantıyla Klaket: toplu ekleme (ADM_EXTRA "kemb"). */
-const KEMB_NAME={yt:"YouTube",ig:"Instagram",tt:"TikTok"};
-function kembSrc(e,auto,mute){const id=encodeURIComponent(e.id);
- if(e.p==="yt")return`https://www.youtube-nocookie.com/embed/${id}?enablejsapi=1&playsinline=1&loop=1&playlist=${id}&rel=0&modestbranding=1&controls=0&autoplay=${auto?1:0}&mute=${mute?1:0}&origin=${encodeURIComponent(location.origin)}`;
- if(e.p==="ig")return`https://www.instagram.com/reel/${id}/embed/`;
- return`https://www.tiktok.com/player/v1/${id}?autoplay=${auto?1:0}&loop=1&music_info=0&description=0&rel=0`}
-function kembHtml(p){const e=p.embed;const n=KEMB_NAME[e.p]||"";return`<div class="kemb" data-kemb="${esc(e.p)}" data-id="${esc(e.id)}"><span class="kemb-b">${esc(n)}</span>${e.p==="yt"?`<span class="kemb-ic">${I("pause")}</span>`:`<button type="button" class="kemb-tap" aria-label="${esc(n)} oynatıcısını aç"><span>${I("play")}Dokun, ${esc(n)} oynatıcısı açılsın</span></button>`}</div>`}
-const slidesHtmlBase518=slidesHtml;
-slidesHtml=function(p){return p&&p.embed&&KEMB_NAME[p.embed.p]&&p.embed.id?kembHtml(p):slidesHtmlBase518(p)};
-function kembCmd(f,func,args){try{f.contentWindow.postMessage(JSON.stringify({event:"command",func,args:args||[]}),"*")}catch{}}
-function kembOn(el){const k=el&&el.querySelector(".kemb");if(!k)return;
- const reels=$$("#main .reel");const i=reels.indexOf(el);reels.forEach((x,j)=>{if(Math.abs(j-i)>1){const f=x.querySelector(".kemb iframe");if(f){f.remove();x.querySelector(".kemb").classList.remove("on")}}});
- let f=k.querySelector("iframe");const e={p:k.dataset.kemb,id:k.dataset.id};
- if(!f){f=document.createElement("iframe");f.allow="autoplay; encrypted-media; picture-in-picture";f.setAttribute("allowfullscreen","");f.referrerPolicy="strict-origin-when-cross-origin";f.title=(KEMB_NAME[e.p]||"")+" videosu";f.src=kembSrc(e,true,!!S.muted);k.insertBefore(f,k.firstChild);k._paused=false}
- else if(e.p==="yt"){kembCmd(f,S.muted?"mute":"unMute");kembCmd(f,"playVideo");k._paused=false}}
-function kembOff(el){const k=el&&el.querySelector(".kemb");if(!k)return;const f=k.querySelector("iframe");if(!f)return;
- if(k.dataset.kemb==="yt")kembCmd(f,"pauseVideo");else{f.remove();k.classList.remove("on")}}
-const activateReelBase518=activateReel;
-activateReel=function(el){const r=activateReelBase518.apply(this,arguments);try{kembOn(el)}catch(e){console.warn(e)}return r};
-const deactivateReelBase518=deactivateReel;
-deactivateReel=function(el){try{kembOff(el)}catch{}return deactivateReelBase518.apply(this,arguments)};
-document.addEventListener("click",e=>{const t=e.target;const k=t.closest&&t.closest(".reel .kemb");if(!k)return;
- if(k.dataset.kemb==="yt"){e.preventDefault();e.stopPropagation();const f=k.querySelector("iframe");if(!f)return kembOn(k.closest(".reel"));
-  k._paused=!k._paused;kembCmd(f,k._paused?"pauseVideo":"playVideo");const ic=k.querySelector(".kemb-ic");if(ic){ic.innerHTML=I(k._paused?"play":"pause");ic.classList.add("show");clearTimeout(ic._t);ic._t=setTimeout(()=>ic.classList.remove("show"),k._paused?99999:600)}return}
- if(t.closest(".kemb-tap")){e.preventDefault();e.stopPropagation();kembOn(k.closest(".reel"));k.classList.add("on")}},true);
-document.addEventListener("click",e=>{if(!(e.target.closest&&e.target.closest('[data-act="mute"]')))return;setTimeout(()=>{for(const f of $$('#main .reel .kemb[data-kemb="yt"] iframe'))kembCmd(f,S.muted?"mute":"unMute")},0)});
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){for(const x of $$("#main .reel"))kembOff(x)}else if(S.route.name==="reels"&&activeReel&&!$$("#overlay .layer").length)kembOn(activeReel)});
 /*}@js:511*/
 /*@js:520{*/
 /* ===== 5.2.0: Sohbette @bahsetme önerileri, DM'de @rota, kaydırarak yanıtla, grupta yazanlar =====
@@ -11991,7 +11958,7 @@ function mnTag(el,map,myU){const re=/@([\w.ğüşıöçĞÜŞİÖÇ]{2,30})/g;le
  for(const n of nodes){const v=n.nodeValue;re.lastIndex=0;if(!re.test(v))continue;re.lastIndex=0;const fr=document.createDocumentFragment();let last=0,m;
   while((m=re.exec(v))){const name=m[1].replace(/\.+$/,"");const uid=map.get(name.toLowerCase());if(!uid)continue;fr.append(v.slice(last,m.index));const b=document.createElement("span");b.className="mtag";b.dataset.prof=uid;b.textContent="@"+name;fr.append(b);last=m.index+1+name.length;if(name.toLowerCase()===myU)hit=true}
   if(last){fr.append(v.slice(last));n.replaceWith(fr)}}return hit}
-function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)return;try{nickPaint(key,box)}catch(e){console.warn(e)}try{cpMsgPaint(box)}catch(e){console.warn(e)}try{ogMsgPaint(box)}catch(e){console.warn(e)}let k;try{k=keyInfo(key)}catch{return}if(!k||k.type==="bot")return;
+function mnAfterRender(){const key=mnKey();const box=$("#msgs");if(!key||!box)return;try{nickPaint(key,box)}catch(e){console.warn(e)}try{cpMsgPaint(box)}catch(e){console.warn(e)}try{s4MsgPaint()}catch(e){console.warn(e)}try{ogMsgPaint(box)}catch(e){console.warn(e)}let k;try{k=keyInfo(key)}catch{return}if(!k||k.type==="bot")return;
  const byId=new Map((S.msgs||[]).map(m=>[m.id,m]));const map=mnUserMap();const myU=String(me().username||"").toLowerCase();
  for(const el of box.querySelectorAll(".msg[data-mid]")){const m=byId.get(el.dataset.mid);if(!m||m.del)continue;
   if(m.text&&m.text.includes("@")&&!el.dataset.mn){el.dataset.mn="1";if(mnTag(el,map,myU)&&m.from!==S.uid)el.classList.add("mme")}
@@ -12438,13 +12405,10 @@ chatHead=function(key,...a){const h=chatHeadBase60.call(this,key,...a);return ke
 const vChatBase60=vChat;
 vChat=function(key,...a){const h=vChatBase60.call(this,key,...a);if(key!==TB_KEY)return h;
  return h.replace(/<div class="cchips">[\s\S]*?<\/div>/,`<div class="cchips">${["yardım","yaz","seri","gör","uzun","fotoğraf","vazgeç","bildirim"].map(c=>`<button data-chip="${esc(c)}">${esc(c)}</button>`).join("")}</div>`).replace('placeholder="Mesaj yaz…"','placeholder="Test botuna yaz…"')};
-{const f=chatList;chatList=function(...a){const out=f.apply(this,a);const c=S.botchats.test;const l=c&&c.msgs&&c.msgs[c.msgs.length-1];if(!l||out.some(x=>x.key===TB_KEY))return out;
- const pins=settings.pinChats||[];out.push({key:TB_KEY,other:TB_UID,last:{text:l.text||(l.img?"Fotoğraf":""),from:l.from,at:l.at},at:l.at,unread:l.from!==S.uid&&l.at>(c.readAt||0),pinned:pins.includes(TB_KEY)});
- return out.sort((a,b)=>(b.pinned-a.pinned)||(a.pinned&&b.pinned?pins.indexOf(a.key)-pins.indexOf(b.key):b.at-a.at))}}
-const vChatsBase60C=vChats;
-vChats=function(...a){const h=vChatsBase60C.apply(this,a);const c=S.botchats.test;if(c&&c.msgs&&c.msgs.length)return h;
- const row=`<div class="box tb-box"><button class="row" data-msg="${TB_UID}" data-crow="${TB_KEY}">${avatar(TB_UID,50,{click:false})}<div class="t"><div><b>${esc(TB_BOT.name)}</b></div><div class="s">Sohbet hareketlerini, görüldüyü ve bildirimleri dene</div></div></button></div>`;
- const i=h.indexOf('data-crow="u:bot:rota"');const j=i<0?-1:h.indexOf("</button></div>",i);return j<0?h+row:h.slice(0,j+15)+row+h.slice(j+15)};
+/* 6.4.4: sahibinin isteğiyle Test botu sohbet listesinde yok; Yönetici paneli › Test botu satırına basınca açılır */
+{const f=chatList;chatList=function(...a){return f.apply(this,a).filter(x=>x.key!==TB_KEY)}}
+try{ADM_EXTRA.push({id:"tbot",title:"Test botu",desc:"Basınca sohbeti açılır: görüldü, yazıyor ve bildirimleri dene",icon:"admbot",order:66,count:()=>({t:"Sohbet",c:"dim"}),html:()=>""})}catch(e){console.warn(e)}
+document.addEventListener("click",e=>{const h=e.target.closest&&e.target.closest("#admH-tbot");if(!h)return;e.preventDefault();e.stopPropagation();openChat(TB_KEY)},true);
 /*}@js:60CHAT*/
 /*@js:61CHAT{*/
 /* ===== 6.1 sohbet (61CHAT) =====
@@ -12891,7 +12855,7 @@ function muListSheet(){const ids=Object.keys(muAll()).filter(u=>S.profiles[u]||B
  l.onclick=e=>{const b=e.target.closest("[data-mux]");if(!b)return;muSet(b.dataset.mux,{p:0,s:0});const row=b.closest(".row");if(row)row.remove();toast("Sessize alma kaldırıldı")}}
 {const f=profMenu;profMenu=function(uid,...a){const r=f.call(this,uid,...a);try{if(uid&&uid!==S.uid&&!S.guest){const l=$('#overlay [data-layer="menu"]');const x=l&&[...l.querySelectorAll(".opt")].find(b=>b.dataset.act==="close");if(l&&!l.querySelector("#pmMu")){const b=document.createElement("button");b.className="opt";b.id="pmMu";b.type="button";b.innerHTML=`${I("mute")}${muP(uid)||muS(uid)?"Sessize almayı düzenle":"Sessize al"}`;b.onclick=()=>{closeLayer("menu");muSheet(uid)};x?x.before(b):l.querySelector(".body,.sheet").appendChild(b)}}}catch(e){console.warn(e)}return r}}
 /* paylaşım arşivi */
-{const f=allPosts;allPosts=function(...a){return f.apply(this,a).filter(p=>!p.arch)}}
+{const f=allPosts;allPosts=function(...a){return f.apply(this,a).filter(p=>!p.arch&&!p.embed)}}
 async function arcSet(id,on){const p=S.posts[id];if(!p||p.uid!==S.uid)return false;S.posts={...S.posts,[id]:{...p,arch:on?1:0}};const ok=await write(()=>DB.update("posts/"+id,{arch:on?1:0}));if(!ok)S.posts={...S.posts,[id]:p};scheduleRefresh();return ok}
 function arcSheet(){const list=Object.values(S.posts||{}).filter(p=>p&&p.uid===S.uid&&p.arch).sort((a,b)=>b.at-a.at);
  const th=p=>{const t=typeof postThumb==="function"?postThumb(p):null;return t?`<img src="${esc(R(t))}" alt="">`:`<span class="dft-n" style="background:${NOTE_BG[p.bg|0]||NOTE_BG[0]}">${esc(String(p.text||p.question||p.caption||"").slice(0,40))}</span>`};

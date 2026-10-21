@@ -1,9 +1,34 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.3 Keşişleme",
+  "ver": "6.4.4 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "4 kişilik satranç: gizli giriş ve iki mod",
+      "ok": true,
+      "not": "Satranç lobisinde üstteki kendi kartına kısa dokunmak açmıyor, basılı tutunca açılıyor; Botlara karşı ve Arkadaşlarla (oda kur / kodla katıl) seçiliyor. Yönetici panelindeki satıra basınca da açılıyor."
+    },
+    {
+      "ad": "4 kişilik satranç çevrim içi",
+      "ok": true,
+      "not": "Oda kuruldu, ikinci oyuncu katıldı, boş koltuklarda botlar oynadı; benim hamlem odaya yazıldı, Mavi'nin hamlesi gelince tahtada göründü, teslim ve odadan çıkış teslim sayıldı. Sarı koltuktayken kendi taşlarım altta. İki gerçek telefonla deneme senin elinde."
+    },
+    {
+      "ad": "Test botu yönetici panelinde",
+      "ok": true,
+      "not": "Sohbet listesinde yok; Yönetici paneli › Test botu satırına basınca sohbeti açılıyor."
+    },
+    {
+      "ad": "Eski Bağlantıyla Klaket kodu silindi",
+      "ok": true,
+      "not": "Klaketler sayfası hatasız açılıyor; bağlantılı eski Klaketler artık gösterilmiyor."
+    },
+    {
+      "ad": "Hızlı test (32 adım)",
+      "ok": true,
+      "not": "Hepsi geçti."
+    },
     {
       "ad": "Test Kadraj'ında canlı mesajlaşma",
       "ok": true,
