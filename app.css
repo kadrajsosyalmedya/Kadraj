@@ -3138,6 +3138,9 @@ textarea.in.k1l{box-sizing:border-box;height:3rem;min-height:3rem!important;padd
 #main .sg[data-n="1"] .sxh{display:none}
 #main .sg .sxs{margin-left:0;margin-right:0}#main .sg .sg-b>.box{margin:8px 12px}
 html.reduce-motion #main .sg-h>.i:last-child{transition:none}
+/* 6.4.9: ekranda olmayan paylaşım kartları ve ızgara kareleri çizilmez (yaklaşınca çizilir, boyu hatırlanır) */
+#main article.card[data-pid]{content-visibility:auto;contain-intrinsic-size:auto 560px}
+#main .grid .tile{content-visibility:auto;contain-intrinsic-size:auto 130px}
 /*}@css:64*/
 /*@css:61TEST{*/
 .kt-btns{display:grid;gap:8px}.kt-box{margin-top:10px}.kt-box:empty{display:none}.kt-h{margin:16px 0 6px;font:700 .9rem var(--f-body)}

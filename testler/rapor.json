@@ -1,9 +1,29 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.8 Keşişleme",
+  "ver": "6.4.9 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "Paylaşımlar dilim dilim",
+      "ok": true,
+      "not": "Akış açılışta 300 yerine 60 paylaşımla başlıyor, aşağı kaydırınca 60'ar büyüyor (150 paylaşımlı denemede 60 → 120 → ...). Klaket, profil, bildirimler, paylaşım sayfası ve Keşfet araması açılınca hepsi (en çok 300) yükleniyor; eski Klaket görünüyor."
+    },
+    {
+      "ad": "Ekranda olmayan kartlar çizilmiyor",
+      "ok": true,
+      "not": "Akış kartları ve ızgara kareleri ekrana yaklaşınca çiziliyor; fotoğraflar arka planda çözülüyor (decoding=async)."
+    },
+    {
+      "ad": "Hızlı test (32 adım)",
+      "ok": true,
+      "not": "Hepsi geçti."
+    },
+    {
+      "ad": "Sohbet kayma ölçümü",
+      "ok": true,
+      "not": "meas.js öncekiyle aynı (bir karede en çok 10 px)."
+    },
     {
       "ad": "CSS ayrı dosyada (app.css)",
       "ok": true,
@@ -20,11 +40,6 @@
       "not": "Açık Klaketin bir sonrakinin videosu tam, ondan sonrakinin başı önceden yükleniyor (veri tasarrufunda daha az)."
     },
     {
-      "ad": "Hızlı test (32 adım)",
-      "ok": true,
-      "not": "Hepsi geçti; arşiv/test kum havuzu app.css'i de sayfaya gömüyor."
-    },
-    {
       "ad": "Kod ayrı dosyada (app.js)",
       "ok": true,
       "not": "Uygulamanın kodu index.html'den app.js'e taşındı. Telefonu taklit eden 4 kat yavaş işlemcide, soğuk açılışta derleme 110-217 ms'den neredeyse sıfıra indi (Chrome derlenmiş kodu saklıyor). index.html 1,57 MB'tan 344 KB'a düştü. Service worker app.js'i sürüme göre önbellekten veriyor; internetsiz açılış çalışıyor."
@@ -38,11 +53,6 @@
       "ad": "Arşiv ve Kadraj testi",
       "ok": true,
       "not": "Kum havuzu app.js'i indirip sayfanın içine koyuyor; hızlı testin 32 adımı geçti."
-    },
-    {
-      "ad": "Sohbet kayma ölçümü",
-      "ok": true,
-      "not": "meas.js 390x470 öncekiyle aynı (bir karede en çok 8 px)."
     },
     {
       "ad": "Gruplu Ayarlar",
