@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60407,APP_VER="6.4.7";
+const APP_V=60408,APP_VER="6.4.8";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -1856,12 +1856,15 @@ const VER_ARCHIVE=[["3.0","0b739169e925bb4618c4ebf7bf22f36c995c7690","2026-10-11
 const ARCH_CACHE={};
 /* 6.4.7'den beri kodun çoğu app.js'te (index.html yalnızca <script src="app.js?v=...">); arşivde ve Kadraj testinde kum havuzu
    ağa çıkamadığı için app.js indirilip sayfanın içine konur (archInline). Eski sürümlerde etiket yoktur, olduğu gibi döner. */
-async function archInline(html,get){const m=html.match(/<script src="app\.js(?:\?v=\d+)?"><\/script>/);if(!m)return html;const js=await get();
- return html.replace(m[0],()=>"<script>"+js.replace(/<\/script/gi,"<\\/script")+"<\/script>")}
+async function archInline(html,get){const esc2=t=>t.replace(/<\/(script|style)/gi,"<\\/$1");
+ const m=html.match(/<script src="app\.js(?:\?v=\d+)?"><\/script>/);if(m){const js=await get("app.js");html=html.replace(m[0],()=>"<script>"+esc2(js)+"<\/script>")}
+ /* 6.4.8'den beri CSS de ayrı (app.css); kum havuzunun CSP'si dış stil dosyasına izin vermez, sayfaya gömülür */
+ const c=html.match(/<link rel="stylesheet" href="app\.css(?:\?v=\d+)?">/);if(c){const st=await get("app.css");html=html.replace(c[0],()=>"<style>"+st.replace(/<\/style/gi,"<\\/style")+"</style>")}
+ return html}
 async function archFetch(sha){if(ARCH_CACHE[sha])return ARCH_CACHE[sha];let last=null;
  for(const base of[`https://raw.githubusercontent.com/${ARCH_REPO}/${sha}/`,`https://cdn.jsdelivr.net/gh/${ARCH_REPO}@${sha}/`]){
   try{const r=await fetch(base+"index.html");if(r.ok){let t=await r.text();if(/<html/i.test(t)){
-   t=await archInline(t,async()=>{const a=await fetch(base+"app.js");if(!a.ok)throw new Error("app.js HTTP "+a.status);return a.text()});ARCH_CACHE[sha]=t;return t}}last=new Error("HTTP "+r.status)}catch(e){last=e}}
+   t=await archInline(t,async f=>{const a=await fetch(base+f);if(!a.ok)throw new Error(f+" HTTP "+a.status);return a.text()});ARCH_CACHE[sha]=t;return t}}last=new Error("HTTP "+r.status)}catch(e){last=e}}
  throw last||new Error("indirilemedi")}
 function archPrep(html){
  const shim=`<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' 'unsafe-eval' blob: data:; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src data: blob:; media-src data: blob:; connect-src data: blob:; worker-src blob: data:"><script>(function(){function M(){var d=Object.create(null);return{getItem:function(k){return k in d?d[k]:null},setItem:function(k,v){d[k]=String(v)},removeItem:function(k){delete d[k]},clear:function(){for(var k in d)delete d[k]},key:function(i){var a=Object.keys(d);return i<a.length?a[i]:null},get length(){return Object.keys(d).length}}}
@@ -7906,6 +7909,10 @@ function sgBuild(){const m=$("#main");if(!m||m.querySelector(".sg"))return;const
 HOOKS.after.push(r=>{if(r==="settings")try{sgBuild();if(S.setQ)kbFilterSettings()}catch(e){console.warn("sg",e)}});
 {const f=kbFilterSettings;kbFilterSettings=function(...a){const r=f.apply(this,a);try{const m=$("#main");const q=!!(S.setQ||"").trim();if(m)m.classList.toggle("sgq",q);
  for(const g of $$("#main .sg")){g.hidden=q&&!g.querySelector(".sxs:not([hidden])");for(const b of $$(".sg-b>.box",g))b.hidden=q}}catch{}return r}}
+/* 6.4.8: Klaket'te sonraki video önceden hazırlanır: açık Klaketin bir sonrakine preload=auto, ondan sonrakine metadata
+   (veri tasarrufunda metadata/none). Parçalı (chunk:) videoları zaten hydrateVideos komşular için çözer. */
+{const f=activateReel;activateReel=function(el,...a){const r=f.call(this,el,...a);try{const rank={none:0,metadata:1,auto:2};let n=el&&el.nextElementSibling;
+ for(let i=0;n&&i<2;i++,n=n.nextElementSibling){const v=n.querySelector&&n.querySelector("video[data-rv]");if(!v)continue;const want=settings.dataSaver?(i?"none":"metadata"):(i?"metadata":"auto");if((rank[v.preload]||0)<rank[want])v.preload=want}}catch(e){console.warn(e)}return r}}
 /*}@js:64*/
 /*@js:61FUN{*/
 /* 6.1 Anılar: kendi paylaşımlarının bugünkü ay ya da yıl dönümü (aynı ay günü, en az 1 ay önce). S.posts son 300 paylaşımı tuttuğu için kişinin bütün

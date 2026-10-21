@@ -106,7 +106,7 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  parent.postMessage({kt:"sonuc",out,ver:APP_FULL},"*")};
  addEventListener("message",e=>{if(e.data&&e.data.kt==="calistir"&&window.__ktRun)window.__ktRun()})}
 /* ---------- iframe hazırlığı ---------- */
-async function build(){const r=await fetch("index.html?_kt="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("index.html indirilemedi ("+r.status+")");let h=archPrep(await archInline(await r.text(),async()=>{const a=await fetch("app.js?_kt="+Date.now(),{cache:"no-store"});if(!a.ok)throw new Error("app.js indirilemedi ("+a.status+")");return a.text()}));
+async function build(){const r=await fetch("index.html?_kt="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("index.html indirilemedi ("+r.status+")");let h=archPrep(await archInline(await r.text(),async f=>{const a=await fetch(f+"?_kt="+Date.now(),{cache:"no-store"});if(!a.ok)throw new Error(f+" indirilemedi ("+a.status+")");return a.text()}));
  const o=location.origin;h=h.replace("script-src 'unsafe-inline' 'unsafe-eval' blob: data:","script-src 'unsafe-inline' 'unsafe-eval' blob: data: "+o).replace("default-src 'none';","default-src 'none'; frame-src https://www.youtube-nocookie.com;").replace("img-src data: blob: "+o,"img-src data: blob: "+o+" https://i.ytimg.com");
  const inj=`<script>(${seedFn.toString()})();(${runFn.toString()})();(${liveFn.toString()})();<\/script>`;h=h.replace(/<\/head>/i,inj+"</head>");
  const i=h.lastIndexOf("bootLocal();");if(i>0)h=h.slice(0,i)+"bootLocal().then(()=>window.__ktSeed&&window.__ktSeed()).then(()=>parent.postMessage({kt:'hazir'},'*'));"+h.slice(i+12);return h}
