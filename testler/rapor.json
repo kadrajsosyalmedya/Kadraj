@@ -1,9 +1,14 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.11 Keşişleme",
+  "ver": "6.4.12 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "Şarkının başlangıç saniyesi",
+      "ok": true,
+      "not": "Şarkıya dokununca kaydırıcı açılıyor, şarkı seçilen saniyeden çalıyor (12. saniye denendi), bitince aynı yere dönüp döngüyle çalıyor. Not kaydında başlangıç saklanıyor, notu açınca oradan çalıyor. Geri düğmesi listeye dönüyor. Başlangıç Apple ve Deezer'ın verdiği 30 saniyenin içinden seçiliyor."
+    },
     {
       "ad": "Şarkılar Apple Music ve Deezer'dan, YouTube tamamen kalktı",
       "ok": true,
