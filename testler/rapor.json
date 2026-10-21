@@ -1,9 +1,24 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.5 Keşişleme",
+  "ver": "6.4.6 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "Gruplu Ayarlar",
+      "ok": true,
+      "not": "12 bölüm 6 kapalı gruba toplandı; sayfa 5.667 px'ten yaklaşık 1.100 px'e indi (390 ve 360 px genişlikte denendi). Grup açılıyor, yeniden çizimde açık kalıyor, arama bütün gruplarda arıyor."
+    },
+    {
+      "ad": "Oyunlar Sohbet'te",
+      "ok": true,
+      "not": "Sohbet sayfasının üst çubuğunda oyun kolu var, Oyunlar penceresi (Satranç, Cephe, mini oyunlar) açılıyor. Ayarlar'daki Oyunlar satırı kalktı."
+    },
+    {
+      "ad": "Hızlı test (32 adım)",
+      "ok": true,
+      "not": "Hepsi geçti."
+    },
     {
       "ad": "Clawd maskotu kaldırıldı",
       "ok": true,
@@ -13,11 +28,6 @@
       "ad": "Satrançta Clawd rakibi duruyor",
       "ok": true,
       "not": "Lobide Clawd'ın yüzü çiziliyor, Clawd'a karşı oyun açılıyor."
-    },
-    {
-      "ad": "Hızlı test (32 adım)",
-      "ok": true,
-      "not": "Hepsi geçti."
     },
     {
       "ad": "4 kişilik satranç çevrim içi",
