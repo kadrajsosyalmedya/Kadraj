@@ -8,6 +8,9 @@ self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;c
  /* 5.7.4: hazır fotoğraflar (img/, reels/*.jpg) hiç değişmez: önce önbellekten. Videolara (mp4) karışılmaz, tarayıcı parça parça (Range) kendisi indirir. */
  if(/\/(img|reels)\/[^/]+\.mp4$/i.test(u.pathname))return;
  if(/\/(img|reels)\/[^/]+\.(jpe?g|png|webp)$/i.test(u.pathname)){e.respondWith(caches.match(r).then(m=>m||fetch(r).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(C).then(c=>c.put(r,cp)).catch(()=>{})}return res})));return}
+ /* 6.4.7: uygulamanın kodu app.js?v=<sürüm>; aynı sürüm hiç değişmez: önce önbellekten (telefon derlenmiş kodu da saklar), eski sürümler silinir. */
+ if(/\/app\.js$/.test(u.pathname)&&u.searchParams.get("v")){e.respondWith(caches.open(C).then(c=>c.match(r).then(m=>m||fetch(r).then(res=>{if(res&&res.ok){const cp=res.clone();
+  c.keys().then(ks=>Promise.all(ks.filter(k=>/\/app\.js\?/.test(k.url)&&k.url!==r.url).map(k=>c.delete(k)))).then(()=>c.put(r,cp)).catch(()=>{})}return res}))));return}
  /* 5.1.7: sayfa açılışı GitHub'ın 10 dakikalık sunucu önbelleğine (CDN) takılmasın diye benzersiz adresle istenir;
     yoksa eski sürüm açılıp hemen yeniden yükleniyordu. Çevrimdışıyken önbellekteki index.html açılır. */
  if(r.mode==="navigate"){const fresh=new URL("./index.html",self.registration.scope);fresh.searchParams.set("_k",Date.now().toString(36));

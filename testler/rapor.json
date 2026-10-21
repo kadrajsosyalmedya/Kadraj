@@ -1,9 +1,29 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.6 Keşişleme",
+  "ver": "6.4.7 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "Kod ayrı dosyada (app.js)",
+      "ok": true,
+      "not": "Uygulamanın kodu index.html'den app.js'e taşındı. Telefonu taklit eden 4 kat yavaş işlemcide, soğuk açılışta derleme 110-217 ms'den neredeyse sıfıra indi (Chrome derlenmiş kodu saklıyor). index.html 1,57 MB'tan 344 KB'a düştü. Service worker app.js'i sürüme göre önbellekten veriyor; internetsiz açılış çalışıyor."
+    },
+    {
+      "ad": "Klaket çubuğu saniyede 5 kez",
+      "ok": true,
+      "not": "Çubuk her karede değil 200 ms'de bir güncelleniyor, arası kayarak doluyor. Klaket'te stil hesabı saniyede 60'tan 21'e indi."
+    },
+    {
+      "ad": "Arşiv ve Kadraj testi",
+      "ok": true,
+      "not": "Kum havuzu app.js'i indirip sayfanın içine koyuyor; hızlı testin 32 adımı geçti."
+    },
+    {
+      "ad": "Sohbet kayma ölçümü",
+      "ok": true,
+      "not": "meas.js 390x470 öncekiyle aynı (bir karede en çok 8 px)."
+    },
     {
       "ad": "Gruplu Ayarlar",
       "ok": true,
