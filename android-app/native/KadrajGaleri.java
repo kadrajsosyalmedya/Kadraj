@@ -240,4 +240,29 @@ public class KadrajGaleri extends Plugin {
         getActivity().runOnUiThread(() -> MainActivity.boya(getActivity(), fc));
         call.resolve();
     }
+
+    /* Uygulamanın yerel sürümü: Java tarafı değişince SURUM'u artır, index.html'deki APK_NATIVE da aynı sayı olsun.
+       Sayfa küçükse "Güncelleme var" penceresi çıkar. */
+    static final int SURUM = 2;
+
+    @PluginMethod
+    public void surum(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("surum", SURUM);
+        try { r.put("ad", getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionName); } catch (Exception e) { r.put("ad", ""); }
+        call.resolve(r);
+    }
+
+    /* Bağlantıyı telefonun tarayıcısında açar (yeni APK'yı indirmek için). */
+    @PluginMethod
+    public void ac(PluginCall call) {
+        String u = call.getString("url", "");
+        if (!u.startsWith("https://")) { call.reject("adres"); return; }
+        try {
+            android.content.Intent it = new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(u));
+            it.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(it);
+            call.resolve();
+        } catch (Exception e) { call.reject("acilamadi"); }
+    }
 }

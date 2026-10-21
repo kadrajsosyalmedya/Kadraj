@@ -1,9 +1,14 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.0 Keşişleme",
+  "ver": "6.4.1 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "Uygulama güncelleme penceresi",
+      "ok": true,
+      "not": "Sahte uygulamayla: eski APK'da (sürüm bilgisi yok) açılışta pencere çıktı, İndir APK bağlantısını açtı; yeni APK'da (sürüm 2) ve tarayıcıda çıkmadı. Uygulamada eski 'yeni logo' penceresi artık çıkmıyor. APK GitHub'da derlendi."
+    },
     {
       "ad": "Yorumlara yanıt",
       "ok": true,
