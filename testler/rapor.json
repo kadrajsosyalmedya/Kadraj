@@ -1,9 +1,14 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.1 Keşişleme",
+  "ver": "6.4.2 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "Test Kadraj'ında canlı mesajlaşma",
+      "ok": true,
+      "not": "6 kişilik test dünyası (5 sohbet, 5 kişilik grup, yorum yanıtları, şarkılı not ve hikâye). Ayşe'ye 'selam nasılsın' yazınca görüldü + yazıyor… gösterip 'Selam! Biraz yorgunum ama iyiyim' dedi; grupta Can yanıt verdi. 'Kimin gözünden: Ayşe' ile Ayşe'nin ekranına geçildi, Bilal'in mesajı okunmamış göründü, Ayşe yazınca Bilal yanıt verdi."
+    },
     {
       "ad": "Uygulama güncelleme penceresi",
       "ok": true,
