@@ -12,7 +12,7 @@ function seedFn(){window.__ktSeed=async function(){const now=Date.now(),H=36e5,M
  const prof=(uid,un,name,extra)=>({uid,username:un,name,bio:"",avatar:null,following:{"bot:rota":now},botFollowers:{},private:false,createdAt:now-30*24*H,...extra});
  const all={u1:now,u2:now,u3:now,u4:now,u5:now,u6:now};
  const me=prof("u1","bilal","Bilal Kara",{bio:"Kadraj testi · ajanların test hesabı",avatar:"img/sisli-dag.jpg",following:{...all,"bot:rota":now},note:{text:"Test Kadraj'ındasın",at:now}});
- const u2=prof("u2","ayse","Ayşe Yıldız",{bio:"Fotoğraf ve kahve",avatar:"img/kedi.jpg",following:{...all},close:{u1:now},music:{u:"yt:cpp69ghR1IM",t:"Tarkan · Şımarık",s:45,d:0},note:{text:"Kahve molası kimde?",at:now-H,music:{u:"yt:uARe3mS0QOE",t:"Barış Manço · Gülpembe",s:0}}});
+ const u2=prof("u2","ayse","Ayşe Yıldız",{bio:"Fotoğraf ve kahve",avatar:"img/kedi.jpg",following:{...all},close:{u1:now},music:{u:"dz:16412330",t:"Tarkan · Şımarık",s:0,d:30},note:{text:"Kahve molası kimde?",at:now-H,music:{u:"dz:66156227",t:"Barış Manço · Gülpembe",s:0}}});
  const u3=prof("u3","can","Can Demir",{bio:"Satranç ve Cephe",avatar:"img/motor.jpg",following:{...all}});
  const u4=prof("u4","zeynep","Zeynep Kaya",{bio:"LGS'ye hazırlanıyorum",following:{...all},note:{text:"Final haftası, dua edin",at:now-2*H}});
  const u5=prof("u5","mert","Mert Aydın",{bio:"Uzay meraklısı",avatar:"img/roket.jpg",following:{u1:now,u2:now}});
@@ -34,7 +34,7 @@ function seedFn(){window.__ktSeed=async function(){const now=Date.now(),H=36e5,M
  await DB.set("meta/kt-p6",{likes:{u1:now,u2:now},comments:{kc5:{uid:"u1",text:"Saat kaçta?",at:now-2*H},kc6:{uid:"u5",text:"@bilal 22.00'de",at:now-110*M,re:"kc5"}}});
  const st=[["kt-s1",{uid:"u2",at:now-H,img:"img/sisli-dag.jpg",st:[{t:"poll",q:"Bu manzara nasıl?",o:["Harika","Eh işte"],x:.5,y:.25},{t:"ask",q:"Bir sonraki yer neresi olsun?",x:.5,y:.66}]}],
   ["kt-s2",{uid:"u2",at:now-.5*H,img:"img/col.jpg",cf:1}],["kt-s3",{uid:"u3",at:now-3*H,img:"img/motor.jpg"}],
-  ["kt-s4",{uid:"u5",at:now-2*H,img:"img/uzay.jpg",mus:{u:"yt:FJ5-ttwIBkI",t:"Barış Manço · Dönence",s:0}}],["kt-s5",{uid:"u6",at:now-4*H,img:"img/gunbatimi.jpg"}]];
+  ["kt-s4",{uid:"u5",at:now-2*H,img:"img/uzay.jpg",mus:{u:"dz:66191768",t:"Barış Manço · Gülpembe",s:0}}],["kt-s5",{uid:"u6",at:now-4*H,img:"img/gunbatimi.jpg"}]];
  for(const[id,d]of st){await DB.set("stories/"+id,d);S.stories={...S.stories,[id]:{id,...d}}}
  const chat=async(cid,members,ms,extra={})=>{const t0=now-(ms.length+3)*M*3;const last=ms[ms.length-1];const lt=t0+ms.length*M*3;
   await DB.set("chats/"+cid,{members,updatedAt:lt,last:{text:last[1]||"Fotoğraf",from:last[0],at:lt},reads:extra.reads||Object.fromEntries(members.map(u=>[u,lt])),...(extra.doc||{})});
@@ -108,7 +108,7 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  addEventListener("message",e=>{if(e.data&&e.data.kt==="calistir"&&window.__ktRun)window.__ktRun()})}
 /* ---------- iframe hazırlığı ---------- */
 async function build(){const r=await fetch("index.html?_kt="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("index.html indirilemedi ("+r.status+")");let h=archPrep(await archInline(await r.text(),async f=>{const a=await fetch(f+"?_kt="+Date.now(),{cache:"no-store"});if(!a.ok)throw new Error(f+" indirilemedi ("+a.status+")");return a.text()}));
- const o=location.origin;h=h.replace("script-src 'unsafe-inline' 'unsafe-eval' blob: data:","script-src 'unsafe-inline' 'unsafe-eval' blob: data: "+o).replace("default-src 'none';","default-src 'none'; frame-src https://www.youtube-nocookie.com;").replace("img-src data: blob: "+o,"img-src data: blob: "+o+" https://i.ytimg.com");
+ const o=location.origin;h=h.replace("script-src 'unsafe-inline' 'unsafe-eval' blob: data:","script-src 'unsafe-inline' 'unsafe-eval' blob: data: "+o);
  const inj=`<script>(${seedFn.toString()})();(${runFn.toString()})();(${liveFn.toString()})();<\/script>`;h=h.replace(/<\/head>/i,inj+"</head>");
  const i=h.lastIndexOf("bootLocal();");if(i>0)h=h.slice(0,i)+"bootLocal().then(()=>window.__ktSeed&&window.__ktSeed()).then(()=>parent.postMessage({kt:'hazir'},'*'));"+h.slice(i+12);return h}
 function frame(html,hidden){const u=URL.createObjectURL(new Blob([html],{type:"text/html"}));const f=document.createElement("iframe");f.src=u;f.title="Kadraj testi";f.setAttribute("sandbox","allow-scripts allow-forms allow-modals allow-popups");f.style.cssText=hidden?"position:fixed;left:-10000px;top:0;width:390px;height:844px;border:0":"flex:1;width:100%;border:0;background:#fff";f._u=u;return f}

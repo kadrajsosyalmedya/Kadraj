@@ -1,18 +1,18 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.10 Keşişleme",
+  "ver": "6.4.11 Keşişleme",
   "at": "21 Ekim 2026",
-  "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
+  "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
     {
-      "ad": "Şarkılar Apple Music'ten (video ve reklam yok)",
+      "ad": "Şarkılar Apple Music ve Deezer'dan, YouTube tamamen kalktı",
       "ok": true,
-      "not": "Not, hikâye ve profil müziğinde şarkı adıyla arama, dinleme ve seçme sahte Apple yanıtlarıyla denendi: not kaydedildi, notu açınca ses çaldı, kapatınca durdu; profil çipi ses olarak çaldı; yabancı adresler reddedildi; Çocuk Modu'nda açık içerik çıkmadı. Gerçek Apple sunucusuna bu ortamdan ulaşılamadığı için telefonda denenmesi gerekiyor."
+      "not": "Arama Deezer, Apple Music Türkiye ve Apple Music ABD'den birlikte yapılıyor, aynı şarkı bir kez çıkıyor. Sahte yanıtlarla denendi: Deezer şarkısı listede çaldı, notta ve profilde kaydedildi, açınca taze adresle çaldı, kapatınca durdu. Bir kaynak çalışmazsa diğerlerinin sonuçları çıkıyor, hiçbiri çalışmazsa hata yazısı. Eski YouTube şarkıları görünmüyor, YouTube kodu yok. Çocuk Modu'nda açık içerik çıkmadı. Gerçek sunuculara bu ortamdan ulaşılamadığı için telefonda denenmesi gerekiyor."
     },
     {
       "ad": "Hızlı test (33 adım)",
       "ok": true,
-      "not": "Hepsi geçti (yeni adım: Şarkı arama)."
+      "not": "Hepsi geçti."
     },
     {
       "ad": "Paylaşımlar dilim dilim",
