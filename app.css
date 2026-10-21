@@ -3141,6 +3141,18 @@ html.reduce-motion #main .sg-h>.i:last-child{transition:none}
 /* 6.4.9: ekranda olmayan paylaşım kartları ve ızgara kareleri çizilmez (yaklaşınca çizilir, boyu hatırlanır) */
 #main article.card[data-pid]{content-visibility:auto;contain-intrinsic-size:auto 560px}
 #main .grid .tile{content-visibility:auto;contain-intrinsic-size:auto 130px}
+/* 6.4.10: Apple Music önizleme oynatıcısı ve arama */
+.it-pl{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:16px;background:var(--surface-2);border:1px solid var(--line);min-width:0}
+.it-pl img,.it-pl .it-ph{width:48px;height:48px;border-radius:10px;flex:none;object-fit:cover;display:grid;place-items:center;background:var(--surface);color:var(--muted)}
+.it-pl .it-tx,.it-pl .it-t{flex:1;min-width:0;display:grid;gap:3px;text-align:left;background:none;border:0;color:var(--fg);padding:0;cursor:pointer}
+.it-pl b{font-weight:650;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it-pl small{color:var(--muted);font-size:.76rem;display:flex;align-items:center;gap:6px}
+.it-pl .it-bar{display:block;height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:3px}.it-pl .it-bar i{display:block;height:100%;background:var(--accent);transform:scaleX(0);transform-origin:left center;transition:transform .25s linear}
+.it-pl.on{border-color:var(--accent)}.it-pl .ib{flex:none}
+.it-e{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:4px;background:var(--muted);color:var(--surface);font:700 .6rem/1 var(--f-mono)}
+.it-l{display:grid;gap:8px;margin:10px 0}.it-r.on .it-pl{border-color:var(--accent)}
+.it-msg{display:flex;align-items:center;gap:8px;padding:14px 4px}.it-note{font-size:.76rem;margin:8px 2px 0}
+.nm-v .it-pl{margin-top:10px}
 /*}@css:64*/
 /*@css:61TEST{*/
 .kt-btns{display:grid;gap:8px}.kt-box{margin-top:10px}.kt-box:empty{display:none}.kt-h{margin:16px 0 6px;font:700 .9rem var(--f-body)}

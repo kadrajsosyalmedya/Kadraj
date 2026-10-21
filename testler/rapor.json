@@ -1,9 +1,19 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.9 Keşişleme",
+  "ver": "6.4.10 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "Şarkılar Apple Music'ten (video ve reklam yok)",
+      "ok": true,
+      "not": "Not, hikâye ve profil müziğinde şarkı adıyla arama, dinleme ve seçme sahte Apple yanıtlarıyla denendi: not kaydedildi, notu açınca ses çaldı, kapatınca durdu; profil çipi ses olarak çaldı; yabancı adresler reddedildi; Çocuk Modu'nda açık içerik çıkmadı. Gerçek Apple sunucusuna bu ortamdan ulaşılamadığı için telefonda denenmesi gerekiyor."
+    },
+    {
+      "ad": "Hızlı test (33 adım)",
+      "ok": true,
+      "not": "Hepsi geçti (yeni adım: Şarkı arama)."
+    },
     {
       "ad": "Paylaşımlar dilim dilim",
       "ok": true,
