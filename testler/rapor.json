@@ -1,9 +1,29 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.7 Keşişleme",
+  "ver": "6.4.8 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "CSS ayrı dosyada (app.css)",
+      "ok": true,
+      "not": "index.html 344 KB'tan 3 KB'a indi. Stil ve kod telefonda saklanıyor, her açılışta yalnızca 3 KB iniyor. Service worker ikisini de sürüme göre önbellekten veriyor; internetsiz açılışta da sayfa stilli geliyor."
+    },
+    {
+      "ad": "Yazı tipleri açılışı bekletmiyor",
+      "ok": true,
+      "not": "Google yazı tipleri arka planda yükleniyor; gelene kadar telefonun kendi yazı tipi görünüyor, sonra yerini alıyor."
+    },
+    {
+      "ad": "Klaket'te sonraki video hazır",
+      "ok": true,
+      "not": "Açık Klaketin bir sonrakinin videosu tam, ondan sonrakinin başı önceden yükleniyor (veri tasarrufunda daha az)."
+    },
+    {
+      "ad": "Hızlı test (32 adım)",
+      "ok": true,
+      "not": "Hepsi geçti; arşiv/test kum havuzu app.css'i de sayfaya gömüyor."
+    },
     {
       "ad": "Kod ayrı dosyada (app.js)",
       "ok": true,
@@ -33,11 +53,6 @@
       "ad": "Oyunlar Sohbet'te",
       "ok": true,
       "not": "Sohbet sayfasının üst çubuğunda oyun kolu var, Oyunlar penceresi (Satranç, Cephe, mini oyunlar) açılıyor. Ayarlar'daki Oyunlar satırı kalktı."
-    },
-    {
-      "ad": "Hızlı test (32 adım)",
-      "ok": true,
-      "not": "Hepsi geçti."
     },
     {
       "ad": "Clawd maskotu kaldırıldı",
