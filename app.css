@@ -3732,3 +3732,6 @@ html.k-lite .scrim{background:rgba(0,0,0,.42)}
 /*}@css:61GAME*/
 
 
+/* 6.4.12 şarkı başlangıcı */
+.it-st{display:grid;gap:10px;margin-top:6px}.it-sl{display:flex;justify-content:space-between;align-items:baseline;margin:6px 2px 0;font-size:.85rem}.it-sl b{font-family:var(--f-mono);font-size:1rem}
+.it-rg{width:100%;accent-color:var(--accent);margin:0}.it-bt{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
