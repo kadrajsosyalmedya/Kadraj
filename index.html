@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
-<meta name="kadraj-version" content="60402">
+<meta name="kadraj-version" content="60403">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#0A110F">
 <link rel="manifest" href="manifest.webmanifest">
@@ -3944,7 +3944,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60402,APP_VER="6.4.2";
+const APP_V=60403,APP_VER="6.4.3";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -12691,11 +12691,10 @@ function ktGo(fn){if(!S.authed||!S.admin)return;ktLoad().then(()=>fn(window.KTES
 ACT.ktOpen=()=>ktGo(K=>K.open());
 ACT.ktRun=()=>{const b=$("#ktRes");if(b)ktGo(K=>K.run(b))};
 ACT.ktRep=()=>{const b=$("#ktRep");if(b)ktGo(K=>K.report(b))};
-try{ADM_EXTRA.push({id:"ktest",title:"Kadraj testi",desc:"Gerçek veriye dokunmadan dene, testleri gör",icon:"check",order:67,count:()=>({t:"Demo",c:"dim"}),
- html:()=>`<p class="muted" style="margin:0 0 12px;font-size:.86rem;line-height:1.45">Ajanların test ettiği Kadraj'ın aynısı: Bilal Kara (sen), Ayşe Yıldız ve Can Demir; paylaşımlar, çıkartmalı hikâye, Yakın Arkadaşlar hikâyesi, Anılar, sohbetler. Her şey bu sayfada kalır, gerçek hesaplara ve Firebase'e hiçbir şey gitmez; kapatınca silinir.</p>
-  <div class="kt-btns"><button class="btn block" data-act="ktOpen">${I("play")}Test Kadraj'ı aç</button><button class="btn sec block" data-act="ktRun">${I("check")}Hızlı testi çalıştır</button></div>
-  <div id="ktRes" class="kt-box"></div>
-  <h4 class="kt-h">Ajan raporu</h4><div id="ktRep" class="kt-box"><button class="btn ghost" data-act="ktRep">Son raporu göster</button></div>`})}catch(e){console.warn("ktest",e)}
+try{ADM_EXTRA.push({id:"ktest",title:"Test raporu",desc:"Ajanların son test sonuçları",icon:"check",order:67,count:()=>({t:"Rapor",c:"dim"}),
+ html:()=>`<div id="ktRep" class="kt-box"><button class="btn ghost" data-act="ktRep">Raporu göster</button></div>`})}catch(e){console.warn("ktest",e)}
+/* 6.4.3: sahibinin isteğiyle panelde yalnızca ajan raporu kaldı; Test Kadraj'ı ve hızlı test (ACT.ktOpen/ktRun) ajanların betikleri için kodda duruyor, panelde düğmesi yok. Bölüm açılınca rapor kendiliğinden yüklenir. */
+HOOKS.after.push(r=>{if(r!=="admin")return;setTimeout(()=>{const b=$('#ktRep [data-act="ktRep"]');if(b&&b.offsetParent)b.click()},300)});
 /*}@js:61TEST*/
 /*@js:62{*/
 /* 6.2 Karayel. Paylaşım taslakları ve hikâye arşivi yalnızca bu cihazda durur (IndexedDB "kadraj_62": "taslak", "arsiv"; kayıtta uid, kişiye göre süzülür).
