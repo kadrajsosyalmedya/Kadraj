@@ -1,18 +1,33 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.4 Keşişleme",
+  "ver": "6.4.5 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, YouTube'un gömmeye izin vermesi, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
     {
-      "ad": "4 kişilik satranç: gizli giriş ve iki mod",
+      "ad": "Clawd maskotu kaldırıldı",
       "ok": true,
-      "not": "Satranç lobisinde üstteki kendi kartına kısa dokunmak açmıyor, basılı tutunca açılıyor; Botlara karşı ve Arkadaşlarla (oda kur / kodla katıl) seçiliyor. Yönetici panelindeki satıra basınca da açılıyor."
+      "not": "Akış, Keşfet, Klaket, Sohbet, Bildirim, Ayarlar, Yönetici ve profil sayfaları hatasız açılıyor, hiçbirinde Clawd odası yok. Kod arsiv/clawd/ klasöründe saklı; index.html %8,6 kısaldı."
+    },
+    {
+      "ad": "Satrançta Clawd rakibi duruyor",
+      "ok": true,
+      "not": "Lobide Clawd'ın yüzü çiziliyor, Clawd'a karşı oyun açılıyor."
+    },
+    {
+      "ad": "Hızlı test (32 adım)",
+      "ok": true,
+      "not": "Hepsi geçti."
     },
     {
       "ad": "4 kişilik satranç çevrim içi",
       "ok": true,
-      "not": "Oda kuruldu, ikinci oyuncu katıldı, boş koltuklarda botlar oynadı; benim hamlem odaya yazıldı, Mavi'nin hamlesi gelince tahtada göründü, teslim ve odadan çıkış teslim sayıldı. Sarı koltuktayken kendi taşlarım altta. İki gerçek telefonla deneme senin elinde."
+      "not": "18 adımlık test yeniden geçti."
+    },
+    {
+      "ad": "4 kişilik satranç: gizli giriş ve iki mod",
+      "ok": true,
+      "not": "Satranç lobisinde üstteki kendi kartına kısa dokunmak açmıyor, basılı tutunca açılıyor; Botlara karşı ve Arkadaşlarla (oda kur / kodla katıl) seçiliyor. Yönetici panelindeki satıra basınca da açılıyor."
     },
     {
       "ad": "Test botu yönetici panelinde",
@@ -23,11 +38,6 @@
       "ad": "Eski Bağlantıyla Klaket kodu silindi",
       "ok": true,
       "not": "Klaketler sayfası hatasız açılıyor; bağlantılı eski Klaketler artık gösterilmiyor."
-    },
-    {
-      "ad": "Hızlı test (32 adım)",
-      "ok": true,
-      "not": "Hepsi geçti."
     },
     {
       "ad": "Test Kadraj'ında canlı mesajlaşma",
