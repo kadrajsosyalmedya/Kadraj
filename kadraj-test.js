@@ -98,6 +98,7 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  await step("+ menüsü Oyunlar (6.3)",async()=>{go("chat",{key:"u:u2"});await W(500);plusMenu();await W(300)},()=>$("#pgm")&&!$("#pch")&&!$("#pog")?true:"Oyunlar satırı yok");
  await step("Notta şarkı (6.3)",async()=>{tab("chats");await W(300);openNote();await W(300)},has(".nm-row"));
  await step("Yorum yanıtı (6.4)",async()=>{const id=(allPosts().find(p=>p.uid==="u1")||{}).id;if(!id)throw new Error("paylaşım yok");await setMeta(id,{comments:{ktc1:{uid:"u2",text:"Çok güzel olmuş",at:now()}}});openComments(id);await W(400);const b=$("[data-crep]");if(!b)throw new Error("Yanıtla düğmesi yok");b.click();await W(200)},()=>$(".cm-rb")&&!$(".cm-rb").hidden?true:"yanıt şeridi yok");
+ await step("Şarkı arama (6.4.10)",async()=>{closeAll&&closeAll();await W(200);nmPick(null,()=>{});await W(400)},has('#overlay [data-layer="nmp"] #itQ'));
  await step("Hikâyede müzik (6.4)",async()=>{const c=document.createElement("canvas");c.width=720;c.height=1280;S.cmp={kind:"story",filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides",img:c,src:null};drawComposer();await W(400)},has("#cMus"));
  await step("Ayarlar 6.4 satırları",async()=>{tab("settings");await W(400);$("#k64T").click();await W(300)},has('#overlay [data-layer="tm"] .tm-c'));
  await step("Satranç",()=>go("chess"),()=>$("#main").children.length?true:"boş");
