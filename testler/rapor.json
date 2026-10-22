@@ -41,8 +41,8 @@
     },
     {
       "ad": "Satranç motoru rastgele oyun testi",
-      "ok": false,
-      "not": "Botların rastgele oynadığı 60 oyunluk denemelerin yaklaşık %15'inde bir kez bir bot kendi şahını tehdit altında bırakan bir hamle yapıyor. Bu 6.5'ten önce de vardı (eski sürümde de 14 denemenin 2'sinde çıktı), bu sürümde motora dokunulmadı. Sonraki hata avında bakılacak."
+      "ok": true,
+      "not": "Uzun denemelerde görülen \"kural hatası\" testin yanılgısıymış: bir oyuncu mat olup elenince şahı tahtadan kalkıyor, açılan çizgiden başka bir oyuncu hamleyi yapanın şahına şah çekmiş oluyor. Bu yasal bir durum, motor doğru. Test buna göre düzeltildi; 6 kez 60 oyunluk denemede hata yok."
     }
   ]
 }
