@@ -2,7 +2,9 @@
    Her zaman önce internetten en yeni sürümü dener. */
 const C="kadraj-v52";
 const ICON="icon-192.png",BADGE="badge-96.png";
-self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./badge-96.png"])).catch(()=>{}))});
+/* 6.5: ilk kurulumda index.html'in andığı app.js?v= ve app.css?v= de önbelleğe alınır (ilk açılıştan sonra internetsiz de açılsın) */
+self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(async c=>{await c.addAll(["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./badge-96.png"]);
+ const h=await (await c.match("./index.html")).text();const fs=[...h.matchAll(/(app\.(?:js|css)\?v=\d+)/g)].map(m=>"./"+m[1]);if(fs.length)await c.addAll(fs)}).catch(()=>{}))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=="kadraj-open").map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;const u=new URL(r.url);if(u.origin!==location.origin)return;
  /* 5.7.4: hazır fotoğraflar (img/, reels/*.jpg) hiç değişmez: önce önbellekten. Videolara (mp4) karışılmaz, tarayıcı parça parça (Range) kendisi indirir. */
@@ -10,7 +12,9 @@ self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;c
  if(/\/(img|reels)\/[^/]+\.(jpe?g|png|webp)$/i.test(u.pathname)){e.respondWith(caches.match(r).then(m=>m||fetch(r).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(C).then(c=>c.put(r,cp)).catch(()=>{})}return res})));return}
  /* 6.4.7: uygulamanın kodu app.js?v=<sürüm> (6.4.8'den beri stili app.css?v=); aynı sürüm hiç değişmez: önce önbellekten (telefon derlenmiş kodu da saklar), eski sürümler silinir. */
  if(/\/app\.(js|css)$/.test(u.pathname)&&u.searchParams.get("v")){const nm=u.pathname.split("/").pop();e.respondWith(caches.open(C).then(c=>c.match(r).then(m=>m||fetch(r).then(res=>{if(res&&res.ok){const cp=res.clone();
-  c.keys().then(ks=>Promise.all(ks.filter(k=>new URL(k.url).pathname.endsWith("/"+nm)&&k.url!==r.url).map(k=>c.delete(k)))).then(()=>c.put(r,cp)).catch(()=>{})}return res}))));return}
+  c.keys().then(ks=>Promise.all(ks.filter(k=>new URL(k.url).pathname.endsWith("/"+nm)&&k.url!==r.url).map(k=>c.delete(k)))).then(()=>c.put(r,cp)).catch(()=>{})}return res}).catch(e=>c.match(r,{ignoreSearch:true}).then(m=>{if(m)return m;throw e})))));return}
+ /* 6.5: test ve sürüm denetimi istekleri (_kt, surum) önbelleğe yazılmaz */
+ if(u.searchParams.has("_kt")||u.searchParams.has("surum"))return;
  /* 5.1.7: sayfa açılışı GitHub'ın 10 dakikalık sunucu önbelleğine (CDN) takılmasın diye benzersiz adresle istenir;
     yoksa eski sürüm açılıp hemen yeniden yükleniyordu. Çevrimdışıyken önbellekteki index.html açılır. */
  if(r.mode==="navigate"){const fresh=new URL("./index.html",self.registration.scope);fresh.searchParams.set("_k",Date.now().toString(36));

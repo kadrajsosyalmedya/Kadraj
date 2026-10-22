@@ -1,168 +1,48 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.14 Keşişleme",
-  "at": "21 Ekim 2026",
+  "ver": "6.5.0 Kıble",
+  "at": "22 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
     {
-      "ad": "Şarkının başlangıç saniyesi",
+      "ad": "Sohbette şarkı",
       "ok": true,
-      "not": "Şarkıya dokununca kaydırıcı açılıyor, şarkı seçilen saniyeden çalıyor (12. saniye denendi), bitince aynı yere dönüp döngüyle çalıyor. Not kaydında başlangıç saklanıyor, notu açınca oradan çalıyor. Geri düğmesi listeye dönüyor. Başlangıç Apple ve Deezer'ın verdiği 30 saniyenin içinden seçiliyor."
+      "not": "+ › Şarkı ile şarkı gönderildi, balonda oynatıcı çıktı ve kendiliğinden çalmadı; dokununca çaldı, sohbete yeni mesaj gelince durmadı, sohbetten çıkınca durdu. Sohbet listesinde \"Şarkı: …\" yazıyor."
     },
     {
-      "ad": "Şarkılar Apple Music ve Deezer'dan, YouTube tamamen kalktı",
+      "ad": "Klakete şarkı",
       "ok": true,
-      "not": "Arama Deezer, Apple Music Türkiye ve Apple Music ABD'den birlikte yapılıyor, aynı şarkı bir kez çıkıyor. Sahte yanıtlarla denendi: Deezer şarkısı listede çaldı, notta ve profilde kaydedildi, açınca taze adresle çaldı, kapatınca durdu. Bir kaynak çalışmazsa diğerlerinin sonuçları çıkıyor, hiçbiri çalışmazsa hata yazısı. Eski YouTube şarkıları görünmüyor, YouTube kodu yok. Çocuk Modu'nda açık içerik çıkmadı. Gerçek sunuculara bu ortamdan ulaşılamadığı için telefonda denenmesi gerekiyor."
+      "not": "Klaket oluştururken şarkı ve 8. saniye seçildi, paylaşıldı; Klaket açılınca şarkı 8. saniyeden çaldı, adı göründü. Sessize alınca durdu, ses açılınca devam etti, Klaket'ten çıkınca durdu."
     },
     {
-      "ad": "Hızlı test (33 adım)",
+      "ad": "Grupta anket",
       "ok": true,
-      "not": "Hepsi geçti."
+      "not": "Grup + menüsünde Anket var (birebir sohbette yok). Boş soru uyarısı, 3 seçenekli anket, oy verme, başkalarının oyları (%67), oyu geri alma denendi."
     },
     {
-      "ad": "Paylaşımlar dilim dilim",
+      "ad": "Doğum günü",
       "ok": true,
-      "not": "Akış açılışta 300 yerine 60 paylaşımla başlıyor, aşağı kaydırınca 60'ar büyüyor (150 paylaşımlı denemede 60 → 120 → ...). Klaket, profil, bildirimler, paylaşım sayfası ve Keşfet araması açılınca hepsi (en çok 300) yükleniyor; eski Klaket görünüyor."
+      "not": "Düzenle'den doğum günü kaydedildi (31 Şubat reddedildi). Arkadaşın doğum gününde Akış'ta kart çıktı, Mesaj gönder sohbeti \"İyi ki doğdun\" taslağıyla açtı, kapatınca o gün bir daha çıkmadı. Profilde çip var. 29 Şubat doğumlular artık yıl değilse 28 Şubat'ta kutlanıyor."
     },
     {
-      "ad": "Ekranda olmayan kartlar çizilmiyor",
+      "ad": "Hata taraması (iki ajan)",
       "ok": true,
-      "not": "Akış kartları ve ızgara kareleri ekrana yaklaşınca çiziliyor; fotoğraflar arka planda çözülüyor (decoding=async)."
+      "not": "11 hata bulundu ve düzeltildi: Akış'ın yenilenince başka paylaşıma zıplaması, eski paylaşımlara gelen beğeni bildirimlerinin gelmemesi, şarkı değiştirince eski kapağın kalması, eski profil müziğinin kaldırılamaması, Ayarlar aramasının bazı satırları bulamaması, internetsiz açılışın takılması ve her açılışta kodun yeniden inmesi, oyun sırasında geri tuşunun sormadan çıkarması ve çok oyunculu oyunlardaki eşzamanlılık sorunları. Her biri için ajanın test betiği düzeltmeden sonra yeniden çalıştırıldı."
     },
     {
-      "ad": "Hızlı test (32 adım)",
+      "ad": "Hızlı test (37 adım)",
       "ok": true,
-      "not": "Hepsi geçti."
+      "not": "Hepsi geçti (yeni adımlar: sohbette şarkı, grupta anket, doğum günü, Klakete şarkı)."
     },
     {
-      "ad": "Sohbet kayma ölçümü",
+      "ad": "Sohbet kayması ölçümü",
       "ok": true,
-      "not": "meas.js öncekiyle aynı (bir karede en çok 10 px)."
+      "not": "Mesaj gönderme ve gelen mesajda kayma öncekiyle aynı, iniş-çıkış yok."
     },
     {
-      "ad": "CSS ayrı dosyada (app.css)",
-      "ok": true,
-      "not": "index.html 344 KB'tan 3 KB'a indi. Stil ve kod telefonda saklanıyor, her açılışta yalnızca 3 KB iniyor. Service worker ikisini de sürüme göre önbellekten veriyor; internetsiz açılışta da sayfa stilli geliyor."
-    },
-    {
-      "ad": "Yazı tipleri açılışı bekletmiyor",
-      "ok": true,
-      "not": "Google yazı tipleri arka planda yükleniyor; gelene kadar telefonun kendi yazı tipi görünüyor, sonra yerini alıyor."
-    },
-    {
-      "ad": "Klaket'te sonraki video hazır",
-      "ok": true,
-      "not": "Açık Klaketin bir sonrakinin videosu tam, ondan sonrakinin başı önceden yükleniyor (veri tasarrufunda daha az)."
-    },
-    {
-      "ad": "Kod ayrı dosyada (app.js)",
-      "ok": true,
-      "not": "Uygulamanın kodu index.html'den app.js'e taşındı. Telefonu taklit eden 4 kat yavaş işlemcide, soğuk açılışta derleme 110-217 ms'den neredeyse sıfıra indi (Chrome derlenmiş kodu saklıyor). index.html 1,57 MB'tan 344 KB'a düştü. Service worker app.js'i sürüme göre önbellekten veriyor; internetsiz açılış çalışıyor."
-    },
-    {
-      "ad": "Klaket çubuğu saniyede 5 kez",
-      "ok": true,
-      "not": "Çubuk her karede değil 200 ms'de bir güncelleniyor, arası kayarak doluyor. Klaket'te stil hesabı saniyede 60'tan 21'e indi."
-    },
-    {
-      "ad": "Arşiv ve Kadraj testi",
-      "ok": true,
-      "not": "Kum havuzu app.js'i indirip sayfanın içine koyuyor; hızlı testin 32 adımı geçti."
-    },
-    {
-      "ad": "Gruplu Ayarlar",
-      "ok": true,
-      "not": "12 bölüm 6 kapalı gruba toplandı; sayfa 5.667 px'ten yaklaşık 1.100 px'e indi (390 ve 360 px genişlikte denendi). Grup açılıyor, yeniden çizimde açık kalıyor, arama bütün gruplarda arıyor."
-    },
-    {
-      "ad": "Oyunlar Sohbet'te",
-      "ok": true,
-      "not": "Sohbet sayfasının üst çubuğunda oyun kolu var, Oyunlar penceresi (Satranç, Cephe, mini oyunlar) açılıyor. Ayarlar'daki Oyunlar satırı kalktı."
-    },
-    {
-      "ad": "Clawd maskotu kaldırıldı",
-      "ok": true,
-      "not": "Akış, Keşfet, Klaket, Sohbet, Bildirim, Ayarlar, Yönetici ve profil sayfaları hatasız açılıyor, hiçbirinde Clawd odası yok. Kod arsiv/clawd/ klasöründe saklı; index.html %8,6 kısaldı."
-    },
-    {
-      "ad": "Satrançta Clawd rakibi duruyor",
-      "ok": true,
-      "not": "Lobide Clawd'ın yüzü çiziliyor, Clawd'a karşı oyun açılıyor."
-    },
-    {
-      "ad": "4 kişilik satranç çevrim içi",
-      "ok": true,
-      "not": "18 adımlık test yeniden geçti."
-    },
-    {
-      "ad": "4 kişilik satranç: gizli giriş ve iki mod",
-      "ok": true,
-      "not": "Satranç lobisinde üstteki kendi kartına kısa dokunmak açmıyor, basılı tutunca açılıyor; Botlara karşı ve Arkadaşlarla (oda kur / kodla katıl) seçiliyor. Yönetici panelindeki satıra basınca da açılıyor."
-    },
-    {
-      "ad": "Test botu yönetici panelinde",
-      "ok": true,
-      "not": "Sohbet listesinde yok; Yönetici paneli › Test botu satırına basınca sohbeti açılıyor."
-    },
-    {
-      "ad": "Eski Bağlantıyla Klaket kodu silindi",
-      "ok": true,
-      "not": "Klaketler sayfası hatasız açılıyor; bağlantılı eski Klaketler artık gösterilmiyor."
-    },
-    {
-      "ad": "Test Kadraj'ında canlı mesajlaşma",
-      "ok": true,
-      "not": "6 kişilik test dünyası (5 sohbet, 5 kişilik grup, yorum yanıtları, şarkılı not ve hikâye). Ayşe'ye 'selam nasılsın' yazınca görüldü + yazıyor… gösterip 'Selam! Biraz yorgunum ama iyiyim' dedi; grupta Can yanıt verdi. 'Kimin gözünden: Ayşe' ile Ayşe'nin ekranına geçildi, Bilal'in mesajı okunmamış göründü, Ayşe yazınca Bilal yanıt verdi."
-    },
-    {
-      "ad": "Uygulama güncelleme penceresi",
-      "ok": true,
-      "not": "Sahte uygulamayla: eski APK'da (sürüm bilgisi yok) açılışta pencere çıktı, İndir APK bağlantısını açtı; yeni APK'da (sürüm 2) ve tarayıcıda çıkmadı. Uygulamada eski 'yeni logo' penceresi artık çıkmıyor. APK GitHub'da derlendi."
-    },
-    {
-      "ad": "Yorumlara yanıt",
-      "ok": true,
-      "not": "Yanıtla şeridi ve @ad geldi, yanıt yorumun altında içeride göründü (re alanı bildirim sarmalayıcısından da geçiyor)."
-    },
-    {
-      "ad": "Yorum sabitleme",
-      "ok": true,
-      "not": "Paylaşım sahibi yorumu sabitledi, en üstte Sabitlendi etiketiyle çıktı (meta.pin)."
-    },
-    {
-      "ad": "Hikâyede müzik",
-      "ok": true,
-      "not": "Müzik ekle ile şarkı seçildi, hikâye belgesine mus yazıldı, izleyicide şarkı çipi çıktı, dokununca oynatıcı penceresi açıldı."
-    },
-    {
-      "ad": "Sessize al",
-      "ok": true,
-      "not": "Ayşe'nin paylaşımları ve hikâyesi Akış'tan kalktı, Ayarlar › Sessize alınanlar'da listelendi."
-    },
-    {
-      "ad": "Paylaşım arşivi",
-      "ok": true,
-      "not": "Fotoğraf arşivlendi (allPosts'tan çıktı), Ayarlar › Paylaşım arşivi'nden Profilde göster ile geri geldi."
-    },
-    {
-      "ad": "Geçirdiğin süre",
-      "ok": true,
-      "not": "Bugün 1 sa 5 dk ve 7 günlük çubuklar göründü, 1 saatlik hatırlatma kaydedildi."
-    },
-    {
-      "ad": "6.2 ve 6.3 özellikleri yeniden",
-      "ok": true,
-      "not": "Taslaklar, arşiv, okunmadı, oyunlar, notta şarkı, temalar ve hikâyende paylaş testleri yine geçti."
-    },
-    {
-      "ad": "Kadraj testi (32 adım)",
-      "ok": true,
-      "not": "Yönetici › Kadraj testi'nin hızlı testi 32 adımın hepsini geçti."
-    },
-    {
-      "ad": "Telefonda: hikâye ve notlarda YouTube şarkısının çalması, Android uygulamasında galeri, geri tuşu ve durum çubuğu",
+      "ad": "Satranç motoru rastgele oyun testi",
       "ok": false,
-      "not": "Burada ölçülemiyor; senin telefonunda denenmeli."
+      "not": "Botların rastgele oynadığı 60 oyunluk denemelerin yaklaşık %15'inde bir kez bir bot kendi şahını tehdit altında bırakan bir hamle yapıyor. Bu 6.5'ten önce de vardı (eski sürümde de 14 denemenin 2'sinde çıktı), bu sürümde motora dokunulmadı. Sonraki hata avında bakılacak."
     }
   ]
 }

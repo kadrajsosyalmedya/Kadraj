@@ -99,6 +99,10 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  await step("Notta şarkı (6.3)",async()=>{tab("chats");await W(300);openNote();await W(300)},has(".nm-row"));
  await step("Yorum yanıtı (6.4)",async()=>{const id=(allPosts().find(p=>p.uid==="u1")||{}).id;if(!id)throw new Error("paylaşım yok");await setMeta(id,{comments:{ktc1:{uid:"u2",text:"Çok güzel olmuş",at:now()}}});openComments(id);await W(400);const b=$("[data-crep]");if(!b)throw new Error("Yanıtla düğmesi yok");b.click();await W(200)},()=>$(".cm-rb")&&!$(".cm-rb").hidden?true:"yanıt şeridi yok");
  await step("Şarkı arama (6.4.10)",async()=>{closeAll&&closeAll();await W(200);nmPick(null,()=>{});await W(400)},has('#overlay [data-layer="nmp"] #itQ'));
+ await step("Sohbette şarkı (6.5)",async()=>{closeAll&&closeAll();openChat("u:u2");await W(600);plusMenu();await W(300)},has('#overlay [data-layer="plus"] #psong'));
+ await step("Grupta anket (6.5)",async()=>{closeAll&&closeAll();const g=Object.keys(S.chats).find(c=>S.chats[c].group);if(!g)throw new Error("grup yok");openChat("g:"+g);await W(600);plusMenu();await W(300);$("#pgpoll").click();await W(300)},has('#overlay [data-layer="gpoll"] #gpQ'));
+ await step("Doğum günü (6.5)",async()=>{closeAll&&closeAll();go("edit");await W(500);$("#bdEdit").click();await W(300)},has('#overlay [data-layer="bday"] #bdM'));
+ await step("Klakete şarkı (6.5)",async()=>{closeAll&&closeAll();S.cmp={kind:"reel",filter:0,ar:"1/1",slides:["img/kahve.jpg"],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides"};drawComposer();await W(400)},has("#rSong"));
  await step("Hikâyede müzik (6.4)",async()=>{const c=document.createElement("canvas");c.width=720;c.height=1280;S.cmp={kind:"story",filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides",img:c,src:null};drawComposer();await W(400)},has("#cMus"));
  await step("Ayarlar 6.4 satırları",async()=>{tab("settings");await W(400);$("#k64T").click();await W(300)},has('#overlay [data-layer="tm"] .tm-c'));
  await step("Satranç",()=>go("chess"),()=>$("#main").children.length?true:"boş");
