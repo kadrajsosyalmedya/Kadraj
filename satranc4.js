@@ -330,12 +330,15 @@ function moveOf(G,s){const a=String(s).split(".").map(Number);return legal(G,G.t
 function build(d){const G=newGame(),evs=Array.isArray(d.ev)?d.ev.map(String):[],ok=[];let j=0,last=null;
  const rs=Object.entries(d.rs||{}).map(([k,n])=>[+k,+n||0]).filter(([k])=>k>=0&&k<4).sort((a,b)=>a[1]-b[1]||a[0]-b[0]);
  const R=i=>{while(j<rs.length&&rs[j][1]<=i){if(!G.over)resign(G,rs[j][0]);j++}};
- for(let i=0;i<evs.length&&!G.over;i++){R(i);if(G.over)break;const m=moveOf(G,evs[i]);if(!m)break;play(G,m);ok.push(evs[i]);last=m}
+ /* 6.5: teslim, aynı anda koşucunun onun yerine oynadığı hamleyle yarışırsa (hamle o rengin yasal hamlesiyse) önce hamle, sonra teslim */
+ for(let i=0;i<evs.length&&!G.over;i++){if(j<rs.length&&rs[j][1]<=i&&rs[j][0]===G.turn){const mm=moveOf(G,evs[i]);if(mm){play(G,mm);ok.push(evs[i]);last=mm;R(i+1);continue}}
+  R(i);if(G.over)break;const m=moveOf(G,evs[i]);if(!m)break;play(G,m);ok.push(evs[i]);last=m}
  R(1e9);return{G,ev:ok,last}}
 function oDoc(d){const o=st.on;if(!o)return;
  if(!d||!d.s4){toast("Oda kapandı.");oStop(false);return modeCard()}o.d=d;const se=seatsOf(d);
  if(d.st!=="play")return lobbyCard();
- const me=Math.max(0,se.indexOf(S.uid));if(!o.live||st.me!==me){o.live=1;st.me=me;o.rsK=null;shell();const ov=$("#s4Ov");ov.classList.remove("on");ov.innerHTML="";setTimeout(()=>snd("start"),200)}
+ {const hv=o.hbV||(o.hbV={}),hl=o.hbL||(o.hbL={});for(const[u,v]of Object.entries(d.hb||{})){if(hv[u]!==v){hv[u]=v;hl[u]=+v?Date.now():0}}}
+ const me=se.indexOf(S.uid);if(me<0){toast("Odada yer kalmadı, oyun sensiz başladı.");oStop(false);return modeCard()}if(!o.live||st.me!==me){o.live=1;st.me=me;o.rsK=null;shell();const ov=$("#s4Ov");ov.classList.remove("on");ov.innerHTML="";setTimeout(()=>snd("start"),200)}
  const rsK=JSON.stringify(d.rs||{}),ev=(Array.isArray(d.ev)?d.ev:[]).map(String),n=st.ev.length;
  const pre=o.rsK===rsK&&n<=ev.length&&st.ev.every((x,i)=>x===ev[i]);
  if(pre&&ev.length===n)return schedule();
@@ -343,13 +346,15 @@ function oDoc(d){const o=st.on;if(!o)return;
  o.rsK=rsK;clearTimeout(st.tm);const b=build(d);st.G=b.G;st.ev=b.ev;st.last=b.last?{f:b.last.f,t:b.last.t}:null;st.sel=-1;st.tg=[];st.busy=false;st.chk=[];
  drawPieces();ui();if(st.G.over)return setTimeout(endCard,300);schedule()}
 /* botların ve sessiz kalanın hamlesini yapan: koltuk sırasına göre ilk canlı insan (son 60 sn'de sinyal veren) */
-function runner(){const d=st.on.d,se=seatsOf(d),hb=d.hb||{},t=Date.now();for(const u of se)if(u&&(u===S.uid||t-(+hb[u]||0)<STALE))return u;return null}
+/* 6.5: sinyal zamanı karşı cihazın saatiyle değil, sinyalin bu cihaza geldiği anla karşılaştırılır (o.hbL; saat farkı oyuncuyu "sessiz" saymasın) */
+const hbAge=(o,u)=>Date.now()-(+((o.hbL||{})[u])||0);
+function runner(){const o=st.on,se=seatsOf(o.d);for(const u of se)if(u&&(u===S.uid||hbAge(o,u)<STALE))return u;return null}
 function schedOn(){const G=st.G,o=st.on;if(!o.d||o.d.st!=="play")return;const k=G.turn,u=seatsOf(o.d)[k];
  if(u===S.uid){st.busy=false;ui();return}
- const stale=!!u&&Date.now()-(+(o.d.hb||{})[u]||0)>STALE;st.busy=!u||stale;cards();ctlUI();
+ const stale=!!u&&hbAge(o,u)>STALE;st.busy=!u||stale;cards();ctlUI();
  if(st.busy&&runner()===S.uid){const n=st.ev.length;st.tm=setTimeout(()=>{if(st.on!==o||st.G!==G||st.ev.length!==n||G.over||G.turn!==k)return;
   const m=botPick(G,k,[0,1,2].includes(o.d.lvl)?o.d.lvl:1);if(!m)return;const x=G.b[m.t];const r=play(G,m);st.ev.push(enc(m));opush();st.busy=false;afterMove(m,x,r)},SPD[1]+Math.random()*200)}}
-function opush(){const o=st.on;if(!o)return;Promise.resolve().then(()=>DB.update(OP(o.code),{ev:st.ev.slice(),up:Date.now()})).catch(e=>{console.warn("s4",e);toast("Hamle gönderilemedi. İnternetini kontrol et.");if(st.on===o&&o.d){o.rsK=null;oDoc(o.d)}})}
+function opush(){const o=st.on;if(!o)return;if(o.d&&Array.isArray(o.d.ev)&&st.ev.length<=o.d.ev.length){o.rsK=null;return oDoc(o.d)}Promise.resolve().then(()=>DB.update(OP(o.code),{ev:st.ev.slice(),up:Date.now()})).catch(e=>{console.warn("s4",e);toast("Hamle gönderilemedi. İnternetini kontrol et.");if(st.on===o&&o.d){o.rsK=null;oDoc(o.d)}})}
 function hbeat(){const o=st.on;if(!o)return;Promise.resolve().then(()=>DB.update(OP(o.code),{hb:{[S.uid]:Date.now()}})).catch(()=>{});if(o.d&&o.d.st==="play")schedule()}
 function oEnter(c){oStop(true);clearTimeout(st.tm);const o=st.on={code:c,d:null};o.un=DB.watchDoc(OP(c),d=>{if(st.on===o)oDoc(d)});hbeat();o.hbT=setInterval(hbeat,20000)}
 function oStop(leave){const o=st.on;if(!o)return;st.on=null;clearInterval(o.hbT);clearTimeout(st.tm);st.busy=false;try{o.un&&o.un()}catch{}
@@ -360,9 +365,11 @@ function oStop(leave){const o=st.on;if(!o)return;st.on=null;clearInterval(o.hbT)
 async function oCreate(){if(typeof guard==="function"&&!guard())return;const c=code5();
  try{await DB.set(OP(c),{s4:1,host:S.uid,st:"lobby",seats:[S.uid,null,null,null],lvl:st.lvl,at:Date.now(),up:Date.now()})}catch(e){return toast("Oda kurulamadı.")}oEnter(c)}
 async function oJoin(c){if(typeof guard==="function"&&!guard())return;c=String(c||"").trim().toUpperCase();if(!/^[A-Z0-9]{5}$/.test(c))return toast("5 harfli oda kodunu yaz.");
- let d=null;try{d=await DB.get(OP(c))}catch{}if(!d||!d.s4)return toast("Böyle bir oda yok.");const se=seatsOf(d);
- if(!se.includes(S.uid)){if(d.st==="play")return toast("Bu odada oyun başlamış.");const i=se.indexOf(null);if(i<0)return toast("Oda dolu.");se[i]=S.uid;
-  try{await DB.update(OP(c),{seats:se,up:Date.now()})}catch{return toast("Odaya girilemedi.")}}
+ let d=null;try{d=await DB.get(OP(c))}catch{}if(!d||!d.s4)return toast("Böyle bir oda yok.");let se=seatsOf(d);
+ /* 6.5: aynı anda iki kişi aynı boş yere oturursa biri silinirdi: yazdıktan sonra yeniden okunur, yer gitmişse sıradaki boş yer denenir */
+ for(let tr=0;tr<3&&!se.includes(S.uid);tr++){if(d.st==="play")return toast("Bu odada oyun başlamış.");const i=se.indexOf(null);if(i<0)return toast("Oda dolu.");se[i]=S.uid;
+  try{await DB.update(OP(c),{seats:se,up:Date.now()});await new Promise(r=>setTimeout(r,350+Math.random()*300));d=await DB.get(OP(c))}catch{return toast("Odaya girilemedi.")}if(!d||!d.s4)return toast("Oda kapandı.");se=seatsOf(d)}
+ if(!se.includes(S.uid))return toast("Odaya girilemedi, tekrar dene.");
  oEnter(c)}
 function joinAsk(){const l=sheet("s4j","Kodla katıl",`<div class="form"><textarea class="in k1l" rows="1" id="s4Code" maxlength="5" placeholder="Oda kodu" style="text-transform:uppercase;letter-spacing:.2em"></textarea><button class="btn block" id="s4Jg">Katıl</button></div>`);
  const i=$("#s4Code",l);setTimeout(()=>i.focus(),50);i.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();$("#s4Jg",l).click()}};$("#s4Jg",l).onclick=()=>{const c=i.value.trim().toUpperCase();if(c.length!==5)return toast("5 harfli oda kodunu yaz.");closeLayer("s4j");oJoin(c)}}
@@ -378,6 +385,8 @@ function modeCard(){const ov=$("#s4Ov");if(!ov)return;const sv=LS.get(saveKey(),
  <div class="btns"><button class="btn" data-s4="bots">${I("admbot")}Botlara karşı${sv&&sv.ev&&sv.ev.length?" (yarım oyun)":""}</button><button class="btn sec" data-s4="ocreate">${I("users")}Arkadaşlarla: oda kur</button><button class="btn sec" data-s4="ojoin">${I("key")}Kodla katıl</button><button class="btn ghost" data-s4="close">Kapat</button></div></div>`;ov.classList.add("on")}
 X.open=function(o){css();if(!(st.layer&&document.body.contains(st.layer))){
  const l=openLayer("s4",`<div class="s4" id="s4"></div>`,{noScrim:true,onClose:()=>{oStop(true);st.shown=false;clearTimeout(st.tm);removeEventListener("resize",fit);st.layer=null}});
+ /* 6.5: Esc, geri tuşu: oyun sürerken önce sorar (closeTop _guard) */
+ l._guard=()=>{const G=st.G,o=st.on;if(o&&o.d&&o.d.st==="play"&&G&&!G.over&&G.alive[st.me]&&seatsOf(o.d)[st.me]===S.uid){dialog("Odadan çıkılsın mı?","Çıkarsan teslim olmuş sayılırsın.",[{label:"Çık",cls:"danger",fn:()=>closeLayer("s4")},{label:"Vazgeç"}]);return true}return false};
  st.layer=l;st.root=$("#s4",l);st.shown=true;st.me=0;st.G=newGame();st.ev=[];st.last=null;shell();addEventListener("resize",fit);requestAnimationFrame(fit);drawPieces();ui()}
  if(o&&o.join)return oJoin(o.join);if(!st.on)modeCard()};
 X.join=c=>X.open({join:c});
