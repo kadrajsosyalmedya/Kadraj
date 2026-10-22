@@ -1,9 +1,14 @@
 {
   "title": "Ajan testleri",
-  "ver": "6.4.12 Keşişleme",
+  "ver": "6.4.13 Keşişleme",
   "at": "21 Ekim 2026",
   "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
   "items": [
+    {
+      "ad": "Spotify bağlantısıyla şarkı",
+      "ok": true,
+      "not": "Sahte Spotify oynatıcısıyla denendi: bağlantı yapıştırınca şarkı adı geldi, oynatıcı açılıp çaldı, kaydırıcı tam şarkıda sona kadar uzadı, 1:35 seçildi ve notu açınca oradan çaldı. 30 saniyelik önizlemede sarmaya çalışmıyor. Profil müziği penceresi açılıyor, kapatınca duruyor. Çocuk Modu'nda Spotify yok. Gerçek Spotify bu ortamdan denenemedi; telefonda kendiliğinden çalıp çalmadığı ve uygulamada (APK) Spotify girişinin görünüp görünmediği denenmeli."
+    },
     {
       "ad": "Şarkının başlangıç saniyesi",
       "ok": true,

@@ -3735,3 +3735,6 @@ html.k-lite .scrim{background:rgba(0,0,0,.42)}
 /* 6.4.12 şarkı başlangıcı */
 .it-st{display:grid;gap:10px;margin-top:6px}.it-sl{display:flex;justify-content:space-between;align-items:baseline;margin:6px 2px 0;font-size:.85rem}.it-sl b{font-family:var(--f-mono);font-size:1rem}
 .it-rg{width:100%;accent-color:var(--accent);margin:0}.it-bt{display:flex;gap:8px;justify-content:flex-end;margin-top:4px}
+/* 6.4.13 Spotify */
+.sp-pl{display:grid;gap:4px;min-width:0}.sp-f{min-height:80px;border-radius:12px;background:var(--surface-2);overflow:hidden}.sp-f iframe{display:block;border:0;border-radius:12px}
+.sp-hint{display:grid;gap:6px;justify-items:start;margin-top:6px}.nm-v .sp-pl{margin-top:10px}
