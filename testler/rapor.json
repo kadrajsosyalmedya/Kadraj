@@ -1,9 +1,14 @@
 {
  "title": "Ajan testleri",
- "ver": "6.6.0 Gündoğusu",
+ "ver": "6.6.1 Gündoğusu",
  "at": "25 Ekim 2026",
  "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
  "items": [
+  {
+   "ad": "Akış zıplaması",
+   "ok": true,
+   "not": "Akış yeniden çizilince (yeni beğeni, çevrimiçi bilgisi vb.) sayfa 29 Ekim ve doğum günü kartlarının boyu kadar (225 px) aşağı kayıyordu. Düzeltildi: 600, 1500 ve 3000 px'te yeniden çizimden sonra aynı paylaşım aynı yerde (0 px fark)."
+  },
   {
    "ad": "29 Ekim geri sayımı",
    "ok": true,

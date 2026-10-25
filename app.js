@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60600,APP_VER="6.6.0";
+const APP_V=60601,APP_VER="6.6.1";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -8534,6 +8534,11 @@ try{ADM_EXTRA.push({id:"gunler",title:"Özel günler",desc:"Bayram ve anma gün�
  html:()=>{const t=GUN.today(),t0=new Date(t.getFullYear(),t.getMonth(),t.getDate());const ls=[...gunList(t.getFullYear()),...gunList(t.getFullYear()+1)].filter(g=>gunDay(g.y,g.to||g.d)>=t0).slice(0,14);
   return`<p class="muted" style="margin:0 0 8px;font-size:.82rem">Kadraj bu günlerde Akış'ta kart gösterir; Rota not paylaşır. Dini bayram tarihleri her yıl kodda (GUN_DIN) güncellenmeli; şu an ${Object.keys(GUN_DIN).join(", ")} var.</p><div class="box" style="margin:0">${ls.map(g=>{const a=gunDay(g.y,g.d);return`<div class="row"><span class="t"><div><b>${esc(g.ad)}</b></div><div class="s">${a.getDate()} ${BD_AY[a.getMonth()]} ${g.y}${g.to?" - "+gunDay(g.y,g.to).getDate()+" "+BD_AY[gunDay(g.y,g.to).getMonth()]:""}</div></span><button class="btn sec sm" type="button" data-gnp="${g.id}">Önizle</button>${g.soon?`<button class="btn ghost sm" type="button" data-gnp="${g.id}" data-gsoon="1">Geri sayım</button>`:""}</div>`}).join("")}</div>`},
  wire:el=>{el.addEventListener("click",e=>{const b=e.target.closest("[data-gnp]");if(!b)return;GUN.prev={id:b.dataset.gnp,soon:!!b.dataset.gsoon};tab("feed")})}})}catch(e){console.warn(e)}
+/* 6.6.1: Akış/Keşfet/profil yeniden çizilince (render(false), her veri gelişinde) HOOKS.after kartları (29 Ekim, doğum günü, Anılar...)
+   scrollTop geri yüklendikten SONRA üste ekleniyordu; tarayıcının kaydırma sabitlemesi (scroll anchoring) sayfayı kartların boyu kadar aşağı
+   kaydırıyordu (sahibi: "kaydırırken sürekli aşağı ışınlanıyor"). Kancalardan sonra kaydırma yeniden yazılır. */
+{const f=render;render=function(full,...a){const m=main();const st=m?m.scrollTop:0;const r=f.call(this,full,...a);
+ try{const n=S.route&&S.route.name;if(!full&&m&&m===main()&&!["chat","reels","chessgame"].includes(n)&&m.scrollTop!==st)m.scrollTop=st}catch{}return r}}
 /* Tanıtım: tanitim.html (kök klasör) uygulamanın gerçek ekran görüntüleriyle (tanitim/*.jpg) animasyonlu tanıtım sayfası. Davet ekranındaki düğme
    aynı pencerede açar (ana ekran uygulamasında da içeride kalır), davet mesajında bağlantısı var (tanitimUrl). */
 ACT.tanitim=()=>{closeAll();location.href=tanitimUrl()};
