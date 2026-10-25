@@ -1,48 +1,53 @@
 {
-  "title": "Ajan testleri",
-  "ver": "6.5.0 Kıble",
-  "at": "22 Ekim 2026",
-  "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
-  "items": [
-    {
-      "ad": "Sohbette şarkı",
-      "ok": true,
-      "not": "+ › Şarkı ile şarkı gönderildi, balonda oynatıcı çıktı ve kendiliğinden çalmadı; dokununca çaldı, sohbete yeni mesaj gelince durmadı, sohbetten çıkınca durdu. Sohbet listesinde \"Şarkı: …\" yazıyor."
-    },
-    {
-      "ad": "Klakete şarkı",
-      "ok": true,
-      "not": "Klaket oluştururken şarkı ve 8. saniye seçildi, paylaşıldı; Klaket açılınca şarkı 8. saniyeden çaldı, adı göründü. Sessize alınca durdu, ses açılınca devam etti, Klaket'ten çıkınca durdu."
-    },
-    {
-      "ad": "Grupta anket",
-      "ok": true,
-      "not": "Grup + menüsünde Anket var (birebir sohbette yok). Boş soru uyarısı, 3 seçenekli anket, oy verme, başkalarının oyları (%67), oyu geri alma denendi."
-    },
-    {
-      "ad": "Doğum günü",
-      "ok": true,
-      "not": "Düzenle'den doğum günü kaydedildi (31 Şubat reddedildi). Arkadaşın doğum gününde Akış'ta kart çıktı, Mesaj gönder sohbeti \"İyi ki doğdun\" taslağıyla açtı, kapatınca o gün bir daha çıkmadı. Profilde çip var. 29 Şubat doğumlular artık yıl değilse 28 Şubat'ta kutlanıyor."
-    },
-    {
-      "ad": "Hata taraması (iki ajan)",
-      "ok": true,
-      "not": "11 hata bulundu ve düzeltildi: Akış'ın yenilenince başka paylaşıma zıplaması, eski paylaşımlara gelen beğeni bildirimlerinin gelmemesi, şarkı değiştirince eski kapağın kalması, eski profil müziğinin kaldırılamaması, Ayarlar aramasının bazı satırları bulamaması, internetsiz açılışın takılması ve her açılışta kodun yeniden inmesi, oyun sırasında geri tuşunun sormadan çıkarması ve çok oyunculu oyunlardaki eşzamanlılık sorunları. Her biri için ajanın test betiği düzeltmeden sonra yeniden çalıştırıldı."
-    },
-    {
-      "ad": "Hızlı test (37 adım)",
-      "ok": true,
-      "not": "Hepsi geçti (yeni adımlar: sohbette şarkı, grupta anket, doğum günü, Klakete şarkı)."
-    },
-    {
-      "ad": "Sohbet kayması ölçümü",
-      "ok": true,
-      "not": "Mesaj gönderme ve gelen mesajda kayma öncekiyle aynı, iniş-çıkış yok."
-    },
-    {
-      "ad": "Satranç motoru rastgele oyun testi",
-      "ok": true,
-      "not": "Uzun denemelerde görülen \"kural hatası\" testin yanılgısıymış: bir oyuncu mat olup elenince şahı tahtadan kalkıyor, açılan çizgiden başka bir oyuncu hamleyi yapanın şahına şah çekmiş oluyor. Bu yasal bir durum, motor doğru. Test buna göre düzeltildi; 6 kez 60 oyunluk denemede hata yok."
-    }
-  ]
+ "title": "Ajan testleri",
+ "ver": "6.6.0 Gündoğusu",
+ "at": "25 Ekim 2026",
+ "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
+ "items": [
+  {
+   "ad": "29 Ekim geri sayımı",
+   "ok": true,
+   "not": "25 Ekim'de Akış'ta \"29 Ekim Cumhuriyet Bayramı'na 4 gün kaldı\" kartı çıktı; kapatınca o gün yeniden çıkmadı, 20 Ekim'de kart yok."
+  },
+  {
+   "ad": "29 Ekim kutlaması",
+   "ok": true,
+   "not": "29 Ekim'de dalgalanan bayraklı kart, \"Cumhuriyetimizin 103. yılı\" yazısı ve kırmızı-beyaz konfeti çıktı; konfeti günde bir kez. Hareket azaltılmışken konfeti yok."
+  },
+  {
+   "ad": "Hikâyende paylaş",
+   "ok": true,
+   "not": "Karttaki düğme hikâye oluşturma ekranını 720x1280 bayraklı kutlama kartıyla açtı."
+  },
+  {
+   "ad": "10 Kasım anma",
+   "ok": true,
+   "not": "Siyah kurdeleli sade kart, Atatürk'ün sözü ve \"88. yılında\" yazısı çıktı; konfeti yok."
+  },
+  {
+   "ad": "Diğer günler",
+   "ok": true,
+   "not": "Ramazan Bayramı 2027 kartı ve geri sayımı, 9 Mayıs 2027 Anneler Günü doğru; sıradan günde kart yok."
+  },
+  {
+   "ad": "Yönetici › Özel günler",
+   "ok": true,
+   "not": "Önümüzdeki günler listelendi, Önizle Akış'ta kartı gösterdi."
+  },
+  {
+   "ad": "Tanıtım sayfası",
+   "ok": true,
+   "not": "tanitim.html telefonda (390 px) ve bilgisayarda (1280 px) yan kaymasız açıldı, ekranlar sırayla değişiyor, bölümler kaydırınca beliriyor; hareket azaltılmışken animasyonsuz. Davet ekranındaki düğme ve davet mesajındaki bağlantı çalışıyor."
+  },
+  {
+   "ad": "Tanıtım internetsiz",
+   "ok": true,
+   "not": "Service worker eskiden her sayfayı index.html'e çeviriyordu, tanıtım hiç açılmazdı; düzeltildi. Tanıtım bir kez açıldıktan sonra internetsiz de açılıyor, uygulama yine açılıyor."
+  },
+  {
+   "ad": "Önceki özellikler",
+   "ok": true,
+   "not": "Kadraj testi 39 adımın hepsi geçti; 6.5 testleri, şarkı başlangıcı, gruplu Ayarlar ve sohbet akışı ölçümü öncekiyle aynı."
+  }
+ ]
 }

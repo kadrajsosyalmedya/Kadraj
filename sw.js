@@ -17,7 +17,9 @@ self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;c
  if(u.searchParams.has("_kt")||u.searchParams.has("surum"))return;
  /* 5.1.7: sayfa açılışı GitHub'ın 10 dakikalık sunucu önbelleğine (CDN) takılmasın diye benzersiz adresle istenir;
     yoksa eski sürüm açılıp hemen yeniden yükleniyordu. Çevrimdışıyken önbellekteki index.html açılır. */
- if(r.mode==="navigate"){const fresh=new URL("./index.html",self.registration.scope);fresh.searchParams.set("_k",Date.now().toString(36));
+ /* 6.6: yalnızca uygulamanın kendi sayfası (kök ya da index.html); tanitim.html gibi başka sayfalar kendisi açılır */
+ const appNav=r.mode==="navigate"&&(u.href.split(/[?#]/)[0]===scope()||/\/index\.html$/.test(u.pathname));
+ if(appNav){const fresh=new URL("./index.html",self.registration.scope);fresh.searchParams.set("_k",Date.now().toString(36));
   e.respondWith(fetch(fresh.href,{cache:"no-store",credentials:"same-origin"}).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(C).then(c=>c.put("./index.html",cp)).catch(()=>{});return res}throw new Error("http "+(res&&res.status))}).catch(()=>caches.match("./index.html").then(m=>m||fetch(r))));return}
  e.respondWith(fetch(r,{cache:"no-cache"}).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(C).then(c=>c.put(r,cp)).catch(()=>{})}return res}).catch(()=>caches.match(r,{ignoreSearch:true}).then(m=>m||caches.match("./index.html"))))});
 const scope=()=>self.registration.scope;
