@@ -103,6 +103,8 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  await step("Grupta anket (6.5)",async()=>{closeAll&&closeAll();const g=Object.keys(S.chats).find(c=>S.chats[c].group);if(!g)throw new Error("grup yok");openChat("g:"+g);await W(600);plusMenu();await W(300);$("#pgpoll").click();await W(300)},has('#overlay [data-layer="gpoll"] #gpQ'));
  await step("Doğum günü (6.5)",async()=>{closeAll&&closeAll();go("edit");await W(500);$("#bdEdit").click();await W(300)},has('#overlay [data-layer="bday"] #bdM'));
  await step("Klakete şarkı (6.5)",async()=>{closeAll&&closeAll();S.cmp={kind:"reel",filter:0,ar:"1/1",slides:["img/kahve.jpg"],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides"};drawComposer();await W(400)},has("#rSong"));
+ await step("Özel günler (6.6)",async()=>{closeAll&&closeAll();GUN.prev={id:"29ekim"};tab("feed");await W(700)},()=>{const ok=!!document.querySelector("#main .gnc.milli [data-gns]");GUN.prev=null;document.querySelectorAll("#main .gnc,.gconf").forEach(e=>e.remove());return ok||"29 Ekim kartı yok"});
+ await step("Tanıtım bağlantısı (6.6)",()=>{},()=>/tanitim\.html$/.test(tanitimUrl())&&/tanitim\.html/.test(inviteText())?true:"tanıtım bağlantısı yok");
  await step("Hikâyede müzik (6.4)",async()=>{const c=document.createElement("canvas");c.width=720;c.height=1280;S.cmp={kind:"story",filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides",img:c,src:null};drawComposer();await W(400)},has("#cMus"));
  await step("Ayarlar 6.4 satırları",async()=>{tab("settings");await W(400);$("#k64T").click();await W(300)},has('#overlay [data-layer="tm"] .tm-c'));
  await step("Satranç",()=>go("chess"),()=>$("#main").children.length?true:"boş");
