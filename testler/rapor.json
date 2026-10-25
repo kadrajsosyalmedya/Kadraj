@@ -1,58 +1,68 @@
 {
  "title": "Ajan testleri",
- "ver": "6.6.1 Gündoğusu",
+ "ver": "6.7.0 Günbatısı",
  "at": "25 Ekim 2026",
  "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
  "items": [
   {
-   "ad": "Akış zıplaması",
+   "ad": "Yeniden paylaş",
    "ok": true,
-   "not": "Akış yeniden çizilince (yeni beğeni, çevrimiçi bilgisi vb.) sayfa 29 Ekim ve doğum günü kartlarının boyu kadar (225 px) aşağı kayıyordu. Düzeltildi: 600, 1500 ve 3000 px'te yeniden çizimden sonra aynı paylaşım aynı yerde (0 px fark)."
+   "not": "Başkasının paylaşımında iki oklu düğme kaydetti ve yeşillendi; takip ettiğin kişinin yeniden paylaştığı paylaşım Akış'ta \"@ayse yeniden paylaştı\" etiketiyle üste taşındı; paylaşımın yeniden paylaşılınca bildirim çıktı; profilde Yeniden sekmesi."
   },
   {
-   "ad": "29 Ekim geri sayımı",
+   "ad": "Kişi etiketleme",
    "ok": true,
-   "not": "25 Ekim'de Akış'ta \"29 Ekim Cumhuriyet Bayramı'na 4 gün kaldı\" kartı çıktı; kapatınca o gün yeniden çıkmadı, 20 Ekim'de kart yok."
+   "not": "Fotoğraf oluştururken bir kişi etiketlendi, paylaşımda tags kaydedildi; etiketli paylaşımda adlar görünüyor, etiketlenene bildirim, profilde Etiketler sekmesi."
   },
   {
-   "ad": "29 Ekim kutlaması",
+   "ad": "Koleksiyonlar",
    "ok": true,
-   "not": "29 Ekim'de dalgalanan bayraklı kart, \"Cumhuriyetimizin 103. yılı\" yazısı ve kırmızı-beyaz konfeti çıktı; konfeti günde bir kez. Hareket azaltılmışken konfeti yok."
+   "not": "⋯ › Koleksiyona kaydet ile \"Kahveler\" oluşturuldu, paylaşım içine girdi ve kaydedildi; Kaydedilenler'de çip seçilince yalnızca o koleksiyon."
   },
   {
-   "ad": "Hikâyende paylaş",
+   "ad": "Favoriler",
    "ok": true,
-   "not": "Karttaki düğme hikâye oluşturma ekranını 720x1280 bayraklı kutlama kartıyla açtı."
+   "not": "Profil menüsünden favoriye eklendi; Akış › Favoriler'de yalnızca onun paylaşımları."
   },
   {
-   "ad": "10 Kasım anma",
+   "ad": "Kadraj kodu",
    "ok": true,
-   "not": "Siyah kurdeleli sade kart, Atatürk'ün sözü ve \"88. yılında\" yazısı çıktı; konfeti yok."
+   "not": "Profildeki kod düğmesi QR açtı; kod ayrı bir QR okuyucuyla (jsQR) okundu ve profil bağlantısını verdi; #u= bağlantısı doğru profili açtı. Kamerayla okutma (Kod tara) telefonda denenmeli."
   },
   {
-   "ad": "Diğer günler",
+   "ad": "Sessiz mod",
    "ok": true,
-   "not": "Ramazan Bayramı 2027 kartı ve geri sayımı, 9 Mayıs 2027 Anneler Günü doğru; sıradan günde kart yok."
+   "not": "Açınca Akış'ta şerit, profilde ve telefon bildirimi tercihlerinde bitiş zamanı; uygulama içi bildirim çıkmadı; Kapat ile kapandı."
   },
   {
-   "ad": "Yönetici › Özel günler",
+   "ad": "Gizli kelimeler",
    "ok": true,
-   "not": "Önümüzdeki günler listelendi, Önizle Akış'ta kartı gösterdi."
+   "not": "\"pizza\" eklenince gruptaki mesaj ve yorum bulanık örtüldü; Göster'e basınca açıldı, mesajın yüksekliği değişmedi."
   },
   {
-   "ad": "Tanıtım sayfası",
+   "ad": "Zaman kapsülü",
    "ok": true,
-   "not": "tanitim.html telefonda (390 px) ve bilgisayarda (1280 px) yan kaymasız açıldı, ekranlar sırayla değişiyor, bölümler kaydırınca beliriyor; hareket azaltılmışken animasyonsuz. Davet ekranındaki düğme ve davet mesajındaki bağlantı çalışıyor."
+   "not": "Kilitli kapsül başkasına yalnızca kilitli kart ve kilitli ızgara karesi olarak göründü (beğeni/yorum yok); açılmış kapsül Akış'ta açılış anına taşındı; kendi kapsülünde açılış tarihi yazıyor."
   },
   {
-   "ad": "Tanıtım internetsiz",
+   "ad": "Günün sorusu",
    "ok": true,
-   "not": "Service worker eskiden her sayfayı index.html'e çeviriyordu, tanıtım hiç açılmazdı; düzeltildi. Tanıtım bir kez açıldıktan sonra internetsiz de açılıyor, uygulama yine açılıyor."
+   "not": "Akış'ta kart çıktı, yanıt kaydedildi; takip edilen kişinin yanıtı göründü, takip edilmeyenin yanıtı yalnızca sayı olarak."
+  },
+  {
+   "ad": "Hikâye çıkartmaları",
+   "ok": true,
+   "not": "Test, Geri sayım ve Bayrak eklendi; testin doğru yanıtı belgeye yazıldı; izleyici yanlış seçince yanlış kırmızı, doğru yeşil oldu ve oyu kaydedildi."
+  },
+  {
+   "ad": "29 Ekim",
+   "ok": true,
+   "not": "29 Ekim'de üst çubukta bayrak; sohbette \"Cumhuriyet Bayramımız kutlu olsun\" mesajında konfeti."
   },
   {
    "ad": "Önceki özellikler",
    "ok": true,
-   "not": "Kadraj testi 39 adımın hepsi geçti; 6.5 testleri, şarkı başlangıcı, gruplu Ayarlar ve sohbet akışı ölçümü öncekiyle aynı."
+   "not": "Kadraj testi 46 adımın hepsi geçti; sohbet akışı ölçümü önceki sürümle aynı; Akış zıplama testi 0 px; 360 ve 390 px'te yan taşma yok."
   }
  ]
 }
