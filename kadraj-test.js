@@ -105,6 +105,13 @@ function runFn(){window.__ktRun=async function(){const out=[];const errs=[];cons
  await step("Klakete şarkı (6.5)",async()=>{closeAll&&closeAll();S.cmp={kind:"reel",filter:0,ar:"1/1",slides:["img/kahve.jpg"],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides"};drawComposer();await W(400)},has("#rSong"));
  await step("Özel günler (6.6)",async()=>{closeAll&&closeAll();GUN.prev={id:"29ekim"};tab("feed");await W(700)},()=>{const ok=!!document.querySelector("#main .gnc.milli [data-gns]");GUN.prev=null;document.querySelectorAll("#main .gnc,.gconf").forEach(e=>e.remove());return ok||"29 Ekim kartı yok"});
  await step("Tanıtım bağlantısı (6.6)",()=>{},()=>/tanitim\.html$/.test(tanitimUrl())&&/tanitim\.html/.test(inviteText())?true:"tanıtım bağlantısı yok");
+ await step("Yeniden paylaş (6.7)",async()=>{closeAll&&closeAll();tab("feed");await W(500)},has("#main [data-rp]"));
+ await step("Günün sorusu (6.7)",async()=>{LS.del("kadraj_gq_"+S.uid);tab("feed");await W(500)},has("#main .gqc"));
+ await step("Koleksiyonlar (6.7)",async()=>{const id=(allPosts().find(p=>p.uid!==S.uid&&!BOT[p.uid])||{}).id;if(!id)throw new Error("paylaşım yok");postMenu(id);await W(300)},has('#overlay [data-layer="menu"] #mKol'));
+ await step("Kadraj kodu (6.7)",async()=>{closeAll&&closeAll();qrSheet(S.uid);await W(300)},has('#overlay [data-layer="qr"] #qrBox canvas'));
+ await step("Sessiz mod (6.7)",async()=>{closeAll&&closeAll();qmSheet();await W(300)},has('#overlay [data-layer="qm"] [data-qmv]'));
+ await step("Zaman kapsülü ve etiket (6.7)",async()=>{closeAll&&closeAll();const c=document.createElement("canvas");c.width=400;c.height=400;S.cmp={kind:"photo",filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides",img:c,src:"img/kahve.jpg"};drawComposer();await W(400)},()=>$("#cCapT")&&$("#cTagB")?true:"kapsül/etiket yok");
+ await step("Hikâye test çıkartması (6.7)",async()=>{closeAll&&closeAll();const c=document.createElement("canvas");c.width=720;c.height=1280;S.cmp={kind:"story",filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides",img:c,src:null};drawComposer();await W(400);$("#cStk").click();await W(300)},has('#overlay [data-stt="quiz"]'));
  await step("Hikâyede müzik (6.4)",async()=>{const c=document.createElement("canvas");c.width=720;c.height=1280;S.cmp={kind:"story",filter:0,ar:"1/1",slides:[],fx:"zoom",music:"lofi",text:"",bg:0,options:["",""],mode:"slides",img:c,src:null};drawComposer();await W(400)},has("#cMus"));
  await step("Ayarlar 6.4 satırları",async()=>{tab("settings");await W(400);$("#k64T").click();await W(300)},has('#overlay [data-layer="tm"] .tm-c'));
  await step("Satranç",()=>go("chess"),()=>$("#main").children.length?true:"boş");
