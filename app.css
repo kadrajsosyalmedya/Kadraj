@@ -3872,3 +3872,20 @@ html.reduce-motion .gnc .gfw .gflag,html.reduce-motion .gnc.dini .gic svg{animat
 .ac-sh{display:grid;gap:10px}.ac-st{display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:14px;background:color-mix(in srgb,#B45309 14%,var(--surface));font-weight:600}
 .ac-st.ok{background:color-mix(in srgb,var(--accent) 14%,var(--surface))}.ac-st .i{flex:none;width:20px;height:20px}
 /*}@css:69*/
+/*@css:70{*/
+/* 6.8.3 Yönetici › Firebase bölümü */
+.fbu{display:grid;gap:14px}.fbu-s{display:grid;gap:8px;padding:12px;border-radius:14px;background:var(--surface-2);min-width:0}
+.fbu-s h4{margin:0;font:700 .8rem var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.fbu-r{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0;overflow-wrap:anywhere}
+.fbu-dot{width:10px;height:10px;border-radius:50%;background:var(--muted);flex:none}.fbu-dot.on{background:var(--ok,#16a34a)}.fbu-dot.hot{background:#dc2626}
+.fbu-kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.86rem}.fbu-kv span{color:var(--muted)}.fbu-kv b{text-align:right;overflow-wrap:anywhere}
+.fbu-s .btn{justify-self:start}.fbu-s p{margin:0;font-size:.86rem;line-height:1.45}
+.fbu-q{display:grid;gap:4px}.fbu-ql{display:flex;justify-content:space-between;gap:8px;font-size:.9rem}.fbu-ql span{font-family:var(--f-mono);font-size:.8rem}
+.fbu-bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.fbu-bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.fbu-bar.warn i{background:#d97706}.fbu-bar.hot i{background:#dc2626}.fbu-q small{color:var(--muted);font-size:.78rem}.fbu-q small b{color:var(--fg)}
+.fbu-inc{display:flex;gap:8px;align-items:flex-start;font-size:.86rem}.fbu-inc .i{width:18px;height:18px;flex:none;color:#d97706}.fbu-inc b{display:block}
+.fbu-err{color:#dc2626}.fbu-how summary{cursor:pointer;font-weight:700;font-size:.9rem}.fbu-how ol{margin:8px 0;padding-left:20px;display:grid;gap:6px;font-size:.84rem;line-height:1.4}
+.fbu-how code{font-family:var(--f-mono);font-size:.78rem;overflow-wrap:anywhere}.fbu-f{display:flex;gap:8px}.fbu-f .in{min-width:0;flex:1}
+.fbu-lnk{display:inline-flex;align-items:center;gap:4px;font-size:.86rem;font-weight:700;color:var(--accent);text-decoration:none;justify-self:start}.fbu-lnk .i{width:16px;height:16px}
+button.fbu-lnk.plain{background:none;border:0;padding:0;color:var(--muted);font-weight:600;cursor:pointer}
+/*}@css:70*/
