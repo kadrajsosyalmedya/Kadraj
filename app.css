@@ -3886,4 +3886,5 @@ html.reduce-motion .gnc .gfw .gflag,html.reduce-motion .gnc.dini .gic svg{animat
 .fbu-inc{display:flex;gap:8px;align-items:flex-start;font-size:.86rem}.fbu-inc .i{width:18px;height:18px;flex:none;color:#d97706}.fbu-inc b{display:block}
 .fbu-err{color:#dc2626}
 .fbu-lnk{display:inline-flex;align-items:center;gap:4px;font-size:.86rem;font-weight:700;color:var(--accent);text-decoration:none;justify-self:start}.fbu-lnk .i{width:16px;height:16px}
+.fbu-mr{display:grid;gap:4px;font-size:.86rem}.fbu-mr>div{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line)}.fbu-mr span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fbu-mr b{font-family:var(--f-mono);font-size:.8rem}
 /*}@css:70*/

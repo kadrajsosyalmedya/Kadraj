@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60804,APP_VER="6.8.4";
+const APP_V=60805,APP_VER="6.8.5";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -178,8 +178,12 @@ async function loadFirebase(cfg){const base=`https://www.gstatic.com/firebasejs/
  const app=appM.initializeApp(cfg);const auth=A.getAuth(app);try{auth.languageCode="tr"}catch{}
  let db;try{db=F.initializeFirestore(app,{ignoreUndefinedProperties:true,localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()})})}catch(e){try{db=F.initializeFirestore(app,{ignoreUndefinedProperties:true})}catch{db=F.getFirestore(app)}}
  FB={app,auth,db,A,F};return FB}
-/* 6.8.4: KU = bu cihazın Firestore işlem sayacı (okuma r, yazma w, silme d; bölge 70 günlük toplamı games/ku-<gün>'e ekler) */
-const KU={r:0,w:0,d:0};
+/* 6.8.4: KU = bu cihazın Firestore işlem sayacı (okuma r, yazma w, silme d; 6.8.5: gönderilen mesaj ms, silinen mesaj md; bölge 70 günlük toplamı games/ku-<gün>'e ekler) */
+const KU_MSG=/^chats\/[^/]+\/msgs\/[^/]+$/;
+const KU={r:0,w:0,d:0,ms:0,md:0,wc:{},log:[]};
+/* kuCol: yolun hangi özelliğe ait olduğu (sohbet mesajları "mesaj"); kuW: yazma/silmeyi özelliğiyle ve zamanıyla kaydeder (son 400 işlem, yalnızca bellekte) */
+const kuCol=p=>{const a=String(p).split("/");return a[0]==="chats"&&a[2]==="msgs"?"mesaj":a[0]==="data"&&a[1]==="users"?"kişisel ("+(a[3]||"").replace(/^bot-.*/,"bot")+")":a[0]==="games"?"games ("+String(a[1]||"").replace(/[-_].*$/,"")+")":a[0]};
+function kuW(p,t){const c=kuCol(p);KU.wc[c]=(KU.wc[c]||0)+1;KU.log.push([Date.now(),c,t]);if(KU.log.length>400)KU.log.splice(0,KU.log.length-400)}
 function FirebaseDB(){const{F,db}=FB;
  const flat=(obj,prefix=[],out=[])=>{for(const[k,v]of Object.entries(obj)){if(v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).length)flat(v,[...prefix,k],out);else out.push(new F.FieldPath(...prefix,k),v===undefined?null:v)}return out};
  const track=u=>{const f=()=>{try{u()}catch{}FB_UNSUBS.delete(f)};FB_UNSUBS.add(f);return f};
@@ -188,9 +192,9 @@ function FirebaseDB(){const{F,db}=FB;
  const kuSnap=()=>{let on=false;return s=>{if(s.metadata&&s.metadata.fromCache)return;if(!on){on=true;KU.r+=s.docs?Math.max(1,s.size):1}else KU.r+=s.docChanges?s.docChanges().filter(c=>c.type!=="removed").length:1}};
  return{
   async get(p){KU.r++;const s=await F.getDoc(F.doc(db,p));return s.exists()?s.data():null},
-  set:(p,o)=>{KU.w++;return F.setDoc(F.doc(db,p),o)},
-  update(p,o){const args=flat(o);if(!args.length)return Promise.resolve();KU.w++;return F.updateDoc(F.doc(db,p),...args)},
-  del:p=>{KU.d++;return F.deleteDoc(F.doc(db,p))},
+  set:(p,o)=>{KU.w++;kuW(p,"w");if(KU_MSG.test(p))KU.ms++;return F.setDoc(F.doc(db,p),o)},
+  update(p,o){const args=flat(o);if(!args.length)return Promise.resolve();KU.w++;kuW(p,"w");return F.updateDoc(F.doc(db,p),...args)},
+  del:p=>{KU.d++;kuW(p,"d");if(KU_MSG.test(p))KU.md++;return F.deleteDoc(F.doc(db,p))},
   watchCol(col,cb,opts={}){const cons=[];if(opts.where)cons.push(F.where(...opts.where));if(opts.orderBy)cons.push(F.orderBy(...opts.orderBy));cons.push(F.limit(opts.limit||500));const k=kuSnap();
    return track(F.onSnapshot(F.query(F.collection(db,col),...cons),s=>{k(s);cb(s.docs.map(d=>({id:d.id,...d.data()})))},opts.onError||onErr))},
   watchDoc(p,cb){const k=kuSnap();return track(F.onSnapshot(F.doc(db,p),s=>{k(s);cb(s.exists()?s.data():null)},onErr))}}}
@@ -198,10 +202,10 @@ function unsubAll(){[...FB_UNSUBS].forEach(f=>f())}
 let rulesWarned=false;function rulesWarn(){if(rulesWarned)return;rulesWarned=true;toast("Firebase veritabanı kuralları izin vermiyor. Kurulumdaki kuralları Firestore > Kurallar'a yapıştırıp Yayınla'ya bas.")}
 /* çevrimiçi durumu ve dürtme: Firestore ile */
 function FsRoom(){const{F,db}=FB;let state={typing:null},hb=null,docs=[],cb=null,pokeH=null;const handled=new Set();
- const push=()=>S.uid&&S.authed&&!S.guest&&document.visibilityState!=="hidden"?(KU.w++,F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:state.typing||null,at:Date.now(),seen:Date.now(),hide:settings.showActive===false}).catch(()=>{})):Promise.resolve();
+ const push=()=>S.uid&&S.authed&&!S.guest&&document.visibilityState!=="hidden"?(KU.w++,kuW("presence","w"),F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:state.typing||null,at:Date.now(),seen:Date.now(),hide:settings.showActive===false}).catch(()=>{})):Promise.resolve();
  const fire=()=>{const vis=docs.filter(d=>!d.hide||d.uid===S.uid);S.lastSeen=Object.fromEntries(vis.map(d=>[d.uid,Math.max(d.seen||0,d.at||0)]));if(!cb)return;const lim=Date.now()-95e3;cb({peers:vis.filter(d=>d.at>lim).map(d=>({presence:{uid:d.uid,typing:d.typing},isMe:d.uid===S.uid}))})};
  setInterval(fire,30e3);
- const off=()=>{if(S.uid&&S.authed&&!S.guest)KU.w++,F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:null,at:0,seen:Date.now()}).catch(()=>{})};
+ const off=()=>{if(S.uid&&S.authed&&!S.guest)KU.w++,kuW("presence","w"),F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:null,at:0,seen:Date.now()}).catch(()=>{})};
  addEventListener("pagehide",off);
  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")push();else off()});
  return{
@@ -210,7 +214,7 @@ function FsRoom(){const{F,db}=FB;let state={typing:null},hb=null,docs=[],cb=null
   listen(){const u1=DB.watchCol("presence",d=>{docs=d;fire()},{limit:300});
    const u2=DB.watchCol("pokes",ds=>{for(const d of ds){if(handled.has(d.id))continue;handled.add(d.id);if(d.at>S.bootAt-5000&&pokeH)pokeH({data:d});DB.del("pokes/"+d.id).catch(()=>{})}},{where:["to","==",S.uid],limit:50});
    return()=>{u1();u2()}},
-  async emit(topic,data){KU.w++;await F.addDoc(F.collection(db,"pokes"),{...data,topic,at:Date.now()})},
+  async emit(topic,data){KU.w++;kuW("pokes","w");await F.addDoc(F.collection(db,"pokes"),{...data,topic,at:Date.now()})},
   on(t,h){pokeH=h},
   async leave(){if(hb){clearInterval(hb);hb=null}if(S.uid)await F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:null,at:0,seen:Date.now()}).catch(()=>{})}}}
 /* kurulum yardımcıları */
@@ -1243,8 +1247,8 @@ function chatRowMenu(key){const k=keyInfo(key);vib(20);const c=k.cid&&S.chats[k.
  const cl=$("#crL",l);if(cl)cl.onclick=()=>{closeLayer("crow");leaveGroup(k.cid)}}
 /* 4.9: bulutta sunucudan parça parça okuyup hepsini siler (eskisi yalnızca önbellekteki ilk 500'ü siliyordu) */
 async function chatWipe(cid){if(S.mode!=="cloud"||!FB||!FB.F||!FB.F.getDocsFromServer)return chatWipeOld(cid);const{F,db}=FB;let n=0;const c0=S.chats[cid];
- for(let r=0;r<40;r++){let sn;try{sn=await F.getDocsFromServer(F.query(F.collection(db,`chats/${cid}/msgs`),F.limit(400)))}catch{break}if(sn.empty)break;
-  const ok=(await Promise.all(sn.docs.map(d=>F.deleteDoc(d.ref).then(()=>1,()=>0)))).reduce((a,b)=>a+b,0);n+=ok;if(!ok)break}
+ for(let r=0;r<40;r++){let sn;try{sn=await F.getDocsFromServer(F.query(F.collection(db,`chats/${cid}/msgs`),F.limit(400)))}catch{break}KU.r+=Math.max(1,sn.size);if(sn.empty)break;
+  const ok=(await Promise.all(sn.docs.map(d=>F.deleteDoc(d.ref).then(()=>1,()=>0)))).reduce((a,b)=>a+b,0);n+=ok;KU.d+=ok;KU.md+=ok;for(let i=0;i<ok;i++)kuW(`chats/${cid}/msgs/x`,"d");if(!ok)break}
  await DB.del("chats/"+cid).catch(()=>{});const ch={...S.chats};delete ch[cid];S.chats=ch;const ok0=(c0&&c0.group)?"g:"+cid:"u:"+(((c0&&c0.members)||[]).find(m=>m!==S.uid)||"");settings.pinChats=(settings.pinChats||[]).filter(x=>x!==ok0);saveSettings();return n}
 async function chatWipeOld(cid){const ds=await admOnce(`chats/${cid}/msgs`);let n=0;for(const d of ds){await DB.del(`chats/${cid}/msgs/${d.id}`).catch(()=>{});n++}await DB.del("chats/"+cid).catch(()=>{});const ch={...S.chats};delete ch[cid];S.chats=ch;return n}
 let crT=null,crXY=null,crFired=false;
@@ -8986,16 +8990,17 @@ HOOKS.after.unshift(r=>{if(r!=="settings"||S.guest||S.mode!=="cloud"||!acCfgV)re
    Test: scratchpad/yd/fbu.js (sahte FB). */
 const FBU={ms:null,ok:null,at:0,err:"",inc:null,incErr:false,incAt:0,use:null,useErr:"",useAt:0,busy:"",sb:null,el:null};
 const FBU_LIM={r:50000,w:20000,d:20000};
-const KU_SENT={r:0,w:0,d:0};
+const KU_SENT={r:0,w:0,d:0,ms:0,md:0,wc:{}};
 const fbuPid=()=>(FB&&FB.app&&FB.app.options&&FB.app.options.projectId)||(LS.get("kadraj_fb_cfg")||EMBED_CFG).projectId;
 function fbuPt(t){const n=new Date(t||Date.now());const p=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(n).map(x=>[x.type,x.value]));
  const s=(+p.hour%24)*3600+(+p.minute)*60+(+p.second);const start=Math.floor(n.getTime()/1000)*1000-s*1000;return{start,reset:start+864e5,key:p.year+p.month+p.day}}
 const fbuNum=n=>Number(n||0).toLocaleString("tr-TR");
-const kuDelta=()=>({r:KU.r-KU_SENT.r,w:KU.w-KU_SENT.w,d:KU.d-KU_SENT.d});
+const kuDelta=()=>({r:KU.r-KU_SENT.r,w:KU.w-KU_SENT.w,d:KU.d-KU_SENT.d,ms:KU.ms-KU_SENT.ms,md:KU.md-KU_SENT.md});
 async function kuFlush(){if(S.mode!=="cloud"||!S.authed||S.guest||!FB||!FB.F||!FB.F.increment)return;const x=kuDelta();if(!x.r&&!x.w&&!x.d)return;
- const {key}=fbuPt(),F=FB.F;KU.w++;const y={...x,w:x.w+1};Object.assign(KU_SENT,{r:KU_SENT.r+y.r,w:KU_SENT.w+y.w,d:KU_SENT.d+y.d});
- try{await F.setDoc(F.doc(FB.db,"games/ku-"+key),{ku:1,d:key,r:F.increment(y.r),w:F.increment(y.w),dl:F.increment(y.d),at:Date.now()},{merge:true})}
- catch(e){KU_SENT.r-=y.r;KU_SENT.w-=y.w;KU_SENT.d-=y.d;console.warn("ku",e)}}
+ const {key}=fbuPt(),F=FB.F;KU.w++;kuW("games/ku","w");const y={...x,w:x.w+1};for(const k in y)KU_SENT[k]+=y[k];
+ const wc={};for(const[c,n]of Object.entries(KU.wc)){const dn=n-(KU_SENT.wc[c]||0);if(dn>0){wc[c.replace(/[.~*/\[\]]/g,"_").slice(0,60)]=F.increment(dn);KU_SENT.wc[c]=n}}
+ try{await F.setDoc(F.doc(FB.db,"games/ku-"+key),{ku:1,d:key,r:F.increment(y.r),w:F.increment(y.w),dl:F.increment(y.d),ms:F.increment(y.ms),md:F.increment(y.md),wc,at:Date.now()},{merge:true})}
+ catch(e){for(const k in y)KU_SENT[k]-=y[k];console.warn("ku",e)}}
 setInterval(kuFlush,180000);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")kuFlush()});
 function fbuRedraw(){const el=FBU.el;if(el&&el.isConnected){el.innerHTML=fbuHtml();fbuWire(el)}if(S.route.name==="admin")scheduleRefresh()}
@@ -9010,8 +9015,15 @@ async function fbuInc(){FBU.incErr=false;try{const r=await withTimeout(fetch("ht
 async function fbuUse(){if(S.mode!=="cloud"){FBU.useErr="Yerel modda sayılmaz.";return}FBU.busy="use";FBU.useErr="";fbuRedraw();
  const {key,start}=fbuPt(),y=fbuPt(start-36e5).key;
  try{const [a,b]=await Promise.all([DB.get("games/ku-"+key),DB.get("games/ku-"+y)]);const x=kuDelta();
-  FBU.use={r:((a&&a.r)||0)+x.r,w:((a&&a.w)||0)+x.w,d:((a&&a.dl)||0)+x.d,y:b?{r:b.r||0,w:b.w||0,d:b.dl||0}:null};FBU.useAt=now()}
- catch(e){FBU.useErr="Sayılar okunamadı: "+((e&&(e.code||e.message))||e)}FBU.busy="";fbuRedraw()}
+  FBU.use={r:((a&&a.r)||0)+x.r,w:((a&&a.w)||0)+x.w,d:((a&&a.dl)||0)+x.d,ms:((a&&a.ms)||0)+x.ms,md:((a&&a.md)||0)+x.md,wc:(a&&a.wc)||{},y:b?{r:b.r||0,w:b.w||0,d:b.dl||0,ms:b.ms||0,md:b.md||0}:null};FBU.useAt=now()}
+ catch(e){FBU.useErr="Sayılar okunamadı: "+((e&&(e.code||e.message))||e)}FBU.busy="";fbuRedraw();fbuMsgs()}
+/* 6.8.5: sunucudaki gerçek mesaj sayısı: bütün sohbetler (chats) + her birinde sıfırlanmadan beri yazılmış mesajlar (getCountFromServer; sohbet başına 1 okuma) */
+async function fbuMsgs(){if(S.mode!=="cloud"||!FB||!FB.F||!FB.F.getCountFromServer||FBU.mbusy)return;const F=FB.F,db=FB.db,{start}=fbuPt();FBU.mbusy=1;FBU.mErr="";fbuRedraw();
+ try{const cs=await F.getDocsFromServer(F.collection(db,"chats"));KU.r+=Math.max(1,cs.size);
+  const rows=(await Promise.all(cs.docs.map(async d=>{const c=d.data()||{};const q=F.query(F.collection(db,"chats",d.id,"msgs"),F.where("at",">=",start));
+   const n=(await F.getCountFromServer(q)).data().count;KU.r+=Math.max(1,Math.ceil(n/1000));
+   const nm=d.id==="meydan"?"Meydan":c.group?(c.name||"Grup"):(c.members||[]).map(u=>(P(u)||{}).name||"?").join(" · ");return{id:d.id,n,nm}}))).filter(r=>r.n>0).sort((a,b)=>b.n-a.n);
+  FBU.msg={n:rows.reduce((a,r)=>a+r.n,0),rows,at:now()}}catch(e){FBU.mErr="Mesajlar sayılamadı: "+((e&&(e.code||e.message))||e)}FBU.mbusy=0;fbuRedraw()}
 function fbuBar(lb,n,lim){const p=Math.min(100,n/lim*100),c=p>=90?"hot":p>=70?"warn":"on";
  return`<div class="fbu-q"><div class="fbu-ql"><b>${esc(lb)}</b><span>${fbuNum(n)} / ${fbuNum(lim)}</span></div><div class="fbu-bar ${c}"><i style="width:${p.toFixed(1)}%"></i></div><small>Kalan: <b>${fbuNum(Math.max(0,lim-n))}</b> (%${Math.max(0,100-p).toFixed(0)})</small></div>`}
 function fbuHtml(){const pid=fbuPid(),{reset}=fbuPt(),left=reset-now(),h=Math.floor(left/36e5),m=Math.floor(left%36e5/6e4);
@@ -9020,7 +9032,7 @@ function fbuHtml(){const pid=fbuPid(),{reset}=fbuPt(),left=reset-now(),h=Math.fl
  const u=FBU.use;
  const use=u?`${fbuBar("Okuma",u.r,FBU_LIM.r)}${fbuBar("Yazma",u.w,FBU_LIM.w)}${fbuBar("Silme",u.d,FBU_LIM.d)}
   ${u.y?`<small class="muted">Dün: ${fbuNum(u.y.r)} okuma, ${fbuNum(u.y.w)} yazma, ${fbuNum(u.y.d)} silme.</small>`:""}
-  <small class="muted">${esc(new Date(FBU.useAt).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}))} itibarıyla, Kadraj'ın kendi sayımı (yaklaşık). Her cihaz 3 dakikada bir ekler; Firebase'in kendi sayısı biraz farklı olabilir.</small>`
+  <small class="muted">${esc(new Date(FBU.useAt).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}))} itibarıyla. Kadraj'ın kendi sayımı: telefonlar gerçek Firebase işlemlerini sayıp 3 dakikada bir ekler, 6.8.4'e geçmeden önceki işlemler yok. Firebase'in kendi sayısı biraz farklı olabilir.</small>`
   :FBU.busy==="use"?`<p class="muted">Sayılar okunuyor…</p>`:"";
  return`<div class="fbu">
  <div class="fbu-s"><h4>Bağlantı</h4><div class="fbu-r">${st}</div>
@@ -9030,9 +9042,28 @@ function fbuHtml(){const pid=fbuPid(),{reset}=fbuPt(),left=reset-now(),h=Math.fl
  <div class="fbu-s"><h4>Bugünkü ücretsiz hak</h4><p class="muted">Ücretsiz planda (Spark) günde 50.000 okuma, 20.000 yazma, 20.000 silme. ${h} sa ${m} dk sonra (Türkiye saatiyle ${esc(new Date(reset).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"}))}) sıfırlanır.</p>
   ${use}${FBU.useErr?`<p class="fbu-err">${esc(FBU.useErr)}</p>`:""}
   <button class="btn ghost sm" data-fbu="use" ${FBU.busy?"disabled":""}>${I("rotate")}Sayıları yenile</button>
-  <a class="fbu-lnk" href="https://console.firebase.google.com/project/${encodeURIComponent(pid)}/firestore/databases/-default-/usage" target="_blank" rel="noopener">Firebase konsolunda kesin sayı ${I("next")}</a></div></div>`}
+  <a class="fbu-lnk" href="https://console.firebase.google.com/project/${encodeURIComponent(pid)}/firestore/databases/-default-/usage" target="_blank" rel="noopener">Firebase konsolunda kesin sayı ${I("next")}</a></div>
+ ${fbuMsgHtml()}${fbuLiveHtml()}</div>`}
+/* canlı: bu telefonun son 60 sn'deki yazmaları (bellekten, Firebase'e ek okuma/yazma yok), özelliğe göre; bölüm açıkken 3 sn'de bir yenilenir */
+function fbuLiveHtml(){const t=Date.now(),l=KU.log.filter(x=>t-x[0]<60e3),by={};for(const x of l)by[x[1]]=(by[x[1]]||0)+1;
+ const top=Object.entries(by).sort((a,b)=>b[1]-a[1]);const u=FBU.use,all=u&&u.wc?Object.entries(u.wc).sort((a,b)=>b[1]-a[1]).slice(0,8):[];
+ return`<div class="fbu-s" id="fbuLive"><h4>Kim yazıyor? (canlı)</h4>
+  <div class="fbu-kv"><span>Bu telefon, son 1 dakika</span><b>${fbuNum(l.length)} yazma/silme</b></div>
+  ${top.length?`<div class="fbu-mr">${top.map(([c,n])=>`<div><span>${esc(c)}</span><b>${fbuNum(n)}</b></div>`).join("")}</div>`:`<p class="muted">Son 1 dakikada bu telefondan yazma yok.</p>`}
+  ${KU.log.length?`<small class="muted">Son yazılanlar: ${KU.log.slice(-6).reverse().map(x=>esc(x[1])+" ("+Math.round((t-x[0])/1000)+" sn önce)").join(", ")}</small>`:""}
+  ${all.length?`<h4 style="margin-top:6px">Bugün, bütün telefonlar</h4><div class="fbu-mr">${all.map(([c,n])=>`<div><span>${esc(c)}</span><b>${fbuNum(n)}</b></div>`).join("")}</div>`:""}
+  <small class="muted">presence = çevrimiçi durumu (40 sn'de bir), mesaj = sohbet mesajları, games = oyunlar ve sayaç, profiles = profil, kişisel = kayıtlı/gizli/bot sohbetleri.</small></div>`}
+setInterval(()=>{const e=$("#fbuLive");if(e&&e.isConnected&&!document.hidden)e.outerHTML=fbuLiveHtml()},3000);
+function fbuMsgHtml(){const g=FBU.msg,u=FBU.use;
+ const kv=(a,b)=>`<span>${a}</span><b>${b}</b>`;
+ return`<div class="fbu-s"><h4>Mesajlar (sıfırlanmadan beri)</h4>
+  ${FBU.mbusy?`<p class="muted">Sunucuda sayılıyor…</p>`:""}${FBU.mErr?`<p class="fbu-err">${esc(FBU.mErr)}</p>`:""}
+  <div class="fbu-kv">${g?kv("Sunucuda duran",fbuNum(g.n)):""}${u?kv("Gönderilen",fbuNum(u.ms))+kv("Herkesten silinen",fbuNum(u.md)):""}${u&&u.y?kv("Dün gönderilen / silinen",fbuNum(u.y.ms)+" / "+fbuNum(u.y.md)):""}</div>
+  ${g&&g.rows.length?`<div class="fbu-mr">${g.rows.slice(0,12).map(r=>`<div><span>${esc(r.nm)}</span><b>${fbuNum(r.n)}</b></div>`).join("")}</div>`:g?`<p class="muted">Bugün sunucuda yeni mesaj yok.</p>`:""}
+  <small class="muted">"Sunucuda duran" Firebase'den o an sayılır (silinenler artık sunucuda olmadığı için içinde yok). "Gönderilen" ve "Herkesten silinen" Kadraj'ın sayacından; "benden sil" yalnızca o telefonda gizler, sayılmaz.</small>
+  <button class="btn ghost sm" data-fbu="msg" ${FBU.mbusy?"disabled":""}>${I("rotate")}Mesajları yeniden say</button></div>`}
 function fbuWire(el){FBU.el=el;
- for(const b of el.querySelectorAll("[data-fbu]"))b.onclick=async e=>{e.preventDefault();const a=b.dataset.fbu;if(a==="ping")fbuPing();else if(a==="use"){await kuFlush();fbuUse()}};
+ for(const b of el.querySelectorAll("[data-fbu]"))b.onclick=async e=>{e.preventDefault();const a=b.dataset.fbu;if(a==="ping")fbuPing();else if(a==="use")fbuUse();else if(a==="msg")fbuMsgs()};
  if(!FBU.at&&!FBU.busy)fbuPing();if(FBU.inc==null&&!FBU.incErr&&now()-FBU.incAt>5000)fbuInc();if(!FBU.use&&!FBU.busy&&!FBU.useErr)fbuUse()}
 try{ADM_EXTRA.push({id:"fbdurum",title:"Firebase",desc:"Bağlantı durumu ve bugünkü ücretsiz hak",icon:"globe",order:40,
  count:()=>FBU.ok===true?{t:FBU.ms+" ms",c:FBU.ms>1500?"warn":"on"}:FBU.ok===false?{t:"Bağlantı yok",c:"hot"}:{t:"Durum",c:"dim"},html:fbuHtml,wire:fbuWire})}catch(e){console.warn("fbu",e)}
