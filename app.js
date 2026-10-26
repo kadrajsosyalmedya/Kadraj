@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60803,APP_VER="6.8.3";
+const APP_V=60804,APP_VER="6.8.4";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -178,26 +178,30 @@ async function loadFirebase(cfg){const base=`https://www.gstatic.com/firebasejs/
  const app=appM.initializeApp(cfg);const auth=A.getAuth(app);try{auth.languageCode="tr"}catch{}
  let db;try{db=F.initializeFirestore(app,{ignoreUndefinedProperties:true,localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()})})}catch(e){try{db=F.initializeFirestore(app,{ignoreUndefinedProperties:true})}catch{db=F.getFirestore(app)}}
  FB={app,auth,db,A,F};return FB}
+/* 6.8.4: KU = bu cihazın Firestore işlem sayacı (okuma r, yazma w, silme d; bölge 70 günlük toplamı games/ku-<gün>'e ekler) */
+const KU={r:0,w:0,d:0};
 function FirebaseDB(){const{F,db}=FB;
  const flat=(obj,prefix=[],out=[])=>{for(const[k,v]of Object.entries(obj)){if(v&&typeof v==="object"&&!Array.isArray(v)&&Object.keys(v).length)flat(v,[...prefix,k],out);else out.push(new F.FieldPath(...prefix,k),v===undefined?null:v)}return out};
  const track=u=>{const f=()=>{try{u()}catch{}FB_UNSUBS.delete(f)};FB_UNSUBS.add(f);return f};
  const onErr=e=>{console.warn("firestore",e);if(e&&e.code==="permission-denied")rulesWarn()};
+ /* dinleyici ilk sunucu yanıtında bütün belgeler (boşsa 1), sonra yalnızca değişenler okunmuş sayılır */
+ const kuSnap=()=>{let on=false;return s=>{if(s.metadata&&s.metadata.fromCache)return;if(!on){on=true;KU.r+=s.docs?Math.max(1,s.size):1}else KU.r+=s.docChanges?s.docChanges().filter(c=>c.type!=="removed").length:1}};
  return{
-  async get(p){const s=await F.getDoc(F.doc(db,p));return s.exists()?s.data():null},
-  set:(p,o)=>F.setDoc(F.doc(db,p),o),
-  update(p,o){const args=flat(o);if(!args.length)return Promise.resolve();return F.updateDoc(F.doc(db,p),...args)},
-  del:p=>F.deleteDoc(F.doc(db,p)),
-  watchCol(col,cb,opts={}){const cons=[];if(opts.where)cons.push(F.where(...opts.where));if(opts.orderBy)cons.push(F.orderBy(...opts.orderBy));cons.push(F.limit(opts.limit||500));
-   return track(F.onSnapshot(F.query(F.collection(db,col),...cons),s=>cb(s.docs.map(d=>({id:d.id,...d.data()}))),opts.onError||onErr))},
-  watchDoc(p,cb){return track(F.onSnapshot(F.doc(db,p),s=>cb(s.exists()?s.data():null),onErr))}}}
+  async get(p){KU.r++;const s=await F.getDoc(F.doc(db,p));return s.exists()?s.data():null},
+  set:(p,o)=>{KU.w++;return F.setDoc(F.doc(db,p),o)},
+  update(p,o){const args=flat(o);if(!args.length)return Promise.resolve();KU.w++;return F.updateDoc(F.doc(db,p),...args)},
+  del:p=>{KU.d++;return F.deleteDoc(F.doc(db,p))},
+  watchCol(col,cb,opts={}){const cons=[];if(opts.where)cons.push(F.where(...opts.where));if(opts.orderBy)cons.push(F.orderBy(...opts.orderBy));cons.push(F.limit(opts.limit||500));const k=kuSnap();
+   return track(F.onSnapshot(F.query(F.collection(db,col),...cons),s=>{k(s);cb(s.docs.map(d=>({id:d.id,...d.data()})))},opts.onError||onErr))},
+  watchDoc(p,cb){const k=kuSnap();return track(F.onSnapshot(F.doc(db,p),s=>{k(s);cb(s.exists()?s.data():null)},onErr))}}}
 function unsubAll(){[...FB_UNSUBS].forEach(f=>f())}
 let rulesWarned=false;function rulesWarn(){if(rulesWarned)return;rulesWarned=true;toast("Firebase veritabanı kuralları izin vermiyor. Kurulumdaki kuralları Firestore > Kurallar'a yapıştırıp Yayınla'ya bas.")}
 /* çevrimiçi durumu ve dürtme: Firestore ile */
 function FsRoom(){const{F,db}=FB;let state={typing:null},hb=null,docs=[],cb=null,pokeH=null;const handled=new Set();
- const push=()=>S.uid&&S.authed&&!S.guest&&document.visibilityState!=="hidden"?F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:state.typing||null,at:Date.now(),seen:Date.now(),hide:settings.showActive===false}).catch(()=>{}):Promise.resolve();
+ const push=()=>S.uid&&S.authed&&!S.guest&&document.visibilityState!=="hidden"?(KU.w++,F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:state.typing||null,at:Date.now(),seen:Date.now(),hide:settings.showActive===false}).catch(()=>{})):Promise.resolve();
  const fire=()=>{const vis=docs.filter(d=>!d.hide||d.uid===S.uid);S.lastSeen=Object.fromEntries(vis.map(d=>[d.uid,Math.max(d.seen||0,d.at||0)]));if(!cb)return;const lim=Date.now()-95e3;cb({peers:vis.filter(d=>d.at>lim).map(d=>({presence:{uid:d.uid,typing:d.typing},isMe:d.uid===S.uid}))})};
  setInterval(fire,30e3);
- const off=()=>{if(S.uid&&S.authed&&!S.guest)F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:null,at:0,seen:Date.now()}).catch(()=>{})};
+ const off=()=>{if(S.uid&&S.authed&&!S.guest)KU.w++,F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:null,at:0,seen:Date.now()}).catch(()=>{})};
  addEventListener("pagehide",off);
  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")push();else off()});
  return{
@@ -206,7 +210,7 @@ function FsRoom(){const{F,db}=FB;let state={typing:null},hb=null,docs=[],cb=null
   listen(){const u1=DB.watchCol("presence",d=>{docs=d;fire()},{limit:300});
    const u2=DB.watchCol("pokes",ds=>{for(const d of ds){if(handled.has(d.id))continue;handled.add(d.id);if(d.at>S.bootAt-5000&&pokeH)pokeH({data:d});DB.del("pokes/"+d.id).catch(()=>{})}},{where:["to","==",S.uid],limit:50});
    return()=>{u1();u2()}},
-  async emit(topic,data){await F.addDoc(F.collection(db,"pokes"),{...data,topic,at:Date.now()})},
+  async emit(topic,data){KU.w++;await F.addDoc(F.collection(db,"pokes"),{...data,topic,at:Date.now()})},
   on(t,h){pokeH=h},
   async leave(){if(hb){clearInterval(hb);hb=null}if(S.uid)await F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:null,at:0,seen:Date.now()}).catch(()=>{})}}}
 /* kurulum yardımcıları */
@@ -8975,72 +8979,61 @@ HOOKS.after.unshift(r=>{if(r!=="settings"||S.guest||S.mode!=="cloud"||!acCfgV)re
 /* 6.8.3 Yönetici › Firebase: bağlantı durumu ve günlük ücretsiz hak (Spark planı).
    - Bağlantı (fbuPing): getDocFromServer(meta/_surum) süresi, oturum, SDK sürümü; Supabase yedeği (acPing). Bölüm sayacı sonucu gösterir.
    - Google genel durumu (fbuInc): status.firebase.google.com/incidents.json süren olaylar (Firestore/Authentication); okunamazsa bağlantı.
-   - Günlük hak (fbuUse): Cloud Monitoring API (document/read_count, write_count, delete_count; bugün = Pasifik saatiyle gece yarısından beri).
-     Tarayıcı bu sayıları ancak yöneticinin Google hesabıyla okuyabilir: Google Identity Services (accounts.google.com/gsi/client) token istemcisi,
-     kapsam monitoring.read, OAuth istemci kimliği admin/fbmon.cid (gizli değil; bölümdeki adımlarla bir kez yapıştırılır). Jeton yalnızca bellekte + sessionStorage (55 dk).
-   Test: scratchpad/yd/fbu.js (sahte FB ve sahte Monitoring yanıtı). */
+   - Günlük hak (6.8.4): Google'ın gerçek sayıları (Cloud Monitoring) faturalandırma açık olmadan okunamıyor, bu yüzden Kadraj kendisi sayar:
+     FirebaseDB ve FsRoom her okuma/yazma/silmede KU'yu artırır (dinleyicide ilk sunucu yanıtı bütün belgeler, sonra değişenler), her cihaz 3 dk'da bir
+     ve arka plana geçince farkı games/ku-<Pasifik günü> belgesine increment ile ekler (ku:1; players alanı yok, satranç dinleyicisine düşmez).
+     Kurallardaki get()/exists() okumaları, konsoldan yapılanlar ve eski sürümlü cihazlar sayılmaz: yaklaşık sayıdır, gerçeği Firebase konsolunda.
+   Test: scratchpad/yd/fbu.js (sahte FB). */
 const FBU={ms:null,ok:null,at:0,err:"",inc:null,incErr:false,incAt:0,use:null,useErr:"",useAt:0,busy:"",sb:null,el:null};
 const FBU_LIM={r:50000,w:20000,d:20000};
-const FBU_SCOPE="https://www.googleapis.com/auth/monitoring.read";
+const KU_SENT={r:0,w:0,d:0};
 const fbuPid=()=>(FB&&FB.app&&FB.app.options&&FB.app.options.projectId)||(LS.get("kadraj_fb_cfg")||EMBED_CFG).projectId;
-function fbuPt(){const n=new Date();const p=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(n).map(x=>[x.type,x.value]));
- const s=(+p.hour%24)*3600+(+p.minute)*60+(+p.second);const start=Math.floor(n.getTime()/1000)*1000-s*1000;return{start,reset:start+864e5}}
+function fbuPt(t){const n=new Date(t||Date.now());const p=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(n).map(x=>[x.type,x.value]));
+ const s=(+p.hour%24)*3600+(+p.minute)*60+(+p.second);const start=Math.floor(n.getTime()/1000)*1000-s*1000;return{start,reset:start+864e5,key:p.year+p.month+p.day}}
 const fbuNum=n=>Number(n||0).toLocaleString("tr-TR");
+const kuDelta=()=>({r:KU.r-KU_SENT.r,w:KU.w-KU_SENT.w,d:KU.d-KU_SENT.d});
+async function kuFlush(){if(S.mode!=="cloud"||!S.authed||S.guest||!FB||!FB.F||!FB.F.increment)return;const x=kuDelta();if(!x.r&&!x.w&&!x.d)return;
+ const {key}=fbuPt(),F=FB.F;KU.w++;const y={...x,w:x.w+1};Object.assign(KU_SENT,{r:KU_SENT.r+y.r,w:KU_SENT.w+y.w,d:KU_SENT.d+y.d});
+ try{await F.setDoc(F.doc(FB.db,"games/ku-"+key),{ku:1,d:key,r:F.increment(y.r),w:F.increment(y.w),dl:F.increment(y.d),at:Date.now()},{merge:true})}
+ catch(e){KU_SENT.r-=y.r;KU_SENT.w-=y.w;KU_SENT.d-=y.d;console.warn("ku",e)}}
+setInterval(kuFlush,180000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")kuFlush()});
 function fbuRedraw(){const el=FBU.el;if(el&&el.isConnected){el.innerHTML=fbuHtml();fbuWire(el)}if(S.route.name==="admin")scheduleRefresh()}
 async function fbuPing(){if(!FB||!FB.F||S.mode!=="cloud"){FBU.ok=null;FBU.err="Yerel mod";return}FBU.busy="ping";fbuRedraw();const t=performance.now();
- try{const r=await withTimeout(FB.F.getDocFromServer(FB.F.doc(FB.db,"meta/_surum")),12000);if(r===null)throw new Error("12 sn içinde yanıt yok");FBU.ok=true;FBU.err=""}
+ try{KU.r++;const r=await withTimeout(FB.F.getDocFromServer(FB.F.doc(FB.db,"meta/_surum")),12000);if(r===null)throw new Error("12 sn içinde yanıt yok");FBU.ok=true;FBU.err=""}
  catch(e){if(e&&e.code==="permission-denied"){FBU.ok=true;FBU.err=""}else{FBU.ok=false;FBU.err=String((e&&(e.code||e.message))||e)}}
  FBU.ms=FBU.ok?Math.round(performance.now()-t):null;FBU.at=now();FBU.sb=acCfgV?await acPing():null;FBU.busy="";fbuRedraw()}
 async function fbuInc(){FBU.incErr=false;try{const r=await withTimeout(fetch("https://status.firebase.google.com/incidents.json",{cache:"no-store"}),10000);if(!r||!r.ok)throw 0;const j=await r.json();if(!Array.isArray(j))throw 0;
   FBU.inc=j.filter(x=>x&&!x.end).map(x=>({t:String(x.external_desc||(x.most_recent_update&&x.most_recent_update.text)||"Sorun").slice(0,200),p:(x.affected_products||[]).map(p=>p&&p.title).filter(Boolean).join(", "),at:Date.parse(x.begin)||0}))
    .filter(x=>!x.p||/firestore|authentication|hosting|realtime/i.test(x.p))}catch{FBU.inc=null;FBU.incErr=true}FBU.incAt=now();fbuRedraw()}
-function fbuTok(){const t=SS.get("kadraj_fbm_tok");return t&&t.exp>now()?t.t:null}
-function fbuGis(){return window.google&&google.accounts&&google.accounts.oauth2?Promise.resolve():acScript("https://accounts.google.com/gsi/client")}
-async function fbuAuth(){const cid=((S.adm&&S.adm.fbmon)||{}).cid;if(!cid)throw new Error("istemci");await fbuGis();
- return new Promise((res,rej)=>{const c=google.accounts.oauth2.initTokenClient({client_id:cid,scope:FBU_SCOPE,callback:r=>{if(r&&r.access_token){SS.set("kadraj_fbm_tok",{t:r.access_token,exp:now()+Math.min(55*60e3,(+r.expires_in||3600)*1000-60e3)});res(r.access_token)}else rej(new Error((r&&(r.error_description||r.error))||"izin verilmedi"))},error_callback:e=>rej(new Error((e&&(e.message||e.type))||"pencere kapandı"))});c.requestAccessToken({prompt:""})})}
-async function fbuSum(tok,metric,start,end){const sec=Math.max(60,Math.ceil((end-start)/1000/60)*60);
- const q=new URLSearchParams({filter:`metric.type="firestore.googleapis.com/document/${metric}"`,"interval.startTime":new Date(end-sec*1000).toISOString(),"interval.endTime":new Date(end).toISOString(),"aggregation.alignmentPeriod":sec+"s","aggregation.perSeriesAligner":"ALIGN_SUM","aggregation.crossSeriesReducer":"REDUCE_SUM"});
- const r=await fetch(`https://monitoring.googleapis.com/v3/projects/${encodeURIComponent(fbuPid())}/timeSeries?`+q,{headers:{Authorization:"Bearer "+tok}});const j=await r.json().catch(()=>({}));
- if(!r.ok){const e=new Error((j.error&&j.error.message)||("HTTP "+r.status));e.status=r.status;e.api=/SERVICE_DISABLED|has not been used|is disabled/i.test(JSON.stringify(j));throw e}
- let n=0;for(const ts of j.timeSeries||[])for(const p of ts.points||[])n+=+((p.value||{}).int64Value||0);return n}
-async function fbuUse(ask){if(FBU.busy)return;let tok=fbuTok();FBU.useErr="";
- if(!tok){if(!ask)return;FBU.busy="use";fbuRedraw();try{tok=await fbuAuth()}catch(e){FBU.busy="";FBU.useErr=e.message==="istemci"?"":"Google izni alınamadı: "+e.message;fbuRedraw();return}}
- FBU.busy="use";fbuRedraw();const {start}=fbuPt(),end=now();
- try{const [r,w,d]=await Promise.all(["read_count","write_count","delete_count"].map(m=>fbuSum(tok,m,start,end)));FBU.use={r,w,d};FBU.useAt=end}
- catch(e){if(e.status===401)SS.del("kadraj_fbm_tok");FBU.useErr=e.api?"api":e.status===403?"Bu Google hesabının projede izni yok (proje sahibi hesabıyla gir). "+e.message:"Kullanım okunamadı: "+e.message}
- FBU.busy="";fbuRedraw()}
+/* bugünkü ve dünkü toplam: belge + bu cihazın henüz gönderilmemiş farkı */
+async function fbuUse(){if(S.mode!=="cloud"){FBU.useErr="Yerel modda sayılmaz.";return}FBU.busy="use";FBU.useErr="";fbuRedraw();
+ const {key,start}=fbuPt(),y=fbuPt(start-36e5).key;
+ try{const [a,b]=await Promise.all([DB.get("games/ku-"+key),DB.get("games/ku-"+y)]);const x=kuDelta();
+  FBU.use={r:((a&&a.r)||0)+x.r,w:((a&&a.w)||0)+x.w,d:((a&&a.dl)||0)+x.d,y:b?{r:b.r||0,w:b.w||0,d:b.dl||0}:null};FBU.useAt=now()}
+ catch(e){FBU.useErr="Sayılar okunamadı: "+((e&&(e.code||e.message))||e)}FBU.busy="";fbuRedraw()}
 function fbuBar(lb,n,lim){const p=Math.min(100,n/lim*100),c=p>=90?"hot":p>=70?"warn":"on";
- return`<div class="fbu-q"><div class="fbu-ql"><b>${esc(lb)}</b><span>${fbuNum(n)} / ${fbuNum(lim)}</span></div><div class="fbu-bar ${c}"><i style="width:${p.toFixed(1)}%"></i></div><small>Kalan: <b>${fbuNum(Math.max(0,lim-n))}</b> (%${Math.max(0,100-p).toFixed(p>99&&p<100?1:0)})</small></div>`}
+ return`<div class="fbu-q"><div class="fbu-ql"><b>${esc(lb)}</b><span>${fbuNum(n)} / ${fbuNum(lim)}</span></div><div class="fbu-bar ${c}"><i style="width:${p.toFixed(1)}%"></i></div><small>Kalan: <b>${fbuNum(Math.max(0,lim-n))}</b> (%${Math.max(0,100-p).toFixed(0)})</small></div>`}
 function fbuHtml(){const pid=fbuPid(),{reset}=fbuPt(),left=reset-now(),h=Math.floor(left/36e5),m=Math.floor(left%36e5/6e4);
  const st=FBU.busy==="ping"?`<span class="fbu-dot"></span>Ölçülüyor…`:FBU.ok===true?`<span class="fbu-dot on"></span><b>Bağlı</b> · yanıt ${FBU.ms} ms${FBU.ms>1500?" (yavaş)":""}`:FBU.ok===false?`<span class="fbu-dot hot"></span><b>Bağlantı yok</b> · ${esc(FBU.err)}`:`<span class="fbu-dot"></span>${esc(FBU.err||"Ölçülmedi")}`;
  const inc=FBU.incErr?`Okunamadı. <a href="https://status.firebase.google.com/" target="_blank" rel="noopener">Durum sayfasını aç</a>`:FBU.inc==null?"Bakılıyor…":FBU.inc.length?FBU.inc.map(x=>`<div class="fbu-inc">${I("info")}<span><b>${esc(x.p||"Firebase")}</b>${esc(x.t)}</span></div>`).join(""):`<span class="fbu-dot on"></span>Bilinen sorun yok`;
- const cid=((S.adm&&S.adm.fbmon)||{}).cid||"";const u=FBU.use;
- const use=u?`${fbuBar("Okuma",u.r,FBU_LIM.r)}${fbuBar("Yazma",u.w,FBU_LIM.w)}${fbuBar("Silme",u.d,FBU_LIM.d)}<small class="muted">${esc(new Date(FBU.useAt).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}))} itibarıyla. Google sayıları birkaç dakika geriden gelir.</small>`
-  :FBU.useErr==="api"?`<p>Google Cloud'da <b>Cloud Monitoring API</b> kapalı. <a href="https://console.cloud.google.com/apis/library/monitoring.googleapis.com?project=${encodeURIComponent(pid)}" target="_blank" rel="noopener">Buradan aç</a>, sonra yeniden dene.</p>`
-  :cid?`<p class="muted">Gerçek sayılar Google hesabınla okunur (yalnızca senin cihazında, 1 saat geçerli).</p>`:"";
+ const u=FBU.use;
+ const use=u?`${fbuBar("Okuma",u.r,FBU_LIM.r)}${fbuBar("Yazma",u.w,FBU_LIM.w)}${fbuBar("Silme",u.d,FBU_LIM.d)}
+  ${u.y?`<small class="muted">Dün: ${fbuNum(u.y.r)} okuma, ${fbuNum(u.y.w)} yazma, ${fbuNum(u.y.d)} silme.</small>`:""}
+  <small class="muted">${esc(new Date(FBU.useAt).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}))} itibarıyla, Kadraj'ın kendi sayımı (yaklaşık). Her cihaz 3 dakikada bir ekler; Firebase'in kendi sayısı biraz farklı olabilir.</small>`
+  :FBU.busy==="use"?`<p class="muted">Sayılar okunuyor…</p>`:"";
  return`<div class="fbu">
  <div class="fbu-s"><h4>Bağlantı</h4><div class="fbu-r">${st}</div>
   <div class="fbu-kv"><span>Oturum</span><b>${FB&&FB.auth&&FB.auth.currentUser?"Açık":"Yok"}</b><span>Proje</span><b>${esc(pid||"-")}</b><span>SDK</span><b>${esc(FBV)}</b><span>Son ölçüm</span><b>${FBU.at?esc(ago(FBU.at)):"-"}</b><span>Supabase yedeği</span><b>${!acCfgV?"Kurulmadı":FBU.sb==null?"-":FBU.sb?"Hazır":"Ulaşılamıyor"}</b></div>
   <button class="btn ghost sm" data-fbu="ping" ${FBU.busy?"disabled":""}>${I("rotate")}Yeniden ölç</button></div>
  <div class="fbu-s"><h4>Google genel durumu</h4><div class="fbu-r">${inc}</div></div>
  <div class="fbu-s"><h4>Bugünkü ücretsiz hak</h4><p class="muted">Ücretsiz planda (Spark) günde 50.000 okuma, 20.000 yazma, 20.000 silme. ${h} sa ${m} dk sonra (Türkiye saatiyle ${esc(new Date(reset).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"}))}) sıfırlanır.</p>
-  ${use}${FBU.useErr&&FBU.useErr!=="api"?`<p class="fbu-err">${esc(FBU.useErr)}</p>`:""}
-  ${cid?`<button class="btn sm" data-fbu="use" ${FBU.busy?"disabled":""}>${I("chart")}${u?"Yenile":fbuTok()?"Kullanımı göster":"Google ile bağlan ve göster"}</button>`
-  :`<details class="fbu-how" open><summary>Gerçek sayıları görmek için bir kez kur</summary><ol>
-   <li><a href="https://console.cloud.google.com/apis/credentials?project=${encodeURIComponent(pid)}" target="_blank" rel="noopener">Google Cloud › Kimlik bilgileri</a> › <b>Kimlik bilgisi oluştur › OAuth istemci kimliği</b> › Web uygulaması.</li>
-   <li><b>Yetkili JavaScript kaynakları</b>'na <code>${esc(location.origin)}</code> ekle, oluştur.</li>
-   <li>Çıkan <b>istemci kimliğini</b> (…apps.googleusercontent.com) aşağıya yapıştır.</li>
-   <li>İzin ekranı "test" durumundaysa kendi Google hesabını <b>test kullanıcısı</b> olarak ekle.</li></ol>
-   <form class="fbu-f" id="fbuF"><input class="in" id="fbuC" placeholder="….apps.googleusercontent.com" autocomplete="off"><button class="btn sm">Kaydet</button></form></details>`}
-  <a class="fbu-lnk" href="https://console.firebase.google.com/project/${encodeURIComponent(pid)}/firestore/databases/-default-/usage" target="_blank" rel="noopener">Firebase konsolunda kullanım ${I("next")}</a>
-  ${cid?`<button class="fbu-lnk plain" data-fbu="cidx">İstemci kimliğini değiştir</button>`:""}</div></div>`}
+  ${use}${FBU.useErr?`<p class="fbu-err">${esc(FBU.useErr)}</p>`:""}
+  <button class="btn ghost sm" data-fbu="use" ${FBU.busy?"disabled":""}>${I("rotate")}Sayıları yenile</button>
+  <a class="fbu-lnk" href="https://console.firebase.google.com/project/${encodeURIComponent(pid)}/firestore/databases/-default-/usage" target="_blank" rel="noopener">Firebase konsolunda kesin sayı ${I("next")}</a></div></div>`}
 function fbuWire(el){FBU.el=el;
- for(const b of el.querySelectorAll("[data-fbu]"))b.onclick=e=>{e.preventDefault();const a=b.dataset.fbu;if(a==="ping")fbuPing();else if(a==="use")fbuUse(true);
-  else if(a==="cidx")dialog("İstemci kimliği silinsin mi?","Yeniden yapıştırana kadar kullanım sayıları gösterilmez.",[{label:"Sil",cls:"danger",fn:async()=>{SS.del("kadraj_fbm_tok");FBU.use=null;await admSet("fbmon",{cid:""});fbuRedraw()}},{label:"Vazgeç"}])};
- const f=el.querySelector("#fbuF");if(f)f.onsubmit=async e=>{e.preventDefault();const v=el.querySelector("#fbuC").value.trim();
-  if(!/^[\w.-]+\.apps\.googleusercontent\.com$/.test(v))return toast("Bu bir OAuth istemci kimliğine benzemiyor (…apps.googleusercontent.com).");
-  if(await admSet("fbmon",{cid:v})){S.adm={...(S.adm||{}),fbmon:{cid:v}};toast("Kaydedildi");fbuRedraw()}};
- if(!FBU.at&&!FBU.busy)fbuPing();if(FBU.inc==null&&!FBU.incErr&&now()-FBU.incAt>5000)fbuInc();if(!FBU.use&&!FBU.busy&&fbuTok()&&!FBU.useErr)fbuUse(false)}
+ for(const b of el.querySelectorAll("[data-fbu]"))b.onclick=async e=>{e.preventDefault();const a=b.dataset.fbu;if(a==="ping")fbuPing();else if(a==="use"){await kuFlush();fbuUse()}};
+ if(!FBU.at&&!FBU.busy)fbuPing();if(FBU.inc==null&&!FBU.incErr&&now()-FBU.incAt>5000)fbuInc();if(!FBU.use&&!FBU.busy&&!FBU.useErr)fbuUse()}
 try{ADM_EXTRA.push({id:"fbdurum",title:"Firebase",desc:"Bağlantı durumu ve bugünkü ücretsiz hak",icon:"globe",order:40,
  count:()=>FBU.ok===true?{t:FBU.ms+" ms",c:FBU.ms>1500?"warn":"on"}:FBU.ok===false?{t:"Bağlantı yok",c:"hot"}:{t:"Durum",c:"dim"},html:fbuHtml,wire:fbuWire})}catch(e){console.warn("fbu",e)}
 /*}@js:70*/
