@@ -3884,8 +3884,6 @@ html.reduce-motion .gnc .gfw .gflag,html.reduce-motion .gnc.dini .gic svg{animat
 .fbu-bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden}.fbu-bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
 .fbu-bar.warn i{background:#d97706}.fbu-bar.hot i{background:#dc2626}.fbu-q small{color:var(--muted);font-size:.78rem}.fbu-q small b{color:var(--fg)}
 .fbu-inc{display:flex;gap:8px;align-items:flex-start;font-size:.86rem}.fbu-inc .i{width:18px;height:18px;flex:none;color:#d97706}.fbu-inc b{display:block}
-.fbu-err{color:#dc2626}.fbu-how summary{cursor:pointer;font-weight:700;font-size:.9rem}.fbu-how ol{margin:8px 0;padding-left:20px;display:grid;gap:6px;font-size:.84rem;line-height:1.4}
-.fbu-how code{font-family:var(--f-mono);font-size:.78rem;overflow-wrap:anywhere}.fbu-f{display:flex;gap:8px}.fbu-f .in{min-width:0;flex:1}
+.fbu-err{color:#dc2626}
 .fbu-lnk{display:inline-flex;align-items:center;gap:4px;font-size:.86rem;font-weight:700;color:var(--accent);text-decoration:none;justify-self:start}.fbu-lnk .i{width:16px;height:16px}
-button.fbu-lnk.plain{background:none;border:0;padding:0;color:var(--muted);font-weight:600;cursor:pointer}
 /*}@css:70*/
