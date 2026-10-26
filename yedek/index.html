@@ -112,16 +112,16 @@ label.lb{display:block;font-size:13px;color:var(--mut);margin-top:8px}
 .nomo *,.nomo *::before,.nomo *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
+<script src="ayar.js"></script>
 <script src="supabase.js"></script>
 </head>
 <body><div id="app"><div class="spin-s"></div></div>
 <script>
 "use strict";
 /* Orbit: Kadraj'ın yedek uygulaması. Giriş ve veriler Supabase'te (kurulum: kurulum.sql), Spark videoları Cloudinary'de.
-   Kurulum: Supabase › Project Settings › API sayfasındaki Project URL ve anon/publishable anahtarını aşağıya yaz.
-   service_role / secret anahtarını ASLA buraya yazma. */
-const SUPA_URL = "";
-const SUPA_KEY = "";
+   Supabase adresi ve anon anahtarı ayar.js'te (Kadraj'ın acil modu da aynı dosyayı okur). */
+const SUPA_URL = (window.SUPA || {}).url || "";
+const SUPA_KEY = (window.SUPA || {}).key || "";
 const CL = {cloud: "jw9koecu", preset: "Kadraj"};
 
 /* ---------- yardımcılar ---------- */
@@ -520,7 +520,7 @@ document.addEventListener("focusout", () => setTimeout(() => {const a = document
 
 /* ---------- açılış ---------- */
 function boot() {
- if (!window.ORBIT_FAKE && (!SUPA_URL || !SUPA_KEY)) {root.innerHTML = `<div class="au"><div class="acn">${LOGO(64)}<div class="wm big">orbit</div><p>Kurulum bekleniyor: index.html'in başındaki SUPA_URL ve SUPA_KEY alanlarına Supabase bilgilerini yaz.</p></div></div>`; return}
+ if (!window.ORBIT_FAKE && (!SUPA_URL || !SUPA_KEY)) {root.innerHTML = `<div class="au"><div class="acn">${LOGO(64)}<div class="wm big">orbit</div><p>Kurulum bekleniyor: yedek/ayar.js dosyasına Supabase adresini ve anon anahtarını yaz.</p></div></div>`; return}
  sb = window.ORBIT_FAKE || supabase.createClient(SUPA_URL, SUPA_KEY, {auth: {storage: store, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true}});
  sb.auth.onAuthStateChange((ev, session) => setTimeout(() => {
   if (ev === "PASSWORD_RECOVERY") {S.recover = true; return newPwView()}
