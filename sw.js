@@ -7,6 +7,8 @@ self.addEventListener("install",e=>{self.skipWaiting();e.waitUntil(caches.open(C
  const h=await (await c.match("./index.html")).text();const fs=[...h.matchAll(/(app\.(?:js|css)\?v=\d+)/g)].map(m=>"./"+m[1]);if(fs.length)await c.addAll(fs)}).catch(()=>{}))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C&&k!=="kadraj-open").map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener("fetch",e=>{const r=e.request;if(r.method!=="GET")return;const u=new URL(r.url);if(u.origin!==location.origin)return;
+ /* Orbit (yedek/) Kadraj'dan bağımsız: service worker ona hiç karışmaz. */
+ if(u.pathname.includes("/yedek/"))return;
  /* 5.7.4: hazır fotoğraflar (img/, reels/*.jpg) hiç değişmez: önce önbellekten. Videolara (mp4) karışılmaz, tarayıcı parça parça (Range) kendisi indirir. */
  if(/\/(img|reels)\/[^/]+\.mp4$/i.test(u.pathname))return;
  if(/\/(img|reels)\/[^/]+\.(jpe?g|png|webp)$/i.test(u.pathname)){e.respondWith(caches.match(r).then(m=>m||fetch(r).then(res=>{if(res&&res.ok){const cp=res.clone();caches.open(C).then(c=>c.put(r,cp)).catch(()=>{})}return res})));return}
