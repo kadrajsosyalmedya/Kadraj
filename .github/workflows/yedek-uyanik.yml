@@ -1,6 +1,6 @@
-# Orbit (yedek/) için: Supabase'in ücretsiz projesi 7 gün kullanılmazsa uyutulur.
+# Orbit (yedek/) ve Kadraj'ın acil modu için: Supabase'in ücretsiz projesi 7 gün kullanılmazsa uyutulur.
 # Bu iş haftada iki kez veritabanına küçük bir istek atarak projeyi uyanık tutar.
-# Adres ve anon anahtarı yedek/index.html'deki SUPA_URL / SUPA_KEY'den okunur (anon anahtar zaten sayfada herkese açık).
+# Adres ve anon anahtarı yedek/ayar.js'ten okunur (anon anahtar zaten sayfada herkese açık).
 name: Orbit uyanık tut
 on:
   schedule:
@@ -14,12 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          sparse-checkout: yedek/index.html
+          sparse-checkout: yedek/ayar.js
           sparse-checkout-cone-mode: false
       - name: Supabase'e dokun
         run: |
-          URL=$(grep -oP '^const SUPA_URL = "\K[^"]*' yedek/index.html || true)
-          KEY=$(grep -oP '^const SUPA_KEY = "\K[^"]*' yedek/index.html || true)
+          URL=$(grep -oP '^\s*url: "\K[^"]*' yedek/ayar.js || true)
+          KEY=$(grep -oP '^\s*key: "\K[^"]*' yedek/ayar.js || true)
           if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "Orbit henüz kurulmadı, atlandı."; exit 0; fi
-          curl -fsS -X POST "$URL/rest/v1/rpc/ping" -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{}'
+          AUTH=""; case "$KEY" in eyJ*) AUTH="Authorization: Bearer $KEY";; esac
+          curl -fsS -X POST "$URL/rest/v1/rpc/ping" -H "apikey: $KEY" ${AUTH:+-H "$AUTH"} -H "Content-Type: application/json" -d '{}'
           echo

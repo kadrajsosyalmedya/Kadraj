@@ -1,8 +1,8 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.0 Meltem",
- "at": "26 Ekim 2026",
- "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
+ "ver": "6.8.1",
+ "at": "2026-10-26T15:55:02+00:00",
+ "note": "Kadraj testi 47 adım geçti. Acil mod sahte Supabase istemcisiyle 360 ve 390 px'te 36 denetimden geçti; Supabase kuralları yerel Postgres'te 31 + 48 denetimden geçti. Gerçek Supabase projesi henüz kurulmadı (yedek/ayar.js boş), bu yüzden gerçek sunucuyla denenmedi.",
  "items": [
   {
    "ad": "Kurgu açılıyor",
@@ -48,6 +48,31 @@
    "ad": "Önceki özellikler",
    "ok": true,
    "not": "Kadraj testi 47 adımın hepsi ve 6.7 testleri (49) geçti."
+  },
+  {
+   "ad": "Acil mod: Firebase'e ulaşılamayınca acil giriş ekranı",
+   "ok": true,
+   "not": "gstatic engellenince açıldı"
+  },
+  {
+   "ad": "Acil mod: giriş, sohbet, fotoğraf, canlı mesaj, yeni sohbet, Meydan",
+   "ok": true,
+   "not": "sahte Supabase"
+  },
+  {
+   "ad": "Acil mod: sahte eşleme gizleniyor, Çocuk Modu'nda Meydan yok",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Acil mod: hazırlık, acil mesajların Kadraj'a taşınması, Ayarlar girişi, uyarı şeridi",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Acil mod: gerçek Supabase ile deneme",
+   "ok": false,
+   "not": "Supabase projesi henüz kurulmadı (yedek/ayar.js boş)"
   }
  ]
 }
