@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0d12">
+<title>Orbit</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='9.5' fill='none' stroke='%236c5cff' stroke-width='3.4'/%3E%3Ccircle cx='25.5' cy='8' r='3.6' fill='%23ff5fa2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Sora:wght@700;800&display=swap" media="print" onload="this.media='all'">
+<style>
+:root{--bg:#fff;--fg:#14141a;--mut:#80808c;--card:#f1f1f5;--line:#e4e4ea;--ac:#6c5cff;--g:linear-gradient(135deg,#ff5fa2,#ffb35f 45%,#6c5cff);--fs:15px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d0d12;--fg:#f2f2f7;--card:#1b1b24;--line:#2a2a36;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d0d12;--fg:#f2f2f7;--card:#1b1b24;--line:#2a2a36;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font:500 var(--fs) Outfit,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+#app{height:100%;display:flex;flex-direction:column;max-width:520px;margin:auto}
+button{border:0;background:var(--ac);color:#fff;padding:10px 16px;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;transition:transform .12s,opacity .2s}
+button:active{transform:scale(.96)}button:disabled{opacity:.5}
+button.sec{background:var(--card);color:var(--fg)}button.ib{background:none;color:var(--fg);padding:8px;border-radius:50%;display:grid;place-items:center}
+button.block{width:100%;margin-top:8px}button.red{background:#e0245e;color:#fff}
+input,textarea{width:100%;padding:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:12px;margin:5px 0;font:inherit;outline:none}
+input:focus,textarea:focus{border-color:var(--ac)}
+label.lb{display:block;font-size:13px;color:var(--mut);margin-top:8px}
+.ic{display:block;flex:none}
+.top{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:54px;border-bottom:1px solid var(--line)}
+.top b{font-size:17px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wm{font:800 25px Sora,Outfit,sans-serif;letter-spacing:-1px;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wm.big{font-size:44px}.sp{flex:1}
+.main{flex:1;overflow:auto;min-height:0;position:relative}
+.pad{padding:14px}.mut{color:var(--mut);font-size:13px}.err{color:#e0245e;font-size:13px;min-height:18px;margin-top:6px}.okm{color:#1a9d5a}
+.av{border-radius:50%;object-fit:cover;display:grid;place-items:center;color:#fff;font-weight:700;flex:none}
+.avw{position:relative;display:inline-flex;flex:none}.avw.on::after{content:"";position:absolute;right:1px;bottom:1px;width:24%;height:24%;min-width:9px;min-height:9px;border-radius:50%;background:#2ecc71;border:2px solid var(--bg)}
+.row{display:flex;gap:12px;align-items:center;padding:10px 14px;cursor:pointer}.row:active{background:var(--card)}
+.row .t{flex:1;min-width:0}.row .t b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row .t .mut{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav{display:flex;gap:4px;margin:6px auto 10px;padding:6px;border-radius:30px;background:var(--card);box-shadow:0 8px 30px #0002;width:fit-content;max-width:96%}
+.nav button{background:none;color:var(--mut);display:flex;align-items:center;padding:10px 13px;border-radius:24px;font-weight:800;position:relative}
+.nav button span{max-width:0;overflow:hidden;white-space:nowrap;transition:max-width .3s,margin .3s}
+.nav button.on{background:var(--g);color:#fff}.nav button.on span{max-width:90px;margin-left:7px}
+.nav .dot{position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;background:#ff3b6b}
+.hi{font:800 28px Sora,Outfit,sans-serif;letter-spacing:-1px}
+.st{display:flex;gap:14px;padding:12px 14px;overflow-x:auto;scrollbar-width:none}.st::-webkit-scrollbar{display:none}
+.st>div{text-align:center;font-size:11px;cursor:pointer;flex:none;width:64px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.rg{display:block;padding:2.5px;border-radius:50%;background:var(--g);width:fit-content;margin:0 auto 4px}.rg.none{background:var(--line)}.rg .av{border:2px solid var(--bg)}
+.add{position:relative;display:block;width:fit-content;margin:0 auto 4px}.add i{position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:var(--ac);color:#fff;display:grid;place-items:center;border:2px solid var(--bg);font-style:normal;font-weight:800;font-size:14px;line-height:1}
+.orb{position:relative;width:290px;height:290px;margin:6px auto}.orb::before{content:"";position:absolute;inset:42px;border:2px dashed var(--line);border-radius:50%}
+.spin{position:absolute;inset:0;animation:sp 60s linear infinite}.rn{position:absolute;width:50px;height:50px;cursor:pointer}.cs{animation:sp 60s linear infinite reverse}
+.ctr{position:absolute;left:110px;top:110px;cursor:pointer;animation:pulse 3s ease-in-out infinite}
+.orb:active .spin,.orb:active .cs{animation-play-state:paused}
+.gt{font:800 12px Outfit,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);padding:12px 14px 4px}
+.cd{display:flex;gap:12px;align-items:center;margin:8px 14px;padding:12px;border-radius:18px;background:var(--card);cursor:pointer}.cd:active{transform:scale(.98)}
+.cd .t{flex:1;min-width:0}.cd .t .mut{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cd.un .t b::after{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff3b6b;margin-left:6px;vertical-align:middle}
+.gav{width:48px;height:48px;border-radius:50%;background:var(--g);display:grid;place-items:center;color:#fff;flex:none}
+.empty{padding:30px 20px;text-align:center;color:var(--mut)}
+.stat{display:flex;gap:22px;text-align:center}.stat b{display:block;font-size:18px}.stat>*{cursor:pointer}
+.seg{display:flex;gap:8px}.seg button{flex:1}
+.msgs{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:4px;min-height:0}
+.mr{display:flex;gap:6px;align-items:flex-end}.mr.me{flex-direction:row-reverse}
+.b{max-width:76%;padding:8px 12px;border-radius:18px;background:var(--card);overflow-wrap:anywhere;white-space:pre-wrap;position:relative}
+.b.n{animation:pop .25s}.me .b{background:var(--g);color:#fff}.b small{display:block;opacity:.7;font-size:11px;white-space:normal}
+.b img{max-width:100%;border-radius:12px;display:block;cursor:zoom-in}
+.hz{display:inline-flex;gap:2px;align-items:center;font-size:11px;cursor:pointer;opacity:.45;margin-left:6px;vertical-align:middle}.hz.on{opacity:1}
+.ic.f{fill:#ff3b6b;stroke:#ff3b6b}
+.sn{display:flex;gap:2px;justify-content:flex-end;padding-right:4px}
+.ty{display:flex;gap:4px;padding:12px 14px}.ty i{width:7px;height:7px;border-radius:50%;background:var(--mut);animation:bn 1s infinite}.ty i:nth-child(2){animation-delay:.15s}.ty i:nth-child(3){animation-delay:.3s}
+.iv{display:flex;gap:10px;align-items:center;background:var(--bg)!important;color:var(--fg)!important;border:1px solid var(--line)}
+.iv button{padding:8px 12px}
+.bar{display:flex;gap:6px;align-items:flex-end;padding:8px;border-top:1px solid var(--line);position:relative}
+.bar textarea{margin:0;border-radius:22px;resize:none;max-height:120px;min-height:44px;line-height:1.35}
+#pm{position:absolute;bottom:60px;left:8px;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:6px;display:none;box-shadow:0 8px 24px #0003;z-index:3}
+#pm.on{display:block;animation:pop .2s}#pm button{display:flex;gap:10px;align-items:center;background:none;color:var(--fg);width:100%}
+.rl{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;background:#000}
+.rv{height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;display:grid;place-items:center}
+.rv video{width:100%;height:100%;object-fit:contain}
+.ri{position:absolute;left:12px;right:70px;bottom:14px;color:#fff;text-shadow:0 1px 3px #000}.ri b{cursor:pointer}
+.ra{position:absolute;right:10px;bottom:20px;display:flex;flex-direction:column;gap:6px;align-items:center;color:#fff;font-size:12px}
+.ra button{background:#0006;border-radius:50%;width:46px;height:46px;padding:0;display:grid;place-items:center}
+.mute{position:absolute;top:12px;right:12px;background:#0006;border-radius:50%;width:38px;height:38px;padding:0;display:grid;place-items:center}
+.gr{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}.gr video{width:100%;aspect-ratio:9/12;object-fit:cover;background:#000;cursor:pointer;display:block}
+.ov{position:fixed;inset:0;background:#000a;z-index:20;display:grid;place-items:center;animation:fi .2s;padding:12px}
+.mod{background:var(--bg);border-radius:18px;padding:16px;width:min(100%,400px);max-height:84vh;overflow:auto;animation:pop .2s}
+.mod h3{margin:0 0 8px}
+.sv{position:fixed;inset:0;background:#000;z-index:21;display:grid;place-items:center;color:#fff}
+.sv img{max-width:100%;max-height:100%}
+.sv .pgb{position:absolute;top:calc(env(safe-area-inset-top,0px) + 8px);left:10px;right:10px;height:3px;background:#fff4;border-radius:3px}
+.sv .pgb i{display:block;height:100%;width:0;background:#fff;border-radius:3px;animation:pg 5s linear forwards}
+.sv .sh{position:absolute;top:calc(env(safe-area-inset-top,0px) + 18px);left:10px;right:10px;display:flex;align-items:center;gap:8px}
+.sv .sh .ib{color:#fff}
+.chm{background:var(--bg);width:min(100%,520px);border-radius:18px;padding:12px;animation:pop .25s}
+.bw{width:min(100%,86vw,62vh);margin:10px auto}#bd{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;box-shadow:0 6px 20px #0004}
+.q{position:absolute;width:12.5%;height:12.5%;display:grid;place-items:center}.q.l{background:#ebecd0}.q.d{background:#739552}
+.q.lm{box-shadow:inset 0 0 0 100px #f6f66980}.q.s{box-shadow:inset 0 0 0 100px #7fc8ff90}.q.ck{background:radial-gradient(#f33,#f330 72%)}
+.q u{width:30%;height:30%;border-radius:50%;background:#0003}.q u.cp{width:92%;height:92%;background:none;border:5px solid #0003}
+.pc{position:absolute;width:12.5%;height:12.5%;display:grid;place-items:center;font-size:min(8.4vw,36px);pointer-events:none;transition:left .25s ease,top .25s ease;font-family:"Segoe UI Symbol","Noto Sans Symbols 2",serif}
+.pc.w{color:#fff;text-shadow:0 0 2px #000,0 0 1px #000,0 1px 3px #0008}.pc.k{color:#111}
+.gp{background:var(--card);border-radius:18px;padding:6px 14px;margin-bottom:14px}
+.gp .gt{padding:10px 0 4px}.st2{display:flex;align-items:center;justify-content:space-between;padding:9px 0;gap:10px}
+.sw{width:48px;height:28px;border-radius:20px;background:var(--line);position:relative;padding:0;flex:none}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s}.sw.on{background:var(--ac)}.sw.on::after{left:23px}
+.cdot{width:30px;height:30px;border-radius:50%;border:3px solid transparent;padding:0}.cdot.on{border-color:var(--fg)}
+.chip{background:var(--card);color:var(--fg);margin:3px 4px 3px 0;padding:8px 12px;font-weight:600}
+#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 86px);left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:9px 16px;border-radius:20px;z-index:40;animation:pop .2s;max-width:90%;text-align:center}
+.au{height:100%;overflow:auto;position:relative;display:grid;place-items:center}
+.orbs{position:absolute;inset:0;overflow:hidden;pointer-events:none}.orbs i{position:absolute;border-radius:50%;border:2px dashed var(--line);left:50%;top:26%;translate:-50% -50%;animation:sp 30s linear infinite}
+.orbs i:nth-child(1){width:260px;height:260px}.orbs i:nth-child(2){width:420px;height:420px;animation-duration:50s;animation-direction:reverse}.orbs i:nth-child(3){width:640px;height:640px;animation-duration:80s}
+.orbs i::after{content:"";position:absolute;top:-7px;left:50%;width:14px;height:14px;border-radius:50%;background:var(--g)}
+.acn{position:relative;width:100%;max-width:420px;padding:24px;text-align:center}.fm{text-align:left;margin-top:14px;animation:fi .5s}
+.lnk{background:none;color:var(--ac);padding:8px 0;font-weight:700}
+.spin-s{width:28px;height:28px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--ac);animation:sp .8s linear infinite;margin:30vh auto}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}}@keyframes pop{from{opacity:0;transform:scale(.88) translateY(8px)}}
+@keyframes bn{40%{transform:translateY(-4px)}}@keyframes pg{to{width:100%}}@keyframes sp{to{transform:rotate(360deg)}}@keyframes pulse{50%{transform:scale(1.07)}}
+.nomo *,.nomo *::before,.nomo *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+<script src="supabase.js"></script>
+</head>
+<body><div id="app"><div class="spin-s"></div></div>
+<script>
+"use strict";
+/* Orbit: Kadraj'ın yedek uygulaması. Giriş ve veriler Supabase'te (kurulum: kurulum.sql), Spark videoları Cloudinary'de.
+   Kurulum: Supabase › Project Settings › API sayfasındaki Project URL ve anon/publishable anahtarını aşağıya yaz.
+   service_role / secret anahtarını ASLA buraya yazma. */
+const SUPA_URL = "";
+const SUPA_KEY = "";
+const CL = {cloud: "jw9koecu", preset: "Kadraj"};
+
+/* ---------- yardımcılar ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const LS = {get(k, d) {try {const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v)} catch {return d}}, set(k, v) {try {localStorage.setItem(k, JSON.stringify(v))} catch {}}, del(k) {try {localStorage.removeItem(k)} catch {}}};
+const now = () => Date.now();
+const ts = x => x ? new Date(x).getTime() : 0;
+const imgOk = s => typeof s === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(s) ? s : "";
+const vidOk = s => typeof s === "string" && /^https:\/\/res\.cloudinary\.com\//.test(s) ? s : "";
+const ago = t => {const s = (now() - t) / 1000; return s < 60 ? "şimdi" : s < 3600 ? Math.floor(s / 60) + " dk" : s < 86400 ? Math.floor(s / 3600) + " sa" : Math.floor(s / 86400) + " g"};
+function toast(x) {document.getElementById("toast")?.remove(); const d = document.createElement("div"); d.id = "toast"; d.textContent = x; document.body.append(d); setTimeout(() => d.remove(), 2600)}
+function pick(accept) {return new Promise(res => {const i = document.createElement("input"); i.type = "file"; i.accept = accept; i.style.cssText = "position:fixed;left:-999px;opacity:0"; i.onchange = () => {res(i.files[0] || null); setTimeout(() => i.remove(), 500)}; document.body.append(i); i.click()})}
+/* resmi küçültüp JPEG data adresine çevirir (en uzun kenar m, en çok lim karakter) */
+function shrink(f, m, lim) {return new Promise((res, rej) => {const u = URL.createObjectURL(f), i = new Image(); i.onerror = () => {URL.revokeObjectURL(u); rej(new Error("Resim açılamadı"))};
+ i.onload = () => {URL.revokeObjectURL(u); let k = Math.min(1, m / Math.max(i.width, i.height)); for (let n = 0; n < 6; n++) {const c = document.createElement("canvas"); c.width = Math.max(1, i.width * k | 0); c.height = Math.max(1, i.height * k | 0); c.getContext("2d").drawImage(i, 0, 0, c.width, c.height);
+  for (let q = .82; q > .3; q -= .1) {const d = c.toDataURL("image/jpeg", q); if (d.length < lim) return res(d)} k *= .8} rej(new Error("Resim çok büyük"))}; i.src = u})}
+
+/* ---------- ayarlar ---------- */
+const CF = Object.assign({theme: "auto", ac: 0, fs: 15, mo: 1, seen: 1, typ: 1, ent: 1, act: 1}, LS.get("ob_cf", {}));
+const ACC = [["#6c5cff", "linear-gradient(135deg,#ff5fa2,#ffb35f 45%,#6c5cff)"], ["#0ea5e9", "linear-gradient(135deg,#22d3ee,#0ea5e9 50%,#6366f1)"], ["#10b981", "linear-gradient(135deg,#a3e635,#10b981 50%,#0d9488)"], ["#f43f5e", "linear-gradient(135deg,#fbbf24,#f43f5e 55%,#a21caf)"]];
+function applyCF() {const d = document.documentElement, a = ACC[CF.ac] || ACC[0]; d.style.setProperty("--ac", a[0]); d.style.setProperty("--g", a[1]); d.style.setProperty("--fs", CF.fs + "px"); d.classList.toggle("nomo", !CF.mo); if (CF.theme === "auto") delete d.dataset.theme; else d.dataset.theme = CF.theme}
+const saveCF = () => {LS.set("ob_cf", CF); applyCF()};
+applyCF();
+
+/* ---------- ikonlar ---------- */
+const IP = {home: "M3 11l9-8 9 8v10h-6v-6H9v6H3z", search: "M11 4a7 7 0 100 14 7 7 0 000-14zM21 21l-5-5", plus: "M12 5v14M5 12h14", reel: "M4 4h16v16H4zM4 9h16M9 4l3 5M15 4l3 5M10 12l5 3-5 3z", user: "M12 4a4 4 0 100 8 4 4 0 000-8zM4 21a8 8 0 0116 0", send: "M22 3L2 11l7 3 3 7zM9 14l13-11", heart: "M12 21s-8-5-8-11a4.5 4.5 0 018-3 4.5 4.5 0 018 3c0 6-8 11-8 11z", back: "M15 5l-7 7 7 7", menu: "M4 7h16M4 12h16M4 17h16", img: "M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4M9 9h.01", sun: "M12 8a4 4 0 100 8 4 4 0 000-8zM12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M5 19l1.5-1.5M17.5 6.5L19 5", moon: "M20 14A8 8 0 1110 4a6 6 0 0010 10z", auto: "M12 3a9 9 0 100 18V3z", pawn: "M12 5a3 3 0 100 6 3 3 0 000-6zM9 21l1-8h4l1 8zM7 21h10", group: "M9 7a3 3 0 100 6 3 3 0 000-6zM3 20a6 6 0 0112 0M17 8a3 3 0 010 6M18 20a5 5 0 00-3-4.5", x: "M6 6l12 12M18 6L6 18", video: "M3 6h12v12H3zM15 10l6-3v10l-6-3", spark: "M12 3l2.2 5.8L20 11l-5.8 2.2L12 19l-2.2-5.8L4 11l5.8-2.2z", trash: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3", vol: "M4 9v6h4l5 4V5L8 9zM16 9a4 4 0 010 6", mute: "M4 9v6h4l5 4V5L8 9zM17 9l4 6M21 9l-4 6", more: "M5 12h.01M12 12h.01M19 12h.01"};
+const I = (n, s = 24, c = "") => `<svg class="ic ${c}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${IP[n]}"/></svg>`;
+const LOGO = (s = 30) => `<svg width="${s}" height="${s}" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lg${s}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5fa2"/><stop offset=".5" stop-color="#ffb35f"/><stop offset="1" stop-color="#6c5cff"/></linearGradient></defs><circle cx="16" cy="16" r="9.5" fill="none" stroke="url(#lg${s})" stroke-width="3.4"/><circle cx="25.5" cy="8" r="3.6" fill="url(#lg${s})"/></svg>`;
+
+/* ---------- durum ---------- */
+const S = {me: null, prof: null, P: {}, FO: [], ST: {}, C: {}, R: [], tab: "home", view: null, cur: null, msgs: [], seen: {}, typing: {}, game: null, online: new Set(), q: "", muted: true, rd: LS.get("ob_rd", {})};
+const root = $("#app");
+let sb = null, dbCh = null, onCh = null, chatCh = null;
+const P = u => S.P[u] || {name: "?", un: "?"};
+const av = (u, s = 40) => {const p = P(u); const h = imgOk(p.ph) ? `<img class="av" alt="" style="width:${s}px;height:${s}px" src="${p.ph}">` : `<div class="av" style="width:${s}px;height:${s}px;font-size:${s * .42}px;background:hsl(${[...String(u)].reduce((a, c) => a + c.charCodeAt(0), 0) * 7 % 360},62%,52%)">${esc((p.name || "?")[0].toUpperCase())}</div>`;
+ return `<span class="avw${CF.act && u !== S.me && S.online.has(u) && s >= 26 ? " on" : ""}">${h}</span>`};
+const following = u => S.FO.filter(f => f.follower === u).map(f => f.followee);
+const followers = u => S.FO.filter(f => f.followee === u).map(f => f.follower);
+const iFollow = u => S.FO.some(f => f.follower === S.me && f.followee === u);
+const storyOf = u => {const s = S.ST[u]; return s && now() - ts(s.created_at) < 864e5 ? s : null};
+const chatOther = c => c.is_group ? null : (c.members || []).find(x => x !== S.me) || S.me;
+const chatName = c => c.is_group ? (c.title || "Grup") : P(chatOther(c)).name;
+const unread = c => c.last && c.last.u !== S.me && ts(c.last.at) > (S.rd[c.id] || 0);
+const ERR = e => {const m = String(e?.message || e || ""); return /Invalid login/i.test(m) ? "E-posta ya da şifre yanlış." : /not confirmed/i.test(m) ? "E-postanı henüz doğrulamadın. Gelen kutundaki bağlantıya dokun." : /already registered|already been registered/i.test(m) ? "Bu e-posta zaten kayıtlı. Giriş yap." : /Password should/i.test(m) ? "Şifre en az 6 karakter olmalı." : /rate limit|too many/i.test(m) ? "Çok fazla deneme oldu, biraz bekle." : /fetch|network|Failed to/i.test(m) ? "İnternet bağlantısı yok ya da sunucuya ulaşılamadı." : /duplicate|23505|unique/i.test(m) ? "Bu kullanıcı adı alınmış." : m ? "Olmadı: " + m : "Olmadı, tekrar dene."};
+
+/* ---------- giriş ---------- */
+const store = {getItem: k => localStorage.getItem(k) ?? sessionStorage.getItem(k), setItem: (k, v) => {if (LS.get("ob_rm", true)) {localStorage.setItem(k, v); sessionStorage.removeItem(k)} else {sessionStorage.setItem(k, v); localStorage.removeItem(k)}}, removeItem: k => {localStorage.removeItem(k); sessionStorage.removeItem(k)}};
+const authShell = h => {root.innerHTML = `<div class="au"><div class="orbs"><i></i><i></i><i></i></div><div class="acn">${LOGO(72)}<div class="wm big">orbit</div><p class="mut">Arkadaşların, tek yörüngede</p><div class="fm">${h}<div class="err" id="er"></div></div></div></div>`};
+const err = m => {const e = $("#er"); if (e) {e.textContent = m; e.classList.remove("okm")}};
+const note = m => {const e = $("#er"); if (e) {e.textContent = m; e.classList.add("okm")}};
+const busy = (b, on) => {if (b) {b.disabled = on; if (on) b.dataset.t = b.textContent, b.textContent = "Bekle…"; else if (b.dataset.t) b.textContent = b.dataset.t}};
+function loginView() {authShell(`<input id="em" type="email" placeholder="E-posta" autocomplete="email" autocapitalize="off"><input id="pw" type="password" placeholder="Şifre" autocomplete="current-password"><label class="mut" style="display:flex;gap:8px;align-items:center;margin:6px 0"><input id="rm" type="checkbox" style="width:auto;margin:0" ${LS.get("ob_rm", true) ? "checked" : ""}> Beni hatırla</label><button class="block" data-a="li">Giriş yap</button><button class="block sec" data-a="toSu">Hesap oluştur</button><button class="lnk" data-a="toFg">Şifremi unuttum</button>`)}
+function signupView() {authShell(`<input id="nm" placeholder="Ad Soyad" maxlength="60"><input id="un" placeholder="Kullanıcı adı (a-z, 0-9, . _)" autocapitalize="off" maxlength="20"><input id="em" type="email" placeholder="E-posta" autocapitalize="off" autocomplete="email"><input id="pw" type="password" placeholder="Şifre (en az 6 karakter)" autocomplete="new-password"><textarea id="bio" rows="2" maxlength="150" placeholder="Hakkında (isteğe bağlı)"></textarea><button class="block" data-a="su">Hesap oluştur</button><button class="block sec" data-a="toLi">Zaten hesabım var</button>`)}
+function forgotView() {authShell(`<p>Şifreni yenilemek için e-postanı yaz; bir bağlantı göndereceğiz.</p><input id="em" type="email" placeholder="E-posta" autocapitalize="off"><button class="block" data-a="fg">Bağlantı gönder</button><button class="block sec" data-a="toLi">Geri</button>`)}
+function newPwView() {authShell(`<p>Yeni şifreni yaz.</p><input id="pw" type="password" placeholder="Yeni şifre (en az 6 karakter)" autocomplete="new-password"><button class="block" data-a="npw">Kaydet ve gir</button>`)}
+function profileView(pre = {}) {authShell(`<p><b>Son bir adım:</b> profilini oluştur.</p><input id="nm" placeholder="Ad Soyad" maxlength="60" value="${esc(pre.name || "")}"><input id="un" placeholder="Kullanıcı adı" autocapitalize="off" maxlength="20" value="${esc(pre.un || "")}"><textarea id="bio" rows="2" maxlength="150" placeholder="Hakkında (isteğe bağlı)">${esc(pre.bio || "")}</textarea><button class="block" data-a="mkp">Başla</button><button class="lnk" data-a="out">Çıkış yap</button>`)}
+const unOk = u => /^[a-z0-9._]{3,20}$/.test(u);
+const readForm = () => ({name: ($("#nm")?.value || "").trim(), un: ($("#un")?.value || "").trim().toLowerCase().replace(/^@/, ""), bio: ($("#bio")?.value || "").trim()});
+async function createProfile(f) {
+ if (!f.name) throw new Error("Adını yaz.");
+ if (!unOk(f.un)) throw new Error("Kullanıcı adı 3-20 karakter olmalı: küçük harf, rakam, nokta ya da alt çizgi.");
+ const {data: tk} = await sb.from("profiles").select("id").eq("un", f.un).maybeSingle();
+ if (tk && tk.id !== S.me) throw new Error("Bu kullanıcı adı alınmış.");
+ const {error} = await sb.from("profiles").insert({id: S.me, un: f.un, name: f.name, bio: f.bio});
+ if (error) throw error;
+}
+async function afterLogin(user) {
+ if (S.me === user.id && S.prof) return;
+ S.me = user.id;
+ const {data: p, error} = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
+ if (error) {root.innerHTML = `<div class="empty">${esc(ERR(error))}<br><button class="block" onclick="location.reload()">Tekrar dene</button></div>`; return}
+ if (!p) {const pend = LS.get("ob_pend", null); if (pend && pend.em === user.email) {try {await createProfile(pend); LS.del("ob_pend"); return afterLogin(user)} catch (e) {profileView(pend); return err(ERR(e))}} return profileView()}
+ S.prof = p; S.P[p.id] = p; LS.del("ob_pend"); await startApp();
+}
+
+/* ---------- veri ve canlı güncellemeler ---------- */
+async function loadAll() {
+ const day = new Date(now() - 864e5).toISOString();
+ const [pr, fo, st, ch, re] = await Promise.all([sb.from("profiles").select("*"), sb.from("follows").select("*"), sb.from("stories").select("*").gt("created_at", day), sb.from("chats").select("*"), sb.from("reels").select("*").order("created_at", {ascending: false}).limit(100)]);
+ for (const r of [pr, fo, st, ch, re]) if (r.error) throw r.error;
+ S.P = {}; pr.data.forEach(p => S.P[p.id] = p); S.FO = fo.data; S.ST = {}; st.data.forEach(s => S.ST[s.uid] = s); S.C = {}; ch.data.forEach(c => S.C[c.id] = c); S.R = re.data;
+ S.prof = S.P[S.me] || S.prof;
+}
+let rq = 0;
+const rf = () => {if (rq) return; rq = requestAnimationFrame(() => {rq = 0; refresh()})};
+function refresh() {
+ if (!S.prof) return;
+ if (S.cur) {chatHead(); return}
+ if (S.tab === "reels" && !S.view) {reelCounts(); return}
+ const a = document.activeElement; if (a && /INPUT|TEXTAREA/.test(a.tagName) && root.contains(a)) {if (S.tab === "search" && !S.view) results(); return}
+ render();
+}
+function onDb(table, p) {
+ const n = p.new, o = p.old, ev = p.eventType;
+ if (table === "profiles") {if (ev === "DELETE") delete S.P[o.id]; else S.P[n.id] = n; if (n && n.id === S.me) S.prof = n}
+ else if (table === "follows") {S.FO = S.FO.filter(f => !(f.follower === (n?.follower ?? o.follower) && f.followee === (n?.followee ?? o.followee))); if (ev !== "DELETE") S.FO.push(n)}
+ else if (table === "stories") {if (ev === "DELETE") delete S.ST[o.uid]; else S.ST[n.uid] = n}
+ else if (table === "chats") {
+  if (ev === "DELETE" || (n && !(n.members || []).includes(S.me))) {delete S.C[(n || o).id]; if (S.cur && S.cur.id === (n || o).id) {closeChat(); toast("Bu sohbetten çıkarıldın.")}}
+  else {const old = S.C[n.id]; S.C[n.id] = n; const l = n.last; if (l && l.u !== S.me && (!old || !old.last || ts(old.last.at) < ts(l.at)) && !(S.cur && S.cur.id === n.id)) toast(`${P(l.u).name}: ${l.k === "img" ? "Resim gönderdi" : l.k === "inv" ? "Satranç daveti" : l.x}`)}}
+ else if (table === "reels") {if (ev === "DELETE") S.R = S.R.filter(r => r.id !== o.id); else {const i = S.R.findIndex(r => r.id === n.id); if (i >= 0) S.R[i] = n; else S.R.unshift(n)}}
+ rf();
+}
+function subscribe() {
+ if (dbCh) sb.removeChannel(dbCh);
+ dbCh = sb.channel("orbit-db");
+ for (const t of ["profiles", "follows", "stories", "chats", "reels"]) dbCh.on("postgres_changes", {event: "*", schema: "public", table: t}, p => onDb(t, p));
+ dbCh.subscribe(st => {if (st === "CHANNEL_ERROR" || st === "TIMED_OUT") console.warn("canlı bağlantı:", st)});
+ if (onCh) sb.removeChannel(onCh);
+ onCh = sb.channel("orbit-online", {config: {presence: {key: S.me}}});
+ onCh.on("presence", {event: "sync"}, () => {S.online = new Set(Object.keys(onCh.presenceState())); rf()});
+ onCh.subscribe(st => {if (st === "SUBSCRIBED" && CF.act) onCh.track({at: now()})});
+}
+async function startApp() {
+ root.innerHTML = `<div class="spin-s"></div>`;
+ try {await loadAll()} catch (e) {root.innerHTML = `<div class="empty">${esc(ERR(e))}<br><button class="block" onclick="location.reload()">Tekrar dene</button></div>`; return}
+ subscribe(); S.tab = "home"; S.view = null; render();
+}
+function stopApp() {for (const c of [dbCh, onCh, chatCh]) if (c) sb.removeChannel(c); dbCh = onCh = chatCh = null; Object.assign(S, {me: null, prof: null, P: {}, FO: [], ST: {}, C: {}, R: [], cur: null, view: null, msgs: []})}
+
+/* ---------- ekranlar ---------- */
+const bar = (title, extra = "") => `<div class="top"><button class="ib" data-a="bk" aria-label="Geri">${I("back")}</button><b>${esc(title)}</b>${extra}</div>`;
+function render() {
+ if (!S.prof) return;
+ const k = S.tab, v = S.view; let top, body;
+ if (v?.k === "set") {top = bar("Ayarlar"); body = vSet()}
+ else if (v?.k === "edit") {top = bar("Profili düzenle"); body = vEdit()}
+ else if (v?.k === "prof") {top = bar("@" + P(v.u).un); body = vProf(v.u)}
+ else if (v?.k === "list") {top = bar(v.t === "fo" ? "Takipçiler" : "Takip edilenler"); body = vList(v.u, v.t)}
+ else {top = `<div class="top">${LOGO(28)}<span class="wm">orbit</span><span class="sp"></span>${k === "home" ? `<button class="ib" data-a="orbi" aria-label="Orbi">${I("spark")}</button><button class="ib" data-a="grp" aria-label="Yeni grup">${I("group")}</button>` : ""}${k === "reels" ? `<button class="ib" data-a="rup" aria-label="Spark yükle">${I("plus")}</button>` : ""}${k === "me" ? `<button class="ib" data-a="set" aria-label="Ayarlar">${I("menu")}</button>` : ""}</div>`;
+  body = k === "home" ? vHome() : k === "search" ? vSearch() : k === "reels" ? vReels() : vProf(S.me)}
+ const un = Object.values(S.C).some(unread);
+ root.innerHTML = top + `<div class="main" id="mn">${body}</div>` + (v ? "" : `<div class="nav">${[["home", "home", "Orbit"], ["search", "search", "Keşfet"], ["reels", "reel", "Spark"], ["me", "user", "Ben"]].map(([a, i, l]) => `<button data-a="tab" data-v="${a}" class="${k === a ? "on" : ""}" aria-label="${l}">${I(i, 22)}<span>${l}</span>${a === "home" && un && k !== "home" ? `<i class="dot"></i>` : ""}</button>`).join("")}</div>`);
+ if (!v && k === "reels") reelObs();
+ if (!v && k === "search") results();
+}
+function vStories() {
+ const mine = storyOf(S.me), ids = [...new Set([...following(S.me), ...Object.values(S.C).flatMap(c => c.members || [])])].filter(u => u !== S.me && storyOf(u));
+ return `<div class="st"><div data-a="${mine ? "sv" : "sadd"}" data-v="${esc(S.me)}">${mine ? `<span class="rg">${av(S.me, 56)}</span>` : `<span class="add">${av(S.me, 60)}<i>+</i></span>`}Hikâyen</div>${ids.map(u => `<div data-a="sv" data-v="${esc(u)}"><span class="rg">${av(u, 56)}</span>${esc(P(u).name)}</div>`).join("")}</div>`;
+}
+function vHome() {
+ const cl = Object.values(S.C).sort((a, b) => ts(b.updated_at) - ts(a.updated_at));
+ const ids = [...new Set([...cl.filter(c => !c.is_group).map(chatOther), ...following(S.me)])].filter(u => u && u !== S.me && S.P[u]).slice(0, 8), R = 104;
+ const ring = ids.map((u, i) => {const a = i / ids.length * 6.2832; return `<div class="rn" style="left:${145 + Math.cos(a) * R - 25}px;top:${145 + Math.sin(a) * R - 25}px" data-a="dm" data-v="${esc(u)}"><div class="cs">${av(u, 50)}</div></div>`}).join("");
+ return `<div class="pad" style="padding-bottom:0"><div class="hi">Selam, ${esc((S.prof.name || "").split(" ")[0])}</div><div class="mut">Çevren seni bekliyor</div></div>${vStories()}<div class="orb"><div class="spin">${ring}</div><div class="ctr" data-a="tab" data-v="me">${av(S.me, 70)}</div></div><div class="gt">Mesajlar</div>` +
+  (cl.map(c => {const l = c.last, pv = !l ? "Henüz mesaj yok" : (c.is_group ? (l.u === S.me ? "Sen" : P(l.u).name.split(" ")[0]) + ": " : l.u === S.me ? "Sen: " : "") + (l.k === "img" ? "Resim" : l.k === "inv" ? "Satranç daveti" : l.x);
+   return `<div class="cd${unread(c) ? " un" : ""}" data-a="open" data-v="${esc(c.id)}">${c.is_group ? `<div class="gav">${I("group")}</div>` : av(chatOther(c), 48)}<div class="t"><b>${esc(chatName(c))}</b><div class="mut">${esc(pv)}${l ? " · " + ago(ts(l.at)) : ""}</div></div></div>`}).join("") || `<div class="empty">Halkadan birine dokun ya da Keşfet'ten arkadaşını bul ve yaz.</div>`);
+}
+const urow = u => `<div class="row" data-a="pv" data-v="${esc(u)}">${av(u, 46)}<div class="t"><b>${esc(P(u).name)}</b><div class="mut">@${esc(P(u).un)}</div></div>${u !== S.me ? `<button class="${iFollow(u) ? "sec" : ""}" data-a="fl" data-v="${esc(u)}" style="padding:8px 14px">${iFollow(u) ? "Takipte" : "Takip et"}</button>` : ""}</div>`;
+const vSearch = () => `<div class="pad"><input id="q" placeholder="Ad ya da @kullanıcı adı ara" value="${esc(S.q)}" autocomplete="off"></div><div id="res"></div>`;
+function results() {const q = S.q.trim().toLocaleLowerCase("tr").replace(/^@/, ""), e = $("#res"); if (!e) return;
+ const l = Object.values(S.P).filter(p => p.id !== S.me && (!q || (p.name || "").toLocaleLowerCase("tr").includes(q) || (p.un || "").includes(q))).sort((a, b) => iFollow(a.id) - iFollow(b.id) || (a.name || "").localeCompare(b.name || "", "tr"));
+ e.innerHTML = (q ? "" : `<div class="gt">Orbit'teki herkes</div>`) + (l.map(p => urow(p.id)).join("") || `<div class="empty">Kimse bulunamadı.</div>`)}
+function vProf(u) {
+ const p = P(u), me = u === S.me, rs = S.R.filter(r => r.uid === u);
+ return `<div class="pad"><div style="display:flex;gap:18px;align-items:center">${av(u, 84)}<div class="stat"><div><b>${rs.length}</b>spark</div><div data-a="lst" data-v="fo" data-u="${esc(u)}"><b>${followers(u).length}</b>takipçi</div><div data-a="lst" data-v="fi" data-u="${esc(u)}"><b>${following(u).length}</b>takip</div></div></div>
+ <p style="margin:12px 0 2px"><b>${esc(p.name)}</b> <span class="mut">@${esc(p.un)}</span></p><div style="white-space:pre-wrap">${esc(p.bio || "")}</div>
+ ${me ? `<div class="seg" style="margin-top:10px"><button class="sec" data-a="edit">Profili düzenle</button><button class="sec" data-a="rup">${"Spark yükle"}</button></div>` : `<div class="seg" style="margin-top:10px"><button data-a="fl" data-v="${esc(u)}" class="${iFollow(u) ? "sec" : ""}">${iFollow(u) ? "Takipte" : "Takip et"}</button><button class="sec" data-a="dm" data-v="${esc(u)}">Mesaj</button></div>`}</div>
+ ${rs.length ? `<div class="gr">${rs.map(r => `<video src="${esc(vidOk(r.url))}#t=0.5" muted playsinline preload="metadata" data-a="rgo" data-v="${r.id}"></video>`).join("")}</div>` : `<div class="empty">${me ? "İlk Spark'ını yükle." : "Henüz Spark yok."}</div>`}`;
+}
+const vList = (u, t) => {const l = t === "fo" ? followers(u) : following(u); return l.filter(x => S.P[x]).map(urow).join("") || `<div class="empty">Liste boş.</div>`};
+function vEdit() {const p = S.prof; return `<div class="pad" style="text-align:center">${av(S.me, 96)}<div><button class="sec" data-a="ph" style="margin-top:8px">Fotoğrafı değiştir</button>${imgOk(p.ph) ? ` <button class="sec" data-a="phx">Kaldır</button>` : ""}</div></div><div class="pad" style="padding-top:0"><label class="lb">Ad Soyad</label><input id="nm" value="${esc(p.name)}" maxlength="60"><label class="lb">Kullanıcı adı</label><input id="un" value="${esc(p.un)}" maxlength="20" autocapitalize="off"><label class="lb">Hakkında</label><textarea id="bio" rows="3" maxlength="150">${esc(p.bio || "")}</textarea><button class="block" data-a="save">Kaydet</button></div>`}
+const swR = (k, t) => `<div class="st2"><span>${t}</span><button class="sw${CF[k] ? " on" : ""}" data-a="tg" data-v="${k}" aria-pressed="${!!CF[k]}" aria-label="${t}"></button></div>`;
+function vSet() {
+ const tb = (v, i, l) => `<button class="${CF.theme === v ? "" : "sec"}" data-a="th" data-v="${v}" aria-label="${l}">${I(i, 20)}</button>`;
+ return `<div class="pad"><div class="gp"><div class="row" data-a="edit" style="padding:12px 0">${av(S.me, 48)}<div class="t"><b>${esc(S.prof.name)}</b><div class="mut">@${esc(S.prof.un)}</div></div></div></div>
+ <div class="gp"><div class="gt">Görünüm</div><div class="st2"><div class="seg" style="flex:1">${tb("light", "sun", "Açık")}${tb("dark", "moon", "Koyu")}${tb("auto", "auto", "Otomatik")}</div></div>
+ <div class="st2"><span>Renk</span><span style="display:flex;gap:8px">${ACC.map((a, i) => `<button class="cdot${CF.ac === i ? " on" : ""}" style="background:${a[1]}" data-a="ac" data-v="${i}" aria-label="Renk ${i + 1}"></button>`).join("")}</span></div>
+ <div class="st2"><span>Yazı boyutu</span><span class="seg">${[14, 15, 17].map(n => `<button class="${CF.fs === n ? "" : "sec"}" data-a="fs" data-v="${n}" style="padding:6px 12px;font-size:${n}px">A</button>`).join("")}</span></div>${swR("mo", "Animasyonlar")}</div>
+ <div class="gp"><div class="gt">Sohbet ve gizlilik</div>${swR("seen", "Görüldü bilgisi")}${swR("typ", "Yazıyor göstergesi")}${swR("ent", "Enter ile gönder")}${swR("act", "Çevrimiçi durumu")}</div>
+ <div class="gp"><div class="gt">Güvenlik</div><input id="np" type="password" placeholder="Yeni şifre (en az 6 karakter)" autocomplete="new-password"><button class="sec block" data-a="pw" style="margin-bottom:10px">Şifreyi değiştir</button></div>
+ <button class="sec block" data-a="out">Çıkış yap</button><button class="red block" data-a="del">Hesabı sil</button><p class="mut" style="text-align:center;margin-top:16px">Orbit · Kadraj'ın yedeği</p></div>`;
+}
+
+/* ---------- Spark (videolar) ---------- */
+function vReels() {
+ if (!S.R.length) return `<div class="empty" style="padding-top:30vh">Henüz Spark yok.<br><button class="block" data-a="rup">İlk Spark'ı yükle</button></div>`;
+ return `<div class="rl" id="rl">${S.R.map(r => `<div class="rv" data-id="${r.id}"><video src="${esc(vidOk(r.url))}" loop playsinline preload="metadata" ${S.muted ? "muted" : ""} data-a="rmu"></video><button class="mute" data-a="rmu" aria-label="Ses">${I(S.muted ? "mute" : "vol", 20)}</button><div class="ri"><b data-a="pv" data-v="${esc(r.uid)}">@${esc(P(r.uid).un)}</b><div>${esc(r.caption || "")}</div></div><div class="ra"><button data-a="rl" data-v="${r.id}" aria-label="Beğen">${I("heart", 24, (r.likes || []).includes(S.me) ? "f" : "")}</button><span data-rc="${r.id}">${(r.likes || []).length}</span>${r.uid === S.me ? `<button data-a="rdel" data-v="${r.id}" aria-label="Sil">${I("trash", 20)}</button>` : ""}</div></div>`).join("")}</div>`;
+}
+function reelObs() {
+ const io = new IntersectionObserver(es => es.forEach(e => {const v = e.target; if (e.isIntersecting) {v.muted = S.muted; v.play().catch(() => {})} else v.pause()}), {threshold: .6});
+ document.querySelectorAll(".rv video").forEach(v => io.observe(v));
+ if (S.rgo) {const el = document.querySelector(`.rv[data-id="${S.rgo}"]`); S.rgo = null; if (el) el.scrollIntoView()}
+}
+function reelCounts() {
+ const ids = [...document.querySelectorAll(".rv")].map(e => +e.dataset.id).join();
+ if (ids !== S.R.map(r => r.id).join()) {const y = $("#rl")?.scrollTop || 0; render(); const rl = $("#rl"); if (rl) rl.scrollTop = y; return}
+ for (const r of S.R) {const c = document.querySelector(`[data-rc="${r.id}"]`); if (c) c.textContent = (r.likes || []).length; const b = document.querySelector(`[data-a="rl"][data-v="${r.id}"]`); if (b) b.innerHTML = I("heart", 24, (r.likes || []).includes(S.me) ? "f" : "")}
+}
+async function uploadReel() {
+ const f = await pick("video/*"); if (!f) return;
+ if (f.size > 95e6) return toast("Video 95 MB'tan küçük olmalı.");
+ const cap = (prompt("Spark açıklaması (isteğe bağlı)", "") || "").slice(0, 100);
+ toast("Yükleniyor…");
+ try {
+  const fd = new FormData(); fd.append("file", f); fd.append("upload_preset", CL.preset);
+  const r = await fetch(`https://api.cloudinary.com/v1_1/${CL.cloud}/video/upload`, {method: "POST", body: fd}); const j = await r.json();
+  if (!j.secure_url) throw new Error(j.error?.message || "yükleme");
+  const {error} = await sb.from("reels").insert({url: j.secure_url, caption: cap}); if (error) throw error;
+  toast("Spark yayında"); S.tab = "reels"; S.view = null; const {data} = await sb.from("reels").select("*").order("created_at", {ascending: false}).limit(100); if (data) S.R = data; render();
+ } catch (e) {toast(ERR(e))}
+}
+
+/* ---------- hikâyeler ---------- */
+function viewStory(u) {
+ const s = storyOf(u); if (!s) return;
+ const o = document.createElement("div"); o.className = "sv"; o.id = "sv";
+ o.innerHTML = `<div class="pgb"><i></i></div><img src="${imgOk(s.img)}" alt=""><div class="sh">${av(u, 32)}<b style="flex:1">${esc(P(u).name)}</b><span class="mut" style="color:#fffa">${ago(ts(s.created_at))}</span>${u === S.me ? `<button class="ib" data-a="sdel" aria-label="Sil">${I("trash", 20)}</button>` : ""}<button class="ib" data-a="sx" aria-label="Kapat">${I("x", 22)}</button></div>`;
+ document.body.append(o); clearTimeout(S.stm); S.stm = setTimeout(closeStory, 5200);
+}
+function closeStory() {clearTimeout(S.stm); $("#sv")?.remove()}
+
+/* ---------- sohbet ---------- */
+function chatHead() {
+ const c = S.cur && S.C[S.cur.id]; if (!c) return;
+ const h = $("#chh"); if (!h) return;
+ const o = chatOther(c); h.innerHTML = `${c.is_group ? `<div class="gav" style="width:36px;height:36px">${I("group", 18)}</div>` : av(o, 36)}<div style="flex:1;min-width:0"><b style="display:block">${esc(chatName(c))}</b><span class="mut">${c.is_group ? (c.members || []).length + " kişi" : CF.act && S.online.has(o) ? "Çevrimiçi" : "@" + esc(P(o).un)}</span></div>`;
+}
+async function openDM(u) {
+ const key = [S.me, u].sort().join("_");
+ let c = Object.values(S.C).find(x => x.dm_key === key);
+ if (!c) {
+  const {data, error} = await sb.from("chats").insert({members: [S.me, u], dm_key: key}).select().single();
+  if (error) {const r = await sb.from("chats").select("*").eq("dm_key", key).maybeSingle(); if (!r.data) return toast(ERR(error)); c = r.data} else c = data;
+  S.C[c.id] = c;
+ }
+ openChat(c.id);
+}
+async function openChat(id) {
+ const c = S.C[id]; if (!c) return;
+ const back = S.cur ? S.cur.back : {tab: S.tab, view: S.view}; closeChat(true); S.view = null; S.cur = {id, back}; S.msgs = []; S.seen = {}; S.typing = {}; S.game = null; S.pc = 0;
+ root.innerHTML = `<div class="top"><button class="ib" data-a="bk" aria-label="Geri">${I("back")}</button><div id="chh" style="display:flex;gap:10px;align-items:center;flex:1;min-width:0"></div>${c.is_group ? `<button class="ib" data-a="gmenu" aria-label="Grup">${I("more")}</button>` : ""}</div><div class="msgs" id="ms"><div class="spin-s" style="margin:20vh auto"></div></div>
+ <div class="bar"><div id="pm"><button data-a="img">${I("img")}Resim</button><button data-a="inv">${I("pawn")}Satranç daveti</button></div><button class="ib" data-a="pl" aria-label="Ekle">${I("plus", 26)}</button><textarea id="in" rows="1" placeholder="Mesaj yaz…" maxlength="2000"></textarea><button class="ib" data-a="send" aria-label="Gönder">${I("send", 26)}</button></div>`;
+ chatHead();
+ const [m, sn, g] = await Promise.all([sb.from("messages").select("*").eq("chat_id", id).order("id", {ascending: false}).limit(150), sb.from("seen").select("*").eq("chat_id", id), sb.from("games").select("*").eq("chat_id", id).maybeSingle()]);
+ if (!S.cur || S.cur.id !== id) return;
+ S.msgs = (m.data || []).reverse(); (sn.data || []).forEach(x => S.seen[x.uid] = x); S.game = g.data ? g.data.state : null; S.pc = S.msgs.length;
+ chatCh = sb.channel("chat-" + id);
+ chatCh.on("postgres_changes", {event: "*", schema: "public", table: "messages", filter: `chat_id=eq.${id}`}, p => {
+   if (p.eventType === "DELETE") S.msgs = S.msgs.filter(x => x.id !== p.old.id);
+   else {const i = S.msgs.findIndex(x => x.id === p.new.id); if (i >= 0) S.msgs[i] = p.new; else {S.msgs.push(p.new); delete S.typing[p.new.uid]}}
+   drawMsgs(); markSeen()})
+  .on("postgres_changes", {event: "*", schema: "public", table: "seen", filter: `chat_id=eq.${id}`}, p => {if (p.new) S.seen[p.new.uid] = p.new; drawMsgs()})
+  .on("postgres_changes", {event: "*", schema: "public", table: "games", filter: `chat_id=eq.${id}`}, p => {S.game = p.new ? p.new.state : null; board()})
+  .on("broadcast", {event: "typ"}, ({payload}) => {if (!payload || payload.u === S.me) return; S.typing[payload.u] = now(); drawMsgs(); setTimeout(drawMsgs, 4200)})
+  .subscribe();
+ drawMsgs(true); markSeen();
+}
+function closeChat(silent) {if (chatCh) sb.removeChannel(chatCh); chatCh = null; $("#ch")?.remove(); if (S.cur) {S.rd[S.cur.id] = now(); LS.set("ob_rd", S.rd); if (!silent && S.cur.back) {S.tab = S.cur.back.tab; S.view = S.cur.back.view}} S.cur = null; if (!silent) render()}
+function markSeen() {
+ const id = S.cur?.id, l = S.msgs[S.msgs.length - 1]; if (!id) return;
+ S.rd[id] = now(); LS.set("ob_rd", S.rd);
+ if (!CF.seen || !l || l.uid === S.me || document.hidden) return;
+ if (ts(S.seen[S.me]?.at) >= ts(l.created_at)) return;
+ const at = new Date(Math.max(now(), ts(l.created_at))).toISOString(); S.seen[S.me] = {uid: S.me, at};
+ sb.from("seen").upsert({chat_id: id, uid: S.me, at}).then(() => {});
+}
+document.addEventListener("visibilitychange", () => {if (!document.hidden) markSeen()});
+function drawMsgs(first) {
+ const m = $("#ms"); if (!m || !S.cur) return;
+ const c = S.C[S.cur.id], g = c?.is_group, nb = first || m.scrollHeight - m.scrollTop - m.clientHeight < 140;
+ const sn = {}; Object.values(S.seen).forEach(s => {if (s.uid === S.me) return; let k = -1; S.msgs.forEach((x, i) => {if (ts(x.created_at) <= ts(s.at)) k = i}); if (k >= 0 && CF.seen) (sn[k] = sn[k] || []).push(s.uid)});
+ const ty = CF.typ ? Object.entries(S.typing).filter(([u, t]) => now() - t < 4000).map(([u]) => u) : [];
+ m.innerHTML = S.msgs.map((x, i) => {const me = x.uid === S.me, lk = x.likes || [], nw = i >= S.pc ? " n" : "";
+  const name = g && !me && (i === 0 || S.msgs[i - 1].uid !== x.uid) ? `<small>${esc(P(x.uid).name)}</small>` : "";
+  const b = x.kind === "inv" ? `<div class="b iv${nw}">${I("pawn", 22)}<div>${esc(P(x.uid).name)} satranç daveti gönderdi</div><button data-a="chs" data-v="${x.id}">Oyna</button></div>`
+   : `<div class="b${nw}" data-m="${x.id}">${name}${x.kind === "img" && imgOk(x.img) ? `<img src="${x.img}" alt="" data-a="zoom">` : esc(x.body)}<span class="hz${lk.length ? " on" : ""}" data-a="lk" data-v="${x.id}">${I("heart", 13, lk.includes(S.me) ? "f" : "")}${lk.length > 1 ? lk.length : ""}</span></div>`;
+  return `<div class="mr${me ? " me" : ""}">${me ? "" : av(x.uid, 26)}${b}</div>` + (sn[i] ? `<div class="sn">${sn[i].map(u => av(u, 14)).join("")}</div>` : "")}).join("") +
+  (ty.length ? `<div class="mr">${av(ty[0], 26)}<div class="b ty"><i></i><i></i><i></i></div></div>` : "") + (S.msgs.length ? "" : `<div class="empty">İlk mesajı sen yaz.</div>`);
+ S.pc = S.msgs.length; if (nb) m.scrollTop = m.scrollHeight;
+}
+async function sendText() {
+ const i = $("#in"), x = i.value.trim(); if (!x || !S.cur) return; i.value = ""; grow(i);
+ const {error} = await sb.from("messages").insert({chat_id: S.cur.id, body: x});
+ if (error) {toast(ERR(error)); if (!i.value) i.value = x}
+}
+const grow = t => {t.style.height = "auto"; t.style.height = Math.min(120, t.scrollHeight + 2) + "px"};
+let typT = 0;
+function typing() {if (!CF.typ || !chatCh || now() - typT < 2000) return; typT = now(); chatCh.send({type: "broadcast", event: "typ", payload: {u: S.me}})}
+
+/* ---------- satranç (sohbette) ---------- */
+const PC = {k: "♚︎", q: "♛︎", r: "♜︎", b: "♝︎", n: "♞︎", p: "♟︎"}, START = "rnbqkbnrpppppppp" + ".".repeat(32) + "PPPPPPPPRNBQKBNR";
+const isW = p => p < "a";
+function pseudo(b, f, t) {const p = b[f], q = b[t]; if (q !== "." && isW(q) === isW(p)) return false;
+ const fx = f % 8, fy = f >> 3, tx = t % 8, ty = t >> 3, dx = tx - fx, dy = ty - fy, ax = Math.abs(dx), ay = Math.abs(dy), k = p.toLowerCase();
+ const clear = () => {const sx = Math.sign(dx), sy = Math.sign(dy); for (let x = fx + sx, y = fy + sy; x !== tx || y !== ty; x += sx, y += sy) if (b[y * 8 + x] !== ".") return false; return true};
+ if (k === "n") return ax * ay === 2; if (k === "k") return ax < 2 && ay < 2 && (ax || ay); if (k === "r") return (!dx || !dy) && clear(); if (k === "b") return ax === ay && ax > 0 && clear(); if (k === "q") return (!dx || !dy || ax === ay) && (ax || ay) && clear();
+ const d = isW(p) ? -1 : 1; if (!dx) return q === "." && (dy === d || (dy === 2 * d && fy === (isW(p) ? 6 : 1) && b[(fy + d) * 8 + fx] === ".")); return ax === 1 && dy === d && q !== "."}
+const inCheck = (b, w) => {const k = b.indexOf(w ? "K" : "k"); for (let i = 0; i < 64; i++) if (b[i] !== "." && isW(b[i]) !== w && pseudo(b, i, k)) return true; return false};
+const legal = (b, f, t) => {if (b[f] === "." || !pseudo(b, f, t)) return false; const a = [...b]; a[t] = a[f]; a[f] = "."; return !inCheck(a.join(""), isW(b[f]))};
+const anyMove = (b, w) => {for (let i = 0; i < 64; i++) if (b[i] !== "." && isW(b[i]) === w) for (let j = 0; j < 64; j++) if (legal(b, i, j)) return true; return false};
+function openBoard() {if ($("#ch")) return board(); const o = document.createElement("div"); o.className = "ov"; o.id = "ch"; o.innerHTML = `<div class="chm"><div class="top" style="border:0;padding:0 0 6px"><b id="cs"></b><button class="ib" data-a="chx" aria-label="Kapat">${I("x")}</button></div><div class="bw"><div id="bd"></div></div><div id="cn" style="text-align:center"></div></div>`; document.body.append(o); S.sel = null; S.lk = undefined; board()}
+function board() {
+ const g = S.game, e = $("#bd"); if (!e) return; if (!g) {$("#cs").textContent = "Oyun yok"; e.innerHTML = ""; $("#cn").innerHTML = ""; return}
+ const fl = g.w !== S.me, pos = i => {const r = i >> 3, c = i & 7; return fl ? [7 - c, 7 - r] : [c, r]}, lm = g.lm || [], key = lm.join(), an = key && S.lk !== undefined && key !== S.lk; S.lk = key;
+ const N = [...Array(64).keys()], lg = S.sel != null ? N.filter(j => legal(g.b, S.sel, j)) : [], ck = !g.win && inCheck(g.b, g.t === "w"), kp = ck ? g.b.indexOf(g.t === "w" ? "K" : "k") : -1;
+ e.innerHTML = N.map(i => {const [x, y] = pos(i); return `<div class="q ${(x + y) % 2 ? "d" : "l"}${lm.includes(i) ? " lm" : ""}${i === S.sel ? " s" : ""}${i === kp ? " ck" : ""}" style="left:${x * 12.5}%;top:${y * 12.5}%" data-a="sq" data-v="${i}">${lg.includes(i) ? `<u class="${g.b[i] !== "." ? "cp" : ""}"></u>` : ""}</div>`}).join("") +
+  N.filter(i => g.b[i] !== ".").map(i => {const [x, y] = pos(i), p = g.b[i], [sx, sy] = an && i === lm[1] ? pos(lm[0]) : [x, y]; return `<div class="pc ${isW(p) ? "w" : "k"}" style="left:${sx * 12.5}%;top:${sy * 12.5}%" data-i="${i}" data-x="${x}" data-y="${y}">${PC[p.toLowerCase()]}</div>`}).join("");
+ if (an) requestAnimationFrame(() => requestAnimationFrame(() => {const p = $(`#bd .pc[data-i="${lm[1]}"]`); if (p) {p.style.left = p.dataset.x * 12.5 + "%"; p.style.top = p.dataset.y * 12.5 + "%"}}));
+ const nm = u => P(u).name.split(" ")[0]; $("#cs").textContent = g.win === "d" ? "Berabere" : g.win ? nm(g.win) + " kazandı" : (ck ? "Şah! " : "") + "Sıra: " + nm(g.t === "w" ? g.w : g.bl);
+ $("#cn").innerHTML = `<div class="row" style="justify-content:center;cursor:default">${av(g.w, 30)}<span class="mut">beyaz · siyah</span>${av(g.bl, 30)}</div>` + (g.win ? `<button data-a="inv">Yeni oyun daveti</button>` : "");
+}
+async function square(i) {
+ const g = S.game; if (!g || g.win) return; const w = g.t === "w"; if (S.me !== (w ? g.w : g.bl)) return; const p = g.b[i];
+ if (p !== "." && isW(p) === w) {S.sel = i; return board()}
+ if (S.sel == null) return; const f = S.sel; S.sel = null; if (!legal(g.b, f, i)) return board();
+ let n = g.b[f]; if (n === "P" && i < 8) n = "Q"; if (n === "p" && i > 55) n = "q";
+ const a = [...g.b]; a[i] = n; a[f] = "."; const b = a.join(""), win = anyMove(b, !w) ? "" : inCheck(b, !w) ? S.me : "d";
+ const st = {...g, b, t: w ? "b" : "w", lm: [f, i], win}; S.game = st; board();
+ const {error} = await sb.from("games").update({state: st, updated_at: new Date().toISOString()}).eq("chat_id", S.cur.id); if (error) {toast(ERR(error)); S.game = g; board()}
+}
+async function startGame(inv) {
+ const m = S.msgs.find(x => x.id === +inv); if (!m) return;
+ const g = S.game, live = g && !g.win;
+ if (!live && m.uid !== S.me) {const st = {b: START, t: "w", w: m.uid, bl: S.me, win: "", lm: [], inv: m.id};
+  const {error} = await sb.from("games").upsert({chat_id: S.cur.id, state: st, updated_at: new Date().toISOString()}); if (error) return toast(ERR(error)); S.game = st}
+ else if (!g) return toast("Davetin gönderildi; arkadaşın Oyna'ya basınca oyun başlar.");
+ openBoard();
+}
+
+/* ---------- Orbi (yardımcı) ---------- */
+const FAQ = [[/spark|video|reel/, "Spark alttaki menünün üçüncü sekmesi. Yüklemek için Spark sekmesinin sağ üstündeki + düğmesi ya da profilinde Spark yükle."], [/satranç|chess/, "Sohbette mesaj kutusunun yanındaki + › Satranç daveti. Arkadaşın davetteki Oyna'ya basınca tahta açılır; davet eden beyaz oynar."], [/hikaye|hikâye|story/, "Ana ekranda Hikâyen yuvarlağına dokun ve resim seç. 24 saat görünür; kendi hikâyeni açınca silebilirsin."],
+ [/ayar|tema|renk|yazı|karanlık|koyu/, "Ayarlar: Ben sekmesinin sağ üstündeki menü. Tema, renk, yazı boyutu, animasyonlar, görüldü, yazıyor, çevrimiçi ve şifre orada."], [/ara|bul|arkadaş|takip/, "Keşfet sekmesinde ad ya da @kullanıcı adıyla ara; Takip et ve Mesaj düğmeleri profilde."], [/görüldü|okundu/, "Mesajı gören kişinin küçük resmi mesajın altında çıkar. Ayarlar › Sohbet ve gizlilik'ten kapatabilirsin."],
+ [/grup/, "Ana ekranın sağ üstündeki grup düğmesiyle grup kur. Gruptan ayrılmak için grup sohbetinin sağ üstündeki üç nokta."], [/şifre|parola/, "Ayarlar › Güvenlik'ten değiştir. Unuttuysan giriş ekranında Şifremi unuttum."], [/kadraj|yedek/, "Orbit, Kadraj'ın yedeği. Kadraj'da sorun olursa burada konuşmaya devam edebilirsin. Hesaplar ayrı."], [/sil|hesap/, "Hesabını Ayarlar'ın en altındaki Hesabı sil ile silebilirsin; iki kez dokunman gerekir."]];
+const orbi = q => (FAQ.find(([r]) => r.test(q.toLocaleLowerCase("tr"))) || [0, "Bunu bilmiyorum. Spark, satranç, hikâye, ayarlar, arkadaş bulma, görüldü, grup ya da şifre hakkında sorabilirsin."])[1];
+function openOrbi() {if ($("#ob")) return; const o = document.createElement("div"); o.className = "ov"; o.id = "ob"; o.innerHTML = `<div class="chm" style="height:76vh;display:flex;flex-direction:column"><div class="top" style="border:0;padding:0 0 6px">${I("spark")}<b>Orbi</b><button class="ib" data-a="obx" aria-label="Kapat">${I("x")}</button></div><div class="msgs" id="obm"><div class="mr"><div class="b">Selam, ben Orbi. Uygulamada bir şeyin nerede olduğunu sorabilirsin.</div></div><div>${["Spark nerede?", "Satranç nasıl başlar?", "Grup nasıl kurulur?"].map(x => `<button class="chip" data-a="obq" data-v="${x}">${x}</button>`).join("")}</div></div><div class="bar" style="padding:8px 0 0"><textarea id="obi" rows="1" placeholder="Orbi'ye sor…"></textarea><button class="ib" data-a="obs" aria-label="Sor">${I("send", 26)}</button></div></div>`; document.body.append(o)}
+function askOrbi(q) {q = (q || $("#obi")?.value || "").trim(); if (!q) return; const i = $("#obi"); if (i) i.value = ""; const m = $("#obm"); m.insertAdjacentHTML("beforeend", `<div class="mr me"><div class="b">${esc(q)}</div></div><div class="mr"><div class="b">${esc(orbi(q))}</div></div>`); m.scrollTop = m.scrollHeight}
+
+/* ---------- grup ---------- */
+function groupModal() {
+ const ppl = Object.values(S.P).filter(p => p.id !== S.me).sort((a, b) => iFollow(b.id) - iFollow(a.id) || (a.name || "").localeCompare(b.name || "", "tr"));
+ const o = document.createElement("div"); o.className = "ov"; o.id = "gm"; o.innerHTML = `<div class="mod"><h3>Yeni grup</h3><input id="gn" placeholder="Grup adı" maxlength="60">${ppl.map(p => `<label class="row" style="padding:8px 0">${av(p.id, 34)}<span class="t"><b>${esc(p.name)}</b><span class="mut">@${esc(p.un)}</span></span><input type="checkbox" style="width:auto" value="${esc(p.id)}"></label>`).join("") || `<p class="mut">Önce birkaç arkadaşın Orbit'e katılsın.</p>`}<div class="seg" style="margin-top:10px"><button data-a="mkg">Oluştur</button><button class="sec" data-a="gx">Vazgeç</button></div></div>`; document.body.append(o);
+}
+
+/* ---------- tıklamalar ---------- */
+const A = {
+ toSu: signupView, toLi: loginView, toFg: forgotView,
+ async li(v, b) {const em = $("#em").value.trim(), pw = $("#pw").value; if (!em || !pw) return err("E-posta ve şifreni yaz."); LS.set("ob_rm", $("#rm").checked); busy(b, true); const {error} = await sb.auth.signInWithPassword({email: em, password: pw}); busy(b, false); if (error) err(ERR(error))},
+ async su(v, b) {const f = readForm(), em = $("#em").value.trim().toLowerCase(), pw = $("#pw").value;
+  if (!f.name) return err("Adını yaz."); if (!unOk(f.un)) return err("Kullanıcı adı 3-20 karakter olmalı: küçük harf, rakam, nokta ya da alt çizgi."); if (!/^\S+@\S+\.\S+$/.test(em)) return err("Geçerli bir e-posta yaz."); if (pw.length < 6) return err("Şifre en az 6 karakter olmalı.");
+  busy(b, true); LS.set("ob_pend", {...f, em}); LS.set("ob_rm", true);
+  const {data, error} = await sb.auth.signUp({email: em, password: pw, options: {emailRedirectTo: location.href.split("#")[0]}}); busy(b, false);
+  if (error) return err(ERR(error));
+  if (!data.session) {loginView(); $("#em").value = em; note("Hesabın açıldı. E-postana gelen doğrulama bağlantısına dokun, sonra buradan giriş yap.")}},
+ async fg(v, b) {const em = $("#em").value.trim(); if (!em) return err("E-postanı yaz."); busy(b, true); const {error} = await sb.auth.resetPasswordForEmail(em, {redirectTo: location.href.split("#")[0]}); busy(b, false); error ? err(ERR(error)) : note("Bağlantı gönderildi. E-postanı kontrol et.")},
+ async npw(v, b) {const pw = $("#pw").value; if (pw.length < 6) return err("Şifre en az 6 karakter olmalı."); busy(b, true); const {data, error} = await sb.auth.updateUser({password: pw}); busy(b, false); if (error) return err(ERR(error)); S.recover = false; toast("Şifren yenilendi"); afterLogin(data.user)},
+ async mkp(v, b) {busy(b, true); try {await createProfile(readForm()); S.prof = null; const {data} = await sb.auth.getUser(); await afterLogin(data.user)} catch (e) {busy(b, false); err(ERR(e))}},
+ async out() {stopApp(); await sb.auth.signOut(); loginView()},
+ tab(v) {S.tab = v; S.view = null; render(); $("#mn")?.scrollTo(0, 0)},
+ bk() {if (S.cur) return closeChat(); S.view = S.view?.back || null; render()},
+ set() {S.view = {k: "set"}; render()}, edit() {S.view = {k: "edit", back: S.view}; render()},
+ pv(v) {if (v === S.me) {S.view = null; S.tab = "me"} else S.view = {k: "prof", u: v, back: S.view}; closeStory(); render()},
+ lst(v, b) {S.view = {k: "list", u: b.dataset.u, t: v, back: S.view}; render()},
+ async fl(v, b) {const on = iFollow(v); b.disabled = true;
+  const r = on ? await sb.from("follows").delete().eq("follower", S.me).eq("followee", v) : await sb.from("follows").insert({follower: S.me, followee: v});
+  if (r.error) {b.disabled = false; return toast(ERR(r.error))}
+  S.FO = on ? S.FO.filter(f => !(f.follower === S.me && f.followee === v)) : [...S.FO, {follower: S.me, followee: v}]; render()},
+ dm: v => openDM(v), open: v => openChat(v),
+ send: sendText, pl() {$("#pm")?.classList.toggle("on")},
+ async img() {$("#pm")?.classList.remove("on"); const f = await pick("image/*"); if (!f || !S.cur) return; try {const d = await shrink(f, 900, 95000); const {error} = await sb.from("messages").insert({chat_id: S.cur.id, kind: "img", img: d}); if (error) throw error} catch (e) {toast(ERR(e))}},
+ async inv() {$("#pm")?.classList.remove("on"); $("#ch")?.remove(); const {error} = await sb.from("messages").insert({chat_id: S.cur.id, kind: "inv"}); if (error) toast(ERR(error))},
+ chs: v => startGame(v), chx() {$("#ch")?.remove()}, sq: v => square(+v),
+ async lk(v) {const m = S.msgs.find(x => x.id === +v); if (!m) return; const {data, error} = await sb.rpc("toggle_msg_like", {mid: m.id}); if (error) return toast(ERR(error)); if (data) {m.likes = data; drawMsgs()}},
+ zoom(v, b) {const o = document.createElement("div"); o.className = "sv"; o.id = "sv"; o.innerHTML = `<img src="${b.src}" alt=""><div class="sh"><span class="sp"></span><button class="ib" data-a="sx" aria-label="Kapat">${I("x", 22)}</button></div>`; document.body.append(o)},
+ gmenu() {const c = S.C[S.cur?.id]; if (!c) return; const o = document.createElement("div"); o.className = "ov"; o.id = "gm"; o.innerHTML = `<div class="mod"><h3>${esc(c.title || "Grup")}</h3>${(c.members || []).map(u => `<div class="row" style="padding:6px 0" data-a="pv" data-v="${esc(u)}">${av(u, 32)}<span class="t"><b>${esc(P(u).name)}${u === S.me ? " (sen)" : ""}</b></span></div>`).join("")}<button class="red block" data-a="leave">Gruptan ayrıl</button><button class="sec block" data-a="gx">Kapat</button></div>`; document.body.append(o)},
+ async leave() {if (!confirm("Gruptan ayrılmak istiyor musun?")) return; const id = S.cur.id; const {error} = await sb.rpc("leave_chat", {cid: id}); if (error) return toast(ERR(error)); $("#gm")?.remove(); delete S.C[id]; closeChat(); toast("Gruptan ayrıldın")},
+ grp: groupModal, gx() {$("#gm")?.remove()},
+ async mkg(v, b) {const m = [...document.querySelectorAll("#gm input[type=checkbox]:checked")].map(x => x.value); if (!m.length) return toast("En az bir kişi seç."); b.disabled = true;
+  const {data, error} = await sb.from("chats").insert({members: [S.me, ...m], is_group: true, title: $("#gn").value.trim() || "Grup"}).select().single(); b.disabled = false; if (error) return toast(ERR(error)); $("#gm")?.remove(); S.C[data.id] = data; openChat(data.id)},
+ async sadd() {const f = await pick("image/*"); if (!f) return; try {toast("Yükleniyor…"); const img = await shrink(f, 1080, 150000); const {data, error} = await sb.from("stories").upsert({uid: S.me, img, created_at: new Date().toISOString()}).select().single(); if (error) throw error; S.ST[S.me] = data; toast("Hikâyen paylaşıldı"); render()} catch (e) {toast(ERR(e))}},
+ sv: v => viewStory(v), sx: closeStory,
+ async sdel() {const {error} = await sb.from("stories").delete().eq("uid", S.me); if (error) return toast(ERR(error)); delete S.ST[S.me]; closeStory(); render(); toast("Hikâyen silindi")},
+ rup: uploadReel, rgo(v) {S.rgo = v; S.tab = "reels"; S.view = null; render()},
+ rmu() {S.muted = !S.muted; document.querySelectorAll(".rv video").forEach(v => v.muted = S.muted); document.querySelectorAll(".rv .mute").forEach(b => b.innerHTML = I(S.muted ? "mute" : "vol", 20))},
+ async rl(v) {const r = S.R.find(x => x.id === +v); if (!r) return; const {data, error} = await sb.rpc("toggle_reel_like", {rid: r.id}); if (error) return toast(ERR(error)); if (data) {r.likes = data; reelCounts()}},
+ async rdel(v) {if (!confirm("Bu Spark silinsin mi?")) return; const {error} = await sb.from("reels").delete().eq("id", +v); if (error) return toast(ERR(error)); S.R = S.R.filter(r => r.id !== +v); render()},
+ async ph() {const f = await pick("image/*"); if (!f) return; try {const ph = await shrink(f, 240, 50000); const {error} = await sb.from("profiles").update({ph}).eq("id", S.me); if (error) throw error; S.prof = S.P[S.me] = {...S.prof, ph}; render()} catch (e) {toast(ERR(e))}},
+ async phx() {const {error} = await sb.from("profiles").update({ph: null}).eq("id", S.me); if (error) return toast(ERR(error)); S.prof = S.P[S.me] = {...S.prof, ph: null}; render()},
+ async save(v, b) {const f = readForm(); if (!f.name) return toast("Adını yaz."); if (!unOk(f.un)) return toast("Kullanıcı adı 3-20 karakter: küçük harf, rakam, nokta ya da alt çizgi."); b.disabled = true;
+  const {data, error} = await sb.from("profiles").update({name: f.name, un: f.un, bio: f.bio}).eq("id", S.me).select().single(); b.disabled = false; if (error) return toast(ERR(error)); S.prof = S.P[S.me] = data; toast("Kaydedildi"); S.view = S.view?.back || null; render()},
+ th(v) {CF.theme = v; saveCF(); render()}, ac(v) {CF.ac = +v; saveCF(); render()}, fs(v) {CF.fs = +v; saveCF(); render()},
+ tg(v) {CF[v] = CF[v] ? 0 : 1; saveCF(); if (v === "act" && onCh) CF.act ? onCh.track({at: now()}) : onCh.untrack(); render()},
+ async pw(v, b) {const n = $("#np").value; if (n.length < 6) return toast("Şifre en az 6 karakter olmalı."); b.disabled = true; const {error} = await sb.auth.updateUser({password: n}); b.disabled = false; if (error) return toast(ERR(error)); $("#np").value = ""; toast("Şifren değişti")},
+ async del(v, b) {if (!S.dq) {S.dq = 1; toast("Hesabın ve bütün mesajların silinecek. Emin isen tekrar dokun."); setTimeout(() => S.dq = 0, 4000); return} b.disabled = true; const {error} = await sb.rpc("delete_me"); if (error) {b.disabled = false; return toast(ERR(error))} stopApp(); await sb.auth.signOut(); loginView(); note("Hesabın silindi.")},
+ orbi: openOrbi, obx() {$("#ob")?.remove()}, obs: () => askOrbi(), obq: v => askOrbi(v)
+};
+document.addEventListener("click", e => {const x = e.target.closest("[data-a]"); if (!x) {if (!e.target.closest("#pm,[data-a=pl]")) $("#pm")?.classList.remove("on"); return} const f = A[x.dataset.a]; if (f) {e.preventDefault(); f(x.dataset.v, x)}});
+document.addEventListener("keydown", e => {
+ if (e.key === "Enter" && !e.shiftKey && e.target.id === "in" && CF.ent) {e.preventDefault(); sendText()}
+ else if (e.key === "Enter" && !e.shiftKey && e.target.id === "obi") {e.preventDefault(); askOrbi()}
+ else if (e.key === "Enter" && ["em", "pw"].includes(e.target.id) && $("[data-a=li]")) {e.preventDefault(); $("[data-a=li]").click()}
+ else if (e.key === "Escape") {if ($("#sv")) closeStory(); else if ($("#ch")) $("#ch").remove(); else if ($("#ob")) $("#ob").remove(); else if ($("#gm")) $("#gm").remove()}});
+document.addEventListener("input", e => {const t = e.target; if (t.id === "q") {S.q = t.value; results()} else if (t.id === "in") {grow(t); typing()}});
+document.addEventListener("focusout", () => setTimeout(() => {const a = document.activeElement; if (!(a && /INPUT|TEXTAREA/.test(a.tagName)) && S.prof && !S.cur && S.tab !== "reels") rf()}, 80));
+
+/* ---------- açılış ---------- */
+function boot() {
+ if (!window.ORBIT_FAKE && (!SUPA_URL || !SUPA_KEY)) {root.innerHTML = `<div class="au"><div class="acn">${LOGO(64)}<div class="wm big">orbit</div><p>Kurulum bekleniyor: index.html'in başındaki SUPA_URL ve SUPA_KEY alanlarına Supabase bilgilerini yaz.</p></div></div>`; return}
+ sb = window.ORBIT_FAKE || supabase.createClient(SUPA_URL, SUPA_KEY, {auth: {storage: store, persistSession: true, autoRefreshToken: true, detectSessionInUrl: true}});
+ sb.auth.onAuthStateChange((ev, session) => setTimeout(() => {
+  if (ev === "PASSWORD_RECOVERY") {S.recover = true; return newPwView()}
+  if (S.recover) return;
+  if (session?.user) afterLogin(session.user); else if (ev === "SIGNED_OUT" || ev === "INITIAL_SESSION") {stopApp(); if (!$(".au [data-a=li]")) loginView()}
+ }, 0));
+}
+boot();
+</script>
+</body>
+</html>
