@@ -4,7 +4,7 @@
    Ekranlar: giriş (kullanıcı adı ya da e-posta + şifre; ad → e-posta k_mail), sohbet listesi, sohbet, yeni sohbet.
    Kadraj'ın genel adlarını (esc, I, toast, cidFor, cleanText, ago, now, LS, EMBED_CFG, FBV, initialsAv) doğrudan kullanır.
    Eşleme denetimi: normal modda kaydedilen kadraj_acil_map'teki Supabase kimliği k_user'dakiyle uyuşmayan hesap "doğrulanmamış" sayılır, mesajları gösterilmez.
-   Sunucu dönüşü: 45 sn'de bir Firestore REST (5xx değilse ayakta) ve gerekirse gstatic yoklanır; dönünce üstte "Kadraj'a dön". */
+   Sunucu dönüşü: 45 sn'de bir Firestore REST (5xx değilse ayakta) ve gerekirse gstatic yoklanır; dönünce üstte "Firebase'e dön". */
 (() => {
 "use strict";
 const A = {sb: null, why: "", me: null, U: {}, C: {}, L: {}, un: {}, cur: null, msgs: [], ch: null, chk: 0, up: false, v: "list"};
@@ -55,7 +55,7 @@ const nm = k => (A.U[k] && A.U[k].name) || "Bilinmeyen";
 const avSrc = k => {const u = A.U[k]; return u && typeof u.av === "string" && u.av.startsWith("data:image/") ? u.av : initialsAv(nm(k), k)};
 const avImg = (k, s) => `<img class="ax-av${s ? " ax-s" : ""}" alt="" src="${esc(avSrc(k))}">`;
 const chatName = c => c.cid === "meydan" ? "Meydan" : c.grp ? (c.name || "Grup") : nm((c.members || []).find(x => x !== A.me.kuid) || A.me.kuid);
-const errTr = e => {const m = String((e && e.message) || e || ""); return /Invalid login/i.test(m) ? "Şifre yanlış ya da bu hesap acil mod için hazırlanmamış." : /fetch|network|Failed/i.test(m) ? "Sunucuya ulaşılamadı. İnternetini kontrol et." : /rate|too many/i.test(m) ? "Çok fazla deneme oldu, biraz bekle." : "Olmadı" + (m ? ": " + m : ".")};
+const errTr = e => {const m = String((e && e.message) || e || ""); return /Invalid login/i.test(m) ? "Şifre yanlış ya da bu hesap Supabase için hazırlanmamış." : /fetch|network|Failed/i.test(m) ? "Sunucuya ulaşılamadı. İnternetini kontrol et." : /rate|too many/i.test(m) ? "Çok fazla deneme oldu, biraz bekle." : "Olmadı" + (m ? ": " + m : ".")};
 
 async function open(o) {
   A.why = (o && o.why) || ""; A.sb = await acSb(); if (!A.sb) throw new Error("Supabase yok");
@@ -68,14 +68,14 @@ async function open(o) {
 /* ---------- giriş ---------- */
 function login(msg) {
   stopCh();
-  root().innerHTML = `<div class="ax-ah"><h1>Kadraj</h1><span class="ax-chip">Acil mod</span></div><div class="ax-bd"><div class="ax-nt">Kadraj'ın sunucusuna şu an ulaşılamıyor. Acil modda sohbetlerine devam edebilirsin; mesajların sunucu dönünce Kadraj'a taşınır.</div>
+  root().innerHTML = `<div class="ax-ah"><h1>Kadraj</h1><span class="ax-chip">Supabase</span></div><div class="ax-bd"><div class="ax-nt">Firebase bağlantısı koptu, Supabase ile devam ediliyor. Giriş yap, sohbetlerin burada sürsün; mesajların Firebase dönünce Kadraj'a taşınır.</div>
   <form class="ax-fm" id="acL"><input id="acU" autocomplete="username" autocapitalize="off" placeholder="Kullanıcı adı ya da e-posta" value="${esc(LS.get("kadraj_last_login", "") || "")}"><input id="acP" type="password" autocomplete="current-password" placeholder="Kadraj şifren"><button class="ax-btn" id="acB">Giriş yap</button><div class="ax-er" id="acE" role="status">${esc(msg || "")}</div></form></div>`;
   q("#acL").onsubmit = async e => {
     e.preventDefault(); const id = q("#acU").value.trim(), pw = q("#acP").value, er = q("#acE"), b = q("#acB"); if (!id || !pw) {er.textContent = "Kullanıcı adını ve şifreni yaz."; return}
     b.disabled = true; er.textContent = "";
     try {
       let email = id.includes("@") ? id.toLowerCase() : null;
-      if (!email) {const r = await A.sb.rpc("k_mail", {u: id.replace(/^@/, "")}); if (r.error) throw r.error; email = r.data; if (!email) {b.disabled = false; er.textContent = "Bu hesap acil mod için hazırlanmamış."; return}}
+      if (!email) {const r = await A.sb.rpc("k_mail", {u: id.replace(/^@/, "")}); if (r.error) throw r.error; email = r.data; if (!email) {b.disabled = false; er.textContent = "Bu hesap Supabase için hazırlanmamış."; return}}
       const r = await A.sb.auth.signInWithPassword({email, password: pw}); if (r.error) throw r.error;
       await start(r.data.session);
     } catch (x) {b.disabled = false; er.textContent = errTr(x)}
@@ -92,7 +92,7 @@ async function start(session) {
   A.U = {}; A.bad = new Set();
   for (const x of u.data) {if (map[x.kuid] && map[x.kuid] !== x.sb) {A.bad.add(x.kuid); continue} A.U[x.kuid] = x}
   A.me = u.data.find(x => x.sb === sbid) || null;
-  if (!A.me) {await A.sb.auth.signOut({scope: "local"}).catch(() => {}); return login("Bu hesap acil mod için hazırlanmamış. Kadraj sunucusu dönünce Ayarlar › Uygulama › Acil mod'dan hazırlayabilirsin.")}
+  if (!A.me) {await A.sb.auth.signOut({scope: "local"}).catch(() => {}); return login("Bu hesap Supabase için hazırlanmamış. Firebase dönünce Ayarlar › Uygulama › Supabase yedeği'nden hazırlayabilirsin.")}
   A.U[A.me.kuid] = A.me;
   A.C = {}; for (const x of c.data) A.C[x.cid] = x;
   A.L = {}; for (const x of m.data) if (!A.L[x.cid] && !A.bad.has(x.kuid)) A.L[x.cid] = x;
@@ -128,12 +128,12 @@ async function checkUp() {
     }
   } catch {ok = false}
   if (!ok) return;
-  A.up = true; const h = q(".ax-ah .ax-chip"); if (h) {h.textContent = "Sunucu döndü"; h.classList.add("ax-up")}
-  if (!q("#acUp")) {const d = document.createElement("div"); d.className = "ax-nt ax-up"; d.id = "acUp"; d.innerHTML = `<span>Kadraj sunucusu geri geldi.</span><button class="ax-btn" data-ac="back">Kadraj'a dön</button>`; const b = q(".ax-bd") || q(".ax-ms"); if (b) b.parentNode.insertBefore(d, b)}
+  A.up = true; const h = q(".ax-ah .ax-chip"); if (h) {h.textContent = "Firebase döndü"; h.classList.add("ax-up")}
+  if (!q("#acUp")) {const d = document.createElement("div"); d.className = "ax-nt ax-up"; d.id = "acUp"; d.innerHTML = `<span>Firebase bağlantısı geri geldi.</span><button class="ax-btn" data-ac="back">Firebase'e dön</button>`; const b = q(".ax-bd") || q(".ax-ms"); if (b) b.parentNode.insertBefore(d, b)}
 }
 
 /* ---------- ekranlar ---------- */
-const head = (title, back, extra = "") => `<div class="ax-ah">${back ? `<button class="ax-ib" data-ac="list" aria-label="Geri">${I("back")}</button>` : ""}<h1>${esc(title)}</h1><span class="ax-chip${A.up ? " ax-up" : ""}">${A.up ? "Sunucu döndü" : "Acil mod"}</span>${extra}</div>${A.up ? `<div class="ax-nt ax-up" id="acUp"><span>Kadraj sunucusu geri geldi.</span><button class="ax-btn" data-ac="back">Kadraj'a dön</button></div>` : ""}`;
+const head = (title, back, extra = "") => `<div class="ax-ah">${back ? `<button class="ax-ib" data-ac="list" aria-label="Geri">${I("back")}</button>` : ""}<h1>${esc(title)}</h1><span class="ax-chip${A.up ? " ax-up" : ""}">${A.up ? "Firebase döndü" : "Supabase"}</span>${extra}</div>${A.up ? `<div class="ax-nt ax-up" id="acUp"><span>Firebase bağlantısı geri geldi.</span><button class="ax-btn" data-ac="back">Firebase'e dön</button></div>` : ""}`;
 function list() {
   A.v = "list"; A.cur = null;
   const cs = Object.values(A.C).filter(c => c.cid !== "meydan" && (c.members || []).includes(A.me.kuid)).sort((a, b) => ts((A.L[b.cid] || b).at) - ts((A.L[a.cid] || a).at));
@@ -141,15 +141,15 @@ function list() {
     const o = (c.members || []).find(x => x !== A.me.kuid) || A.me.kuid;
     return `<button class="ax-row${unread(c.cid) ? " ax-un" : ""}" data-ac="open" data-v="${esc(c.cid)}">${c.cid === "meydan" || c.grp ? `<span class="ax-gi">${I(c.cid === "meydan" ? "globe" : "users")}</span>` : avImg(o)}<span class="ax-t"><b>${esc(chatName(c))}</b><small>${esc(pv)}${l ? " · " + ago(ts(l.at)) : ""}</small></span></button>`};
   root().innerHTML = head("Kadraj", false, `<button class="ax-ib" data-ac="out" aria-label="Çıkış">${I("logout")}</button>`) +
-    `<div class="ax-bd"><div class="ax-nt">Kadraj'ın sunucusuna şu an ulaşılamıyor. Sohbetlerin burada sürüyor; eski mesajlar burada görünmez, acil mesajların sunucu dönünce Kadraj'a taşınır.</div>
+    `<div class="ax-bd"><div class="ax-nt">Firebase bağlantısı koptu, Supabase ile devam ediliyor. Eski mesajlar burada görünmez; burada yazdıkların Firebase dönünce Kadraj'a taşınır.</div>
     ${kid() ? "" : row(A.C.meydan || {cid: "meydan", grp: true, at: 0})}
-    <div class="ax-sh">Sohbetler</div>${cs.map(row).join("") || `<div class="ax-em">Acil modda sohbet yok.</div>`}
+    <div class="ax-sh">Sohbetler</div>${cs.map(row).join("") || `<div class="ax-em">Supabase'de sohbet yok.</div>`}
     ${kid() ? "" : `<div style="padding:12px 14px"><button class="ax-btn ax-sec" data-ac="new" style="width:100%">Yeni sohbet</button></div>`}</div>`;
 }
 function people() {
   A.v = "people";
   const us = Object.values(A.U).filter(u => u.kuid !== A.me.kuid && !u.child).sort((a, b) => (a.name || "").localeCompare(b.name || "", "tr"));
-  root().innerHTML = head("Yeni sohbet", true) + `<div class="ax-bd">${us.map(u => `<button class="ax-row" data-ac="dm" data-v="${esc(u.kuid)}">${avImg(u.kuid)}<span class="ax-t"><b>${esc(u.name || "?")}</b><small>@${esc(u.un || "")}</small></span></button>`).join("") || `<div class="ax-em">Acil mod için hazırlanmış başka kimse yok.</div>`}</div>`;
+  root().innerHTML = head("Yeni sohbet", true) + `<div class="ax-bd">${us.map(u => `<button class="ax-row" data-ac="dm" data-v="${esc(u.kuid)}">${avImg(u.kuid)}<span class="ax-t"><b>${esc(u.name || "?")}</b><small>@${esc(u.un || "")}</small></span></button>`).join("") || `<div class="ax-em">Supabase için hazırlanmış başka kimse yok.</div>`}</div>`;
 }
 async function dm(k) {
   const cid = cidFor(A.me.kuid, k);
@@ -181,7 +181,7 @@ function drawMsgs(first) {
   m.innerHTML = A.msgs.map((x, i) => {const me = x.kuid === A.me.kuid, prev = A.msgs[i - 1], first_ = !prev || prev.kuid !== x.kuid;
     const img = typeof x.img === "string" && x.img.startsWith("data:image/") ? `<img alt="" src="${esc(x.img)}">` : "";
     return `<div class="ax-mr${me ? " ax-me" : ""}">${me ? "" : first_ || !many ? avImg(x.kuid, 1) : `<span style="width:28px;flex:none"></span>`}<div class="ax-b">${many && !me && first_ ? `<small>${esc(nm(x.kuid))}</small>` : ""}${img}${esc(x.text || "")}<time>${ago(ts(x.at))}</time></div></div>`}).join("")
-    || `<div class="ax-em">Acil modda henüz mesaj yok. İlk mesajı sen yaz.</div>`;
+    || `<div class="ax-em">Supabase'de henüz mesaj yok. İlk mesajı sen yaz.</div>`;
   if (atEnd) m.scrollTop = m.scrollHeight;
   for (const im of m.querySelectorAll("img")) if (!im.complete) im.addEventListener("load", () => {if (atEnd) m.scrollTop = m.scrollHeight}, {once: true});
 }
