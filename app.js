@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60806,APP_VER="6.8.6";
+const APP_V=60807,APP_VER="6.8.7";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -203,13 +203,13 @@ let rulesWarned=false;function rulesWarn(){if(rulesWarned)return;rulesWarned=tru
 /* çevrimiçi durumu ve dürtme: Firestore ile */
 function FsRoom(){const{F,db}=FB;let state={typing:null},hb=null,docs=[],cb=null,pokeH=null;const handled=new Set();
  const push=()=>S.uid&&S.authed&&!S.guest&&document.visibilityState!=="hidden"?(KU.w++,kuW("presence","w"),F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:state.typing||null,at:Date.now(),seen:Date.now(),hide:settings.showActive===false}).catch(()=>{})):Promise.resolve();
- const fire=()=>{const vis=docs.filter(d=>!d.hide||d.uid===S.uid);S.lastSeen=Object.fromEntries(vis.map(d=>[d.uid,Math.max(d.seen||0,d.at||0)]));if(!cb)return;const lim=Date.now()-95e3;cb({peers:vis.filter(d=>d.at>lim).map(d=>({presence:{uid:d.uid,typing:d.typing},isMe:d.uid===S.uid}))})};
+ const fire=()=>{const vis=docs.filter(d=>!d.hide||d.uid===S.uid);S.lastSeen=Object.fromEntries(vis.map(d=>[d.uid,Math.max(d.seen||0,d.at||0)]));if(!cb)return;const lim=Date.now()-200e3;cb({peers:vis.filter(d=>d.at>lim).map(d=>({presence:{uid:d.uid,typing:d.typing},isMe:d.uid===S.uid}))})};
  setInterval(fire,30e3);
  const off=()=>{if(S.uid&&S.authed&&!S.guest)KU.w++,kuW("presence","w"),F.setDoc(F.doc(db,"presence/"+S.uid),{uid:S.uid,typing:null,at:0,seen:Date.now()}).catch(()=>{})};
  addEventListener("pagehide",off);
  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")push();else off()});
  return{
-  presence(p){Object.assign(state,p);if(!hb)hb=setInterval(push,40e3);return push()},
+  presence(p){Object.assign(state,p);if(!hb)hb=setInterval(push,90e3);return push()},
   onPeers(f){cb=f},
   listen(){const u1=DB.watchCol("presence",d=>{docs=d;fire()},{limit:300});
    const u2=DB.watchCol("pokes",ds=>{for(const d of ds){if(handled.has(d.id))continue;handled.add(d.id);if(d.at>S.bootAt-5000&&pokeH)pokeH({data:d});DB.del("pokes/"+d.id).catch(()=>{})}},{where:["to","==",S.uid],limit:50});
@@ -7947,7 +7947,7 @@ HOOKS.after.push(r=>{if(r==="settings")try{sgBuild();if(S.setQ)kbFilterSettings(
    POST_STEP (60) ile başlar, aşağı kaydırınca (#main dibine 1500 px kala) 60'ar büyür. Eski paylaşım gösterebilen sayfalar
    (paylaşım, Klaket, profil, bildirimler, kişiler, Keşfet araması) ve sohbette dilim dışında kalan paylaşım mesajı POST_MAX'a (300) çıkarır.
    S.postLim o anki sınır, S.postsEnd daha fazlası yok demek; abonelik postsSub ile yeniden kurulur (eskisi yenisi gelince kapanır). */
-const POST_STEP=60,POST_MAX=300;let POSTS_UN=null;
+const POST_STEP=30,POST_MAX=300;let POSTS_UN=null;
 /* 6.5: kişinin kendi paylaşımları (en çok 300) dilimden bağımsız ayrıca izlenir: dilim dışındaki eski paylaşımına gelen beğeni/yorum bildirimi,
    Bildirimler ve Akış'taki "ilk paylaşımını yap" afişi doğru çalışsın. S.posts = kendi paylaşımları + dilim (dilim önceliklidir). */
 let POSTS_WIN={},MYP={},MYP_UN=null,MYP_UID=null;

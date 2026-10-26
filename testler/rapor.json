@@ -1,7 +1,7 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.6",
- "at": "2026-10-26T18:36:30+00:00",
+ "ver": "6.8.7",
+ "at": "2026-10-26T18:54:09+00:00",
  "note": "Kadraj testi 47 adım geçti. Supabase yedeği sahte Supabase istemcisiyle 360 ve 390 px'te 36 denetimden geçti; Supabase kuralları yerel Postgres'te 31 + 48 denetimden geçti. Gerçek Supabase projesi henüz kurulmadı (yedek/ayar.js boş), bu yüzden gerçek sunucuyla denenmedi.",
  "items": [
   {
@@ -83,6 +83,11 @@
    "ad": "Yönetici › Firebase: gerçek Firebase'de",
    "ok": false,
    "not": "bu ortamdan Firebase'e erişilemiyor; sahibinin telefonunda denenmeli"
+  },
+  {
+   "ad": "Okuma azaltma: çevrimiçi 90 sn, Akış ilk 30 paylaşım",
+   "ok": true,
+   "not": "Kadraj testi 47 adım geçti; gerçek okuma düşüşü panelde birkaç günde görülecek"
   }
  ]
 }
