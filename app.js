@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60805,APP_VER="6.8.5";
+const APP_V=60806,APP_VER="6.8.6";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -9016,7 +9016,7 @@ async function fbuUse(){if(S.mode!=="cloud"){FBU.useErr="Yerel modda sayılmaz."
  const {key,start}=fbuPt(),y=fbuPt(start-36e5).key;
  try{const [a,b]=await Promise.all([DB.get("games/ku-"+key),DB.get("games/ku-"+y)]);const x=kuDelta();
   FBU.use={r:((a&&a.r)||0)+x.r,w:((a&&a.w)||0)+x.w,d:((a&&a.dl)||0)+x.d,ms:((a&&a.ms)||0)+x.ms,md:((a&&a.md)||0)+x.md,wc:(a&&a.wc)||{},y:b?{r:b.r||0,w:b.w||0,d:b.dl||0,ms:b.ms||0,md:b.md||0}:null};FBU.useAt=now()}
- catch(e){FBU.useErr="Sayılar okunamadı: "+((e&&(e.code||e.message))||e)}FBU.busy="";fbuRedraw();fbuMsgs()}
+ catch(e){FBU.useErr="Sayılar okunamadı: "+((e&&(e.code||e.message))||e)}FBU.busy="";fbuRedraw()}
 /* 6.8.5: sunucudaki gerçek mesaj sayısı: bütün sohbetler (chats) + her birinde sıfırlanmadan beri yazılmış mesajlar (getCountFromServer; sohbet başına 1 okuma) */
 async function fbuMsgs(){if(S.mode!=="cloud"||!FB||!FB.F||!FB.F.getCountFromServer||FBU.mbusy)return;const F=FB.F,db=FB.db,{start}=fbuPt();FBU.mbusy=1;FBU.mErr="";fbuRedraw();
  try{const cs=await F.getDocsFromServer(F.collection(db,"chats"));KU.r+=Math.max(1,cs.size);
@@ -9026,43 +9026,37 @@ async function fbuMsgs(){if(S.mode!=="cloud"||!FB||!FB.F||!FB.F.getCountFromServ
   FBU.msg={n:rows.reduce((a,r)=>a+r.n,0),rows,at:now()}}catch(e){FBU.mErr="Mesajlar sayılamadı: "+((e&&(e.code||e.message))||e)}FBU.mbusy=0;fbuRedraw()}
 function fbuBar(lb,n,lim){const p=Math.min(100,n/lim*100),c=p>=90?"hot":p>=70?"warn":"on";
  return`<div class="fbu-q"><div class="fbu-ql"><b>${esc(lb)}</b><span>${fbuNum(n)} / ${fbuNum(lim)}</span></div><div class="fbu-bar ${c}"><i style="width:${p.toFixed(1)}%"></i></div><small>Kalan: <b>${fbuNum(Math.max(0,lim-n))}</b> (%${Math.max(0,100-p).toFixed(0)})</small></div>`}
-function fbuHtml(){const pid=fbuPid(),{reset}=fbuPt(),left=reset-now(),h=Math.floor(left/36e5),m=Math.floor(left%36e5/6e4);
- const st=FBU.busy==="ping"?`<span class="fbu-dot"></span>Ölçülüyor…`:FBU.ok===true?`<span class="fbu-dot on"></span><b>Bağlı</b> · yanıt ${FBU.ms} ms${FBU.ms>1500?" (yavaş)":""}`:FBU.ok===false?`<span class="fbu-dot hot"></span><b>Bağlantı yok</b> · ${esc(FBU.err)}`:`<span class="fbu-dot"></span>${esc(FBU.err||"Ölçülmedi")}`;
- const inc=FBU.incErr?`Okunamadı. <a href="https://status.firebase.google.com/" target="_blank" rel="noopener">Durum sayfasını aç</a>`:FBU.inc==null?"Bakılıyor…":FBU.inc.length?FBU.inc.map(x=>`<div class="fbu-inc">${I("info")}<span><b>${esc(x.p||"Firebase")}</b>${esc(x.t)}</span></div>`).join(""):`<span class="fbu-dot on"></span>Bilinen sorun yok`;
- const u=FBU.use;
- const use=u?`${fbuBar("Okuma",u.r,FBU_LIM.r)}${fbuBar("Yazma",u.w,FBU_LIM.w)}${fbuBar("Silme",u.d,FBU_LIM.d)}
-  ${u.y?`<small class="muted">Dün: ${fbuNum(u.y.r)} okuma, ${fbuNum(u.y.w)} yazma, ${fbuNum(u.y.d)} silme.</small>`:""}
-  <small class="muted">${esc(new Date(FBU.useAt).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}))} itibarıyla. Kadraj'ın kendi sayımı: telefonlar gerçek Firebase işlemlerini sayıp 3 dakikada bir ekler, 6.8.4'e geçmeden önceki işlemler yok. Firebase'in kendi sayısı biraz farklı olabilir.</small>`
-  :FBU.busy==="use"?`<p class="muted">Sayılar okunuyor…</p>`:"";
+function fbuHtml(){const pid=fbuPid(),{reset}=fbuPt(),u=FBU.use,trT=new Date(reset).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"});
+ const st=FBU.busy==="ping"?`<span class="fbu-dot"></span>Bakılıyor…`:FBU.ok===true?`<span class="fbu-dot on"></span><b>Firebase çalışıyor</b><span class="muted">· ${FBU.ms>1500?"yavaş":"hızlı"} (${FBU.ms} ms)</span>`:FBU.ok===false?`<span class="fbu-dot hot"></span><b>Firebase'e ulaşılamıyor</b>`:`<span class="fbu-dot"></span>${esc(FBU.err||"Bakılmadı")}`;
+ const inc=FBU.inc&&FBU.inc.length?FBU.inc.map(x=>`<div class="fbu-inc">${I("info")}<span><b>Google'da sorun var: ${esc(x.p||"Firebase")}</b>${esc(x.t)}</span></div>`).join(""):"";
+ const bol=u&&u.r<FBU_LIM.r*.7&&u.w<FBU_LIM.w*.7&&u.d<FBU_LIM.d*.7;
  return`<div class="fbu">
- <div class="fbu-s"><h4>Bağlantı</h4><div class="fbu-r">${st}</div>
-  <div class="fbu-kv"><span>Oturum</span><b>${FB&&FB.auth&&FB.auth.currentUser?"Açık":"Yok"}</b><span>Proje</span><b>${esc(pid||"-")}</b><span>SDK</span><b>${esc(FBV)}</b><span>Son ölçüm</span><b>${FBU.at?esc(ago(FBU.at)):"-"}</b><span>Supabase yedeği</span><b>${!acCfgV?"Kurulmadı":FBU.sb==null?"-":FBU.sb?"Hazır":"Ulaşılamıyor"}</b></div>
-  <button class="btn ghost sm" data-fbu="ping" ${FBU.busy?"disabled":""}>${I("rotate")}Yeniden ölç</button></div>
- <div class="fbu-s"><h4>Google genel durumu</h4><div class="fbu-r">${inc}</div></div>
- <div class="fbu-s"><h4>Bugünkü ücretsiz hak</h4><p class="muted">Ücretsiz planda (Spark) günde 50.000 okuma, 20.000 yazma, 20.000 silme. ${h} sa ${m} dk sonra (Türkiye saatiyle ${esc(new Date(reset).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"}))}) sıfırlanır.</p>
-  ${use}${FBU.useErr?`<p class="fbu-err">${esc(FBU.useErr)}</p>`:""}
-  <button class="btn ghost sm" data-fbu="use" ${FBU.busy?"disabled":""}>${I("rotate")}Sayıları yenile</button>
-  <a class="fbu-lnk" href="https://console.firebase.google.com/project/${encodeURIComponent(pid)}/firestore/databases/-default-/usage" target="_blank" rel="noopener">Firebase konsolunda kesin sayı ${I("next")}</a></div>
- ${fbuMsgHtml()}${fbuLiveHtml()}</div>`}
-/* canlı: bu telefonun son 60 sn'deki yazmaları (bellekten, Firebase'e ek okuma/yazma yok), özelliğe göre; bölüm açıkken 3 sn'de bir yenilenir */
-function fbuLiveHtml(){const t=Date.now(),l=KU.log.filter(x=>t-x[0]<60e3),by={};for(const x of l)by[x[1]]=(by[x[1]]||0)+1;
- const top=Object.entries(by).sort((a,b)=>b[1]-a[1]);const u=FBU.use,all=u&&u.wc?Object.entries(u.wc).sort((a,b)=>b[1]-a[1]).slice(0,8):[];
- return`<div class="fbu-s" id="fbuLive"><h4>Kim yazıyor? (canlı)</h4>
-  <div class="fbu-kv"><span>Bu telefon, son 1 dakika</span><b>${fbuNum(l.length)} yazma/silme</b></div>
-  ${top.length?`<div class="fbu-mr">${top.map(([c,n])=>`<div><span>${esc(c)}</span><b>${fbuNum(n)}</b></div>`).join("")}</div>`:`<p class="muted">Son 1 dakikada bu telefondan yazma yok.</p>`}
-  ${KU.log.length?`<small class="muted">Son yazılanlar: ${KU.log.slice(-6).reverse().map(x=>esc(x[1])+" ("+Math.round((t-x[0])/1000)+" sn önce)").join(", ")}</small>`:""}
-  ${all.length?`<h4 style="margin-top:6px">Bugün, bütün telefonlar</h4><div class="fbu-mr">${all.map(([c,n])=>`<div><span>${esc(c)}</span><b>${fbuNum(n)}</b></div>`).join("")}</div>`:""}
-  <small class="muted">presence = çevrimiçi durumu (40 sn'de bir), mesaj = sohbet mesajları, games = oyunlar ve sayaç, profiles = profil, kişisel = kayıtlı/gizli/bot sohbetleri.</small></div>`}
-setInterval(()=>{const e=$("#fbuLive");if(e&&e.isConnected&&!document.hidden)e.outerHTML=fbuLiveHtml()},3000);
-function fbuMsgHtml(){const g=FBU.msg,u=FBU.use;
- const kv=(a,b)=>`<span>${a}</span><b>${b}</b>`;
- return`<div class="fbu-s"><h4>Mesajlar (sıfırlanmadan beri)</h4>
-  ${FBU.mbusy?`<p class="muted">Sunucuda sayılıyor…</p>`:""}${FBU.mErr?`<p class="fbu-err">${esc(FBU.mErr)}</p>`:""}
-  <div class="fbu-kv">${g?kv("Sunucuda duran",fbuNum(g.n)):""}${u?kv("Gönderilen",fbuNum(u.ms))+kv("Herkesten silinen",fbuNum(u.md)):""}${u&&u.y?kv("Dün gönderilen / silinen",fbuNum(u.y.ms)+" / "+fbuNum(u.y.md)):""}</div>
-  ${g&&g.rows.length?`<div class="fbu-mr">${g.rows.slice(0,12).map(r=>`<div><span>${esc(r.nm)}</span><b>${fbuNum(r.n)}</b></div>`).join("")}</div>`:g?`<p class="muted">Bugün sunucuda yeni mesaj yok.</p>`:""}
-  <small class="muted">"Sunucuda duran" Firebase'den o an sayılır (silinenler artık sunucuda olmadığı için içinde yok). "Gönderilen" ve "Herkesten silinen" Kadraj'ın sayacından; "benden sil" yalnızca o telefonda gizler, sayılmaz.</small>
-  <button class="btn ghost sm" data-fbu="msg" ${FBU.mbusy?"disabled":""}>${I("rotate")}Mesajları yeniden say</button></div>`}
+ <div class="fbu-s"><div class="fbu-r">${st}</div>${inc}</div>
+ <div class="fbu-s"><h4>Bugün kalan hak</h4>
+  ${u?`${fbuBar("Okuma",u.r,FBU_LIM.r)}${fbuBar("Yazma",u.w,FBU_LIM.w)}${fbuBar("Silme",u.d,FBU_LIM.d)}
+   <p class="muted">${bol?"Bugün hak bol.":"Hak azalıyor."} Okumanın artması normal: Kadraj açıkken mesajları, kimin çevrimiçi olduğunu ve paylaşımları canlı izler. Türkiye saatiyle ${esc(trT)}'da sıfırlanır.</p>`
+  :FBU.busy==="use"?`<p class="muted">Bakılıyor…</p>`:""}${FBU.useErr?`<p class="fbu-err">${esc(FBU.useErr)}</p>`:""}
+  <button class="btn ghost sm" data-fbu="use" ${FBU.busy?"disabled":""}>${I("rotate")}Yenile</button></div>
+ ${u?`<div class="fbu-s"><h4>Bugün mesajlar</h4><div class="fbu-kv"><span>Gönderilen</span><b>${fbuNum(u.ms)}</b><span>Silinen</span><b>${fbuNum(u.md)}</b></div></div>`:""}
+ <details class="fbu-more" ${FBU.more?"open":""}><summary>Ayrıntılar</summary>${fbuMsgHtml()}${fbuLiveHtml()}
+  <div class="fbu-s"><div class="fbu-kv"><span>Proje</span><b>${esc(pid||"-")}</b><span>Supabase yedeği</span><b>${!acCfgV?"Kurulmadı":FBU.sb==null?"-":FBU.sb?"Hazır":"Ulaşılamıyor"}</b></div>
+   <button class="btn ghost sm" data-fbu="ping" ${FBU.busy?"disabled":""}>${I("rotate")}Bağlantıyı yeniden ölç</button>
+   <a class="fbu-lnk" href="https://console.firebase.google.com/project/${encodeURIComponent(pid)}/firestore/databases/-default-/usage" target="_blank" rel="noopener">Firebase konsolunda kesin sayı ${I("next")}</a></div></details></div>`}
+function fbuMsgHtml(){const g=FBU.msg;
+ return`<div class="fbu-s"><h4>Sohbetlere göre bugünkü mesajlar</h4>
+  ${FBU.mbusy?`<p class="muted">Sayılıyor…</p>`:""}${FBU.mErr?`<p class="fbu-err">${esc(FBU.mErr)}</p>`:""}
+  ${g?(g.rows.length?`<div class="fbu-mr">${g.rows.slice(0,12).map(r=>`<div><span>${esc(r.nm)}</span><b>${fbuNum(r.n)}</b></div>`).join("")}</div>`:`<p class="muted">Bugün mesaj yok.</p>`):""}
+  <button class="btn ghost sm" data-fbu="msg" ${FBU.mbusy?"disabled":""}>${I("chat")}${g?"Yeniden say":"Say"}</button></div>`}
+/* bu telefonun son 60 sn'deki yazmaları (bellekten, Firebase'e ek okuma/yazma yok); Ayrıntılar açıkken 3 sn'de bir yenilenir */
+const KU_NM={presence:"Çevrimiçi durumu",mesaj:"Mesajlar",chats:"Sohbet bilgisi",profiles:"Profil",meta:"Beğeni ve yorum",posts:"Paylaşım",stories:"Hikâye",pokes:"Dürtme",unames:"Kullanıcı adı",push:"Bildirim aboneliği"};
+const kuNm=c=>KU_NM[c]||(/^games \(ku\)/.test(c)?"Bu sayaç":/^games/.test(c)?"Oyunlar":/^kişisel/.test(c)?"Kişisel kayıtlar":c);
+function fbuLiveHtml(){const t=Date.now(),by={};for(const x of KU.log)if(t-x[0]<60e3){const n=kuNm(x[1]);by[n]=(by[n]||0)+1}
+ const top=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+ return`<div class="fbu-s" id="fbuLive"><h4>Bu telefon son 1 dakikada ne yazdı?</h4>
+  ${top.length?`<div class="fbu-mr">${top.map(([c,n])=>`<div><span>${esc(c)}</span><b>${fbuNum(n)}</b></div>`).join("")}</div>`:`<p class="muted">Hiçbir şey yazmadı.</p>`}</div>`}
+setInterval(()=>{const e=$("#fbuLive");if(e&&e.isConnected&&!document.hidden&&e.closest("details[open]"))e.outerHTML=fbuLiveHtml()},3000);
 function fbuWire(el){FBU.el=el;
+ const dm=el.querySelector(".fbu-more");if(dm)dm.ontoggle=()=>{FBU.more=dm.open};
  for(const b of el.querySelectorAll("[data-fbu]"))b.onclick=async e=>{e.preventDefault();const a=b.dataset.fbu;if(a==="ping")fbuPing();else if(a==="use")fbuUse();else if(a==="msg")fbuMsgs()};
  if(!FBU.at&&!FBU.busy)fbuPing();if(FBU.inc==null&&!FBU.incErr&&now()-FBU.incAt>5000)fbuInc();if(!FBU.use&&!FBU.busy&&!FBU.useErr)fbuUse()}
 try{ADM_EXTRA.push({id:"fbdurum",title:"Firebase",desc:"Bağlantı durumu ve bugünkü ücretsiz hak",icon:"globe",order:40,
