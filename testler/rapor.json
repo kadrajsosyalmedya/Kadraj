@@ -1,7 +1,7 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.2",
- "at": "2026-10-26T15:59:08+00:00",
+ "ver": "6.8.3",
+ "at": "2026-10-26T16:05:52+00:00",
  "note": "Kadraj testi 47 adım geçti. Supabase yedeği sahte Supabase istemcisiyle 360 ve 390 px'te 36 denetimden geçti; Supabase kuralları yerel Postgres'te 31 + 48 denetimden geçti. Gerçek Supabase projesi henüz kurulmadı (yedek/ayar.js boş), bu yüzden gerçek sunucuyla denenmedi.",
  "items": [
   {
@@ -73,6 +73,16 @@
    "ad": "Supabase yedeği: gerçek Supabase ile deneme",
    "ok": false,
    "not": "Supabase projesi henüz kurulmadı (yedek/ayar.js boş)"
+  },
+  {
+   "ad": "Yönetici › Firebase: bağlantı ölçümü, Google genel durumu, günlük hak çubukları",
+   "ok": true,
+   "not": "sahte Firebase, Monitoring ve Google girişiyle 360/390 px"
+  },
+  {
+   "ad": "Yönetici › Firebase: gerçek Google Cloud Monitoring ile deneme",
+   "ok": false,
+   "not": "OAuth istemci kimliği henüz yapıştırılmadı; bu ortamdan Google sunucularına erişilemiyor"
   }
  ]
 }
