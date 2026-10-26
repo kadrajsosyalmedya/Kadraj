@@ -1,68 +1,53 @@
 {
  "title": "Ajan testleri",
- "ver": "6.7.0 Günbatısı",
- "at": "25 Ekim 2026",
+ "ver": "6.8.0 Meltem",
+ "at": "26 Ekim 2026",
  "note": "Ajanlar her yayından önce bu testleri başsız tarayıcıda Kadraj'ın demo kopyasında çalıştırır. Telefon donanımına bağlı şeyler (kasma, klavye şeridi, Apple Music ve Deezer'ın gerçek sunucuları, Cloudflare köprüsü) burada ölçülemez; onları senin telefonunda denemen gerekir.",
  "items": [
   {
-   "ad": "Yeniden paylaş",
+   "ad": "Kurgu açılıyor",
    "ok": true,
-   "not": "Başkasının paylaşımında iki oklu düğme kaydetti ve yeşillendi; takip ettiğin kişinin yeniden paylaştığı paylaşım Akış'ta \"@ayse yeniden paylaştı\" etiketiyle üste taşındı; paylaşımın yeniden paylaşılınca bildirim çıktı; profilde Yeniden sekmesi."
+   "not": "Klaket oluştururken video seçilince Kurgu düğmesi çıktı; düzenleyici açıldı, önizleme çizildi, zaman şeridinde küçük resimler var, süre doğru (6 sn)."
   },
   {
-   "ad": "Kişi etiketleme",
+   "ad": "Kes ve hızlandır",
    "ok": true,
-   "not": "Fotoğraf oluştururken bir kişi etiketlendi, paylaşımda tags kaydedildi; etiketli paylaşımda adlar görünüyor, etiketlenene bildirim, profilde Etiketler sekmesi."
+   "not": "Başı %20'den, sonu %80'den kesildi (3,6 sn); 2x hızla 1,8 sn oldu."
   },
   {
-   "ad": "Koleksiyonlar",
+   "ad": "Yazı",
    "ok": true,
-   "not": "⋯ › Koleksiyona kaydet ile \"Kahveler\" oluşturuldu, paylaşım içine girdi ve kaydedildi; Kaydedilenler'de çip seçilince yalnızca o koleksiyon."
+   "not": "\"Merhaba Kadraj\" eklendi; sarı renk, kutulu stil, zıplama animasyonu seçildi; önizlemede görünüyor."
   },
   {
-   "ad": "Favoriler",
+   "ad": "Filtre, format, kapak",
    "ok": true,
-   "not": "Profil menüsünden favoriye eklendi; Akış › Favoriler'de yalnızca onun paylaşımları."
+   "not": "Filtre önizlemeleri çıktı, Sıcak seçildi; 9:16 format önizlemede doğru oranda; oynatma çizgisindeki kare kapak yapıldı."
   },
   {
-   "ad": "Kadraj kodu",
+   "ad": "Dışa aktarma",
    "ok": true,
-   "not": "Profildeki kod düğmesi QR açtı; kod ayrı bir QR okuyucuyla (jsQR) okundu ve profil bağlantısını verdi; #u= bağlantısı doğru profili açtı. Kamerayla okutma (Kod tara) telefonda denenmeli."
+   "not": "Bitti'ye basınca hazırlanıyor ekranı çıktı. Çıkan video ffprobe ile ölçüldü: 480x854 (9:16), 1,8 sn, sesli. ffmpeg ile alınan karede sarı kutulu yazı var."
   },
   {
-   "ad": "Sessiz mod",
+   "ad": "Yeniden aç ve kapat",
    "ok": true,
-   "not": "Açınca Akış'ta şerit, profilde ve telefon bildirimi tercihlerinde bitiş zamanı; uygulama içi bildirim çıkmadı; Kapat ile kapandı."
+   "not": "Tekrar Kurgu'ya basınca önceki ayarlar duruyor; değişiklik varken kapatınca onay soruyor; Bırak deyince önceki kurgu korunuyor."
   },
   {
-   "ad": "Gizli kelimeler",
+   "ad": "Paylaşım",
    "ok": true,
-   "not": "\"pizza\" eklenince gruptaki mesaj ve yorum bulanık örtüldü; Göster'e basınca açıldı, mesajın yüksekliği değişmedi."
+   "not": "Düzenlenmiş Klaket paylaşıldı; kapak seçilen kareden, süre 1,8 sn kaydedildi. 360 ve 390 px'te yan taşma yok."
   },
   {
-   "ad": "Zaman kapsülü",
+   "ad": "mp4 videolar",
    "ok": true,
-   "not": "Kilitli kapsül başkasına yalnızca kilitli kart ve kilitli ızgara karesi olarak göründü (beğeni/yorum yok); açılmış kapsül Akış'ta açılış anına taşındı; kendi kapsülünde açılış tarihi yazıyor."
-  },
-  {
-   "ad": "Günün sorusu",
-   "ok": true,
-   "not": "Akış'ta kart çıktı, yanıt kaydedildi; takip edilen kişinin yanıtı göründü, takip edilmeyenin yanıtı yalnızca sayı olarak."
-  },
-  {
-   "ad": "Hikâye çıkartmaları",
-   "ok": true,
-   "not": "Test, Geri sayım ve Bayrak eklendi; testin doğru yanıtı belgeye yazıldı; izleyici yanlış seçince yanlış kırmızı, doğru yeşil oldu ve oyu kaydedildi."
-  },
-  {
-   "ad": "29 Ekim",
-   "ok": true,
-   "not": "29 Ekim'de üst çubukta bayrak; sohbette \"Cumhuriyet Bayramımız kutlu olsun\" mesajında konfeti."
+   "not": "Bu ortamdaki test tarayıcısı mp4 (H.264) açamıyor, bu yüzden testler webm ile yapıldı. Telefondaki Chrome mp4'ü açar; telefonunda bir kez denemen iyi olur."
   },
   {
    "ad": "Önceki özellikler",
    "ok": true,
-   "not": "Kadraj testi 46 adımın hepsi geçti; sohbet akışı ölçümü önceki sürümle aynı; Akış zıplama testi 0 px; 360 ve 390 px'te yan taşma yok."
+   "not": "Kadraj testi 47 adımın hepsi ve 6.7 testleri (49) geçti."
   }
  ]
 }
