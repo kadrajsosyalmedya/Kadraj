@@ -1,8 +1,8 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.8",
- "at": "2026-10-27T17:04:31+00:00",
- "note": "Kadraj testi 47 adım geçti. Mesaj kopyalama ve köprü yeniden denemesi 360 ve 390 px'te 12 denetimden geçti. Gerçek yapay zekâ köprüsü (Cloudflare) bu ortamdan denenemedi.",
+ "ver": "6.8.9",
+ "at": "2026-10-27T17:18:29+00:00",
+ "note": "Kadraj testi 47 adım geçti. Açılış emniyeti 7 senaryoda geçti. Gerçek Firebase'le çıkış yapmışken açılış denendi; giriş yapmışken açılış sahte Firebase ile denendi (gerçek hesap açılmadı).",
  "items": [
   {
    "ad": "Kurgu açılıyor",
@@ -113,6 +113,31 @@
    "ad": "Gerçek yapay zekâ köprüsü",
    "ok": false,
    "not": "köprü adresi yalnızca Firestore'da (admin/ai) ve bu ortamdan okunamıyor; sahibi Yönetici › Yapay zekâ'dan köprü durumuna bakmalı"
+  },
+  {
+   "ad": "Açılış (gerçek Firebase, giriş yok)",
+   "ok": true,
+   "not": "3 saniyede karşılama ekranı geldi."
+  },
+  {
+   "ad": "Açılış (giriş yapmış, sahte Firebase)",
+   "ok": true,
+   "not": "2 saniyede Akış geldi; 38 saniye beklendi, uyarı kartı çıkmadı."
+  },
+  {
+   "ad": "app.js ilk denemede inmezse",
+   "ok": true,
+   "not": "Bir kez daha indirdi ve uygulama açıldı."
+  },
+  {
+   "ad": "app.js hiç inmezse",
+   "ok": true,
+   "not": "Hemen \"Kadraj açılamadı\" kartı ve Yeniden aç düğmesi çıktı."
+  },
+  {
+   "ad": "Kod hata verirse",
+   "ok": true,
+   "not": "35 saniyede kart çıktı, hatanın yazısı ve satırı görünüyor; Yeniden aç önbelleği temizleyip sayfayı yeniden açtı."
   }
  ]
 }
