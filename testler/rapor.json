@@ -1,8 +1,8 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.9",
- "at": "2026-10-27T17:18:29+00:00",
- "note": "Kadraj testi 47 adım geçti. Açılış emniyeti 7 senaryoda geçti. Gerçek Firebase'le çıkış yapmışken açılış denendi; giriş yapmışken açılış sahte Firebase ile denendi (gerçek hesap açılmadı).",
+ "ver": "6.8.10",
+ "at": "2026-10-27T17:21:22+00:00",
+ "note": "Kadraj testi 47 adım geçti. Rota'nın nedenleri ve kopyalama 13 denetimden geçti. Gerçek köprü bu ortamdan denenemedi.",
  "items": [
   {
    "ad": "Kurgu açılıyor",
@@ -138,6 +138,11 @@
    "ad": "Kod hata verirse",
    "ok": true,
    "not": "35 saniyede kart çıktı, hatanın yazısı ve satırı görünüyor; Yeniden aç önbelleği temizleyip sayfayı yeniden açtı."
+  },
+  {
+   "ad": "Rota köprü adresi yokken nedenini söyler",
+   "ok": true,
+   "not": "Ayarlar yüklenmedi / köprü kapatılmış / adres kayıtlı değil / boş yanıt durumları ayrı yazılıyor; demo modunda ek yok."
   }
  ]
 }
