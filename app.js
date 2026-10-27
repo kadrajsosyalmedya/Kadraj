@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60808,APP_VER="6.8.8";
+const APP_V=60809,APP_VER="6.8.9";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -1883,7 +1883,7 @@ const ARCH_CACHE={};
 /* 6.4.7'den beri kodun çoğu app.js'te (index.html yalnızca <script src="app.js?v=...">); arşivde ve Kadraj testinde kum havuzu
    ağa çıkamadığı için app.js indirilip sayfanın içine konur (archInline). Eski sürümlerde etiket yoktur, olduğu gibi döner. */
 async function archInline(html,get){const esc2=t=>t.replace(/<\/(script|style)/gi,"<\\/$1");
- const m=html.match(/<script src="app\.js(?:\?v=\d+)?"><\/script>/);if(m){const js=await get("app.js");html=html.replace(m[0],()=>"<script>"+esc2(js)+"<\/script>")}
+ const m=html.match(/<script src="app\.js(?:\?v=\d+)?"[^>]*><\/script>/);if(m){const js=await get("app.js");html=html.replace(m[0],()=>"<script>"+esc2(js)+"<\/script>")}
  /* 6.4.8'den beri CSS de ayrı (app.css); kum havuzunun CSP'si dış stil dosyasına izin vermez, sayfaya gömülür */
  const c=html.match(/<link rel="stylesheet" href="app\.css(?:\?v=\d+)?">/);if(c){const st=await get("app.css");html=html.replace(c[0],()=>"<style>"+st.replace(/<\/style/gi,"<\\/style")+"</style>")}
  return html}
