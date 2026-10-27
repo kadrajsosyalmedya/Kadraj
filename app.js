@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60809,APP_VER="6.8.9";
+const APP_V=60810,APP_VER="6.8.10";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -2200,15 +2200,17 @@ async function sendToBot(uid,payload){const b=BOT[uid];const k=b.key;const path=
  let msgs=[...cur,mine];S.botchats={...S.botchats,[k]:{msgs,readAt:now()}};renderMsgs();
  if(!S.guest)DB.set(path,{msgs:botSlim(msgs),readAt:now()}).catch(()=>{});
  S.botTyping=uid;renderMsgs();let reply="";
- let aiErr=null;try{reply=await botReply(b,msgs)}catch(e){console.warn(e);aiErr=e}
+ let aiErr=null;if(b.ai)try{kaiSync()}catch{}try{reply=await botReply(b,msgs)}catch(e){console.warn(e);aiErr=e}
  if(!reply){const cn=b.replies||BOT_CANNED[k]||["Merhaba!"];reply=b.ai?rotaWhy(aiErr)+fallbackRota(payload.text||""):cn[Math.floor(Math.random()*cn.length)]}
  S.botTyping=null;S.stream=null;
  msgs=[...(S.botchats[k]?.msgs||msgs),{from:uid,text:reply,at:now()}];const onScreen=S.route.name==="chat"&&S.route.params.key==="u:"+uid;S.botchats={...S.botchats,[k]:{msgs,readAt:onScreen?now():0}};
  if(!S.guest)DB.set(path,{msgs:botSlim(msgs.slice(-80)),readAt:onScreen?now():0}).catch(()=>{});
  if(onScreen)renderMsgs();else if(settings.notify)toast(`${b.name}: ${String(reply).replace(/\*\*|__|`/g,"").replace(/\s+/g," ").slice(0,70)}`,uid);scheduleRefresh()}
 /* 6.1: köprü kuruluyken hazır yanıta düşülürse Rota nedenini söyler (sahibi "Rota niye hazır cevap" dedi) */
-function rotaWhy(e){if(!kAI.url())return"";if(!kAI.ready())return"(Yapay zekâ bağlantım şu an hazır değil: "+(S.mode!=="cloud"?"demo modundasın":"oturum açılıyor, birazdan tekrar dene")+". Hazır yanıtla cevaplıyorum.)\n\n";
- const c=e&&e.code||"",m=e&&e.message||"";if(!e)return"";const why=c==="rate_limited"?(m||"bugünlük soru hakkın doldu").replace(/[.]+$/,""):c==="free_ai"?"ücretsiz yapay zekânın günlük kotası dolmuş olabilir":c==="network"?"köprüye ulaşılamadı; Cloudflare'deki Worker kapalı ya da internet zayıf olabilir":c==="crash"?"köprü açık ama bu soruda hata verdi":c==="origin"?"köprü bu adresten gelen isteği kabul etmedi":c==="timeout"?"yanıt çok uzun sürdü":c==="auth"?"oturum doğrulanamadı":m?m.replace(/[.]+$/,""):"yanıt boş geldi";
+function rotaWhy(e){if(!kAI.url()){if(S.mode!=="cloud")return"";
+  /* 6.8.10: adres yoksa nedenini söyle (yönetici verisi gelmedi ya da Yönetici › Yapay zekâ'da adres boş / kapatılmış) */
+  return!S.adm?"(Yapay zekâ ayarları henüz yüklenmedi, birazdan tekrar dene. Hazır yanıtla cevaplıyorum.)\n\n":(S.adm.ai&&S.adm.ai.at?"(Yapay zekâ köprüsü kapatılmış: Yönetici › Yapay zekâ'da adres boş. Hazır yanıtla cevaplıyorum.)\n\n":"(Yapay zekâ köprüsünün adresi kayıtlı değil: Yönetici › Yapay zekâ'dan girilmeli. Hazır yanıtla cevaplıyorum.)\n\n")}if(!kAI.ready())return"(Yapay zekâ bağlantım şu an hazır değil: "+(S.mode!=="cloud"?"demo modundasın":"oturum açılıyor, birazdan tekrar dene")+". Hazır yanıtla cevaplıyorum.)\n\n";
+ const c=e&&e.code||"",m=e&&e.message||"";if(!e)return"(Yapay zekâ boş yanıt verdi. Hazır yanıtla cevaplıyorum.)\n\n";const why=c==="rate_limited"?(m||"bugünlük soru hakkın doldu").replace(/[.]+$/,""):c==="free_ai"?"ücretsiz yapay zekânın günlük kotası dolmuş olabilir":c==="network"?"köprüye ulaşılamadı; Cloudflare'deki Worker kapalı ya da internet zayıf olabilir":c==="crash"?"köprü açık ama bu soruda hata verdi":c==="origin"?"köprü bu adresten gelen isteği kabul etmedi":c==="timeout"?"yanıt çok uzun sürdü":c==="auth"?"oturum doğrulanamadı":m?m.replace(/[.]+$/,""):"yanıt boş geldi";
  return"(Yapay zekâ köprüsü yanıt vermedi: "+why+". Hazır yanıtla cevaplıyorum.)\n\n"}
 function fallbackRota(q){for(const[re,a]of FAQ)if(re.test(q))return a;return"Şu an yapay zekâ bağlantım yok, hazır yanıtlarla çalışıyorum. Şunları sorabilirsin: nasıl kullanırım, arkadaşlarımla nasıl konuşurum, fotoğraf yüklenmiyor, Klaket, sesli mesaj, arama, hikâye, tema, şifre. Ya da “Test bildirimleri oluştur” de."}
 async function botReply(b,msgs){const sample=S.caps.sample;if(!sample)return null;const meName=me().name||"kullanıcı";
