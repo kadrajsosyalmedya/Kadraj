@@ -1,8 +1,8 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.11",
- "at": "2026-10-28T12:01:40+00:00",
- "note": "Kadraj testi 47 adım geçti. Keşif Klaketleri ve Kurgu kutucuğu 360 ve 390 px'te 19 denetimden geçti (sahte Commons yanıtıyla). Gerçek Wikimedia Commons sunucusu bu ortamdan erişilemedi.",
+ "ver": "6.8.12",
+ "at": "2026-10-28T12:36:57+00:00",
+ "note": "Kadraj testi 47 adım geçti. Keşif Klaketleri (Pexels) 360 ve 390 px'te 21 denetimden geçti (sahte Pexels yanıtıyla). Commons'ın oynamama nedeni GitHub Actions'ta gerçek isteklerle bulundu (429).",
  "items": [
   {
    "ad": "Kurgu açılıyor",
@@ -145,16 +145,6 @@
    "not": "Ayarlar yüklenmedi / köprü kapatılmış / adres kayıtlı değil / boş yanıt durumları ayrı yazılıyor; demo modunda ek yok."
   },
   {
-   "ad": "Keşif Klaketleri listesi",
-   "ok": true,
-   "not": "Sahte Commons yanıtıyla: uzun, çok kısa, küçük ve ogv videolar elendi; mp4 türevi önde; aynı video bir kez."
-  },
-  {
-   "ad": "Keşif Klaketleri Klaket sayfasında",
-   "ok": true,
-   "not": "Arkadaş Klaketlerinin arasına serpiştirildi; Akış'ta ve profilden açılan Klaketlerde yok; video oynadı; yazar ve lisans görünüyor; beğeni ve yorum çalışıyor."
-  },
-  {
    "ad": "Commons'a ulaşılamazsa",
    "ok": true,
    "not": "Saklanan liste kullanılıyor, liste yoksa Klaketler eskisi gibi; sayfa hatası yok."
@@ -165,9 +155,29 @@
    "not": "Kutucuk Klaket video ekranını açtı, video seçilince düzenleyici kendiliğinden açıldı."
   },
   {
-   "ad": "Keşif Klaketleri (gerçek Commons)",
+   "ad": "Commons videoları neden oynamadı",
+   "ok": true,
+   "not": "GitHub Actions'ta denendi: upload.wikimedia.org ilk istekten sonra 429 veriyor. Kaynak Pexels'e geçti."
+  },
+  {
+   "ad": "Keşif Klaketleri: Yönetici anahtarı",
+   "ok": true,
+   "not": "Anahtar kutusu, adımlar, Kaydet; anahtar yokken Pexels'e sorulmuyor; geçersiz anahtar hata olarak yazıyor."
+  },
+  {
+   "ad": "Keşif Klaketleri: liste ve oynatma",
+   "ok": true,
+   "not": "Uzun, yatay, çok kısa ve başka siteden adresler elendi; 720p mp4 seçildi; Klaketlerde video oynadı; çekenin adı ve Pexels yazıyor; beğeni çalışıyor; Akış'ta ve profilden açılan Klaketlerde yok."
+  },
+  {
+   "ad": "Oynamayan keşif videosu",
+   "ok": true,
+   "not": "Listeden çıkarıldı, bir sonraki Klakete geçildi."
+  },
+  {
+   "ad": "Keşif Klaketleri (gerçek Pexels)",
    "ok": false,
-   "not": "commons.wikimedia.org bu ortamdan engelli; sahibinin telefonunda Klaketler sayfasında görülmeli"
+   "not": "api.pexels.com bu ortamdan engelli; sahibi anahtarı yapıştırınca telefonunda görülmeli"
   }
  ]
 }
