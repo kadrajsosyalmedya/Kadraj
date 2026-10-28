@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60818,APP_VER="6.8.18";
+const APP_V=60819,APP_VER="6.8.19";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -1216,14 +1216,23 @@ function vibStop(){clearInterval(vibT);vibT=null;try{navigator.vibrate&&navigato
 function netBar(){let b=document.getElementById("netbar");if(navigator.onLine){if(b)b.remove();return}if(!b){b=document.createElement("div");b.id="netbar";b.className="netbar";b.textContent="İnternet bağlantısı yok. Gönderdiklerin bağlantı gelince iletilecek.";document.body.appendChild(b)}}
 addEventListener("online",netBar);addEventListener("offline",netBar);setTimeout(netBar,1500);
 
+/* 6.8.19 kurallar: DM ve grup mesajlarını yalnızca o sohbetin üyeleri okur/yazar (chats belgesindeki members). Bu yüzden yeni bir DM'de
+   önce sohbet belgesi (members ile) oluşur, sonra mesaj yazılır. Belge zaten varsa ama S.chats'te yoksa okunup üzerine yazılmaz. */
+async function dmEnsure(k,meta){if(k.type!=="dm"||S.chats[k.cid])return true;let c=null;try{c=await DB.get("chats/"+k.cid)}catch{}
+ if(c){S.chats={...S.chats,[k.cid]:c};return true}
+ const t=now(),d=meta||{members:[S.uid,k.uid].sort(),updatedAt:t,reads:{[S.uid]:t}};
+ if(!await write(()=>DB.set("chats/"+k.cid,d)))return false;S.chats={...S.chats,[k.cid]:{...d}};return true}
 async function sendMessage(key,payload){const k=keyInfo(key);if(k.type==="dm"&&!childGate(k.uid))return;if(isChild(S.uid)&&payload&&payload.text)payload={...payload,text:cleanText(payload.text)};if(k.type==="bot"){if(S.guest&&!BOT[k.uid].ai)return sendToBot(k.uid,payload);Promise.resolve(sendToBot(k.uid,payload)).catch(()=>{});return true}if(!guard())return;
  const at=now();const mid=at.toString(36)+Math.random().toString(36).slice(2,6);const msg={from:S.uid,at,...payload};if(!msg.text)delete msg.text;
  if(S.route.name==="chat"&&chatKey===k.cid){S.msgs=[...S.msgs,{id:mid,...msg}];renderMsgs()}
- if(!await write(()=>DB.set(`chats/${k.cid}/msgs/${mid}`,msg))){if(S.msgs.some(x=>x.id===mid)){S.msgs=S.msgs.filter(x=>x.id!==mid);renderMsgs()}return false}
  const preview=payload.text||(payload.mus?"Şarkı: "+String(payload.mus.t||""):payload.gpoll?"Anket: "+String(payload.gpoll.q||""):payload.once?"Tek seferlik fotoğraf":payload.post?"Bir paylaşım gönderdi":payload.img?"Fotoğraf":payload.video?"Video":payload.audio?"Sesli mesaj":payload.call?callLabel(payload.call,false):"");
+ const unsent=()=>{if(S.msgs.some(x=>x.id===mid)){S.msgs=S.msgs.filter(x=>x.id!==mid);renderMsgs()}return false};
+ const rd=S._noRead?{}:{reads:{[S.uid]:at}};
+ if(k.type==="dm"&&!S.chats[k.cid]&&!await dmEnsure(k,{members:[S.uid,k.uid].sort(),last:{text:preview,from:S.uid,at},updatedAt:at,...rd}))return unsent();
+ if(!await write(()=>DB.set(`chats/${k.cid}/msgs/${mid}`,msg)))return unsent();
  if(k.type==="meydan")await write(()=>DB.set("chats/meydan",{last:{text:preview,from:S.uid,at},updatedAt:at}),{quiet:true});
- else if(k.type==="group")await write(()=>DB.update("chats/"+k.cid,{last:{text:preview,from:S.uid,at},updatedAt:at,reads:{[S.uid]:at}}),{quiet:true});
- else{const meta={members:[S.uid,k.uid].sort(),last:{text:preview,from:S.uid,at},updatedAt:at,reads:{[S.uid]:at}};await write(()=>S.chats[k.cid]?DB.update("chats/"+k.cid,meta):DB.set("chats/"+k.cid,meta),{quiet:true})}
+ else if(k.type==="group")await write(()=>DB.update("chats/"+k.cid,{last:{text:preview,from:S.uid,at},updatedAt:at,...rd}),{quiet:true});
+ else{const meta={members:[S.uid,k.uid].sort(),last:{text:preview,from:S.uid,at},updatedAt:at,...rd};await write(()=>S.chats[k.cid]?DB.update("chats/"+k.cid,meta):DB.set("chats/"+k.cid,meta),{quiet:true})}
  if((k.type==="meydan"||k.type==="group")&&/@rota\b/i.test(payload.text||""))rotaInRoom(key,k);return true}
 async function rotaInRoom(key,k){S.botTyping="bot:rota@"+key;renderMsgs();let reply=null;
  try{const sample=S.caps.sample;if(sample){const tr=S.msgs.slice(-14).map(m=>`${P(m.from).name}: ${m.text||"[paylaşım]"}`).join("\n");const r=await sample(`${ROTA_SYS}\n\nŞu an "${k.type==="meydan"?"Meydan (herkese açık ortak sohbet)":"bir grup sohbeti"}" içindesin ve biri seni @rota diye çağırdı. Konuşma:\n${tr}\n\nRota olarak kısa (1-4 cümle) yanıt ver. Sadece yanıt metnini yaz.`,{cache:false,modelTier:"quick"});reply=(r&&r.text||"").trim()}}catch(e){console.warn(e)}
@@ -1795,8 +1804,14 @@ service cloud.firestore {
       match /cands/{c} { allow read, write: if girdi(); }
     }
     match /chats/{cid} {
-      allow read, write: if girdi();
-      match /msgs/{mid} { allow read, write: if girdi(); }
+      allow read: if girdi() && (cid == 'meydan' || yonetici() || resource == null || request.auth.uid in resource.data.members);
+      allow create: if girdi() && (cid == 'meydan' || yonetici() || request.auth.uid in request.resource.data.members);
+      allow update: if girdi() && (cid == 'meydan' || yonetici() || request.auth.uid in resource.data.members);
+      allow delete: if girdi() && (yonetici() || (cid != 'meydan' && request.auth.uid in resource.data.members));
+      match /msgs/{mid} {
+        allow read: if girdi() && (cid == 'meydan' || yonetici() || !exists(/databases/$(database)/documents/chats/$(cid)) || request.auth.uid in get(/databases/$(database)/documents/chats/$(cid)).data.members);
+        allow write: if girdi() && (cid == 'meydan' || yonetici() || request.auth.uid in get(/databases/$(database)/documents/chats/$(cid)).data.members);
+      }
     }
   }
 }`;
@@ -2664,7 +2679,7 @@ async function setSharedTheme(key,id,photo,tone){let k=null;try{k=keyInfo(key)}c
  if(id==="photo"){if(!photo)return false;ref="wp-"+k.cid;if(!await write(()=>DB.set("vchunks/"+ref,{d:photo,at,by:S.uid})))return false;wpcPut(k.cid,at,photo)}
  const nm=(me().name||me().username||"").trim();
  const theme={id,by:S.uid,at,ref:ref||null,c:id==="photo"&&kbOkHex(tone)||null};
- const ok=await write(async()=>{try{await DB.update("chats/"+k.cid,{theme})}catch(e){const c=e&&e.code;if(k.type==="dm"&&(c==="invalid_argument"||c==="not-found"))await DB.set("chats/"+k.cid,{members:[S.uid,k.uid].sort(),updatedAt:at,reads:{[S.uid]:at},theme});else throw e}});
+ const ok=await write(async()=>{if(k.type==="dm"&&!S.chats[k.cid]&&!await DB.get("chats/"+k.cid).catch(()=>null)){await DB.set("chats/"+k.cid,{members:[S.uid,k.uid].sort(),updatedAt:at,reads:{[S.uid]:at},theme});return}try{await DB.update("chats/"+k.cid,{theme})}catch(e){const c=e&&e.code;if(k.type==="dm"&&(c==="invalid_argument"||c==="not-found"))await DB.set("chats/"+k.cid,{members:[S.uid,k.uid].sort(),updatedAt:at,reads:{[S.uid]:at},theme});else throw e}});
  if(!ok)return false;
  const c=S.chats[k.cid]||{};S.chats={...S.chats,[k.cid]:{...c,theme}};
  Promise.resolve().then(()=>sendMessage(key,{text:id==="none"?`${nm} sohbet temasını kaldırdı`:`${nm} sohbet temasını “${kbThLabel(id)}” yaptı`,sys:"theme"})).catch(()=>{});
@@ -4903,9 +4918,10 @@ async function knHeart(o){try{if(!S.authed||!guard())return false;const k=keyInf
  const mid=o.mid||await knLastMid(cid,o.uid||o.from,o.at);if(!mid){toast("Mesaj bulunamadı.");return false}o.mid=mid;const t=now();vib(15);
  if(typeof chatKey!=="undefined"&&chatKey===cid&&S.msgs){S.msgs=S.msgs.map(x=>x.id===mid?{...x,likes:{...(x.likes||{}),[S.uid]:t},reacts:{...(x.reacts||{}),[S.uid]:"heart"}}:x);if(S.route.name==="chat")renderMsgs()}
  return await write(()=>DB.update(`chats/${cid}/msgs/${mid}`,{likes:{[S.uid]:t},reacts:{[S.uid]:"heart"}}),{quiet:true})}catch{return false}}
+/* 6.8.19: bildirimden yazılan yanıt "görüldü" göndermez (sahibinin isteği): sendMessage S._noRead varken reads yazmaz */
 async function knReply(o,text){text=String(text||"").trim();if(!text)return false;const mid=o.mid||await knLastMid(o.cid||keyInfo(o.key).cid,o.uid||o.from,o.at);
  const extra=mid?{reply:{mid,from:o.uid||o.from||"",text:String(o.text||"").slice(0,80)}}:{};
- const ok=await sendMessage(o.key,{text,...extra});if(ok===true){knSeen(o);return true}return false}
+ S._noRead=true;let ok;try{ok=await sendMessage(o.key,{text,...extra})}finally{S._noRead=false}return ok===true}
 /* sw.js'ten gelen eylem (telefon bildirimindeki düğmeler) */
 async function knAction(d){if(!d||!d.action||!d.key)return;if(d.at&&d.at<=KN.doneActs)return;KN.doneActs=d.at||now();
  if(!S.authed){S.pendingAct=d;return}
@@ -4974,7 +4990,7 @@ function knWire(el){const o=()=>el._o;let sy=0,sx=0,dy=0,drag=false,pid=null,mov
  const f=$(".kn-r",el);if(f){const i=$(".kn-in",f);
   i.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();el._replying=false;knKill(el)}});
   f.onsubmit=async e=>{e.preventDefault();const v=i.value.trim();if(!v)return;const sb=$(".kn-send",f);sb.disabled=true;i.disabled=true;
-   const ok=await knReply(o(),v);if(ok){el._replying=false;el.classList.add("sent");const x=$(".kn-x",el);if(x)x.textContent="Yanıtın gönderildi";f.hidden=true;setTimeout(()=>knKill(el),900)}else{sb.disabled=false;i.disabled=false;try{i.focus()}catch{}}}}}
+   const ok=await knReply(o(),v);if(ok){el._replying=false;el.classList.add("sent");const x=$(".kn-x",el);if(x)x.textContent="Yanıtın gönderildi (görüldü gitmedi)";f.hidden=true;setTimeout(()=>knKill(el),900)}else{sb.disabled=false;i.disabled=false;try{i.focus()}catch{}}}}}
 /* arka plandayken oluşan kartlar: telefon bildirimi gösterildiyse dönüşte kaldır, gösterilmediyse şimdi saymaya başla */
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState!=="visible")return;const sys=typeof Notification!=="undefined"&&Notification.permission==="granted";let oc="";try{if(S.route.name==="chat")oc=keyInfo(S.route.params.key).cid||""}catch{}for(const c of[...KN.cards]){if(c.dataset.bg){delete c.dataset.bg;if(sys||(oc&&c._o.cid===oc))knKill(c,true);else knArm(c)}}});
 /* sohbet açılınca o sohbetin kartları kapanır */
@@ -7537,7 +7553,7 @@ function schOpen(){const k=pinKey();if(!k)return;if(!S.chats[k.cid])return toast
   const at=pick||(dt.value?new Date(dt.value).getTime():0);if(!at||at<now()+60e3)return toast("En az bir dakika sonrasını seç.");
   closeLayer("sch");if(mi&&mi.value.trim()===v){mi.value="";try{cfGrow(mi,true)}catch{}try{draftSet(S.route.params.key,"")}catch{}}
   const mid=rid();const msg={from:S.uid,at,text:v,sch:1};S.msgs=[...S.msgs,{id:mid,...msg}].sort((a,b)=>a.at-b.at);renderMsgs();
-  if(await write(()=>DB.set(`chats/${k.cid}/msgs/${mid}`,msg)))toast("Zamanlandı: "+schLabel(at));else{S.msgs=S.msgs.filter(x=>x.id!==mid);renderMsgs()}}}
+  if(await dmEnsure(k)&&await write(()=>DB.set(`chats/${k.cid}/msgs/${mid}`,msg)))toast("Zamanlandı: "+schLabel(at));else{S.msgs=S.msgs.filter(x=>x.id!==mid);renderMsgs()}}}
 /* zamanı gelmemiş başkasının mesajı görünmez; zamanı gelince yeniden çizilir ve son mesaj özeti güncellenir */
 let schT=0;
 function schDue(k){const t=now();let next=Infinity;for(const m of S.msgs)if(m.sch&&m.at>t)next=Math.min(next,m.at);clearTimeout(schT);
@@ -8282,7 +8298,7 @@ function ciAct(a,key,k,paint){const c=S.chats[k.cid]||{};
   const l=sheet("cinick","Takma adlar",`<div class="form"><p class="muted" style="margin:0;font-size:.85rem">Takma adı bu sohbetteki herkes görür.</p>${mem.map(u=>`<div class="field"><label for="nk-${esc(u)}">${esc(P(u).name)}${u===S.uid?" (sen)":""} · @${esc(P(u).username)}</label><input class="in" id="nk-${esc(u)}" data-nk="${esc(u)}" maxlength="24" placeholder="Takma ad yok" value="${esc(nickOf(k.cid,u))}"></div>`).join("")}<button class="btn block" id="nkGo" type="button">Kaydet</button></div>`,{tall:mem.length>3,onClose:()=>paint()});
   $("#nkGo",l).onclick=async()=>{if(!guard())return;const cur=c.nicks||{};const ch={};for(const x of $$("[data-nk]",l)){const v=kidClean(x.value.trim()).slice(0,24);if(v!==(cur[x.dataset.nk]||""))ch[x.dataset.nk]=v}
    if(!Object.keys(ch).length)return closeLayer("cinick");const at=now();
-   const ok=await write(async()=>{try{await DB.update("chats/"+k.cid,{nicks:ch})}catch(e){const cd=e&&e.code;if(k.type==="dm"&&(cd==="invalid_argument"||cd==="not-found"))await DB.set("chats/"+k.cid,{members:[S.uid,k.uid].sort(),updatedAt:at,reads:{[S.uid]:at},nicks:ch});else throw e}});
+   const ok=await write(async()=>{if(k.type==="dm"&&!S.chats[k.cid]&&!await DB.get("chats/"+k.cid).catch(()=>null)){await DB.set("chats/"+k.cid,{members:[S.uid,k.uid].sort(),updatedAt:at,reads:{[S.uid]:at},nicks:ch});return}try{await DB.update("chats/"+k.cid,{nicks:ch})}catch(e){const cd=e&&e.code;if(k.type==="dm"&&(cd==="invalid_argument"||cd==="not-found"))await DB.set("chats/"+k.cid,{members:[S.uid,k.uid].sort(),updatedAt:at,reads:{[S.uid]:at},nicks:ch});else throw e}});
    if(!ok)return;S.chats={...S.chats,[k.cid]:{...c,nicks:{...cur,...ch}}};closeLayer("cinick");toast("Takma adlar kaydedildi");
    const nm=(me().name||me().username||"").trim();for(const[u,v]of Object.entries(ch)){const who=u===S.uid?"kendi":P(u).name+" için";sendMessage(key,{text:v?`${nm} ${who} takma adını “${v}” yaptı`:`${nm} ${who} takma adını kaldırdı`,sys:"nick"}).catch(()=>{})}
    renderTop();renderMsgs()};return}}
@@ -8968,6 +8984,7 @@ async function acBack(){const uid=S.uid;const sb=await acSb().catch(()=>null);if
  for(const cid of cids){const c=CH[cid];if(cid!=="meydan"&&!c)continue;
   const dm=c&&!c.grp&&Array.isArray(c.members)&&c.members.length===2&&c.members.includes(uid)&&cid===cidFor(c.members[0],c.members[1]);
   if(cid!=="meydan"&&!dm&&!(S.chats&&S.chats[cid]))continue;
+  if(dm&&!(S.chats&&S.chats[cid])&&!await DB.get("chats/"+cid).catch(()=>null)){const t0=now();await write(()=>DB.set("chats/"+cid,{members:[...c.members].sort(),updatedAt:t0,reads:{[uid]:t0}}),{quiet:true})}
   const ms=mine.filter(m=>m.cid===cid);let lastOk=null;
   for(const m of ms){const at=Date.parse(m.at)||now();const msg={from:uid,at,acil:1};if(m.text)msg.text=isChild(uid)?cleanText(m.text):m.text;if(m.img)msg.img=m.img;
    if(await write(()=>DB.set(`chats/${cid}/msgs/ac${m.id}`,msg),{quiet:true})){done.push(m.id);lastOk={at,text:(msg.text||"Fotoğraf").slice(0,80)}}}
