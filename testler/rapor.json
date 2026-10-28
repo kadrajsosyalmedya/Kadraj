@@ -1,9 +1,24 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.16",
- "at": "2026-10-28T16:10:00+00:00",
- "note": "Meme videoları önceden hazırlanıyor: sonraki video beklerken kurulup ilk karede duruyor. Sahte oynatıcıyla 24 denetim geçti; gerçek hız sahibinin telefonunda görülmeli.",
+ "ver": "6.8.17",
+ "at": "2026-10-28T17:20:00+00:00",
+ "note": "Orbit kaldırıldı. Kadraj'ın Supabase yedeği testi 36/36, sadeleşen veritabanı kurulumu yerel Postgres'te 31/31 kural denetimi geçti.",
  "items": [
+  {
+   "ad": "Supabase yedeği Orbit olmadan çalışıyor",
+   "ok": true,
+   "not": "ac.js 36 denetim"
+  },
+  {
+   "ad": "Sade kurulum.sql iki kez çalıştırılabiliyor",
+   "ok": true,
+   "not": "Yerel Postgres"
+  },
+  {
+   "ad": "Yedek güvenlik kuralları",
+   "ok": true,
+   "not": "31 denetim"
+  },
   {
    "ad": "Sonraki meme önceden hazırlanıyor",
    "ok": true,
@@ -208,21 +223,6 @@
    "ad": "Commons videoları neden oynamadı",
    "ok": true,
    "not": "GitHub Actions'ta denendi: upload.wikimedia.org ilk istekten sonra 429 veriyor. Kaynak Pexels'e geçti."
-  },
-  {
-   "ad": "Keşif Klaketleri: Yönetici anahtarı",
-   "ok": true,
-   "not": "Anahtar kutusu, adımlar, Kaydet; anahtar yokken Pexels'e sorulmuyor; geçersiz anahtar hata olarak yazıyor."
-  },
-  {
-   "ad": "Keşif Klaketleri: liste ve oynatma",
-   "ok": true,
-   "not": "Uzun, yatay, çok kısa ve başka siteden adresler elendi; 720p mp4 seçildi; Klaketlerde video oynadı; çekenin adı ve Pexels yazıyor; beğeni çalışıyor; Akış'ta ve profilden açılan Klaketlerde yok."
-  },
-  {
-   "ad": "Oynamayan keşif videosu",
-   "ok": true,
-   "not": "Listeden çıkarıldı, bir sonraki Klakete geçildi."
   }
  ]
 }

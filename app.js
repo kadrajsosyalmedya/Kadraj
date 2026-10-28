@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60816,APP_VER="6.8.16";
+const APP_V=60817,APP_VER="6.8.17";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -8901,7 +8901,7 @@ ACT.kurgu=()=>kedOpen();
 /*}@js:68*/
 /*@js:69{*/
 /* 6.8.1 Acil mod: Firebase koparsa Kadraj Supabase'e geçer (tablolar yedek/kurulum.sql sonundaki k_user, k_chat, k_msg).
-   - Ayar yedek/ayar.js (Orbit ile ortak: window.SUPA={url,key}). Boşsa bu bölge hiçbir şey yapmaz.
+   - Ayar yedek/ayar.js (window.SUPA={url,key}). Boşsa bu bölge hiçbir şey yapmaz. (Orbit uygulaması 6.8.17'de kaldırıldı.)
    - Hazırlık (normal modda, acPrep): şifre girilince (KASA.pw; HOOKS.enter başında okunur) aynı e-posta ve şifreyle gölge Supabase hesabı
      (oturum varsa updateUser, yoksa signIn, olmazsa signUp), k_user eşlemesi (kuid = S.uid, ilk sahiplenen alır), sohbetler k_chat'e; günde bir yenilenir.
      Profile `acil` = Supabase kimliği yazılır; herkes bunları kadraj_acil_map'te tutar, acil.js uymayan (sahte) eşlemeyi göstermez.
