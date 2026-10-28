@@ -1,9 +1,14 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.17",
- "at": "2026-10-28T17:20:00+00:00",
- "note": "Orbit kaldırıldı. Kadraj'ın Supabase yedeği testi 36/36, sadeleşen veritabanı kurulumu yerel Postgres'te 31/31 kural denetimi geçti.",
+ "ver": "6.8.18",
+ "at": "2026-10-28T17:50:00+00:00",
+ "note": "Supabase yedeği sahibinin projesine bağlandı. Yedek ekranı testi 36/36 geçti; gerçek Supabase'e bağlantı GitHub'daki uyandırma işiyle denendi.",
  "items": [
+  {
+   "ad": "Supabase ayarı yazıldı (adres ve herkese açık anahtar)",
+   "ok": true,
+   "not": ""
+  },
   {
    "ad": "Supabase yedeği Orbit olmadan çalışıyor",
    "ok": true,
@@ -218,11 +223,6 @@
    "ad": "+ › Kurgu",
    "ok": true,
    "not": "Kutucuk Klaket video ekranını açtı, video seçilince düzenleyici kendiliğinden açıldı."
-  },
-  {
-   "ad": "Commons videoları neden oynamadı",
-   "ok": true,
-   "not": "GitHub Actions'ta denendi: upload.wikimedia.org ilk istekten sonra 429 veriyor. Kaynak Pexels'e geçti."
   }
  ]
 }
