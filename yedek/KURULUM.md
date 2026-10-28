@@ -1,17 +1,14 @@
-# Orbit ve Kadraj acil modu kurulumu
+# Kadraj'ın Supabase yedeği kurulumu
 
-Aynı Supabase projesi iki işe yarar: Orbit (ayrı yedek uygulama) ve Kadraj'ın acil modu (Firebase koparsa Kadraj buraya geçer).
+Firebase koparsa Kadraj sohbetlere Supabase üzerinden devam eder (ekranda "Firebase bağlantısı koptu, Supabase ile devam ediliyor"). Bu klasörde yalnızca yedeğin ayarı (`ayar.js`), Supabase istemcisi (`supabase.js`) ve veritabanı kurulumu (`kurulum.sql`) var; ayrı bir uygulama yok (eski Orbit 6.8.17'de kaldırıldı).
 
-Adres: https://kadrajsosyalmedya.github.io/Kadraj/yedek/
-
-1. https://supabase.com › ücretsiz hesap › **New project** (bölge: Frankfurt ya da en yakını).
+1. https://supabase.com › ücretsiz hesap › **New project** (Region: Europe).
 2. **SQL Editor › New query** › `kurulum.sql` dosyasının tamamını yapıştır › **Run**.
-3. **Authentication › URL Configuration**: Site URL = `https://kadrajsosyalmedya.github.io/Kadraj/yedek/`, Redirect URLs'e aynı adresi ekle (şifre sıfırlama ve e-posta doğrulama bağlantıları buraya döner).
-4. **Authentication › Sign In / Providers › Email › Confirm email** kapatılmalı: Kadraj acil mod hesabını arka planda açar, e-posta doğrulaması açıksa acil mod hazırlanamaz (Orbit'te de kayıt olan hemen girer).
-5. **Project Settings › API**: Project URL ve **anon / publishable** anahtarı `yedek/ayar.js`'e (`url`, `key`) yazılır. Orbit ve Kadraj ikisi de bu dosyayı okur. **service_role / secret anahtarı asla yazılmaz.**
+3. **Authentication › Sign In / Providers › Email › Confirm email** kapatılmalı: Kadraj yedek hesabı arka planda açar, e-posta doğrulaması açıksa yedek hazırlanamaz.
+4. **Authentication › URL Configuration**: Site URL = `https://kadrajsosyalmedya.github.io/Kadraj/`.
+5. **Project Settings › API**: Project URL ve **anon / publishable** anahtar `ayar.js`'e (`url`, `key`) yazılır. **service_role / secret anahtarı asla yazılmaz.**
 
-Kadraj acil modu: ayar.js dolunca herkes Kadraj'a bir sonraki girişinde (şifre girince) kendiliğinden hazırlanır; beni hatırla ile girenler Ayarlar › Uygulama › Acil mod'dan şifresini bir kez yazar.
+ayar.js dolunca herkes Kadraj'a bir sonraki girişinde (şifre girince) yedeğe kendiliğinden hazırlanır; beni hatırla ile girenler Ayarlar › Uygulama › Supabase yedeği'nden şifresini bir kez yazar.
 
 Uyanık tutma: `.github/workflows/yedek-uyanik.yml` haftada iki kez `ping` çağırır (ücretsiz proje 7 gün boşta kalınca uyutulur).
-Videolar (Spark) Kadraj'ın Cloudinary hesabına yüklenir; resimler (profil, hikâye, mesaj) küçültülüp veritabanında durur.
-Test: Kadraj acil modu `scratchpad/yd/ac.js <genişlik>` (sahte `fake2.js`), kuralları `rls2.py`; Orbit `scratchpad/yd/t.js <genişlik>` (sahte Supabase istemcisi `fake.js`, `python3 -m http.server 8781`), kurallar `scratchpad/yd/rls.py` (yerel Postgres).
+Test: `scratchpad/yd/ac.js <genişlik>` (sahte `fake2.js`), kurallar `rls2.py` (yerel Postgres).

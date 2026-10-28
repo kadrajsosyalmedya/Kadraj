@@ -1,7 +1,7 @@
-# Orbit (yedek/) ve Kadraj'ın acil modu için: Supabase'in ücretsiz projesi 7 gün kullanılmazsa uyutulur.
+# Kadraj'ın Supabase yedeği için: Supabase'in ücretsiz projesi 7 gün kullanılmazsa uyutulur.
 # Bu iş haftada iki kez veritabanına küçük bir istek atarak projeyi uyanık tutar.
 # Adres ve anon anahtarı yedek/ayar.js'ten okunur (anon anahtar zaten sayfada herkese açık).
-name: Orbit uyanık tut
+name: Supabase uyanık tut
 on:
   schedule:
     - cron: "17 6 * * 1,4"
@@ -20,7 +20,7 @@ jobs:
         run: |
           URL=$(grep -oP '^\s*url: "\K[^"]*' yedek/ayar.js || true)
           KEY=$(grep -oP '^\s*key: "\K[^"]*' yedek/ayar.js || true)
-          if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "Orbit henüz kurulmadı, atlandı."; exit 0; fi
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "Supabase yedeği henüz kurulmadı, atlandı."; exit 0; fi
           AUTH=""; case "$KEY" in eyJ*) AUTH="Authorization: Bearer $KEY";; esac
           curl -fsS -X POST "$URL/rest/v1/rpc/ping" -H "apikey: $KEY" ${AUTH:+-H "$AUTH"} -H "Content-Type: application/json" -d '{}'
           echo
