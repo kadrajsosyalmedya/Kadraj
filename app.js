@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60813,APP_VER="6.8.13";
+const APP_V=60814,APP_VER="6.8.14";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -9116,7 +9116,8 @@ async function kvFetchQ([q,tag],key,page){const u=`https://api.pexels.com/videos
   if(r.status===401||r.status===403){KV.err="Pexels anahtarı geçersiz";return[]}if(r.status===429){KV.err="Pexels saatlik sınırı doldu";return[]}if(!r.ok)return[];
   const d=await r.json();return(Array.isArray(d&&d.videos)?d.videos:[]).map(v=>kvFromPx(v,tag)).filter(Boolean)}catch{return[]}finally{clearTimeout(t)}}
 function kvSaved(){try{const c=LS.get("kadraj_kv2",null);return c&&Array.isArray(c.list)?c:null}catch{return null}}
-async function kvLoad(force){if(KV.busy)return;const key=kvKey(),kh=key?hash32(key,71):"";const c=kvSaved();
+function kvLoad(force){if(KV.busy&&KV.p)return KV.p;return KV.p=kvLoad1(force)}
+async function kvLoad1(force){const key=kvKey(),kh=key?hash32(key,71):"";const c=kvSaved();
  if(c&&c.k===kh&&!KV.list){KV.list=c.list;KV.at=c.at}
  if(!key){if(KV.list&&KV.list.length){KV.list=null;KV_POSTS=null}return}
  if(!force&&KV.list&&c&&c.k===kh&&now()-KV.at<KV_TTL)return;if(typeof fetch!=="function")return;KV.busy=true;KV.err=null;
@@ -9179,7 +9180,9 @@ try{ADM_EXTRA.push({id:"kesif",title:"Keşif Klaketleri",desc:"Pexels'ten otomat
      düğmesi mute/unMute, arka plana geçince durur. Olaylar "listening" ile dinlenir: oynayınca kapak kalkar, onError (gömme kapalı vb.) →
      KY.bad (LS `kadraj_kvy_bad`) ve sonraki Klakete kayar.
    - Test scratchpad/c69/ky.js <genişlik> (sahte API + sahte oynatıcı sayfası). Gerçek YouTube bu ortamdan erişilemez. */
-const KY_Q=["türkçe meme","komik videolar","türk mizah","komik anlar","caps video","güldüren videolar","komik kedi","efsane anlar","komik tiktok türkçe","okul komik"];
+const KY_Q=["komik türk videoları","türk mizahı shorts","komik anlar türkçe","kemal sunal komik","komik yorumlar türkçe","türkçe komik kesitler","komik hayvanlar türkçe","okul komik anlar","komik sokak röportajı","türk caps video","güldüren videolar türkçe","komik skeç türkçe"];
+/* 6.8.14: Türkçe görünen başlık (Türkçe harf ya da sık kelime); küfürlü başlık (cleanText değiştiriyorsa) elenir */
+const KY_TR=/[ğüşıöçĞÜŞİÖÇ]|\b(ve|bir|bu|ne|çok|abi|kanka|yok|var|ama|için|komik|güldüren|türk|anlar|yorumlar)\b/i;
 const KY_ID=/^[A-Za-z0-9_-]{11}$/,KY={list:null,busy:false,err:null,d:"",bad:new Set(LS.get("kadraj_kvy_bad",[])||[])};
 const kyKey=()=>{const a=S.adm&&S.adm.kesif;const k=a&&typeof a.yt==="string"?a.yt.trim():"";return /^AIza[0-9A-Za-z_-]{35}$/.test(k)?k:""};
 const kyDay=()=>{const d=new Date();return d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0")};
@@ -9188,17 +9191,20 @@ function kyClean(L){return(Array.isArray(L)?L:[]).filter(x=>x&&KY_ID.test(x.id)&
 const kyDur=s=>{const m=String(s||"").match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/);return m?(+m[1]||0)*3600+(+m[2]||0)*60+(+m[3]||0):0};
 const kyTxt=t=>{const d=document.createElement("textarea");d.innerHTML=String(t||"");return d.value};
 async function kyApi(key){const sd=hash32(kyDay(),72),k={};for(const q of KY_Q)k[q]=hash32(q,sd);const qs=KY_Q.slice().sort((a,b)=>k[a]<k[b]?-1:1).slice(0,3);
- const after=new Date(now()-120*24*H).toISOString();const ids=[];
- for(const q of qs){const u=`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoDuration=short&safeSearch=strict&regionCode=TR&relevanceLanguage=tr&order=viewCount&maxResults=50&publishedAfter=${encodeURIComponent(after)}&q=${encodeURIComponent(q)}&key=${encodeURIComponent(key)}`;
-  const r=await fetch(u);const d=await r.json().catch(()=>({}));if(!r.ok){const re=(((d||{}).error||{}).errors||[{}])[0].reason||"";KY.err=/quota/i.test(re)?"YouTube günlük sınırı doldu":/keyInvalid|badRequest|forbidden|accessNotConfigured|API_KEY/i.test(re+JSON.stringify(d.error||{}))?"Anahtar geçersiz ya da YouTube Data API açık değil":"Videolar alınamadı ("+r.status+")";if(r.status===403||r.status===400)break;continue}
+ const after=new Date(now()-365*24*H).toISOString();const ids=[];
+ const get=async u=>{const ac=new AbortController(),t=setTimeout(()=>ac.abort(),15000);try{return await fetch(u,{signal:ac.signal})}finally{clearTimeout(t)}};
+ for(const q of qs){const u=`https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoDuration=short&safeSearch=strict&regionCode=TR&relevanceLanguage=tr&order=relevance&maxResults=50&publishedAfter=${encodeURIComponent(after)}&q=${encodeURIComponent(q)}&key=${encodeURIComponent(key)}`;
+  const r=await get(u);const d=await r.json().catch(()=>({}));if(!r.ok){const gm=String(((d||{}).error||{}).message||"").slice(0,140);const re=(((d||{}).error||{}).errors||[{}])[0].reason||"";KY.err=/quota/i.test(re)?"YouTube günlük sınırı doldu":/keyInvalid|badRequest|forbidden|accessNotConfigured|API_KEY/i.test(re+JSON.stringify(d.error||{}))?"Anahtar geçersiz ya da YouTube Data API açık değil"+(gm?" ("+gm+")":""):"Videolar alınamadı ("+r.status+(gm?", "+gm:"")+")";if(r.status===403||r.status===400)break;continue}
   for(const it of d.items||[]){const id=it&&it.id&&it.id.videoId;if(KY_ID.test(id||"")&&!ids.includes(id))ids.push(id)}}
  const out=[];for(let i=0;i<ids.length;i+=50){const u=`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,status,snippet&id=${ids.slice(i,i+50).join(",")}&key=${encodeURIComponent(key)}`;
-  const r=await fetch(u);if(!r.ok)continue;const d=await r.json().catch(()=>({}));
+  const r=await get(u);if(!r.ok)continue;const d=await r.json().catch(()=>({}));
   for(const v of d.items||[]){const st=v.status||{},cd=v.contentDetails||{},sn=v.snippet||{};const dur=kyDur(cd.duration);if(!st.embeddable||st.privacyStatus==="private"||dur<3||dur>75)continue;
    if(cd.contentRating&&cd.contentRating.ytRating==="ytAgeRestricted")continue;const th=(sn.thumbnails&&(sn.thumbnails.high||sn.thumbnails.medium||sn.thumbnails.default)||{}).url||`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`;
-   out.push({id:v.id,t:kyTxt(sn.title),ch:kyTxt(sn.channelTitle),th,dur})}}
- return kyClean(out)}
-async function kyLoad(force){if(KY.busy||!kyOk())return;const key=kyKey(),kh=hash32(key,72),day=kyDay();const c=LS.get("kadraj_kvy",null);
+   const t=kyTxt(sn.title),ch=kyTxt(sn.channelTitle);if(typeof cleanText==="function"&&cleanText(t)!==t)continue;out.push({id:v.id,t,ch,th,dur,tr:KY_TR.test(t+" "+ch)})}}
+ if(ids.length&&!out.length&&!KY.err)KY.err=ids.length+" video bulundu ama hiçbiri uygun değildi";
+ const tr=out.filter(x=>x.tr);return kyClean(tr.length>=20?tr:out)}
+function kyLoad(force){if(KY.busy&&KY.p)return KY.p;if(!kyOk())return Promise.resolve();return KY.p=kyLoad1(force)}
+async function kyLoad1(force){const key=kyKey(),kh=hash32(key,72),day=kyDay();const c=LS.get("kadraj_kvy",null);
  if(!force&&c&&c.d===day&&c.k===kh&&Array.isArray(c.list)){KY.list=kyClean(c.list);KY.d=day;return}KY.busy=true;KY.err=null;
  try{let L=null;if(!force){try{const g=await DB.get("games/kvy-"+day);if(g&&g.kvy&&Array.isArray(g.list)&&g.list.length)L=kyClean(g.list)}catch{}}
   if(!L||!L.length){L=await kyApi(key);if(L.length&&S.mode==="cloud")DB.set("games/kvy-"+day,{kvy:1,d:day,at:now(),list:L}).catch(()=>{})}
