@@ -1,9 +1,39 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.18",
- "at": "2026-10-28T17:50:00+00:00",
- "note": "Supabase yedeği sahibinin projesine bağlandı. Yedek ekranı testi 36/36 geçti; gerçek Supabase'e bağlantı GitHub'daki uyandırma işiyle denendi.",
+ "ver": "6.8.19",
+ "at": "2026-10-28T18:30:00+00:00",
+ "note": "Yeni sohbet kuralları gerçek Firestore emülatöründe denendi: 38 kural denetimi ve üç kişiyle uçtan uca 18 denetim geçti. Kadraj testi 47 adım geçti.",
  "items": [
+  {
+   "ad": "Başkası DM'i okuyamıyor/yazamıyor",
+   "ok": true,
+   "not": "Emülatörde"
+  },
+  {
+   "ad": "Yeni DM'de ilk mesaj gidiyor, karşı taraf canlı görüyor",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Gruptan ayrılan grubu göremiyor",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Meydan herkese açık",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Bildirimden yanıt görüldü göndermiyor",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Bildirimden Kalp ve Görüldü",
+   "ok": true,
+   "not": ""
+  },
   {
    "ad": "Supabase ayarı yazıldı (adres ve herkese açık anahtar)",
    "ok": true,
@@ -193,36 +223,6 @@
    "ad": "Açılış (giriş yapmış, sahte Firebase)",
    "ok": true,
    "not": "2 saniyede Akış geldi; 38 saniye beklendi, uyarı kartı çıkmadı."
-  },
-  {
-   "ad": "app.js ilk denemede inmezse",
-   "ok": true,
-   "not": "Bir kez daha indirdi ve uygulama açıldı."
-  },
-  {
-   "ad": "app.js hiç inmezse",
-   "ok": true,
-   "not": "Hemen \"Kadraj açılamadı\" kartı ve Yeniden aç düğmesi çıktı."
-  },
-  {
-   "ad": "Kod hata verirse",
-   "ok": true,
-   "not": "35 saniyede kart çıktı, hatanın yazısı ve satırı görünüyor; Yeniden aç önbelleği temizleyip sayfayı yeniden açtı."
-  },
-  {
-   "ad": "Rota köprü adresi yokken nedenini söyler",
-   "ok": true,
-   "not": "Ayarlar yüklenmedi / köprü kapatılmış / adres kayıtlı değil / boş yanıt durumları ayrı yazılıyor; demo modunda ek yok."
-  },
-  {
-   "ad": "Commons'a ulaşılamazsa",
-   "ok": true,
-   "not": "Saklanan liste kullanılıyor, liste yoksa Klaketler eskisi gibi; sayfa hatası yok."
-  },
-  {
-   "ad": "+ › Kurgu",
-   "ok": true,
-   "not": "Kutucuk Klaket video ekranını açtı, video seçilince düzenleyici kendiliğinden açıldı."
   }
  ]
 }
