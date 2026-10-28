@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60815,APP_VER="6.8.15";
+const APP_V=60816,APP_VER="6.8.16";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -9226,12 +9226,23 @@ function kySrc(id,mute){const e=encodeURIComponent(id);return`https://www.youtub
 if(!LS.get("kadraj_kvy_bad2")){KY.bad.clear();LS.del("kadraj_kvy_bad");LS.set("kadraj_kvy_bad2",1)}
 let KY_ERRN=0,KY_SNDTIP=false;
 function kyListen(f,k){let n=0;const go=()=>{if(f._ok||!f.isConnected||n++>20)return;try{f.contentWindow.postMessage(JSON.stringify({event:"listening",id:k.dataset.yid,channel:"widget"}),"*")}catch{}f._lt=setTimeout(go,500)};go()}
-function kyOn(el){const k=el&&el.querySelector(".kyt");if(!k)return;const reels=$$("#main .reel"),i=reels.indexOf(el);
- reels.forEach((x,j)=>{if(j!==i){const f=x.querySelector(".kyt iframe");if(f){f.remove();x.querySelector(".kyt").classList.remove("on","man")}}});
- let f=k.querySelector("iframe");if(!f){f=document.createElement("iframe");f.allow="autoplay; encrypted-media";f.referrerPolicy="strict-origin-when-cross-origin";f.title="Video";f.tabIndex=-1;
-  f.src=kySrc(k.dataset.yid,true);f.onload=()=>kyListen(f,k);k.insertBefore(f,k.firstChild);k._paused=false;
-  clearTimeout(k._wd);k._wd=setTimeout(()=>{if(f.isConnected&&!k.classList.contains("on")&&activeReel===el)k.classList.add("man")},4500)}
- else{kyCmd(f,"playVideo");if(!S.muted&&f._pl)kyCmd(f,"unMute");k._paused=false}Music.stop()}
+/* 6.8.16 hız: açık Klaketin bir sonrakindeki (ve geri dönüş için bir öncekindeki) meme oynatıcısı önceden kurulur; sonraki sessiz başlar,
+   ilk karede durup başa sarılır (`f._pre`), sıra ona gelince yalnızca playVideo gider. Veri tasarrufunda önceden kurma yok. Klaketlere girince
+   oynatıcı sunucularına önceden bağlanılır (kyWarm). Önceden kurulanda gelen hata o açılınca işlenir (`f._ec`). */
+function kyMk(k){const f=document.createElement("iframe");f.allow="autoplay; encrypted-media";f.referrerPolicy="strict-origin-when-cross-origin";f.title="Video";f.tabIndex=-1;
+ f.src=kySrc(k.dataset.yid,true);f.onload=()=>kyListen(f,k);k.insertBefore(f,k.firstChild);return f}
+function kyNb(el,d){let n=el&&el[d?"nextElementSibling":"previousElementSibling"];while(n&&!n.classList.contains("reel"))n=n[d?"nextElementSibling":"previousElementSibling"];return n&&n.querySelector(".kyt")?n:null}
+function kyWd(k,f,el){clearTimeout(k._wd);k._wd=setTimeout(()=>{if(f.isConnected&&!k.classList.contains("on")&&activeReel===el)k.classList.add("man")},4500)}
+let KY_WARM=false;
+function kyWarm(){if(KY_WARM)return;KY_WARM=true;for(const h of["https://www.youtube-nocookie.com","https://www.youtube.com","https://i.ytimg.com","https://www.google.com"]){const l=document.createElement("link");l.rel="preconnect";l.href=h;l.crossOrigin="";document.head.appendChild(l)}}
+function kyOn(el){const k=el&&el.querySelector(".kyt");if(!k)return;kyWarm();
+ const nx=settings.dataSaver?null:kyNb(el,1),pv=kyNb(el,0),keep=[el,nx,pv];
+ for(const x of $$("#main .reel"))if(!keep.includes(x)){const f=x.querySelector(".kyt iframe");if(f){f.remove();x.querySelector(".kyt").classList.remove("on","man")}}
+ let f=k.querySelector("iframe");if(!f){f=kyMk(k);k._paused=false;kyWd(k,f,el)}
+ else{f._pre=0;k._paused=false;if(f._ec)return kyErr(f,k,el,f._ec);kyCmd(f,"playVideo");if(!S.muted&&f._pl){f._um=Date.now();kyCmd(f,"unMute")}if(!k.classList.contains("on"))kyWd(k,f,el)}
+ if(nx){const kn=nx.querySelector(".kyt");if(!kn.querySelector("iframe"))kyMk(kn)._pre=1}
+ Music.stop()}
+function kyErr(f,k,r,c){KY_ERRN++;if(activeReel===r&&KY_ERRN<=3){const n=r.nextElementSibling;if(n&&n.classList.contains("reel"))n.scrollIntoView({behavior:k4rm()?"auto":"smooth"})}else{clearTimeout(k._wd);k.classList.add("man")}}
 function kyOff(el){const k=el&&el.querySelector(".kyt");if(!k)return;const f=k.querySelector("iframe");if(f)kyCmd(f,"pauseVideo")}
 {const f=activateReel;activateReel=function(el,...a){const r=f.call(this,el,...a);try{kyOn(el)}catch(e){console.warn("ky",e)}return r}}
 {const f=deactivateReel;deactivateReel=function(el,...a){try{kyOff(el)}catch{}return f.call(this,el,...a)}}
@@ -9239,12 +9250,13 @@ function kyOff(el){const k=el&&el.querySelector(".kyt");if(!k)return;const f=k.q
 addEventListener("message",e=>{if(!/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin))return;let d=e.data;if(typeof d==="string")try{d=JSON.parse(d)}catch{return}if(!d||!d.event)return;
  const f=$$("#main .reel .kyt iframe").find(x=>x.contentWindow===e.source);if(!f)return;const k=f.closest(".kyt"),r=f.closest(".reel");f._ok=true;
  if(d.event==="onReady"&&!k._paused&&activeReel===r)kyCmd(f,"playVideo");
+ if(activeReel!==r){if(d.event==="onStateChange"&&d.info===1&&!f._pd){f._pd=1;f._pl=1;k.classList.add("on");kyCmd(f,"pauseVideo");kyCmd(f,"seekTo",[0,true])}
+  if(d.event==="onError"){const c=+d.info;f._ec=c;if(c===100||c===101||c===150){KY.bad.add(k.dataset.yid);LS.set("kadraj_kvy_bad",[...KY.bad].slice(-300))}}return}
  const st=d.event==="onStateChange"?d.info:d.event==="infoDelivery"&&d.info&&typeof d.info.playerState==="number"?d.info.playerState:null;
  if(st===1){k.classList.add("on");k.classList.remove("man");clearTimeout(k._wd);KY_ERRN=0;
   if(!f._pl){f._pl=1;if(!S.muted&&activeReel===r){kyCmd(f,"unMute");f._um=Date.now()}}}
  if(st===2&&f._um&&Date.now()-f._um<1500&&!k._paused&&activeReel===r){f._um=0;kyCmd(f,"mute");kyCmd(f,"playVideo");if(!KY_SNDTIP){KY_SNDTIP=true;toast("Sesi açmak için videoya dokun")}}
- if(d.event==="onError"){const c=+d.info;KY_ERRN++;if(c===100||c===101||c===150){const id=k.dataset.yid;KY.bad.add(id);LS.set("kadraj_kvy_bad",[...KY.bad].slice(-300))}
-  if(activeReel===r&&KY_ERRN<=3){const n=r.nextElementSibling;if(n&&n.classList.contains("reel"))n.scrollIntoView({behavior:k4rm()?"auto":"smooth"})}else{clearTimeout(k._wd);k.classList.add("man")}}});
+ if(d.event==="onError"){const c=+d.info;if(c===100||c===101||c===150){KY.bad.add(k.dataset.yid);LS.set("kadraj_kvy_bad",[...KY.bad].slice(-300))}kyErr(f,k,r,c)}});
 document.addEventListener("click",e=>{const k=e.target.closest&&e.target.closest(".reel .kyt");if(!k)return;e.preventDefault();e.stopPropagation();const f=k.querySelector("iframe");if(!f)return kyOn(k.closest(".reel"));
  if(f._um===0&&!f._tr&&!S.muted&&!k._paused){f._tr=1;f._um=Date.now();kyCmd(f,"unMute");return}
  k._paused=!k._paused;kyCmd(f,k._paused?"pauseVideo":"playVideo");if(!k._paused&&!S.muted)kyCmd(f,"unMute");const ic=k.querySelector(".kyt-ic");if(ic){ic.innerHTML=I(k._paused?"play":"pause");ic.classList.add("show");clearTimeout(ic._t);ic._t=setTimeout(()=>ic.classList.remove("show"),k._paused?99999:600)}},true);
