@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60814,APP_VER="6.8.14";
+const APP_V=60815,APP_VER="6.8.15";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -9218,22 +9218,36 @@ function kyList(){if(!kyOk())return[];if(!KY.list){const c=LS.get("kadraj_kvy",n
 function kyHtml(p){return`<div class="kyt" data-yid="${esc(p.yid)}"><img class="kyt-p" src="${esc(p.slides[0])}" alt="" loading="lazy" referrerpolicy="no-referrer"><span class="kyt-ic">${I("pause")}</span></div>`}
 function kyCmd(f,func,args){try{f.contentWindow.postMessage(JSON.stringify({event:"command",func,args:args||[]}),"*")}catch{}}
 function kySrc(id,mute){const e=encodeURIComponent(id);return`https://www.youtube-nocookie.com/embed/${e}?enablejsapi=1&playsinline=1&loop=1&playlist=${e}&rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&autoplay=1&mute=${mute?1:0}&origin=${encodeURIComponent(location.origin)}`}
+/* 6.8.15 oynatma emniyeti: hep sessiz başlar (sessiz kendiliğinden oynatmaya her tarayıcı izin verir), oynayınca ses açıksa unMute; ses açılınca
+   tarayıcı durdurursa yeniden sessiz oynar ve "Sesi açmak için dokun" der. "listening" oynatıcı yanıt verene kadar yinelenir, onReady'de playVideo.
+   4,5 sn'de oynamazsa `.kyt.man`: kapak kalkar, iframe dokunuşa açılır, kişi oynatıcının kendisine dokunup başlatır (oynayınca yeniden kapanır,
+   kaydırma bozulmasın). Yalnızca videoya özgü hatalar (100, 101, 150) KY.bad'e girer; 2/5/152/153 gibi oynatıcı/ortam hataları listeyi silmez,
+   art arda 3 hata olursa kendiliğinden kaymayı bırakır. 6.8.14'te ortam hatası yüzünden dolmuş olabilecek kadraj_kvy_bad bir kez temizlenir. */
+if(!LS.get("kadraj_kvy_bad2")){KY.bad.clear();LS.del("kadraj_kvy_bad");LS.set("kadraj_kvy_bad2",1)}
+let KY_ERRN=0,KY_SNDTIP=false;
+function kyListen(f,k){let n=0;const go=()=>{if(f._ok||!f.isConnected||n++>20)return;try{f.contentWindow.postMessage(JSON.stringify({event:"listening",id:k.dataset.yid,channel:"widget"}),"*")}catch{}f._lt=setTimeout(go,500)};go()}
 function kyOn(el){const k=el&&el.querySelector(".kyt");if(!k)return;const reels=$$("#main .reel"),i=reels.indexOf(el);
- reels.forEach((x,j)=>{if(j!==i){const f=x.querySelector(".kyt iframe");if(f){f.remove();x.querySelector(".kyt").classList.remove("on")}}});
+ reels.forEach((x,j)=>{if(j!==i){const f=x.querySelector(".kyt iframe");if(f){f.remove();x.querySelector(".kyt").classList.remove("on","man")}}});
  let f=k.querySelector("iframe");if(!f){f=document.createElement("iframe");f.allow="autoplay; encrypted-media";f.referrerPolicy="strict-origin-when-cross-origin";f.title="Video";f.tabIndex=-1;
-  f.src=kySrc(k.dataset.yid,!!S.muted);f.onload=()=>{try{f.contentWindow.postMessage(JSON.stringify({event:"listening",id:k.dataset.yid,channel:"widget"}),"*")}catch{}};k.insertBefore(f,k.firstChild);k._paused=false}
- else{kyCmd(f,S.muted?"mute":"unMute");kyCmd(f,"playVideo");k._paused=false}Music.stop()}
+  f.src=kySrc(k.dataset.yid,true);f.onload=()=>kyListen(f,k);k.insertBefore(f,k.firstChild);k._paused=false;
+  clearTimeout(k._wd);k._wd=setTimeout(()=>{if(f.isConnected&&!k.classList.contains("on")&&activeReel===el)k.classList.add("man")},4500)}
+ else{kyCmd(f,"playVideo");if(!S.muted&&f._pl)kyCmd(f,"unMute");k._paused=false}Music.stop()}
 function kyOff(el){const k=el&&el.querySelector(".kyt");if(!k)return;const f=k.querySelector("iframe");if(f)kyCmd(f,"pauseVideo")}
 {const f=activateReel;activateReel=function(el,...a){const r=f.call(this,el,...a);try{kyOn(el)}catch(e){console.warn("ky",e)}return r}}
 {const f=deactivateReel;deactivateReel=function(el,...a){try{kyOff(el)}catch{}return f.call(this,el,...a)}}
-/* oynatıcıdan gelen olaylar: oynayınca kapak kalkar; hata olursa listeden çıkar, sonrakine geç */
+/* oynatıcıdan gelen olaylar: oynayınca kapak kalkar, ses açılır; videoya özgü hata olursa listeden çıkar, sonrakine geç */
 addEventListener("message",e=>{if(!/^https:\/\/www\.youtube(-nocookie)?\.com$/.test(e.origin))return;let d=e.data;if(typeof d==="string")try{d=JSON.parse(d)}catch{return}if(!d||!d.event)return;
- const f=$$("#main .reel .kyt iframe").find(x=>x.contentWindow===e.source);if(!f)return;const k=f.closest(".kyt"),r=f.closest(".reel");
+ const f=$$("#main .reel .kyt iframe").find(x=>x.contentWindow===e.source);if(!f)return;const k=f.closest(".kyt"),r=f.closest(".reel");f._ok=true;
+ if(d.event==="onReady"&&!k._paused&&activeReel===r)kyCmd(f,"playVideo");
  const st=d.event==="onStateChange"?d.info:d.event==="infoDelivery"&&d.info&&typeof d.info.playerState==="number"?d.info.playerState:null;
- if(st===1)k.classList.add("on");
- if(d.event==="onError"){const id=k.dataset.yid;KY.bad.add(id);LS.set("kadraj_kvy_bad",[...KY.bad].slice(-300));if(activeReel===r){const n=r.nextElementSibling;if(n&&n.classList.contains("reel"))n.scrollIntoView({behavior:k4rm()?"auto":"smooth"})}}});
+ if(st===1){k.classList.add("on");k.classList.remove("man");clearTimeout(k._wd);KY_ERRN=0;
+  if(!f._pl){f._pl=1;if(!S.muted&&activeReel===r){kyCmd(f,"unMute");f._um=Date.now()}}}
+ if(st===2&&f._um&&Date.now()-f._um<1500&&!k._paused&&activeReel===r){f._um=0;kyCmd(f,"mute");kyCmd(f,"playVideo");if(!KY_SNDTIP){KY_SNDTIP=true;toast("Sesi açmak için videoya dokun")}}
+ if(d.event==="onError"){const c=+d.info;KY_ERRN++;if(c===100||c===101||c===150){const id=k.dataset.yid;KY.bad.add(id);LS.set("kadraj_kvy_bad",[...KY.bad].slice(-300))}
+  if(activeReel===r&&KY_ERRN<=3){const n=r.nextElementSibling;if(n&&n.classList.contains("reel"))n.scrollIntoView({behavior:k4rm()?"auto":"smooth"})}else{clearTimeout(k._wd);k.classList.add("man")}}});
 document.addEventListener("click",e=>{const k=e.target.closest&&e.target.closest(".reel .kyt");if(!k)return;e.preventDefault();e.stopPropagation();const f=k.querySelector("iframe");if(!f)return kyOn(k.closest(".reel"));
- k._paused=!k._paused;kyCmd(f,k._paused?"pauseVideo":"playVideo");const ic=k.querySelector(".kyt-ic");if(ic){ic.innerHTML=I(k._paused?"play":"pause");ic.classList.add("show");clearTimeout(ic._t);ic._t=setTimeout(()=>ic.classList.remove("show"),k._paused?99999:600)}},true);
+ if(f._um===0&&!f._tr&&!S.muted&&!k._paused){f._tr=1;f._um=Date.now();kyCmd(f,"unMute");return}
+ k._paused=!k._paused;kyCmd(f,k._paused?"pauseVideo":"playVideo");if(!k._paused&&!S.muted)kyCmd(f,"unMute");const ic=k.querySelector(".kyt-ic");if(ic){ic.innerHTML=I(k._paused?"play":"pause");ic.classList.add("show");clearTimeout(ic._t);ic._t=setTimeout(()=>ic.classList.remove("show"),k._paused?99999:600)}},true);
 document.addEventListener("click",e=>{if(!(e.target.closest&&e.target.closest('[data-act="mute"]')))return;setTimeout(()=>{for(const f of $$("#main .reel .kyt iframe"))kyCmd(f,S.muted?"mute":"unMute")},0)});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden"){for(const x of $$("#main .reel"))kyOff(x)}else if(S.route.name==="reels"&&activeReel&&!$$("#overlay .layer").length)kyOn(activeReel)});
 HOOKS.enter.push(()=>setTimeout(()=>kyLoad(),6000));

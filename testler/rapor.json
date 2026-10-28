@@ -1,9 +1,39 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.14",
- "at": "2026-10-28T13:39:42+00:00",
- "note": "Kadraj testi 47 adım geçti. Meme Klaketleri sahibinin gerçek anahtarıyla gerçek API'den denendi: 133 Türkçe meme geldi ve Klaketlerde göründü.",
+ "ver": "6.8.15",
+ "at": "2026-10-28T15:30:00+00:00",
+ "note": "Meme oynatma emniyeti sahte oynatıcıyla denendi (19 denetim). Gerçek YouTube oynatıcısı bu ortamdan açılamıyor; sahibinin telefonunda bakılmalı.",
  "items": [
+  {
+   "ad": "Meme hep sessiz başlıyor, oynayınca ses açılıyor",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Oynatıcı geç yanıt verince yeniden soruluyor",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Kendiliğinden oynamazsa dokununca oynuyor",
+   "ok": true,
+   "not": "4,5 sn sonra oynatıcı dokunuşa açılıyor"
+  },
+  {
+   "ad": "Ses açılamazsa sessiz oynuyor ve uyarıyor",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Oynatıcı hatası listeyi silmiyor",
+   "ok": true,
+   "not": "Yalnızca 100/101/150 kara listeye giriyor"
+  },
+  {
+   "ad": "Gerçek YouTube oynatıcısında oynatma",
+   "ok": false,
+   "not": "Bu ortamdan YouTube'a erişilemiyor, denenemedi"
+  },
   {
    "ad": "Kurgu açılıyor",
    "ok": true,
@@ -178,26 +208,6 @@
    "ad": "Keşif Klaketleri (gerçek Pexels)",
    "ok": false,
    "not": "api.pexels.com bu ortamdan engelli; sahibi anahtarı yapıştırınca telefonunda görülmeli"
-  },
-  {
-   "ad": "Meme Klaketleri: yönetici anahtarı",
-   "ok": true,
-   "not": "Panelde meme anahtarı kutusu ve adımlar; anahtar yokken meme yok; Pexels anahtarı silinmiyor."
-  },
-  {
-   "ad": "Meme Klaketleri: günlük liste",
-   "ok": true,
-   "not": "Günde 3 arama (güvenli arama, kısa video); gömmesi kapalı, uzun, yaş sınırlı ve bozuk kimlik elendi; liste ortak belgeye yazıldı, ikinci açılış arama yapmadan okudu."
-  },
-  {
-   "ad": "Meme Klaketleri: oynatma",
-   "ok": true,
-   "not": "Yalnızca açık Klakette oynatıcı; dokununca duruyor; ses düğmesi çalışıyor; oynamayan meme atlandı; yazılarda kaynak adı ve dışarı bağlantı yok; Çocuk Modu'nda meme yok; memeler en az %70."
-  },
-  {
-   "ad": "Meme Klaketleri (gerçek sunucu)",
-   "ok": true,
-   "not": "Sahibinin anahtarıyla gerçek API'den 133 Türkçe meme alındı, Klaketlerde göründü. Oynatıcının kendisi bu ortamda açılamadığı için telefonda görülmeli."
   },
   {
    "ad": "Alma sürerken yenile",

@@ -3897,4 +3897,5 @@ html.reduce-motion .gnc .gfw .gflag,html.reduce-motion .gnc.dini .gic svg{animat
 .reel .kyt.on .kyt-p{opacity:0}
 .reel .kyt .kyt-ic{position:absolute;left:50%;top:50%;z-index:2;transform:translate(-50%,-50%);width:64px;height:64px;border-radius:50%;background:rgba(0,0,0,.45);color:#fff;display:grid;place-items:center;opacity:0;transition:opacity .2s;pointer-events:none}
 .reel .kyt .kyt-ic.show{opacity:1}.reel .kyt .kyt-ic .i{width:30px;height:30px}
+.reel .kyt.man .kyt-p{opacity:0}.reel .kyt.man iframe{pointer-events:auto;z-index:1}
 /*}@css:72*/
