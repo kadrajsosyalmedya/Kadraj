@@ -1,8 +1,8 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.10",
- "at": "2026-10-27T17:21:22+00:00",
- "note": "Kadraj testi 47 adım geçti. Rota'nın nedenleri ve kopyalama 13 denetimden geçti. Gerçek köprü bu ortamdan denenemedi.",
+ "ver": "6.8.11",
+ "at": "2026-10-28T12:01:40+00:00",
+ "note": "Kadraj testi 47 adım geçti. Keşif Klaketleri ve Kurgu kutucuğu 360 ve 390 px'te 19 denetimden geçti (sahte Commons yanıtıyla). Gerçek Wikimedia Commons sunucusu bu ortamdan erişilemedi.",
  "items": [
   {
    "ad": "Kurgu açılıyor",
@@ -143,6 +143,31 @@
    "ad": "Rota köprü adresi yokken nedenini söyler",
    "ok": true,
    "not": "Ayarlar yüklenmedi / köprü kapatılmış / adres kayıtlı değil / boş yanıt durumları ayrı yazılıyor; demo modunda ek yok."
+  },
+  {
+   "ad": "Keşif Klaketleri listesi",
+   "ok": true,
+   "not": "Sahte Commons yanıtıyla: uzun, çok kısa, küçük ve ogv videolar elendi; mp4 türevi önde; aynı video bir kez."
+  },
+  {
+   "ad": "Keşif Klaketleri Klaket sayfasında",
+   "ok": true,
+   "not": "Arkadaş Klaketlerinin arasına serpiştirildi; Akış'ta ve profilden açılan Klaketlerde yok; video oynadı; yazar ve lisans görünüyor; beğeni ve yorum çalışıyor."
+  },
+  {
+   "ad": "Commons'a ulaşılamazsa",
+   "ok": true,
+   "not": "Saklanan liste kullanılıyor, liste yoksa Klaketler eskisi gibi; sayfa hatası yok."
+  },
+  {
+   "ad": "+ › Kurgu",
+   "ok": true,
+   "not": "Kutucuk Klaket video ekranını açtı, video seçilince düzenleyici kendiliğinden açıldı."
+  },
+  {
+   "ad": "Keşif Klaketleri (gerçek Commons)",
+   "ok": false,
+   "not": "commons.wikimedia.org bu ortamdan engelli; sahibinin telefonunda Klaketler sayfasında görülmeli"
   }
  ]
 }
