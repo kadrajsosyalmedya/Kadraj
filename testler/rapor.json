@@ -1,8 +1,8 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.13",
- "at": "2026-10-28T12:49:46+00:00",
- "note": "Kadraj testi 47 adım geçti. Meme Klaketleri 360 ve 390 px'te 21 denetimden, Pexels Keşif Klaketleri 21 denetimden geçti (sahte sunucularla). Gerçek video sunucuları bu ortamdan erişilemedi.",
+ "ver": "6.8.14",
+ "at": "2026-10-28T13:39:42+00:00",
+ "note": "Kadraj testi 47 adım geçti. Meme Klaketleri sahibinin gerçek anahtarıyla gerçek API'den denendi: 133 Türkçe meme geldi ve Klaketlerde göründü.",
  "items": [
   {
    "ad": "Kurgu açılıyor",
@@ -196,8 +196,13 @@
   },
   {
    "ad": "Meme Klaketleri (gerçek sunucu)",
-   "ok": false,
-   "not": "googleapis.com/youtube bu ortamdan engelli; sahibi anahtarı yapıştırınca telefonunda görülmeli"
+   "ok": true,
+   "not": "Sahibinin anahtarıyla gerçek API'den 133 Türkçe meme alındı, Klaketlerde göründü. Oynatıcının kendisi bu ortamda açılamadığı için telefonda görülmeli."
+  },
+  {
+   "ad": "Alma sürerken yenile",
+   "ok": true,
+   "not": "Kaydet'ten hemen sonra Memeleri şimdi yenile: artık süren işi bekliyor, \"133 meme hazır\" yazıyor."
   }
  ]
 }
