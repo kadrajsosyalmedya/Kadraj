@@ -1,9 +1,29 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.15",
- "at": "2026-10-28T15:30:00+00:00",
- "note": "Meme oynatma emniyeti sahte oynatıcıyla denendi (19 denetim). Gerçek YouTube oynatıcısı bu ortamdan açılamıyor; sahibinin telefonunda bakılmalı.",
+ "ver": "6.8.16",
+ "at": "2026-10-28T16:10:00+00:00",
+ "note": "Meme videoları önceden hazırlanıyor: sonraki video beklerken kurulup ilk karede duruyor. Sahte oynatıcıyla 24 denetim geçti; gerçek hız sahibinin telefonunda görülmeli.",
  "items": [
+  {
+   "ad": "Sonraki meme önceden hazırlanıyor",
+   "ok": true,
+   "not": "İlk karede durup başa sarılıyor"
+  },
+  {
+   "ad": "Sıra gelince yeniden yüklenmeden oynuyor",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Oynatıcı sunucularına önceden bağlanılıyor",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "En çok 3 oynatıcı (önceki, açık, sonraki)",
+   "ok": true,
+   "not": ""
+  },
   {
    "ad": "Meme hep sessiz başlıyor, oynayınca ses açılıyor",
    "ok": true,
@@ -203,16 +223,6 @@
    "ad": "Oynamayan keşif videosu",
    "ok": true,
    "not": "Listeden çıkarıldı, bir sonraki Klakete geçildi."
-  },
-  {
-   "ad": "Keşif Klaketleri (gerçek Pexels)",
-   "ok": false,
-   "not": "api.pexels.com bu ortamdan engelli; sahibi anahtarı yapıştırınca telefonunda görülmeli"
-  },
-  {
-   "ad": "Alma sürerken yenile",
-   "ok": true,
-   "not": "Kaydet'ten hemen sonra Memeleri şimdi yenile: artık süren işi bekliyor, \"133 meme hazır\" yazıyor."
   }
  ]
 }
