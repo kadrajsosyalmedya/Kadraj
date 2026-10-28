@@ -1,8 +1,8 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.12",
- "at": "2026-10-28T12:36:57+00:00",
- "note": "Kadraj testi 47 adım geçti. Keşif Klaketleri (Pexels) 360 ve 390 px'te 21 denetimden geçti (sahte Pexels yanıtıyla). Commons'ın oynamama nedeni GitHub Actions'ta gerçek isteklerle bulundu (429).",
+ "ver": "6.8.13",
+ "at": "2026-10-28T12:49:46+00:00",
+ "note": "Kadraj testi 47 adım geçti. Meme Klaketleri 360 ve 390 px'te 21 denetimden, Pexels Keşif Klaketleri 21 denetimden geçti (sahte sunucularla). Gerçek video sunucuları bu ortamdan erişilemedi.",
  "items": [
   {
    "ad": "Kurgu açılıyor",
@@ -178,6 +178,26 @@
    "ad": "Keşif Klaketleri (gerçek Pexels)",
    "ok": false,
    "not": "api.pexels.com bu ortamdan engelli; sahibi anahtarı yapıştırınca telefonunda görülmeli"
+  },
+  {
+   "ad": "Meme Klaketleri: yönetici anahtarı",
+   "ok": true,
+   "not": "Panelde meme anahtarı kutusu ve adımlar; anahtar yokken meme yok; Pexels anahtarı silinmiyor."
+  },
+  {
+   "ad": "Meme Klaketleri: günlük liste",
+   "ok": true,
+   "not": "Günde 3 arama (güvenli arama, kısa video); gömmesi kapalı, uzun, yaş sınırlı ve bozuk kimlik elendi; liste ortak belgeye yazıldı, ikinci açılış arama yapmadan okudu."
+  },
+  {
+   "ad": "Meme Klaketleri: oynatma",
+   "ok": true,
+   "not": "Yalnızca açık Klakette oynatıcı; dokununca duruyor; ses düğmesi çalışıyor; oynamayan meme atlandı; yazılarda kaynak adı ve dışarı bağlantı yok; Çocuk Modu'nda meme yok; memeler en az %70."
+  },
+  {
+   "ad": "Meme Klaketleri (gerçek sunucu)",
+   "ok": false,
+   "not": "googleapis.com/youtube bu ortamdan engelli; sahibi anahtarı yapıştırınca telefonunda görülmeli"
   }
  ]
 }
