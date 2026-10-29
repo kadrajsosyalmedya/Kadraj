@@ -1,6 +1,7 @@
 package io.github.kadrajsosyalmedya.kadraj;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Window;
@@ -15,6 +16,7 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(KadrajGaleri.class);
         super.onCreate(savedInstanceState);
+        bildirimHedefi(getIntent());
         boya(this, 0xFF0A110F);
         /* Geri tuşu: önce Kadraj'a sorar (window.kBack: katman, yığın, Akış'a dön); "0" dönerse uygulamadan çıkar. */
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -26,6 +28,26 @@ public class MainActivity extends BridgeActivity {
                 });
             }
         });
+    }
+
+    /* 6.8.20: bildirime dokunarak açıldıysa (uygulama kapalıyken de) gidilecek yeri sakla; sayfa KadrajGaleri.acilis() ile alır. */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        bildirimHedefi(intent);
+    }
+
+    private void bildirimHedefi(Intent it) {
+        try {
+            if (it == null || it.getExtras() == null) return;
+            String k = it.getStringExtra("key");
+            if (k != null && k.matches("^(u:|g:|post:|prof:|meydan$|activity$)[\\w:.-]{0,120}$")) {
+                KadrajGaleri.bekleyen = k;
+                KadrajGaleri.bekleyenAt = System.currentTimeMillis();
+                if (bridge != null && bridge.getWebView() != null)
+                    bridge.getWebView().post(() -> bridge.getWebView().evaluateJavascript("window.kPushOpen&&window.kPushOpen()", null));
+            }
+        } catch (Exception e) { }
     }
 
     /* Durum ve gezinme çubuğunu boyar; renk açıksa simgeler koyu. */

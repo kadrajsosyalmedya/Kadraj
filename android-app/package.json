@@ -1,10 +1,11 @@
 {
   "name": "kadraj-android",
   "private": true,
-  "description": "Kadraj Android uygulaması: siteyi (GitHub Pages) açar, telefon galerisini Kadraj'a verir (KadrajGaleri eklentisi).",
+  "description": "Kadraj Android uygulaması: siteyi (GitHub Pages) açar, telefon galerisini Kadraj'a verir (KadrajGaleri eklentisi), uygulama kapalıyken bildirim alır (Firebase Cloud Messaging).",
   "dependencies": {
     "@capacitor/android": "6.2.0",
     "@capacitor/cli": "6.2.0",
-    "@capacitor/core": "6.2.0"
+    "@capacitor/core": "6.2.0",
+    "@capacitor/push-notifications": "6.0.4"
   }
 }

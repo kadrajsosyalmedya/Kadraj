@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60819,APP_VER="6.8.19";
+const APP_V=60820,APP_VER="6.8.20";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -5122,11 +5122,11 @@ const KP={cache:new Map(),denied:0,
   const list=[...new Set(uids||[])].filter(u=>u&&u!==S.uid&&!BOT[u]&&!String(u).startsWith("bot:")).slice(0,40);if(!list.length)return;
   const dead=new Set(this.dead());const subs=[];const lim=now()-60*24*H;
   for(const u of list){const d=await this.doc(u);if(!d||!d.subs)continue;const pr=d.prefs||{};if(pr.notify===false||(+pr.qm||0)>now()||(pref&&pr[pref]===false)||(payload&&payload.cid&&pr.mute&&pr.mute[payload.cid]))continue;
-   for(const s of Object.values(d.subs).slice(0,8))if(s&&s.endpoint&&s.keys&&!dead.has(s.endpoint)&&(s.at||0)>lim)subs.push({endpoint:s.endpoint,keys:{p256dh:s.keys.p256dh,auth:s.keys.auth}})}
+   for(const s of Object.values(d.subs).slice(0,8)){if(!s||(s.at||0)<=lim)continue;if(s.fcm){if(!dead.has(s.fcm))subs.push({fcm:s.fcm});continue}if(s.endpoint&&s.keys&&!dead.has(s.endpoint))subs.push({endpoint:s.endpoint,keys:{p256dh:s.keys.p256dh,auth:s.keys.auth}})}}
   if(!subs.length)return;let tok="";try{tok=await FB.auth.currentUser.getIdToken()}catch{return}
   const body={...payload,at:payload.at||now()};const gone=[];
   for(let i=0;i<subs.length;i+=20){const part=subs.slice(i,i+20);let r=null;try{r=await fetch(kAI.url()+"/push",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+tok},body:JSON.stringify({subscriptions:part,payload:body})})}catch{return}
-   let j=null;try{j=await r.json()}catch{}if(!r.ok||!j||!Array.isArray(j.results))return;for(const x of j.results)if(x&&x.gone&&part[x.i])gone.push(part[x.i].endpoint)}
+   let j=null;try{j=await r.json()}catch{}if(!r.ok||!j||!Array.isArray(j.results))return;for(const x of j.results)if(x&&x.gone&&part[x.i])gone.push(part[x.i].endpoint||part[x.i].fcm)}
   if(gone.length){const all=[...new Set([...gone,...dead])].slice(0,200);LS.set("kadraj_push_dead",all)}}catch(e){console.warn("push send",e)}},
  afterSend(key,payload,t0){if(!this.can())return;let k;try{k=keyInfo(key)}catch{return}if(!k||(k.type!=="dm"&&k.type!=="group"))return;
   const prev=String(payload.text||(payload.post?"Bir paylaşım gönderdi":payload.img?"Fotoğraf":payload.audio?"Sesli mesaj":payload.game?"Satranç daveti":payload.call?"Arama":"Yeni mesaj")).replace(/\s+/g," ").trim();
@@ -9298,6 +9298,58 @@ HOOKS.after.push(()=>{if(S.route.name==="reels"&&kyOk()&&!KY.busy&&KY.d!==kyDay(
  else if(a==="off"){if(await admSet("kesif",{...cur,yt:""})){S.adm={...(S.adm||{}),kesif:{...cur,yt:"",at:now(),by:S.uid}};KY.list=null;KY_POSTS=null;LS.del("kadraj_kvy");toast("Meme videoları kapatıldı.");st()}}})}}
 try{const s=ADM_EXTRA.find(x=>x.id==="kesif");if(s){s.html=kvAdmHtml;s.wire=kvAdmWire;s.desc="Otomatik meme ve kısa videolar";s.count=()=>{const n=kyList().length+kvListPx().length;return kyKey()||kvKey()?{t:n?n+" video":"Açık",c:"on"}:{t:"Kapalı",c:"dim"}}}}catch(e){console.warn("ky",e)}
 /*}@js:72*/
+
+/*@js:73{*/
+/* 6.8.20 Kadraj Android uygulamasında, uygulama kapalıyken telefon bildirimi (Firebase Cloud Messaging).
+   WebView'da Web Push (PushManager) yok; uygulama Capacitor PushNotifications eklentisiyle FCM cihaz jetonu alır ve
+   push/{uid}.subs içine {fcm, at, ua} olarak yazar (Web Push aboneliklerinin yanında). Gönderen KP.send aynı listeyi köprünün
+   /push yoluna yollar, köprü FCM HTTP v1 ile gönderir (gizli değişken FCM_SA, ai-worker/src/push.js sendFcm).
+   Bildirim Android'de kanal "kadraj"da, aynı sohbetin bildirimi bir öncekinin yerine geçer (tag); dokununca o sohbet açılır:
+   sıcak açılışta eklentinin pushNotificationActionPerformed olayı, soğuk açılışta MainActivity'nin sakladığı hedef
+   (KadrajGaleri.acilis, window.kPushOpen). Uygulama açıkken (önde) telefon bildirimi çıkmaz; üstteki Kadraj kartı gösterilir.
+   APK google-services.json ile derlenmediyse (surum().fcm false) hiçbir şey yapılmaz.
+   KP'nin enable/disable/sync/forget/status/supported yöntemleri uygulamada bu yola gider; tarayıcıda eskisi gibi. */
+const KPN={wired:false,fcm:null,last:"",lastAt:0,
+ p(){try{const C=window.Capacitor;return C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.PushNotifications||null}catch{return null}},
+ on(){return!!(this.p()&&this.fcm===true)},
+ async check(){if(this.fcm!==null)return this.fcm;const G=kgal();if(!G||!this.p())return this.fcm=false;try{const r=await G.surum();this.fcm=!!(r&&r.fcm)}catch{this.fcm=false}return this.fcm},
+ go(key){if(!key)return;if(key===this.last&&now()-this.lastAt<4000)return;this.last=key;this.lastAt=now();openTarget(key)},
+ wire(){if(this.wired)return;const P=this.p();if(!P)return;this.wired=true;
+  try{P.addListener("pushNotificationActionPerformed",a=>{const d=(a&&a.notification&&a.notification.data)||{};this.go(String(d.key||""))})}catch{}
+  try{P.addListener("registration",t=>{const v=t&&t.value;if(this._ok)this._ok(v)})}catch{}
+  try{P.addListener("registrationError",e=>{if(this._no)this._no(new Error((e&&e.error)||"Bildirim kaydı yapılamadı."))})}catch{}},
+ async perm(ask){const P=this.p();let r=await P.checkPermissions();if(ask&&(r.receive==="prompt"||r.receive==="prompt-with-rationale"))r=await P.requestPermissions();return r.receive},
+ async token(){const P=this.p();this.wire();
+  try{await P.createChannel({id:"kadraj",name:"Kadraj",description:"Mesajlar, beğeniler ve aramalar",importance:4,visibility:1,vibration:true,lights:true,lightColor:"#0C7A63"})}catch{}
+  const t=new Promise((ok,no)=>{this._ok=ok;this._no=no;setTimeout(()=>no(new Error("Bildirim kaydı zaman aşımına uğradı.")),20000)});
+  await P.register();return await t},
+ async save(tok){const uid=S.uid;if(!uid||!tok)return false;const h="a"+hash32(tok,7)+hash32(tok,99);let d=null;try{d=await DB.get("push/"+uid)}catch{}
+  const subs={};const lim=now()-60*24*H;for(const[k,v]of Object.entries((d&&d.subs)||{}))if(v&&(v.at||0)>lim&&v.fcm!==tok&&k!==h)subs[k]=v;
+  subs[h]={fcm:tok,at:now(),ua:"Kadraj Android"};LS.set("kadraj_push_h_"+uid,h);LS.set("kadraj_push_fcm_"+uid,tok);
+  return write(()=>DB.set("push/"+uid,{uid,subs,prefs:KP.prefs(),at:now()}),{quiet:true})},
+ async drop(){const uid=S.uid;const tok=LS.get("kadraj_push_fcm_"+uid,"");if(!uid)return;try{const d=await DB.get("push/"+uid);if(!d||!d.subs)return;const subs={};for(const[k,v]of Object.entries(d.subs))if(v&&!(tok&&v.fcm===tok))subs[k]=v;await DB.set("push/"+uid,{...d,subs,at:now()})}catch{}}};
+/* soğuk açılış: MainActivity'nin sakladığı hedef */
+window.kPushOpen=async function(){try{const G=kgal();if(!G||typeof G.acilis!=="function")return;const r=await G.acilis();if(r&&r.key)KPN.go(String(r.key))}catch{}};
+{KPN.wire();setTimeout(()=>window.kPushOpen(),0);HOOKS.enter.push(()=>setTimeout(()=>window.kPushOpen(),300));
+ document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")window.kPushOpen()})}
+{const sup=KP.supported.bind(KP),st=KP.status.bind(KP),en=KP.enable.bind(KP),dis=KP.disable.bind(KP),sy=KP.sync.bind(KP),fg=KP.forget.bind(KP);
+ KP.supported=function(){return sup()||KPN.on()};
+ KP.status=function(){if(!KPN.p())return st();if(S.mode!=="cloud")return{can:false,on:false,text:"Yalnızca bulut modunda (Firebase) çalışır."};
+  if(KPN.fcm===false)return{can:false,on:false,text:"Bu uygulama sürümü bildirim almıyor. Ayarlar'dan uygulamayı güncelle."};
+  if(KPN.fcm===null){KPN.check().then(()=>{try{if(S.route.name==="settings"||S.route.name==="feed")scheduleRefresh()}catch{}});return{can:false,on:false,text:"Bildirim durumu denetleniyor…"}}
+  if(!kAI.url())return{can:false,on:false,text:"Yönetici Kadraj köprüsünü kurunca açılabilir."};
+  return this.isOn()?{can:true,on:true,text:"Açık · Kadraj kapalıyken de mesaj, beğeni ve aramalardan haberin olur."}:{can:true,on:false,text:"Kadraj kapalıyken de mesaj, beğeni ve aramalardan haberin olsun."}};
+ KP.enable=async function(){if(!KPN.p())return en();try{if(!this.can()||!await KPN.check()){toast(this.status().text);return false}
+  const pr=await KPN.perm(true);if(pr!=="granted"){toast("Bildirim izni verilmedi. Telefonun Ayarlar › Uygulamalar › Kadraj › Bildirimler'den açabilirsin.");return false}
+  const tok=await KPN.token();if(!await KPN.save(tok)){toast("Bildirim kaydı kaydedilemedi. Yönetici Firestore kurallarını yeniden yayınlamalı.");return false}
+  LS.set(this.onKey(),1);toast("Kadraj kapalıyken de bildirim alacaksın");return true}
+  catch(e){console.warn("fcm",e);toast("Bildirim açılamadı: "+String((e&&e.message)||e).slice(0,90));return false}};
+ KP.disable=async function(){if(!KPN.p())return dis();LS.del(this.onKey());await KPN.drop();try{await KPN.p().unregister()}catch{}toast("Kadraj kapalıyken bildirim gelmeyecek");return true};
+ KP.sync=async function(force){if(!KPN.p())return sy(force);try{if(!this.isOn()||!this.can()||!await KPN.check())return;if(await KPN.perm(false)!=="granted")return;
+  const sk="kadraj_push_sync_"+S.uid;const sig=JSON.stringify(this.prefs());const last=LS.get(sk,{})||{};const tok=await KPN.token();
+  if(!force&&last.ep===tok&&last.sig===sig&&now()-(last.at||0)<12*H)return;if(await KPN.save(tok))LS.set(sk,{ep:tok,sig,at:now()})}catch(e){console.warn("fcm sync",e)}};
+ KP.forget=function(){if(!KPN.p())return fg();if(S.mode!=="cloud"||!S.uid||!this.isOn())return;KPN.drop();try{KPN.p().unregister()}catch{}}}
+/*}@js:73*/
 
 boot();
 

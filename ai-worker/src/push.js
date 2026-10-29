@@ -174,7 +174,88 @@ export async function sendPush(sub, payloadObj, env, fetcher = fetch) {
   return { status: r.status, gone: r.status === 404 || r.status === 410 };
 }
 
+// 6.8.20: Kadraj Android uygulaması (Capacitor WebView) Web Push alamaz; ona Firebase Cloud Messaging (HTTP v1) ile gönderilir.
+// Hizmet hesabı JSON'u Cloudflare'de gizli değişken FCM_SA (Firebase › Proje ayarları › Hizmet hesapları › Yeni özel anahtar oluştur).
+// Abonelik biçimi {fcm:"<cihaz jetonu>"}; erişim jetonu (OAuth, 1 saat) Worker belleğinde saklanır.
+let FCM_AT = null;
+export function fcmSa(env) {
+  const s = env && env.FCM_SA;
+  if (!s) return null;
+  try {
+    const j = typeof s === "string" ? JSON.parse(s) : s;
+    if (j && j.client_email && j.private_key && j.project_id) return j;
+  } catch {}
+  return null;
+}
+function pemBytes(pem) {
+  const b = String(pem).replace(/-----[^-]+-----/g, "").replace(/\s+/g, "");
+  const bin = atob(b);
+  const u = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+  return u;
+}
+export async function fcmAccess(env, fetcher = fetch) {
+  const sa = fcmSa(env);
+  if (!sa) throw new Error("no_fcm");
+  const now = Math.floor(Date.now() / 1000);
+  if (FCM_AT && FCM_AT.email === sa.client_email && FCM_AT.exp > now + 60) return FCM_AT.tok;
+  const h = b64u(te.encode(JSON.stringify({ alg: "RS256", typ: "JWT" })));
+  const p = b64u(te.encode(JSON.stringify({ iss: sa.client_email, scope: "https://www.googleapis.com/auth/firebase.messaging", aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 3600 })));
+  const key = await crypto.subtle.importKey("pkcs8", pemBytes(sa.private_key), { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
+  const sig = b64u(new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", key, te.encode(h + "." + p))));
+  const r = await fetcher("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: "grant_type=" + encodeURIComponent("urn:ietf:params:oauth:grant-type:jwt-bearer") + "&assertion=" + h + "." + p + "." + sig,
+  });
+  let j = null;
+  try {
+    j = await r.json();
+  } catch {}
+  if (!r.ok || !j || !j.access_token) throw new Error("fcm_auth");
+  FCM_AT = { email: sa.client_email, tok: j.access_token, exp: now + Math.min(3500, Number(j.expires_in) || 3500) };
+  return FCM_AT.tok;
+}
+export function validFcm(s) {
+  return !!s && typeof s === "object" && typeof s.fcm === "string" && /^[\w:.-]{20,400}$/.test(s.fcm);
+}
+// Tek cihaza gönderir. Dönüş: {status, gone}. Bildirim Android'de kanal "kadraj"da, aynı sohbetten gelen bir öncekinin yerine (tag).
+export async function sendFcm(token, payloadObj, env, fetcher = fetch) {
+  const sa = fcmSa(env);
+  const at = await fcmAccess(env, fetcher);
+  const data = {};
+  for (const [k, v] of Object.entries(payloadObj)) data[k] = String(v == null ? "" : v); // FCM data değerleri metin olmalı
+  const hi = payloadObj.kind === "msg" || payloadObj.kind === "call";
+  const msg = {
+    message: {
+      token,
+      data,
+      android: {
+        priority: hi ? "high" : "normal",
+        ttl: payloadObj.kind === "call" ? "60s" : "86400s",
+        notification: { title: payloadObj.title, body: payloadObj.body, tag: payloadObj.tag || "kadraj", channel_id: "kadraj", icon: "ic_stat_kadraj", color: "#0C7A63", sound: "default", notification_priority: hi ? "PRIORITY_HIGH" : "PRIORITY_DEFAULT" },
+      },
+    },
+  };
+  let r;
+  try {
+    r = await fetcher("https://fcm.googleapis.com/v1/projects/" + encodeURIComponent(sa.project_id) + "/messages:send", { method: "POST", headers: { Authorization: "Bearer " + at, "Content-Type": "application/json" }, body: JSON.stringify(msg) });
+  } catch {
+    return { status: 0, gone: false };
+  }
+  let gone = r.status === 404;
+  if (r.status === 400) {
+    let t = "";
+    try {
+      t = await r.text();
+    } catch {}
+    gone = /UNREGISTERED|not a valid FCM registration token|registration-token-not-registered/i.test(t);
+  }
+  return { status: r.status, gone };
+}
+
 // POST /push gövdesi: {subscriptions:[...]} ya da {subscription:{...}}, payload:{title, body, key, tag, icon, mid, kind}
+// Abonelik ya Web Push ({endpoint, keys}) ya da Android uygulaması ({fcm}).
 export async function handlePush(body, uid, env, fetcher = fetch) {
   const raw = Array.isArray(body && body.subscriptions) ? body.subscriptions : body && body.subscription ? [body.subscription] : [];
   if (!raw.length) return { status: 400, data: { error: "bad_request", message: "Abonelik yok." } };
@@ -182,7 +263,17 @@ export async function handlePush(body, uid, env, fetcher = fetch) {
   const payload = cleanPayload(body.payload, uid);
   const results = await Promise.all(
     raw.map(async (s, i) => {
+      if (validFcm(s)) {
+        if (!fcmSa(env)) return { i, status: 0, gone: false, error: "no_fcm" };
+        try {
+          const r = await sendFcm(s.fcm, payload, env, fetcher);
+          return { i, status: r.status, gone: r.gone, ok: r.status >= 200 && r.status < 300 };
+        } catch (e) {
+          return { i, status: 0, gone: false, error: String((e && e.message) || "error").slice(0, 40) };
+        }
+      }
       if (!validSub(s, env)) return { i, status: 0, gone: false, error: "invalid" };
+      if (!env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY) return { i, status: 0, gone: false, error: "no_vapid" };
       try {
         const r = await sendPush({ endpoint: s.endpoint, keys: { p256dh: s.keys.p256dh, auth: s.keys.auth } }, payload, env, fetcher);
         return { i, status: r.status, gone: r.gone, ok: r.status >= 200 && r.status < 300 };

@@ -243,13 +243,32 @@ public class KadrajGaleri extends Plugin {
 
     /* Uygulamanın yerel sürümü: Java tarafı değişince SURUM'u artır, index.html'deki APK_NATIVE da aynı sayı olsun.
        Sayfa küçükse "Güncelleme var" penceresi çıkar. */
-    static final int SURUM = 2;
+    static final int SURUM = 3;
 
     @PluginMethod
     public void surum(PluginCall call) {
         JSObject r = new JSObject();
         r.put("surum", SURUM);
+        r.put("fcm", fcmVar());
         try { r.put("ad", getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionName); } catch (Exception e) { r.put("ad", ""); }
+        call.resolve(r);
+    }
+
+    /* 6.8.20 bildirimler: google-services.json ile derlendiyse (Firebase Cloud Messaging kullanılabilir) true. Yoksa sayfa bildirim kaydı denemez. */
+    private boolean fcmVar() {
+        try { return getContext().getResources().getIdentifier("google_app_id", "string", getContext().getPackageName()) != 0; } catch (Exception e) { return false; }
+    }
+
+    /* Bildirime dokunarak açılınca gidilecek yer (FCM data "key", ör. u:<uid>, g:<grup>, post:<id>). MainActivity yazar, sayfa bir kez okur. */
+    static volatile String bekleyen = null;
+    static volatile long bekleyenAt = 0;
+
+    @PluginMethod
+    public void acilis(PluginCall call) {
+        JSObject r = new JSObject();
+        String k = bekleyen;
+        if (k != null && System.currentTimeMillis() - bekleyenAt < 10 * 60 * 1000) r.put("key", k);
+        bekleyen = null;
         call.resolve(r);
     }
 
