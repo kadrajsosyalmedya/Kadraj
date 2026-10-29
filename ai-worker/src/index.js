@@ -3,7 +3,7 @@
 // - Yalnızca Kadraj'a giriş yapmış kişilerin isteklerini kabul eder: her istekte Firebase kimlik jetonu doğrulanır.
 // - Kişi başına günlük sınır vardır (DAILY_LIMIT). Asıl harcama sınırını Anthropic Console > Limits'ten koy.
 import Anthropic from "@anthropic-ai/sdk";
-import { handlePush, vapidKeys } from "./push.js";
+import { handlePush, vapidKeys, fcmSa } from "./push.js";
 
 const JWKS_URL_DEFAULT = "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com";
 const MAX_MESSAGES = 24;
@@ -472,7 +472,7 @@ export default {
     if (req.method === "OPTIONS") return new Response(null, { status: origin ? 204 : 403, headers: cors(origin) });
     if (req.method === "GET" && (url.pathname === "/" || url.pathname === "/health")) {
       const free = !env.ANTHROPIC_API_KEY && !!env.AI;
-      return json({ ok: true, name: "kadraj-ai", provider: env.ANTHROPIC_API_KEY ? "claude" : free ? "free" : "none", model: env.ANTHROPIC_API_KEY ? String(env.MODEL || "claude-opus-5-5") : free ? String(env.FREE_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") : "", key: !!(env.ANTHROPIC_API_KEY || env.AI), push: !!(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY), search: !!(env.ANTHROPIC_API_KEY || env.TAVILY_API_KEY), image: !!env.AI }, 200, origin);
+      return json({ ok: true, name: "kadraj-ai", provider: env.ANTHROPIC_API_KEY ? "claude" : free ? "free" : "none", model: env.ANTHROPIC_API_KEY ? String(env.MODEL || "claude-opus-5-5") : free ? String(env.FREE_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast") : "", key: !!(env.ANTHROPIC_API_KEY || env.AI), push: !!(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY), fcm: !!fcmSa(env), search: !!(env.ANTHROPIC_API_KEY || env.TAVILY_API_KEY), image: !!env.AI }, 200, origin);
     }
     // 5.1: Web Push açık anahtarı (tarayıcı aboneliği için applicationServerKey)
     if (req.method === "GET" && url.pathname === "/vapid") {
@@ -487,7 +487,7 @@ export default {
     // 5.1: uygulama kapalıyken bildirim gönder (gönderenin Firebase oturumu gerekir)
     if (req.method === "POST" && url.pathname === "/push") {
       if (!origin) return json({ error: "origin", message: "Bu adres yalnızca Kadraj'dan kullanılabilir." }, 403, origin);
-      if (!env.VAPID_PUBLIC_KEY || !env.VAPID_PRIVATE_KEY) return json({ error: "no_vapid", message: "Köprüde VAPID anahtarları yok." }, 501, origin);
+      if (!(env.VAPID_PUBLIC_KEY && env.VAPID_PRIVATE_KEY) && !fcmSa(env)) return json({ error: "no_vapid", message: "Köprüde VAPID anahtarları da FCM_SA da yok." }, 501, origin);
       let puid;
       try {
         puid = await verifyFirebase((req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, ""), env);

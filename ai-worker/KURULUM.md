@@ -85,6 +85,13 @@ Bu adımdan sonra Kadraj kapalıyken de mesaj, beğeni, yorum, takip ve aramalar
    - Denemek için: Kadraj > Yönetici paneli > **Yapay zekâ** > **Test bildirimi (5 sn sonra)**'ya bas ve 5 saniye içinde Kadraj'ı kapat. Bildirim, bu ayarı açtığın bütün cihazlarına gelir.
    - iPhone'da bu yalnızca Kadraj **Ana ekrana eklenip** oradan açıldığında çalışır (iOS 16.4 ve sonrası).
 
+**Kadraj Android uygulaması (6.8.20)**: Uygulama Web Push alamaz; ona Firebase Cloud Messaging ile gider.
+1. Firebase konsolu › Proje ayarları (dişli) › Genel › **Uygulama ekle** › Android. Paket adı: `io.github.kadrajsosyalmedya.kadraj`. Kaydet, **google-services.json**'ı indir. Bu dosya gizli değil; depoda `android-app/google-services.json` olarak durur, APK onunla derlenir.
+2. Firebase konsolu › Proje ayarları › **Hizmet hesapları** › **Yeni özel anahtar oluştur** › bir JSON dosyası iner. **Bu gizlidir**: kimseyle paylaşma, GitHub'a koyma.
+3. Cloudflare › Workers › kadraj-ai › Settings › Variables and Secrets › Add: Type **Secret**, Name `FCM_SA`, Value: indirilen JSON dosyasının **tamamı**.
+4. Cloudflare'de Edit code ile `hazir/kadraj-ai.js`'i yapıştır, Deploy. `/health` yanıtında `"fcm":true` görünmeli.
+5. Yeni APK'yı kur; Kadraj > Ayarlar > Bildirimler > **Uygulama kapalıyken de bildir**'i aç ve izin ver.
+
 **Notlar**
 - Anahtarları bir kez kur, sonra değiştirme. Değiştirirsen herkesin bu anahtarı kapatıp yeniden açması gerekir.
 - Kişi başına sınır: günde `PUSH_DAILY_LIMIT` (varsayılan 600) gönderim isteği, 10 dakikada en fazla 80.

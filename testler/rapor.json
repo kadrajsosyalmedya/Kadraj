@@ -1,9 +1,34 @@
 {
  "title": "Ajan testleri",
- "ver": "6.8.19",
- "at": "2026-10-28T18:30:00+00:00",
- "note": "Yeni sohbet kuralları gerçek Firestore emülatöründe denendi: 38 kural denetimi ve üç kişiyle uçtan uca 18 denetim geçti. Kadraj testi 47 adım geçti.",
+ "ver": "6.8.20",
+ "at": "2026-10-29T10:00:00+00:00",
+ "note": "Android uygulamasında uygulama kapalıyken bildirim: köprü testleri 16+34, emülatörde sahte Android eklentileriyle uçtan uca 16 denetim geçti. Gerçek telefonda denenmedi; sahibinin Firebase ve Cloudflare ayarları bekleniyor.",
  "items": [
+  {
+   "ad": "Uygulamada bildirim izni ve kayıt",
+   "ok": true,
+   "not": "Sahte eklentiyle"
+  },
+  {
+   "ad": "Mesaj gelince Android cihazına bildirim isteği",
+   "ok": true,
+   "not": "Köprüye {fcm} gidiyor"
+  },
+  {
+   "ad": "Köprü FCM gönderimi (imza, jeton, mesaj biçimi)",
+   "ok": true,
+   "not": "Sahte Google uçlarıyla"
+  },
+  {
+   "ad": "Bildirime dokununca DM açılıyor (açık ve kapalı uygulama)",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Gerçek telefonda bildirim",
+   "ok": false,
+   "not": "Firebase/Cloudflare ayarları ve yeni APK bekleniyor"
+  },
   {
    "ad": "Başkası DM'i okuyamıyor/yazamıyor",
    "ok": true,
@@ -198,31 +223,6 @@
    "ad": "Pano izni yokken kopyalama",
    "ok": true,
    "not": "navigator.clipboard yokken eski yöntemle (execCommand) kopyaladı, uyarı çıktı."
-  },
-  {
-   "ad": "Anket ve şarkı mesajı kopyalama",
-   "ok": true,
-   "not": "Grup anketi soru + seçeneklerle, şarkı adıyla kopyalanıyor; silinen ve tek seferlik fotoğraf kopyalanmıyor."
-  },
-  {
-   "ad": "Köprü ağ hatasında yeniden dener",
-   "ok": true,
-   "not": "Sahte sunucuyla: ilk deneme kopunca ikincide yanıt geldi; köprü açık ama soruda çökünce 'bu soruda hata verdi', kapalıyken 'ulaşılamadı' yazıyor."
-  },
-  {
-   "ad": "Gerçek yapay zekâ köprüsü",
-   "ok": false,
-   "not": "köprü adresi yalnızca Firestore'da (admin/ai) ve bu ortamdan okunamıyor; sahibi Yönetici › Yapay zekâ'dan köprü durumuna bakmalı"
-  },
-  {
-   "ad": "Açılış (gerçek Firebase, giriş yok)",
-   "ok": true,
-   "not": "3 saniyede karşılama ekranı geldi."
-  },
-  {
-   "ad": "Açılış (giriş yapmış, sahte Firebase)",
-   "ok": true,
-   "not": "2 saniyede Akış geldi; 38 saniye beklendi, uyarı kartı çıkmadı."
   }
  ]
 }
