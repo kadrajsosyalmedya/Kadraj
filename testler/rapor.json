@@ -1,228 +1,38 @@
 {
- "title": "Ajan testleri",
- "ver": "6.8.20",
- "at": "2026-10-29T10:00:00+00:00",
- "note": "Android uygulamasında uygulama kapalıyken bildirim: köprü testleri 16+34, emülatörde sahte Android eklentileriyle uçtan uca 16 denetim geçti. Gerçek telefonda denenmedi; sahibinin Firebase ve Cloudflare ayarları bekleniyor.",
+ "title": "6.8.21 Gizli kullanıcı",
+ "ver": "6.8.21",
+ "at": 1793378878491,
+ "note": "Yönetici › Gizli kullanıcılar. Demo modunda 15 denetim ve Kadraj testi 47 adım geçti.",
  "items": [
   {
-   "ad": "Uygulamada bildirim izni ve kayıt",
+   "ad": "Gizli kullanıcı başkalarına görünmez",
    "ok": true,
-   "not": "Sahte eklentiyle"
+   "not": "Kişiler, arama, paylaşım, hikâye, takipçi, yorum"
   },
   {
-   "ad": "Mesaj gelince Android cihazına bildirim isteği",
+   "ad": "Gizli kullanıcının profili açılmaz, ona mesaj gitmez",
    "ok": true,
-   "not": "Köprüye {fcm} gidiyor"
+   "not": "Bu profil görüntülenemiyor"
   },
   {
-   "ad": "Köprü FCM gönderimi (imza, jeton, mesaj biçimi)",
-   "ok": true,
-   "not": "Sahte Google uçlarıyla"
-  },
-  {
-   "ad": "Bildirime dokununca DM açılıyor (açık ve kapalı uygulama)",
+   "ad": "İşaretlenen kişi onu görür",
    "ok": true,
    "not": ""
   },
   {
-   "ad": "Gerçek telefonda bildirim",
-   "ok": false,
-   "not": "Firebase/Cloudflare ayarları ve yeni APK bekleniyor"
-  },
-  {
-   "ad": "Başkası DM'i okuyamıyor/yazamıyor",
-   "ok": true,
-   "not": "Emülatörde"
-  },
-  {
-   "ad": "Yeni DM'de ilk mesaj gidiyor, karşı taraf canlı görüyor",
+   "ad": "Gizli kullanıcı yalnızca işaretlileri görür, Meydan kapalı",
    "ok": true,
    "not": ""
   },
   {
-   "ad": "Gruptan ayrılan grubu göremiyor",
+   "ad": "Yönetici paneli: gizli yap, kişi işaretle, kaldır",
    "ok": true,
-   "not": ""
+   "not": "admin/gizli yazılıyor"
   },
   {
-   "ad": "Meydan herkese açık",
+   "ad": "Kadraj testi (47 adım)",
    "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Bildirimden yanıt görüldü göndermiyor",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Bildirimden Kalp ve Görüldü",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Supabase ayarı yazıldı (adres ve herkese açık anahtar)",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Supabase yedeği Orbit olmadan çalışıyor",
-   "ok": true,
-   "not": "ac.js 36 denetim"
-  },
-  {
-   "ad": "Sade kurulum.sql iki kez çalıştırılabiliyor",
-   "ok": true,
-   "not": "Yerel Postgres"
-  },
-  {
-   "ad": "Yedek güvenlik kuralları",
-   "ok": true,
-   "not": "31 denetim"
-  },
-  {
-   "ad": "Sonraki meme önceden hazırlanıyor",
-   "ok": true,
-   "not": "İlk karede durup başa sarılıyor"
-  },
-  {
-   "ad": "Sıra gelince yeniden yüklenmeden oynuyor",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Oynatıcı sunucularına önceden bağlanılıyor",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "En çok 3 oynatıcı (önceki, açık, sonraki)",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Meme hep sessiz başlıyor, oynayınca ses açılıyor",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Oynatıcı geç yanıt verince yeniden soruluyor",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Kendiliğinden oynamazsa dokununca oynuyor",
-   "ok": true,
-   "not": "4,5 sn sonra oynatıcı dokunuşa açılıyor"
-  },
-  {
-   "ad": "Ses açılamazsa sessiz oynuyor ve uyarıyor",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Oynatıcı hatası listeyi silmiyor",
-   "ok": true,
-   "not": "Yalnızca 100/101/150 kara listeye giriyor"
-  },
-  {
-   "ad": "Gerçek YouTube oynatıcısında oynatma",
-   "ok": false,
-   "not": "Bu ortamdan YouTube'a erişilemiyor, denenemedi"
-  },
-  {
-   "ad": "Kurgu açılıyor",
-   "ok": true,
-   "not": "Klaket oluştururken video seçilince Kurgu düğmesi çıktı; düzenleyici açıldı, önizleme çizildi, zaman şeridinde küçük resimler var, süre doğru (6 sn)."
-  },
-  {
-   "ad": "Kes ve hızlandır",
-   "ok": true,
-   "not": "Başı %20'den, sonu %80'den kesildi (3,6 sn); 2x hızla 1,8 sn oldu."
-  },
-  {
-   "ad": "Yazı",
-   "ok": true,
-   "not": "\"Merhaba Kadraj\" eklendi; sarı renk, kutulu stil, zıplama animasyonu seçildi; önizlemede görünüyor."
-  },
-  {
-   "ad": "Filtre, format, kapak",
-   "ok": true,
-   "not": "Filtre önizlemeleri çıktı, Sıcak seçildi; 9:16 format önizlemede doğru oranda; oynatma çizgisindeki kare kapak yapıldı."
-  },
-  {
-   "ad": "Dışa aktarma",
-   "ok": true,
-   "not": "Bitti'ye basınca hazırlanıyor ekranı çıktı. Çıkan video ffprobe ile ölçüldü: 480x854 (9:16), 1,8 sn, sesli. ffmpeg ile alınan karede sarı kutulu yazı var."
-  },
-  {
-   "ad": "Yeniden aç ve kapat",
-   "ok": true,
-   "not": "Tekrar Kurgu'ya basınca önceki ayarlar duruyor; değişiklik varken kapatınca onay soruyor; Bırak deyince önceki kurgu korunuyor."
-  },
-  {
-   "ad": "Paylaşım",
-   "ok": true,
-   "not": "Düzenlenmiş Klaket paylaşıldı; kapak seçilen kareden, süre 1,8 sn kaydedildi. 360 ve 390 px'te yan taşma yok."
-  },
-  {
-   "ad": "mp4 videolar",
-   "ok": true,
-   "not": "Bu ortamdaki test tarayıcısı mp4 (H.264) açamıyor, bu yüzden testler webm ile yapıldı. Telefondaki Chrome mp4'ü açar; telefonunda bir kez denemen iyi olur."
-  },
-  {
-   "ad": "Önceki özellikler",
-   "ok": true,
-   "not": "Kadraj testi 47 adımın hepsi ve 6.7 testleri (49) geçti."
-  },
-  {
-   "ad": "Supabase yedeği: Firebase'e ulaşılamayınca acil giriş ekranı",
-   "ok": true,
-   "not": "gstatic engellenince açıldı"
-  },
-  {
-   "ad": "Supabase yedeği: giriş, sohbet, fotoğraf, canlı mesaj, yeni sohbet, Meydan",
-   "ok": true,
-   "not": "sahte Supabase"
-  },
-  {
-   "ad": "Supabase yedeği: sahte eşleme gizleniyor, Çocuk Modu'nda Meydan yok",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Supabase yedeği: hazırlık, acil mesajların Kadraj'a taşınması, Ayarlar girişi, uyarı şeridi",
-   "ok": true,
-   "not": ""
-  },
-  {
-   "ad": "Supabase yedeği: gerçek Supabase ile deneme",
-   "ok": false,
-   "not": "Supabase projesi henüz kurulmadı (yedek/ayar.js boş)"
-  },
-  {
-   "ad": "Yönetici › Firebase: sade panel (durum, kalan hak, bugün mesajlar, Ayrıntılar)",
-   "ok": true,
-   "not": "sahte Firebase ile 360/390 px, 19 denetim; ekranlarda beklerken yeniden abone olma döngüsü yok"
-  },
-  {
-   "ad": "Yönetici › Firebase: gerçek Firebase'de",
-   "ok": false,
-   "not": "bu ortamdan Firebase'e erişilemiyor; sahibinin telefonunda denenmeli"
-  },
-  {
-   "ad": "Okuma azaltma: çevrimiçi 90 sn, Akış ilk 30 paylaşım",
-   "ok": true,
-   "not": "Kadraj testi 47 adım geçti; gerçek okuma düşüşü panelde birkaç günde görülecek"
-  },
-  {
-   "ad": "Rota'nın mesajını kopyalama",
-   "ok": true,
-   "not": "Rota sohbetinde mesaja basılı tutunca ve sağ tıkla Metni kopyala çıktı; ** işaretleri ve (Yapay zekâ …) notu olmadan düz yazı kopyalandı."
-  },
-  {
-   "ad": "Pano izni yokken kopyalama",
-   "ok": true,
-   "not": "navigator.clipboard yokken eski yöntemle (execCommand) kopyaladı, uyarı çıktı."
+   "not": "Hepsi geçti"
   }
  ]
 }
