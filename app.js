@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60820,APP_VER="6.8.20";
+const APP_V=60821,APP_VER="6.8.21";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -6356,7 +6356,7 @@ STK.fx=stkFx;STK.paint=stkPaint;
 /* 5.1 engelleme: profiles/{uid}.blocked = {uid: zaman|0}. Engelleyen ya da engellenen arasında paylaşım, mesaj, takip, arama, yorum ve bildirim görünmez. */
 const blkOf=u=>((S.profiles[u]||{}).blocked)||{};
 const iBlocked=u=>!!(u&&u!==S.uid&&blkOf(S.uid)[u]);
-const blockedMe=u=>!!(u&&u!==S.uid&&blkOf(u)[S.uid]);
+const blockedMe=u=>!!(u&&u!==S.uid&&(blkOf(u)[S.uid]||gzNo(u)));
 const isBlk=u=>iBlocked(u)||blockedMe(u);
 {const f=allPosts;allPosts=function(...a){return f.apply(this,a).filter(p=>!isBlk(p.uid))}}
 {const f=canSee;canSee=function(p){if(p&&isBlk(p.uid))return false;return f(p)}}
@@ -9350,6 +9350,47 @@ window.kPushOpen=async function(){try{const G=kgal();if(!G||typeof G.acilis!=="f
   if(!force&&last.ep===tok&&last.sig===sig&&now()-(last.at||0)<12*H)return;if(await KPN.save(tok))LS.set(sk,{ep:tok,sig,at:now()})}catch(e){console.warn("fcm sync",e)}};
  KP.forget=function(){if(!KPN.p())return fg();if(S.mode!=="cloud"||!S.uid||!this.isOn())return;KPN.drop();try{KPN.p().unregister()}catch{}}}
 /*}@js:73*/
+
+/*@js:74{*/
+/* 6.8.21 gizli kullanıcı (sahibinin isteği): yönetici bir hesabı gizli yapar ve kimlerle konuşabileceğini işaretler.
+   Belge admin/gizli = {list:{uid:{at, ok:{uid:1}}}} (admin koleksiyonu girişli herkese okunur, yalnızca yönetici yazar; kural değişikliği yok).
+   gzNo(u): bu cihazdaki kişi (S.uid) ile u arasında izin yoksa true. İki yönlü: gizli kişi yalnızca ok listesindekileri görür,
+   listede olmayanlar da onu görmez. 51BLOCK'taki blockedMe yerinde gzNo'ya da bakar, böylece engellemenin bütün süzgeçleri
+   (paylaşım, hikâye, profil "Bu profil görüntülenemiyor", humans(): kişiler, yeni sohbet, grup, @, DM gönderme, arama, takip,
+   bildirimler) gizli kullanıcıya da uygulanır. Ek olarak: Meydan gizli kişiye kapalı, Meydan/grup mesajları, yorumlar,
+   sohbet listesi, Keşfet kişi araması ve takipçi listeleri süzülür. Yönetici modu (S.admin) her şeyi görür.
+   Not: süzme istemcide; Firestore kuralları bunu zorlamaz. Yönetici › Gizli kullanıcılar (ADM_EXTRA "gizli", gzAdmHtml/gzAdmWire). */
+function gzList(){const l=S.adm&&S.adm.gizli&&S.adm.gizli.list;return l&&typeof l==="object"?l:{}}
+function gzMe(){return!!(S.uid&&!S.admin&&gzList()[S.uid])}
+function gzNo(u){if(!u||!S.uid||u===S.uid||S.admin||String(u).startsWith("bot:"))return false;const L=gzList();const a=L[S.uid],b=L[u];if(!a&&!b)return false;
+ if(a&&!((a.ok||{})[u]))return true;if(b&&!((b.ok||{})[S.uid]))return true;return false}
+{const f=childBlockMeydan;childBlockMeydan=function(){if(gzMe()){toast("Meydan bu hesapta kapalı. Arkadaşlarınla buradan konuşabilirsin.");return true}return f.apply(this,arguments)}}
+{const f=sendMessage;sendMessage=async function(key,payload){const k=keyInfo(key);if(k.type==="meydan"&&gzMe()&&!(payload&&payload.sys)){toast("Meydan bu hesapta kapalı.");return false}
+ if(k.type==="group"&&gzMe()){const mm=((S.chats[k.cid]||{}).members||[]).filter(u=>u!==S.uid&&gzNo(u));if(mm.length){toast("Bu grupta konuşamazsın.");return false}}return f.apply(this,arguments)}}
+{const f=currentMsgs;currentMsgs=function(){const m=f.apply(this,arguments);const k=keyInfo(S.route.params.key);return k.type==="bot"?m:m.filter(x=>!(x&&gzNo(x.from)))}}
+{const f=commentsOf;commentsOf=function(p){return f.apply(this,arguments).filter(c=>!gzNo(c.uid))}}
+{const f=chatList;chatList=function(...a){return f.apply(this,a).filter(c=>{if(c.key==="meydan"||c.cid==="meydan")return!gzMe();return c.group||!gzNo(c.other)})}}
+{const f=srPeopleAll;srPeopleAll=function(){return f.apply(this,arguments).filter(u=>!gzNo(u))}}
+{const f=followersOf;followersOf=function(){return f.apply(this,arguments).filter(u=>!gzNo(u))}}
+{const f=followingOf;followingOf=function(){const r=f.apply(this,arguments);return Array.isArray(r)?r.filter(u=>!gzNo(u)):r}}
+/* yönetici bölümü */
+function gzAdmHtml(){const L=gzList();const us=admUsers().sort((a,b)=>String(a.name||a.username||"").localeCompare(String(b.name||b.username||""),"tr"));
+ const nm=u=>{const p=P(u);return esc(p.name||p.username||u)};const ids=Object.keys(L).filter(u=>S.profiles[u]);
+ let h=`<p class="adm5-note">Gizli hesap yalnızca işaretlediğin kişileri görür ve onlarla konuşur. Diğerleri onu hiçbir yerde görmez (arama, paylaşım, hikâye, profil, mesaj); Meydan ona kapalıdır.</p>`;
+ for(const u of ids){const ok=L[u].ok||{};
+  h+=`<div class="box" style="margin:10px 0;padding:12px"><div style="display:flex;align-items:center;gap:10px">${avatar(u,36,{click:false,ring:false,online:false})}<div style="flex:1;min-width:0"><b>${nm(u)}</b><div class="muted">@${esc(P(u).username||"")} · ${Object.keys(ok).filter(x=>ok[x]).length} kişi</div></div><button type="button" class="btn sec sm" data-gza="off" data-u="${esc(u)}">Gizliliği kaldır</button></div>
+  <div class="muted" style="margin:10px 0 6px">Kimlerle konuşabilir?</div><div style="display:flex;flex-wrap:wrap;gap:6px">${us.filter(p=>p.uid!==u).map(p=>{const on=!!ok[p.uid];return`<button type="button" class="chip${on?" on":""}" aria-pressed="${on}" data-gza="ok" data-u="${esc(u)}" data-o="${esc(p.uid)}">${on?I("check"):""}${nm(p.uid)}</button>`}).join("")}</div></div>`}
+ const rest=us.filter(p=>!L[p.uid]);
+ h+=rest.length?`<div style="display:flex;gap:8px;margin-top:10px"><select id="gzSel" class="in" style="flex:1;min-width:0">${rest.map(p=>`<option value="${esc(p.uid)}">${nm(p.uid)} (@${esc(p.username||"")})</option>`).join("")}</select><button type="button" class="btn sm" data-gza="add">Gizli yap</button></div>`:`<p class="adm5-note">Gizli yapılacak başka hesap yok.</p>`;
+ return h}
+async function gzSave(L,msg){const ok=await admSet("gizli",{list:L});if(ok){S.adm={...(S.adm||{}),gizli:{list:L,at:now(),by:S.uid}};if(msg){admLog(msg);toast(msg)}const pad=document.querySelector("#admS-gizli .adm5-pad");if(pad)pad.innerHTML=gzAdmHtml()}return ok}
+function gzAdmWire(el){if(el._gzw)return;el._gzw=1;el.addEventListener("click",async e=>{const b=e.target.closest("[data-gza]");if(!b)return;e.preventDefault();if(!S.admin)return;const a=b.dataset.gza;
+ const L=JSON.parse(JSON.stringify(gzList()));const un=u=>"@"+(P(u).username||u);
+ if(a==="add"){const u=($("#gzSel",el)||{}).value;if(!u)return;L[u]={at:now(),ok:{}};b.disabled=true;await gzSave(L,un(u)+" gizli yapıldı");b.disabled=false}
+ else if(a==="off"){const u=b.dataset.u;dialog(un(u)+" yeniden herkese görünsün mü?","Gizlilik kalkar, herkes onu yeniden görür ve ona yazabilir.",[{label:"Gizliliği kaldır",cls:"danger",fn:()=>{delete L[u];gzSave(L,un(u)+" artık gizli değil")}},{label:"Vazgeç"}])}
+ else if(a==="ok"){const u=b.dataset.u,o=b.dataset.o;if(!L[u])return;const ok={...(L[u].ok||{})};if(ok[o])delete ok[o];else ok[o]=1;L[u]={...L[u],ok};b.disabled=true;await gzSave(L,"");}})}
+try{ADM_EXTRA.push({id:"gizli",title:"Gizli kullanıcılar",desc:"Yalnızca seçtiği kişileri görsün ve onlarla konuşsun",icon:"lock",order:42,count:()=>{const n=Object.keys(gzList()).length;return n?{t:n+" gizli",c:"on"}:{t:"Yok",c:"dim"}},html:gzAdmHtml,wire:gzAdmWire})}catch(e){console.warn("gizli",e)}
+/*}@js:74*/
 
 boot();
 
