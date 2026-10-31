@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60822,APP_VER="6.8.22";
+const APP_V=60823,APP_VER="6.8.23";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -9422,6 +9422,24 @@ klnCheck().then(ok=>{if(!ok)return;const ask=()=>{if(!S.uid||S.guest||settings.n
  HOOKS.enter.push(ask);if(S.uid)ask()});
 document.addEventListener("visibilitychange",()=>{if(KLN.on&&document.visibilityState==="visible")KLN.p.bildirimIzin({sor:false}).then(x=>{KLN.perm=x&&x.ok?"granted":KLN.perm==="granted"?"denied":KLN.perm}).catch(()=>{})});
 /*}@js:75*/
+
+/*@js:76{*/
+/* 6.8.23 rozet kısayolu (sahibi "arkadaşıma No.1 Hayran vereceğim, olmadı" dedi): rozet vermek yalnızca yönetici modunda
+   rozet penceresinden yapılabiliyordu. Kurucu (K51_OWNER) ya da yönetici, başkasının profilindeki ⋯ menüsünde
+   "No.1 Hayran rozetini ver/kaldır" (tek dokunuş, rzToggle) ve "Rozetleri düzenle" (admRozetSheet) görür; yönetici modu gerekmez
+   (admin/rozet yazma izni kurallarda zaten sahibin uid'inde). */
+const rzMine=()=>!!S.uid&&!S.guest&&(S.admin||String((S.profiles[S.uid]||{}).username||"").toLowerCase()===K51_OWNER);
+async function rzToggle(uid,id){if(!rzMine()||!RZM[id])return false;const list={...rzManual()};const cur=new Set(list[uid]||[]);const on=!cur.has(id);if(on)cur.add(id);else cur.delete(id);
+ const arr=RZ.map(b=>b.id).filter(x=>cur.has(x));if(arr.length)list[uid]=arr;else delete list[uid];
+ if(!await admSet("rozet",{...k51Doc("rozet"),list,at:now()}))return false;S.adm={...(S.adm||{}),rozet:{...k51Doc("rozet"),list}};
+ try{admLog(`@${P(uid).username} ${RZM[id].t} rozeti ${on?"verildi":"kaldırıldı"}`,"kullanici")}catch{}toast(on?`${RZM[id].t} rozeti verildi`:`${RZM[id].t} rozeti kaldırıldı`);render(false);return true}
+{const f=admRozetSheet;admRozetSheet=function(uid){if(S.admin||!rzMine())return f.apply(this,arguments);S.admin=true;try{return f.apply(this,arguments)}finally{S.admin=false}}}
+{const f=profMenu;profMenu=function(uid,...a){const r=f.call(this,uid,...a);try{if(uid&&uid!==S.uid&&!BOT[uid]&&S.profiles[uid]&&rzMine()){const l=$('#overlay [data-layer="menu"]');const box=l&&(l.querySelector(".opts")||l.querySelector(".sheet")||l);
+ if(box&&!box.querySelector("#pmRzH")){const has=(rzManual()[uid]||[]).includes("hayran");const cl=box.querySelector('[data-act="close"]');
+  const b1=document.createElement("button");b1.className="opt";b1.id="pmRzH";b1.innerHTML=`${I("rzno1")}${has?"No.1 Hayran rozetini kaldır":"No.1 Hayran rozetini ver"}`;b1.onclick=()=>{closeLayer("menu");rzToggle(uid,"hayran")};
+  const b2=document.createElement("button");b2.className="opt";b2.id="pmRzE";b2.innerHTML=`${I("rzcrown")}Rozetleri düzenle`;b2.onclick=()=>{closeLayer("menu");setTimeout(()=>admRozetSheet(uid),280)};
+  if(cl){cl.before(b1);cl.before(b2)}else{box.appendChild(b1);box.appendChild(b2)}}}}catch(e){console.warn("rz76",e)}return r}}
+/*}@js:76*/
 
 boot();
 

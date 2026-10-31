@@ -1,38 +1,33 @@
 {
- "title": "6.8.22 Yerel bildirim ve No.1 Hayran rozeti",
- "ver": "6.8.22",
- "at": 1793483480765,
- "note": "Sahte Capacitor ile 14 denetim. Android derlemesi GitHub'da.",
+ "title": "6.8.23 Rozet kısayolu",
+ "ver": "6.8.23",
+ "at": 1793484784664,
+ "note": "8 + 14 denetim geçti.",
  "items": [
   {
-   "ad": "Yeni uygulamada yerel bildirim açılıyor, izin bir kez soruluyor",
+   "ad": "Kurucuya profil ⋯ menüsünde 'No.1 Hayran rozetini ver' (yönetici modu kapalıyken)",
    "ok": true,
    "not": ""
   },
   {
-   "ad": "Uygulama öndeyken telefon bildirimi yok (kart çıkıyor)",
+   "ad": "Rozet veriliyor, profilde görünüyor, kaldırılabiliyor",
    "ok": true,
    "not": ""
   },
   {
-   "ad": "Arka plandayken mesaj gelince telefon bildirimi",
-   "ok": true,
-   "not": "başlık, metin, sohbete gitme anahtarı"
-  },
-  {
-   "ad": "Bildirimler kapalıyken gelmiyor; sohbet açılınca bildirim siliniyor",
+   "ad": "Rozetleri düzenle penceresi açılıyor",
    "ok": true,
    "not": ""
   },
   {
-   "ad": "No.1 Hayran rozeti profilde",
+   "ad": "Normal kullanıcıda rozet seçeneği yok",
    "ok": true,
    "not": ""
   },
   {
-   "ad": "Eski uygulama ve tarayıcıda davranış değişmedi",
+   "ad": "6.8.22 yerel bildirim testleri",
    "ok": true,
-   "not": ""
+   "not": "14/14"
   }
  ]
 }
