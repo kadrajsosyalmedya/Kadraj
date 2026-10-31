@@ -30,6 +30,26 @@ public class MainActivity extends BridgeActivity {
         });
     }
 
+    /* 6.8.22: arka plana geçince sayfaya haber ver (WebView'da görünürlük her zaman değişmiyor; yerel bildirim bununla çıkar). */
+    @Override
+    public void onPause() {
+        super.onPause();
+        arkaPlan(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        arkaPlan(false);
+    }
+
+    private void arkaPlan(boolean b) {
+        try {
+            if (bridge != null && bridge.getWebView() != null)
+                bridge.getWebView().evaluateJavascript("window.kAppBg&&window.kAppBg(" + b + ")", null);
+        } catch (Exception e) { }
+    }
+
     /* 6.8.20: bildirime dokunarak açıldıysa (uygulama kapalıyken de) gidilecek yeri sakla; sayfa KadrajGaleri.acilis() ile alır. */
     @Override
     protected void onNewIntent(Intent intent) {
