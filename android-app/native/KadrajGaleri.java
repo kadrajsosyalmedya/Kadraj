@@ -36,7 +36,8 @@ import java.util.Map;
     name = "KadrajGaleri",
     permissions = {
         @Permission(alias = "foto", strings = { Manifest.permission.READ_MEDIA_IMAGES }),
-        @Permission(alias = "fotoEski", strings = { Manifest.permission.READ_EXTERNAL_STORAGE })
+        @Permission(alias = "fotoEski", strings = { Manifest.permission.READ_EXTERNAL_STORAGE }),
+        @Permission(alias = "bildirim", strings = { "android.permission.POST_NOTIFICATIONS" })
     }
 )
 public class KadrajGaleri extends Plugin {
@@ -243,13 +244,14 @@ public class KadrajGaleri extends Plugin {
 
     /* Uygulamanın yerel sürümü: Java tarafı değişince SURUM'u artır, index.html'deki APK_NATIVE da aynı sayı olsun.
        Sayfa küçükse "Güncelleme var" penceresi çıkar. */
-    static final int SURUM = 3;
+    static final int SURUM = 4;
 
     @PluginMethod
     public void surum(PluginCall call) {
         JSObject r = new JSObject();
         r.put("surum", SURUM);
         r.put("fcm", fcmVar());
+        r.put("yerel", true);
         try { r.put("ad", getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0).versionName); } catch (Exception e) { r.put("ad", ""); }
         call.resolve(r);
     }
@@ -270,6 +272,85 @@ public class KadrajGaleri extends Plugin {
         if (k != null && System.currentTimeMillis() - bekleyenAt < 10 * 60 * 1000) r.put("key", k);
         bekleyen = null;
         call.resolve(r);
+    }
+
+    /* 6.8.22 yerel bildirim: uygulama açıkken ya da arka plandayken sayfa telefon bildirimi gösterir (FCM olmadan da).
+       bildirimIzin() → {ok}, bildirim({title, body, tag, key}), bildirimSil({tag}). Dokununca MainActivity "key" ile ilgili yere gider. */
+    private boolean bildirimAcik() {
+        boolean izin = Build.VERSION.SDK_INT < 33 || getPermissionState("bildirim") == PermissionState.GRANTED;
+        return izin && androidx.core.app.NotificationManagerCompat.from(getContext()).areNotificationsEnabled();
+    }
+
+    @PluginMethod
+    public void bildirimIzin(PluginCall call) {
+        if (Build.VERSION.SDK_INT < 33 || getPermissionState("bildirim") == PermissionState.GRANTED) {
+            JSObject r = new JSObject();
+            r.put("ok", bildirimAcik());
+            call.resolve(r);
+            return;
+        }
+        if (call.getBoolean("sor", true)) requestPermissionForAlias("bildirim", call, "bildirimSonuc");
+        else { JSObject r = new JSObject(); r.put("ok", false); call.resolve(r); }
+    }
+
+    @PermissionCallback
+    private void bildirimSonuc(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("ok", bildirimAcik());
+        call.resolve(r);
+    }
+
+    private void kanal() {
+        if (Build.VERSION.SDK_INT < 26) return;
+        android.app.NotificationManager nm = (android.app.NotificationManager) getContext().getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+        if (nm == null || nm.getNotificationChannel("kadraj") != null) return;
+        android.app.NotificationChannel ch = new android.app.NotificationChannel("kadraj", "Kadraj", android.app.NotificationManager.IMPORTANCE_HIGH);
+        ch.setDescription("Mesajlar, beğeniler, yorumlar ve takipler");
+        ch.enableVibration(true);
+        nm.createNotificationChannel(ch);
+    }
+
+    @PluginMethod
+    public void bildirim(PluginCall call) {
+        try {
+            if (!bildirimAcik()) { call.reject("izin"); return; }
+            kanal();
+            android.content.Context c = getContext();
+            String tag = call.getString("tag", "kadraj");
+            String key = call.getString("key", "");
+            String title = call.getString("title", "Kadraj");
+            String body = call.getString("body", "");
+            android.content.Intent it = new android.content.Intent(c, MainActivity.class);
+            it.addFlags(android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            if (key != null && !key.isEmpty()) it.putExtra("key", key);
+            android.app.PendingIntent pi = android.app.PendingIntent.getActivity(c, tag.hashCode(), it,
+                android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
+            int ic = c.getResources().getIdentifier("ic_stat_kadraj", "drawable", c.getPackageName());
+            if (ic == 0) ic = c.getApplicationInfo().icon;
+            androidx.core.app.NotificationCompat.Builder b = new androidx.core.app.NotificationCompat.Builder(c, "kadraj")
+                .setSmallIcon(ic)
+                .setColor(0xFF0C7A63)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setStyle(new androidx.core.app.NotificationCompat.BigTextStyle().bigText(body))
+                .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                .setCategory(androidx.core.app.NotificationCompat.CATEGORY_MESSAGE)
+                .setDefaults(androidx.core.app.NotificationCompat.DEFAULT_ALL)
+                .setAutoCancel(true)
+                .setContentIntent(pi);
+            androidx.core.app.NotificationManagerCompat.from(c).notify(tag, 1, b.build());
+            call.resolve();
+        } catch (SecurityException e) {
+            call.reject("izin");
+        } catch (Exception e) {
+            call.reject("bildirim: " + e.getMessage());
+        }
+    }
+
+    @PluginMethod
+    public void bildirimSil(PluginCall call) {
+        try { androidx.core.app.NotificationManagerCompat.from(getContext()).cancel(call.getString("tag", "kadraj"), 1); } catch (Exception e) { }
+        call.resolve();
     }
 
     /* Bağlantıyı telefonun tarayıcısında açar (yeni APK'yı indirmek için). */

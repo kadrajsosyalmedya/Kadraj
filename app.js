@@ -21,7 +21,7 @@ const vib=ms=>{try{if(settings.haptics===false)return;navigator.vibrate&&navigat
 /* Sürüm: ana.ara.yama (4.1.0). Hata düzeltme ve küçük şeyler → yama artar (4.1.1); büyük güncelleme → ara artar (4.2.0).
    APP_V = ana*10000 + ara*100 + yama (4.1.0 → 40100). Başlıktaki <meta name="kadraj-version"> ile aynı tutulmalı.
    Eski biçim (4.0 → 40) verNorm ile çevrilir. "İki sürüm geride" ara sürüm sayısıyla ölçülür (yamalar engellemez). */
-const APP_V=60821,APP_VER="6.8.21";
+const APP_V=60822,APP_VER="6.8.22";
 /* Güncelleme adları (sahibinin isteği, 6.0.5): her ara sürümün bir adı var, Türkiye'nin rüzgârları. Yeni ara sürümde buraya sıradakini ekle. */
 const VER_NAMES={60:"Poyraz",61:"Lodos",62:"Karayel",63:"Yıldız",64:"Keşişleme",65:"Kıble",66:"Gündoğusu",67:"Günbatısı",68:"Meltem",69:"Bora"};
 const APP_NAME=VER_NAMES[Math.floor(APP_V/10000)*10+Math.floor(APP_V/100)%100]||"";
@@ -5154,6 +5154,7 @@ HOOKS.enter.push(()=>setTimeout(()=>KP.sync(false),4000));
    çıkarır), fbRegister, showRegister, welScreen, vSettings, toast (açılışta tekrar eden "Duyuru:" uyarısı susar; duyuru artık şeritte). */
 Object.assign(IP,{
  rzcrown:'<path d="M3.5 8.5 8 12.2 12 5.5l4 6.7 4.5-3.7-1.8 10H5.3z"/><path d="M6 21h12"/>',
+ rzno1:'<circle cx="12" cy="14.5" r="6.5"/><path d="M8.2 2.5 10.6 8.4M15.8 2.5l-2.4 5.9"/><path d="M10.9 13.2 12.6 12v5.6"/>',
  rzseed:'<path d="M12 21v-8.5"/><path d="M12 12.5c0-4.2 2.9-7.3 8-7.3 0 5-3 7.3-8 7.3z"/><path d="M12 14.5c0-3.2-2.4-5.6-7-5.6 0 4 2.6 5.6 7 5.6z"/>',
  rzclap:'<rect x="3" y="9.5" width="18" height="10.5" rx="2"/><path d="m3.4 9.4-.9-3.3 15.9-3.4 1 3.4z"/><path d="m7.3 5.3 2.4 3M12.4 4.2l2.4 3"/>',
  k51chart:'<path d="M4 20V11M9.3 20V5M14.7 20v-6.5M20 20V8.5"/>',
@@ -5210,7 +5211,8 @@ const RZ=[
  {id:"destek",t:"Destekleyen",d:"Kadraj'a destek olan, büyümesine katkı veren kişi. Yönetici verir.",ic:"heart",c:"#E11D48",man:1},
  {id:"satranc",t:"Satranç ustası",d:"Kadraj Satrancı'nda 1500 puanı geçen oyuncu (en az 10 oyun).",ic:"knight",c:"#475569",man:1,auto:1},
  {id:"klaket",t:"Klaket yıldızı",d:"Klaketleri toplamda 25'ten fazla beğeni alan kişi.",ic:"rzclap",c:"#DB2777",man:1,auto:1},
- {id:"uretken",t:"Üretken",d:"20 ya da daha fazla paylaşım yapan kişi.",ic:"spark",c:"#7C3AED",man:1,auto:1}];
+ {id:"uretken",t:"Üretken",d:"20 ya da daha fazla paylaşım yapan kişi.",ic:"spark",c:"#7C3AED",man:1,auto:1},
+ {id:"hayran",t:"No.1 Hayran",d:"Kadraj'ın bir numaralı hayranı. Yönetici verir.",ic:"rzno1",c:"#F59E0B",man:1}];
 const RZM=Object.fromEntries(RZ.map(b=>[b.id,b]));
 const rzDesc=b=>typeof b.d==="function"?b.d():b.d;
 const rzIlkN=()=>{const n=+k51Doc("rozet").ilkN;return n>0&&n<=1000?n:50};
@@ -7939,7 +7941,7 @@ HOOKS.after.push(r=>{if(r!=="settings"||S.guest)return;const m=$("#main");if(!m|
 /* 6.4.1 uygulama güncellemesi: APK'nın yerel sürümü (KadrajGaleri.surum, SURUM sabiti) APK_NATIVE'den küçükse ya da yöntem yoksa (eski APK)
    açılışta günde bir kez "Yeni sürüm var" penceresi (kadraj_apkask_<uid> = gün); İndir telefonun tarayıcısında APK_URL'yi açar (KadrajGaleri.ac).
    Ayarlar'daki #appInfo satırına da yazılır. Java tarafı değişince iki sayıyı birlikte artır. Site güncellemeleri APK'sız gelir, bunlar için gerekmez. */
-const APK_NATIVE=2;
+const APK_NATIVE=4;
 async function apkNative(){const G=kgal();if(!G)return null;try{if(typeof G.surum==="function"){const r=await G.surum();return r&&+r.surum||0}}catch{}return 0}
 function apkOpen(){const G=kgal();try{if(G&&typeof G.ac==="function"){G.ac({url:APK_URL}).catch(()=>{location.href=APK_URL});return}}catch{}location.href=APK_URL}
 async function apkCheck(force){const v=await apkNative();if(v==null||v>=APK_NATIVE)return false;const k="kadraj_apkask_"+(S.uid||"");if(!force){if(LS.get(k)===tmDay())return true;if($$("#overlay .layer").length){setTimeout(()=>apkCheck(false),15000);return true}LS.set(k,tmDay())}
@@ -9391,6 +9393,35 @@ function gzAdmWire(el){if(el._gzw)return;el._gzw=1;el.addEventListener("click",a
  else if(a==="ok"){const u=b.dataset.u,o=b.dataset.o;if(!L[u])return;const ok={...(L[u].ok||{})};if(ok[o])delete ok[o];else ok[o]=1;L[u]={...L[u],ok};b.disabled=true;await gzSave(L,"");}})}
 try{ADM_EXTRA.push({id:"gizli",title:"Gizli kullanıcılar",desc:"Yalnızca seçtiği kişileri görsün ve onlarla konuşsun",icon:"lock",order:42,count:()=>{const n=Object.keys(gzList()).length;return n?{t:n+" gizli",c:"on"}:{t:"Yok",c:"dim"}},html:gzAdmHtml,wire:gzAdmWire})}catch(e){console.warn("gizli",e)}
 /*}@js:74*/
+
+/*@js:75{*/
+/* 6.8.22 Android uygulamasında yerel bildirim (FCM kurulmadan da): uygulama açıkken ya da arka plandayken telefon bildirimi.
+   Android WebView'da Notification API yok; KadrajGaleri (SURUM 4) bildirim({title,body,tag,key}), bildirimIzin(), bildirimSil({tag}) verir.
+   KLN.on: eklenti yerel bildirimi biliyorsa (surum().yerel). MainActivity onPause/onResume → window.kAppBg(true/false):
+   WebView arka planda görünürlüğü her zaman "hidden" yapmadığı için document.visibilityState/hidden bu bayrağa da bakar
+   ve visibilitychange olayı atılır. sysNote (en dışta, sessiz moda uyar), notifPerm, askNotif ve clearChatNotes uygulamada bu yola gider.
+   Uygulama tamamen kapalıyken bildirim için yine FCM gerekir (bölge 73). */
+const KLN={on:false,perm:"default",bg:false,p:null,asked:0,asking:null};
+window.kAppBg=function(b){b=!!b;if(KLN.bg===b)return;KLN.bg=b;try{document.dispatchEvent(new Event("visibilitychange"))}catch{}};
+try{const pv=Object.getOwnPropertyDescriptor(Document.prototype,"visibilityState"),ph=Object.getOwnPropertyDescriptor(Document.prototype,"hidden");
+ if(pv&&pv.get&&ph&&ph.get){Object.defineProperty(document,"visibilityState",{configurable:true,get(){return KLN.bg?"hidden":pv.get.call(document)}});
+  Object.defineProperty(document,"hidden",{configurable:true,get(){return KLN.bg?true:ph.get.call(document)}})}}catch{}
+async function klnCheck(){const g=kgal();if(!g||typeof g.surum!=="function")return false;
+ try{const r=await g.surum();if(!r||!r.yerel)return false;KLN.p=g;KLN.on=true;const x=await g.bildirimIzin({sor:false});KLN.perm=x&&x.ok?"granted":"default";return true}catch{return false}}
+async function klnAsk(silent){if(!KLN.on)return"unsupported";if(KLN.asking)return KLN.asking;KLN.asked=1;return KLN.asking=klnAsk1(silent).finally(()=>{KLN.asking=null})}
+async function klnAsk1(silent){try{const x=await KLN.p.bildirimIzin({sor:true});KLN.perm=x&&x.ok?"granted":"denied";
+ if(!silent)toast(KLN.perm==="granted"?"Bildirimler açık":"Bildirime izin verilmedi. Telefon Ayarlar › Uygulamalar › Kadraj › Bildirimler'den açabilirsin.");scheduleRefresh();return KLN.perm}catch{return"default"}}
+{const f=notifPerm;notifPerm=function(){return KLN.on?KLN.perm:f.apply(this,arguments)}}
+{const f=askNotif;askNotif=function(silent){return KLN.on?klnAsk(silent):f.apply(this,arguments)}}
+{const f=sysNote;sysNote=function(title,body,tag,o={}){if(!KLN.on)return f.apply(this,arguments);
+ try{if(!settings.notify||KLN.perm!=="granted")return;if(typeof quietOn==="function"&&quietOn())return;if(document.visibilityState==="visible"&&!(o&&o.force))return;
+  KLN.p.bildirim({title:String(title||"Kadraj").slice(0,80),body:String(body||"").slice(0,300),tag:String(tag||"kadraj").slice(0,80),key:String((o&&o.key)||"")}).catch(()=>{})}catch{}}}
+{const f=clearChatNotes;clearChatNotes=function(cid){if(KLN.on&&cid)try{KLN.p.bildirimSil({tag:"m-"+cid}).catch(()=>{})}catch{}return f.apply(this,arguments)}}
+/* açılışta: eklenti varsa yerel bildirimi aç; izin bir kez sorulur (Android 13+) */
+klnCheck().then(ok=>{if(!ok)return;const ask=()=>{if(!S.uid||S.guest||settings.notify===false||KLN.perm==="granted")return;if(LS.get("kadraj_kln_ask_"+S.uid))return;setTimeout(()=>{if(KLN.asked||KLN.perm==="granted")return;LS.set("kadraj_kln_ask_"+S.uid,1);klnAsk(true)},6000)};
+ HOOKS.enter.push(ask);if(S.uid)ask()});
+document.addEventListener("visibilitychange",()=>{if(KLN.on&&document.visibilityState==="visible")KLN.p.bildirimIzin({sor:false}).then(x=>{KLN.perm=x&&x.ok?"granted":KLN.perm==="granted"?"denied":KLN.perm}).catch(()=>{})});
+/*}@js:75*/
 
 boot();
 

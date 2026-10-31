@@ -1,38 +1,38 @@
 {
- "title": "6.8.21 Gizli kullanıcı",
- "ver": "6.8.21",
- "at": 1793378878491,
- "note": "Yönetici › Gizli kullanıcılar. Demo modunda 15 denetim ve Kadraj testi 47 adım geçti.",
+ "title": "6.8.22 Yerel bildirim ve No.1 Hayran rozeti",
+ "ver": "6.8.22",
+ "at": 1793483480765,
+ "note": "Sahte Capacitor ile 14 denetim. Android derlemesi GitHub'da.",
  "items": [
   {
-   "ad": "Gizli kullanıcı başkalarına görünmez",
-   "ok": true,
-   "not": "Kişiler, arama, paylaşım, hikâye, takipçi, yorum"
-  },
-  {
-   "ad": "Gizli kullanıcının profili açılmaz, ona mesaj gitmez",
-   "ok": true,
-   "not": "Bu profil görüntülenemiyor"
-  },
-  {
-   "ad": "İşaretlenen kişi onu görür",
+   "ad": "Yeni uygulamada yerel bildirim açılıyor, izin bir kez soruluyor",
    "ok": true,
    "not": ""
   },
   {
-   "ad": "Gizli kullanıcı yalnızca işaretlileri görür, Meydan kapalı",
+   "ad": "Uygulama öndeyken telefon bildirimi yok (kart çıkıyor)",
    "ok": true,
    "not": ""
   },
   {
-   "ad": "Yönetici paneli: gizli yap, kişi işaretle, kaldır",
+   "ad": "Arka plandayken mesaj gelince telefon bildirimi",
    "ok": true,
-   "not": "admin/gizli yazılıyor"
+   "not": "başlık, metin, sohbete gitme anahtarı"
   },
   {
-   "ad": "Kadraj testi (47 adım)",
+   "ad": "Bildirimler kapalıyken gelmiyor; sohbet açılınca bildirim siliniyor",
    "ok": true,
-   "not": "Hepsi geçti"
+   "not": ""
+  },
+  {
+   "ad": "No.1 Hayran rozeti profilde",
+   "ok": true,
+   "not": ""
+  },
+  {
+   "ad": "Eski uygulama ve tarayıcıda davranış değişmedi",
+   "ok": true,
+   "not": ""
   }
  ]
 }
